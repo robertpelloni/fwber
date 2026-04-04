@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-04
-> **Version:** 1.4.1
+> **Version:** 1.6.0
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -160,6 +160,35 @@ php artisan optimize
 ```
 
 ### Re-Deploy Sequence
+Use the in-repo deploy script for the repeatable path:
+
+GitHub Actions backend deployment should now target Hetzner as well, using `.github/workflows/deploy-backend.yml` plus repository secrets:
+- `HETZNER_HOST`
+- `HETZNER_USERNAME`
+- `HETZNER_SSH_KEY`
+- optional `HETZNER_PROJECT_PATH`
+- optional `HETZNER_REVERB_APP_KEY`
+
+
+```bash
+FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
+```
+
+That path now writes timestamped smoke-check reports under:
+
+```bash
+/var/www/fwber/repo/logs/deploy-reports/<timestamp>/
+```
+
+Override the report root if needed:
+
+```bash
+FWBER_DEPLOY_REPORT_DIR=/var/log/fwber-deploy-reports \
+FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
+```
+
+If you need the manual equivalent, it remains:
+
 ```bash
 cd /var/www/fwber/repo
 git pull origin main
@@ -169,6 +198,7 @@ composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear
 php artisan optimize
+php artisan deploy:verify
 
 cd ../fwber-geo
 cargo build --release
@@ -177,6 +207,7 @@ sudo systemctl restart fwber-queue
 sudo systemctl restart fwber-reverb
 sudo systemctl restart fwber-geo
 sudo systemctl reload nginx
+/var/www/fwber/repo/ops/hetzner/scripts/smoke-check.sh
 ```
 
 ---
@@ -235,16 +266,31 @@ Ready-to-copy infrastructure templates also live in:
 
 Always verify the following after a major version bump or infrastructure move:
 
+Automation support now exists in:
+- `ops/hetzner/scripts/smoke-check.sh`
+- `ops/hetzner/scripts/deploy-backend.sh` (`FWBER_RUN_SMOKE_CHECK=1`)
+- timestamped smoke-check report artifacts under `logs/deploy-reports/` (or `FWBER_DEPLOY_REPORT_DIR`)
+- remediation-oriented diagnostics inside the generated smoke-check reports
+- endpoint fingerprints inside the generated smoke-check reports (remote IP, server header, redirects, body excerpts)
+- DNS resolution appendix inside the generated smoke-check reports (resolved addresses per public host)
+- drift-diff artifacts comparing the newest smoke report with the previous one when available
+- compact notification artifacts (and optional webhook publishing) summarizing smoke + drift state
+- live Hetzner backend execution with local MySQL import and active queue/reverb/geo services
+- privilege-safe deploy execution when run as `deploy` rather than only `root`
+- corrected websocket smoke probing so post-cutover websocket validation no longer false-fails on an invalid test key
+
 1. [ ] Frontend Vercel deploy is green
-2. [ ] `https://api.fwber.me/api/auth/login` returns expected validation/auth behavior
-3. [ ] `/roast` works against the live API
-4. [ ] `/premium` upgrade initiation works
-5. [ ] `/merchant/register` and `/merchant/dashboard` work
-6. [ ] `wss://ws.fwber.me` accepts websocket traffic
-7. [ ] `https://geo.fwber.me` responds successfully
-8. [ ] queue workers are processing jobs
-9. [ ] scheduler is firing recurring tasks
-10. [ ] migrations complete without duplicate-index or missing-column drift failures
+2. [ ] `php artisan deploy:verify` returns healthy or only expected non-critical degradations
+3. [ ] `https://api.fwber.me/api/health` reports expected version and service state
+4. [ ] `https://api.fwber.me/api/auth/login` returns expected validation/auth behavior
+5. [ ] `/roast` works against the live API
+6. [ ] `/premium` upgrade initiation works
+7. [ ] `/merchant/register` and `/merchant/dashboard` work
+8. [ ] `wss://ws.fwber.me` accepts websocket traffic
+9. [ ] `https://geo.fwber.me` responds successfully
+10. [ ] queue workers are processing jobs
+11. [ ] scheduler is firing recurring tasks
+12. [ ] migrations complete without duplicate-index or missing-column drift failures
 
 ---
 

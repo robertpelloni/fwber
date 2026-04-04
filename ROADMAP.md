@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.4.2 "Hetzner Ops Templates & CI Env Alignment"
+> **Current Version:** 1.6.0 "GitHub Backend Deploy Switched to Hetzner"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -8,15 +8,28 @@
 ## 🗺️ High-Level Trajectory
 
 ### The Pivot: Laser Focus on Core (COMPLETED)
-The `fwber` platform has undergone a massive simplification (v1.2.0/v1.2.1). We have officially removed all bloat, including:
-- Decentralized Governance (DAOs, Councils, Merkle Provers)
-- ActivityPub Federation (Global Social Feeds, Group Actors)
-- Physical Marketplace (B2B Inventory, Tap-to-Pay, Stripe checkouts)
-- Gamification (Leaderboards, Daily Streaks, Rate-My-Cat)
-- AI Bloat (Wingman, AI Content Generation, Roast Generator)
+The `fwber` platform underwent a major simplification during v1.2.x to remove unstable sprawl and recover a coherent, production-usable center.
 
-The platform is now **100% focused on its core identity**:
-**Privacy-first, proximity-based hookups determined by mutual preference.**
+That simplification intentionally retired large systems first so the repo could return to a healthy baseline around:
+- proximity-based matching
+- private messaging
+- safety tooling
+- lean onboarding/profile flows
+
+### The Controlled Restoration Wave (ACTIVE / PARTIALLY COMPLETED)
+After the simplification stabilized, selected systems were restored in a compact and production-oriented form based on explicit user approval.
+
+Restored:
+- AI roast / wingman surface
+- premium billing and subscriptions
+- merchant marketplace and storefront tooling
+- geo-aware merchant discovery
+- merchant trust scoring and moderation workflows
+
+Explicitly still excluded from restoration:
+- ActivityPub / Federation
+- Governance / DAO / Council / On-chain systems
+- Journals / Scrapbooks / Icebreakers / extra profile-social layer
 
 ### Phase 1: Core Foundation (COMPLETED)
 - Basic matching, chat, and profile systems.
@@ -34,7 +47,25 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.4.2)
+### Phase 5: Production Scale (COMPLETED - v1.6.0)
+- **GitHub Backend Deploy Switched to Hetzner:** Replaced the stale GitHub Actions backend deployment job that still targeted DreamHost so CI deployment automation now matches the Hetzner production backend.
+- **Live Dashboard API + Realtime Recovery:** Fixed the browser API origin to hit `api.fwber.me`, restored missing dashboard routes, added schema guards for simplified databases, and hardened Reverb defaults so live frontend requests and realtime stop failing on production contract drift.
+- **Restored Feature Navigation Surface:** Exposed Gold Premium, Roast, Merchant, and moderator surfaces directly in the signed-in app shell via sidebar, mobile nav, dashboard cards, and clearer settings entry points so restored systems are actually reachable by users.
+- **Hetzner Script Executable Bits:** Marked the Hetzner ops scripts executable in git so server pulls retain runnable permissions for deploy, smoke, drift, and notification tooling.
+- **WebSocket Smoke Handshake Fix:** Corrected the smoke-check websocket probe to use a valid RFC-compliant handshake key so public post-cutover smoke runs no longer report false-negative websocket failures.
+- **Deploy Script Privilege Hardening:** Hardened `deploy-backend.sh` so it auto-uses `sudo` for systemd/nginx actions when run by a non-root operator like `deploy`.
+- **Hetzner Backend Execution & Database Migration:** Deployed fwber backend runtime to Hetzner, installed missing dependencies, upgraded Rust, built `fwber-geo`, provisioned local MySQL, imported DreamHost production data, and enabled `fwber-queue`, `fwber-reverb`, and `fwber-geo` under systemd.
+- **Smoke Report Notification Publisher:** Added `publish-smoke-report.py` plus deploy integration so smoke + drift artifacts can be condensed into compact notification JSON/Markdown outputs and optionally POSTed to a webhook.
+- **Smoke Report Drift Diff:** Added `compare-smoke-reports.py` plus deploy integration so smoke reports can be compared across runs for summary, diagnostics, endpoint fingerprints, and DNS changes.
+- **DNS Resolution Appendix & Host Mapping:** Extended smoke-check reports with resolved-address capture for frontend, API, geo, and websocket hosts so DNS drift can be documented alongside HTTP fingerprints and diagnostics.
+- **Endpoint Fingerprints & Host Signals:** Extended smoke-check reports with per-endpoint remote IPs, server headers, redirect targets, content types, and body excerpts so live routing drift can be fingerprinted, not just inferred.
+- **Smoke Check Diagnostics & Remediation Hints:** Extended smoke-check reports with structured diagnostics and recommended next actions for stale backend routes, geo-domain drift, incomplete authenticated coverage, and partial-health signals.
+- **Smoke Check Report Artifacts & Live Drift Detection:** Extended `ops/hetzner/scripts/smoke-check.sh` to emit JSON/Markdown reports, updated the deploy script to preserve timestamped run artifacts, and used the new automation to detect current live drift on `/api/health*` and `geo.fwber.me`.
+- **Hetzner Post-Deploy Smoke Checks:** Added `ops/hetzner/scripts/smoke-check.sh`, optional authenticated and websocket probes, and deploy-script integration through `FWBER_RUN_SMOKE_CHECK=1` so public-contract validation can be repeated after real deploys.
+- **Deployment Health & Verification Surface:** Added `/api/health`, `/api/health/liveness`, `/api/health/readiness`, `/api/health/metrics`, centralized dependency health evaluation, and `php artisan deploy:verify` so Hetzner cutover validation is consistent and scriptable.
+- **Merchant Review Prioritization:** Added merchant moderation queue priority scoring, queue search, and inline review-note handling so storefront moderation is operationally practical.
+- **Merchant Trust Scoring & Moderation:** Added merchant trust scoring, moderator review endpoints, moderation dashboard merchant queue, and trust-weighted nearby marketplace ranking so storefronts are ranked by more than proximity alone.
+- **Geo-Aware Merchant Ranking:** Merchant profiles now persist storefront coordinates, nearby marketplace inventory can sort by real user-to-merchant distance, and AR overlays consume returned merchant coordinates instead of fake demo offsets.
 - **Hetzner Ops Templates & CI Env Alignment:** Added copy-ready Hetzner Nginx/systemd/script assets under `ops/hetzner/` and corrected frontend CI/env examples to match the active API + Reverb contract.
 - **Hetzner Deployment Docs Refresh:** Replaced DreamHost-first deployment guidance with Vercel frontend + Hetzner VPS backend documentation across root ops docs and deployment references, aligning operations with the restored active stack.
 - **Marketplace & Merchant Restoration:** Restored compact merchant commerce infrastructure with merchant registration/profile/dashboard/inventory/analytics endpoints, merchant storefront pages, purchase/redemption flow, digital receipts, and `merchant_profiles` / `merchant_inventories` / `merchant_payments` / `inventory_redemptions` schema.
@@ -46,24 +77,18 @@ The platform is now **100% focused on its core identity**:
 - **Console Error Sweep:** Removed stale archived-route prefetches, restored analytics event ingestion, repaired notification settings routing, and hardened auth response parsing against malformed server bodies.
 - **Sentry Build Modernization:** The Next.js App Router Sentry setup now uses modern `instrumentation.ts` and `instrumentation-client.ts` hooks, eliminating outdated warning noise from production builds.
 - **Notification Route Consistency:** Backend notification payloads, notification drawer links, foreground toast CTAs, and `/messages` routing now agree on shared destination logic.
-- **Conversation-Aware Message Notifications:** Message pushes now open the relevant conversation route (`/messages?user={id}`) instead of dropping users into a generic inbox.
 - **Foreground Notification UX:** Expo foreground pushes now bridge into the WebView and render in-app match/message toasts during active mobile sessions.
-- **Cold-Start Push Routing:** The native shell checks the last tapped notification on launch so deep linking remains reliable when the app is opened from a push.
 - **Trust & Safety Hardening:** Blocking now severs discovery visibility, established matches, and messaging access instead of behaving like a superficial preference flag.
-- **Safety Contract Repair:** Frontend block requests now match the backend validator contract, and the unblock endpoint is exposed in the active API surface.
-- **Legacy Discovery Cleanup:** The active match feed no longer relies on archived `followedTopics` relations or the removed `date_feedback` table during core ranking.
-- **Native Push Linking:** The Expo mobile app correctly interprets push notification JSON objects and executes deep linking into the `RealTimeChat.tsx` or `ProfileViewModal.tsx`.
 - **E2E Global UX:** Persistent `<E2ERecoveryAlert />` injected into `<ProtectedRoute />` protects users from losing chat history across device upgrades.
 - **Geo-Service Load Testing:** Artisan command simulated 10,000 concurrent users against the Rust microservice (Avg: 1.5ms).
 - **Database Optimization:** Migrated `optimize_core_indexes` to ensure spatial, conversational, and matchmaking indices scale to millions of rows seamlessly.
-- **E2E Photo Hydration:** WebWorkers explicitly wired into the `RealTimeChat.tsx` and `ProfileViewModal.tsx` interfaces to offload AES-GCM photo decryption for full galleries.
-- **Native Permissions & EAS / Fastlane:** Ghost pings resolved, `eas.json` generated, Fastlane `Fastfile` automated, and location permission strings embedded in `app.json`.
 - **CI/CD Build Pipelines:** GitHub Actions implemented for automated PHPUnit testing, Vercel/Next.js deployments, and Mobile EAS Store distributions.
-- **Data Minimization:** Explicit S3 / object storage wipe triggers automatically upon account deletion to prevent "ghost files".
+- **Data Minimization:** Explicit object-storage wipe triggers automatically upon account deletion to prevent ghost files.
 
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the new `ops/hetzner/` templates and validate restored AI, premium, and merchant systems in the new environment.
-2. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
-3. **Geo-Aware Merchant Ranking:** Add real merchant location persistence so nearby marketplace and AR overlays can rank by actual merchant distance.
+1. **Run the New GitHub Hetzner Deploy Workflow:** Add the Hetzner secrets and confirm GitHub Actions can execute the in-repo deploy script successfully.
+2. **Verify Live v1.5.9 Frontend Recovery:** Confirm dashboard requests, E2E key restore checks, and realtime auth all use the correct `api.fwber.me` / `ws.fwber.me` production surfaces after deploy.
+3. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in the Hetzner-hosted backend environment.
+4. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

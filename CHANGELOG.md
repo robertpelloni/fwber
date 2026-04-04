@@ -2,6 +2,157 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-04-04 — GitHub Backend Deploy Switched to Hetzner
+
+### Changed
+- Replaced the stale GitHub Actions backend deployment workflow that still SSHed into DreamHost with a Hetzner-targeted deployment workflow.
+- `deploy-backend.yml` now deploys to Hetzner using `ops/hetzner/scripts/deploy-backend.sh` and new secrets (`HETZNER_HOST`, `HETZNER_USERNAME`, `HETZNER_SSH_KEY`, optional `HETZNER_PROJECT_PATH`, optional `HETZNER_REVERB_APP_KEY`).
+- Added workflow dispatch support and expanded path triggers so ops changes under `ops/hetzner/` can trigger the backend deploy pipeline.
+
+## [1.5.9] - 2026-04-04 — Live Dashboard API + Realtime Recovery
+
+### Fixed
+- Corrected the browser API base handling so authenticated frontend requests go to `https://api.fwber.me/api/...` instead of incorrectly hitting Vercel-relative `/api/...` paths like `https://www.fwber.me/api/dashboard/stats`.
+- Restored missing backend routes for `/api/dashboard/stats` and `/api/dashboard/activity`, eliminating the live dashboard 404 spam.
+- Hardened `DashboardController` to tolerate simplified/drifted databases where `profile_views` may not exist, returning zero values instead of throwing a production error.
+- Hardened realtime client defaults so the live fwber frontend can fall back to `ws.fwber.me` and the correct API broadcast-auth origin when Vercel env drift leaves Reverb config incomplete.
+- Added backend coverage for the dashboard endpoints via `DashboardEndpointsTest`.
+
+## [1.5.8] - 2026-04-04 — Restored Feature Navigation Surface
+
+### Fixed
+- Surfaced the restored sections directly inside the authenticated app instead of leaving them discoverable only by direct URL or deep settings paths.
+- Added a new "Restored features" area to the main app sidebar/mobile nav for Gold Premium, Roast, Merchant, and moderation surfaces.
+- Added a dedicated restored-sections card grid on the dashboard so signed-in users can actually reach the restored feature set immediately after login.
+- Updated Settings to expose the restored premium, merchant, AI roast, and moderation entry points more clearly.
+
+## [1.5.7] - 2026-04-04 — Hetzner Script Executable Bits
+
+### Changed
+- Marked the Hetzner operations scripts as executable in git so fresh clones/pulls on the server retain runnable permissions for `deploy-backend.sh`, `smoke-check.sh`, `compare-smoke-reports.py`, and `publish-smoke-report.py`.
+- This fixes the live Hetzner issue where smoke execution could be silently skipped after pull because the script existence check required `-x` but the repo tracked the files as non-executable.
+
+## [1.5.6] - 2026-04-04 — WebSocket Smoke Handshake Fix
+
+### Fixed
+- Corrected the websocket smoke probe in `ops/hetzner/scripts/smoke-check.sh` to use a valid RFC-compliant `Sec-WebSocket-Key`, fixing the live Hetzner smoke-check failure where the websocket endpoint was healthy but the probe itself produced `400 Invalid Sec-WebSocket-Key`.
+- This turns the public smoke run from a false-negative websocket failure into a valid handshake test against `ws.fwber.me`.
+
+## [1.5.5] - 2026-04-04 — Deploy Script Privilege Hardening
+
+### Changed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so service restarts and nginx reloads automatically use `sudo` when the script is run as a non-root operator such as `deploy`, while still working normally when run as root.
+- This directly fixes the live Hetzner issue where deploy execution from the `deploy` account reached the systemctl stage successfully but failed on service restart due to insufficient privileges.
+
+## [1.5.4] - 2026-04-04 — Hetzner Backend Execution & Database Migration
+
+### Added
+- Added deployment execution notes in `docs/ai/deployment/hetzner-cutover-execution-status.md` to document the real Hetzner server actions completed during live infrastructure work.
+
+### Changed
+- Deployed the fwber backend stack to Hetzner at `5.161.250.43`, including repo checkout, backend dependency install, local MySQL provisioning, DreamHost database import, local Redis/Reverb/geo integration, and systemd activation for `fwber-queue`, `fwber-reverb`, and `fwber-geo`.
+- Upgraded the Hetzner host Rust toolchain via `rustup` so `fwber-geo` could build successfully with its `edition2024` manifest requirements.
+- Reconfigured the Hetzner backend runtime away from the temporary sqlite fallback and onto local MySQL plus Redis, matching the intended production topology much more closely.
+
+### Verified
+- Confirmed `php artisan deploy:verify --json` returns healthy on Hetzner using local MySQL + Redis.
+- Confirmed the geo service responds locally on `127.0.0.1:8081`.
+- Confirmed Reverb is listening on `127.0.0.1:8080` and a websocket handshake through nginx succeeds with `101 Switching Protocols` using the production-style app key.
+- Confirmed the queue worker, Reverb service, geo service, and Redis are active under systemd.
+
+## [1.5.3] - 2026-04-04 — Smoke Report Notification Publisher
+
+### Added
+- Added `ops/hetzner/scripts/publish-smoke-report.py`, which converts the current smoke report (and optional drift report) into compact notification artifacts plus an optional webhook POST payload.
+- Added AI DevKit implementation/testing notes for the notification layer under `docs/ai/implementation/smoke-report-notification-publisher.md` and `docs/ai/testing/smoke-report-notification-publisher.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` so smoke-checked deploys now also generate `smoke-check-notification.json` and `smoke-check-notification.md`, and can optionally publish them via `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`.
+- Revalidated the end-to-end artifact pipeline: smoke summary, drift diff, and compact notification outputs can now be generated in sequence from the same report set.
+
+## [1.5.2] - 2026-04-04 — Smoke Report Drift Diff
+
+### Added
+- Added `ops/hetzner/scripts/compare-smoke-reports.py`, which compares two smoke-check JSON reports and emits `smoke-check-drift.json` plus `smoke-check-drift.md`.
+- Added AI DevKit implementation/testing notes for drift comparison under `docs/ai/implementation/smoke-report-drift-diff.md` and `docs/ai/testing/smoke-report-drift-diff.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` so smoke-checked deploys now attempt to compare the current report with the previous saved report and write drift artifacts into the new report directory.
+- Revalidated the compare flow against two generated smoke reports and confirmed stable environments produce stable drift summaries with no unexpected fingerprint or DNS changes.
+
+## [1.5.1] - 2026-04-04 — DNS Resolution Appendix & Host Mapping
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` with a DNS appendix that resolves the frontend, API, geo, and websocket hosts and records them in both JSON and Markdown smoke-check reports.
+- Added a `dns_records` section to `smoke-check-summary.json` and a `DNS Resolution Appendix` section to `smoke-check-summary.md`.
+- Added AI DevKit implementation/testing notes for the DNS appendix layer under `docs/ai/implementation/dns-resolution-appendix-and-host-mapping.md` and `docs/ai/testing/dns-resolution-appendix-and-host-mapping.md`.
+
+### Changed
+- Smoke-check reports now connect hostname resolution with HTTP responder fingerprints, making live routing drift easier to prove without extra manual DNS commands.
+- Re-ran the public smoke check and confirmed concrete host mappings: `api.fwber.me` resolves to `75.119.202.57`, while `geo.fwber.me` currently resolves to `216.198.79.65|64.29.17.1`, reinforcing the geo-domain drift diagnosis.
+
+## [1.5.0] - 2026-04-04 — Endpoint Fingerprints & Host Signals
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` so every HTTP probe now records endpoint fingerprints including HTTP code, remote IP, effective URL, `Server` header, `Content-Type`, redirect location, and a response-body excerpt.
+- Added a `snapshots` array to `smoke-check-summary.json` and an `Endpoint Fingerprints` section to `smoke-check-summary.md`, turning smoke reports into stronger routing-debug artifacts.
+- Added AI DevKit implementation/testing notes for the fingerprinting layer under `docs/ai/implementation/endpoint-fingerprints-and-host-signals.md` and `docs/ai/testing/endpoint-fingerprints-and-host-signals.md`.
+
+### Changed
+- Hardened snapshot logging by normalizing empty values to `—`, preventing Bash field-parsing drift when optional headers like `Location` are absent.
+- Re-ran the public smoke check and confirmed the live environment is now fingerprinted more concretely: `api.fwber.me` health-route failures come back from **Apache** at `75.119.202.57`, while `geo.fwber.me` failures come back from **Vercel** at `64.29.17.1`.
+
+## [1.4.9] - 2026-04-04 — Smoke Check Diagnostics & Remediation Hints
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` to analyze smoke-run outcomes and emit structured remediation diagnostics in both JSON and Markdown report outputs.
+- Added AI DevKit implementation/testing notes for the diagnostics layer under `docs/ai/implementation/smoke-check-diagnostics-and-remediation.md` and `docs/ai/testing/smoke-check-diagnostics-and-remediation.md`.
+
+### Changed
+- Smoke-check reports now translate common failure patterns into concrete next steps, including stale backend route detection on `api.fwber.me`, geo-domain drift pointing at Vercel, incomplete authenticated smoke coverage, and “partial health” narrowing hints when only selected public surfaces fail.
+
+### Verified
+- Re-ran the smoke-check script against the currently reachable public domains and confirmed the new diagnostics correctly identified backend route drift on `/api/health*`, `geo.fwber.me` misrouting, incomplete authenticated coverage, and the fact that auth error handling + public roast preview remain healthy.
+
+## [1.4.8] - 2026-04-04 — Smoke Check Report Artifacts & Live Drift Detection
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` with optional JSON and Markdown report artifact output via `FWBER_REPORT_DIR`, `FWBER_REPORT_JSON_PATH`, and `FWBER_REPORT_MD_PATH`, making each smoke run easier to archive, share, and attach to release or cutover notes.
+- Added AI DevKit implementation/testing notes for the report-artifact layer under `docs/ai/implementation/smoke-check-report-artifacts.md` and `docs/ai/testing/smoke-check-report-artifacts.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` so opt-in smoke-check runs now create timestamped report directories under `logs/deploy-reports/` (or `FWBER_DEPLOY_REPORT_DIR`) and preserve run summaries automatically.
+- Hardened the Markdown report writer in `smoke-check.sh` so report generation works even when checks fail and lines begin with dash-prefixed text.
+- Updated deployment docs to describe the new report artifact paths and how to use them during Hetzner cutover.
+
+### Verified
+- Ran the smoke-check script against the currently reachable public deployment targets with report generation enabled and discovered live-environment drift: `/api/health*` is still returning `404` on `api.fwber.me`, while `geo.fwber.me/nearby` currently returns a Vercel `404 deployment could not be found` response.
+- Confirmed the current public contract still passes invalid-login (`422`) and public roast preview (`200`) checks, which narrows the live deployment gap to specific routing/domain alignment issues rather than a total outage.
+
+## [1.4.7] - 2026-04-04 — Hetzner Post-Deploy Smoke Checks
+
+### Added
+- Added `ops/hetzner/scripts/smoke-check.sh`, a reusable post-deploy smoke-check script that validates frontend reachability, `/api/health*`, invalid-login behavior, public roast preview behavior, and the geo-service nearby contract.
+- Added optional smoke-check support for authenticated premium, merchant, and moderation surfaces via env-provided bearer tokens, so live rollout validation can grow deeper without hardcoding credentials into the repo.
+- Added optional Reverb websocket upgrade probing via `openssl s_client` when `FWBER_REVERB_APP_KEY` is supplied, giving operators a real handshake-level signal instead of only checking that the websocket hostname resolves.
+- Added AI DevKit implementation/testing notes for the smoke-check automation under `docs/ai/implementation/post-deploy-smoke-check-script.md` and `docs/ai/testing/post-deploy-smoke-check-script.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` to run `php artisan deploy:verify` as part of the default deploy path and to support opt-in smoke-check execution through `FWBER_RUN_SMOKE_CHECK=1`.
+- Updated deployment and dashboard documentation so Hetzner cutover guidance now references the smoke-check automation alongside `php artisan deploy:verify` and `/api/health*`.
+
+## [1.4.6] - 2026-04-04 — Deployment Health & Verification Surface
+
+### Added
+- Activated a public backend health surface at `/api/health`, `/api/health/liveness`, `/api/health/readiness`, and `/api/health/metrics`, giving deployment tooling and operators a stable way to verify the restored stack after Hetzner cutover.
+- Added `HealthStatusService` so HTTP health endpoints and command-line deployment verification share the same dependency checks instead of drifting apart over time.
+- Added `php artisan deploy:verify` with optional `--json` output to make server-side validation faster during bootstrap, redeploys, and incident triage.
+- Added backend regression coverage in `tests/Feature/HealthEndpointsTest.php` for the new health routes.
+
+### Changed
+- Refactored `HealthController` to use centralized health evaluation, report the active app version, and only treat Redis as critical when the active configuration actually depends on Redis-backed services.
+- Updated Hetzner/Vercel deployment docs so the redeploy and validation sequence explicitly includes `php artisan deploy:verify` and the new `/api/health*` endpoints.
+
 ## [1.0.74] - 2026-04-02 — ActivityPub Signed Outbound Delivery
 
 ### Fixed
@@ -935,3 +1086,41 @@ All notable changes to this project will be documented in this file.
 - Corrected `.github/workflows/frontend-build.yml` so CI now uses the real frontend runtime contract (`NEXT_PUBLIC_API_URL` without `/api`, and Reverb host/port/scheme vars).
 - Corrected `fwber-frontend/.env.production.example` to remove stale `/api` suffix usage and legacy Mercure-oriented realtime configuration.
 - Updated Hetzner deployment docs to point directly at the new operational templates.
+
+## [1.4.3] - 2026-04-04
+### Added
+- Added merchant storefront coordinate persistence (`location_name`, `latitude`, `longitude`) to the restored merchant profile model and migration path.
+- Added merchant onboarding/profile UI controls for geolocation capture and manual storefront coordinate editing.
+
+### Fixed
+- Reworked `/api/marketplace/nearby` so it can filter and sort by real merchant distance when caller coordinates are provided.
+- Updated AR inventory browsing to use actual merchant coordinates from the API instead of synthetic offsets.
+- Allowed merchant registration to inherit location defaults from the user profile when explicit merchant coordinates are not supplied.
+
+## [1.4.4] - 2026-04-04
+### Added
+- Added `MerchantTrustService` and `MerchantModerationController` to compute merchant trust and support moderator review workflows.
+- Added a merchant verification queue to the moderation dashboard, including verify/reject/reset actions.
+
+### Fixed
+- Restored moderation API routes that the frontend moderation dashboard already expected, including dashboard, flagged-content, spoof, throttle, action, user-profile, and merchant-review endpoints.
+- Updated nearby marketplace ranking to blend trust score with proximity rather than relying only on raw distance.
+- Hardened `lib/api/moderation.ts` so it resolves `/api` correctly regardless of whether `NEXT_PUBLIC_API_URL` includes the suffix.
+
+## [1.4.5] - 2026-04-04
+### Added
+- Added merchant moderation queue priority scoring and priority tiers to help moderators review the highest-signal storefronts first.
+- Added merchant queue search and inline note workflows to the moderation dashboard.
+
+### Fixed
+- Extended merchant moderation API support so queue filtering/search is reflected in frontend moderation hooks and API clients.
+- Surfaced merchant priority and verification-note context in the moderation dashboard instead of forcing moderators through a flat queue.
+
+## [1.4.5] - 2026-04-04
+### Added
+- Added merchant moderation queue priority scoring and priority tiers to help moderators review the highest-signal storefronts first.
+- Added merchant queue search and inline note workflows to the moderation dashboard.
+
+### Fixed
+- Extended merchant moderation API support so queue filtering/search is reflected in frontend moderation hooks and API clients.
+- Surfaced merchant priority and verification-note context in the moderation dashboard instead of forcing moderators through a flat queue.

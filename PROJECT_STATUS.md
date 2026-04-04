@@ -1,46 +1,20 @@
-# PROJECT_STATUS.md - fwber v1.4.2 (Hetzner Ops Templates & CI Env Alignment)
+# PROJECT_STATUS.md - fwber v1.6.0 (GitHub Backend Deploy Switched to Hetzner)
 
 **Date:** 2026-04-04
-**Version:** 1.4.2 "Hetzner Ops Templates & CI Env Alignment"
-**Status:** ✅ **VERIFIED, COMMITTED, AND READY FOR VPS EXECUTION**
+**Version:** 1.6.0 "GitHub Backend Deploy Switched to Hetzner"
+**Status:** ✅ **BACKEND IS LIVE ON HETZNER AND CI DEPLOY TARGET NOW MATCHES REAL INFRASTRUCTURE**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release turns the new Hetzner/Vercel deployment recommendation into concrete operational assets.
+This release fixes deployment automation drift.
 
 Delivered:
-- copy-ready Hetzner **Nginx vhost templates**
-- copy-ready Hetzner **systemd service units** for queue, Reverb, and geo
-- copy-ready Hetzner **bootstrap** and **deploy** shell scripts
-- corrected frontend CI env values so the GitHub build workflow reflects the actual frontend runtime contract
-- corrected frontend production env example to use `NEXT_PUBLIC_API_URL` without `/api` and Reverb env vars instead of legacy realtime config
+- confirmed the live backend is deploying correctly on Hetzner via the in-repo deploy script
+- replaced the stale GitHub Actions backend deploy workflow that still pointed at DreamHost
+- aligned GitHub deployment automation with the actual Hetzner production topology
 
-## 🧰 New Operational Assets
-Added under `ops/hetzner/`:
-- `nginx/api.fwber.me.conf`
-- `nginx/ws.fwber.me.conf`
-- `nginx/geo.fwber.me.conf`
-- `systemd/fwber-queue.service`
-- `systemd/fwber-reverb.service`
-- `systemd/fwber-geo.service`
-- `scripts/bootstrap-ubuntu.sh`
-- `scripts/deploy-backend.sh`
-
-## 🔧 Alignment Fixes
-- `.github/workflows/frontend-build.yml` now uses:
-  - `NEXT_PUBLIC_API_URL=https://api.fwber.me`
-  - `NEXT_PUBLIC_REVERB_HOST=ws.fwber.me`
-  - `NEXT_PUBLIC_REVERB_PORT=443`
-  - `NEXT_PUBLIC_REVERB_SCHEME=https`
-- `fwber-frontend/.env.production.example` now matches the active frontend contract instead of the old `/api`-suffixed and Mercure-oriented example.
-- Hetzner deployment docs now point directly to the new `ops/hetzner/` templates.
-
-## ✅ Validation
-- `bash -n ops/hetzner/scripts/bootstrap-ubuntu.sh`
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `npm run build --prefix fwber-frontend`
-- Result: scripts validated and frontend production build passed.
-
-## ✅ Why This Matters
-The docs refresh in v1.4.1 established the right architecture. This release adds the actual reusable artifacts needed to execute that architecture quickly once the Hetzner VPS is provisioned.
+## ✅ Current Reality
+- Manual/SSH-driven Hetzner deploys are working.
+- The stale GitHub Action was still configured for DreamHost before this release.
+- The workflow now targets Hetzner instead.
