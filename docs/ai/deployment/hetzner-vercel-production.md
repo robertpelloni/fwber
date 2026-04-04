@@ -1,6 +1,6 @@
 # Hetzner + Vercel Production Blueprint
 
-> **Version:** 1.4.1  
+> **Version:** 1.4.7
 > **Status:** Recommended deployment topology for restored fwber stack
 
 This document captures the production topology now recommended for fwber after the phased restoration of:
@@ -118,6 +118,7 @@ GEO_SCREENER_URL=https://geo.fwber.me
 Copy-ready bootstrap and deploy scripts now exist in:
 - `ops/hetzner/scripts/bootstrap-ubuntu.sh`
 - `ops/hetzner/scripts/deploy-backend.sh`
+- `ops/hetzner/scripts/smoke-check.sh`
 
 Nginx virtual host templates exist in:
 - `ops/hetzner/nginx/api.fwber.me.conf`
@@ -135,12 +136,15 @@ Nginx virtual host templates exist in:
 8. Start workers/reverb/scheduler
 9. Configure Nginx and TLS
 10. Configure Vercel env + frontend deploy
-11. Validate restored surfaces (`/roast`, `/premium`, `/merchant/*`, marketplace purchases)
+11. Run `php artisan deploy:verify`
+12. Run `ops/hetzner/scripts/smoke-check.sh`
+13. Validate restored surfaces (`/roast`, `/premium`, `/merchant/*`, marketplace purchases)
 
 ## 8. Validation Checklist
 
 After cutover:
 - [ ] `php artisan deploy:verify` reports healthy critical services
+- [ ] `ops/hetzner/scripts/smoke-check.sh` passes with the appropriate env tokens/keys
 - [ ] `/api/health`, `/api/health/liveness`, and `/api/health/readiness` respond correctly
 - [ ] auth routes behave correctly
 - [ ] websocket connection succeeds

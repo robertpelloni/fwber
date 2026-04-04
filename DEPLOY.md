@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
-> **Last Updated:** 2026-04-05
-> **Version:** 1.6.9
+> **Last Updated:** 2026-04-04
+> **Version:** 1.4.7
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -162,36 +162,7 @@ php artisan optimize
 ### Re-Deploy Sequence
 Use the in-repo deploy script for the repeatable path:
 
-GitHub Actions backend deployment should now target Hetzner as well, using `.github/workflows/deploy-backend.yml` plus repository secrets:
-- note: the deploy script now explicitly sources rustup Cargo from `~/.cargo/env` / `~/.cargo/bin` so `fwber-geo` builds correctly in non-login CI SSH sessions as well as manual shells
-- validated: the GitHub `Deploy Backend (Hetzner)` workflow has now completed successfully end-to-end after secrets setup and the rustup-path fix
-- supporting CI workflows were also trimmed/aligned so backend/frontend verification no longer competes with stale duplicate pipelines
-- frontend CI lockfile drift was resolved by resyncing `fwber-frontend/package-lock.json`, which should allow the dedicated frontend workflow to install/build cleanly again
-- shared log write access on Hetzner is now handled via ACLs on `storage/logs` rather than Monolog chmod attempts, preventing deploy-time artisan failures against rotated `www-data` log files
-- the dedicated frontend GitHub build now targets Node.js 24 so CI uses the same runtime family as the locally verified lockfile/build flow
-- public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
-- the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
-- `HETZNER_HOST`
-- `HETZNER_USERNAME`
-- `HETZNER_SSH_KEY`
-- optional `HETZNER_PROJECT_PATH`
-- optional `HETZNER_REVERB_APP_KEY`
-
-
 ```bash
-FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
-```
-
-That path now writes timestamped smoke-check reports under:
-
-```bash
-/var/www/fwber/repo/logs/deploy-reports/<timestamp>/
-```
-
-Override the report root if needed:
-
-```bash
-FWBER_DEPLOY_REPORT_DIR=/var/log/fwber-deploy-reports \
 FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
 ```
 
@@ -277,15 +248,6 @@ Always verify the following after a major version bump or infrastructure move:
 Automation support now exists in:
 - `ops/hetzner/scripts/smoke-check.sh`
 - `ops/hetzner/scripts/deploy-backend.sh` (`FWBER_RUN_SMOKE_CHECK=1`)
-- timestamped smoke-check report artifacts under `logs/deploy-reports/` (or `FWBER_DEPLOY_REPORT_DIR`)
-- remediation-oriented diagnostics inside the generated smoke-check reports
-- endpoint fingerprints inside the generated smoke-check reports (remote IP, server header, redirects, body excerpts)
-- DNS resolution appendix inside the generated smoke-check reports (resolved addresses per public host)
-- drift-diff artifacts comparing the newest smoke report with the previous one when available
-- compact notification artifacts (and optional webhook publishing) summarizing smoke + drift state
-- live Hetzner backend execution with local MySQL import and active queue/reverb/geo services
-- privilege-safe deploy execution when run as `deploy` rather than only `root`
-- corrected websocket smoke probing so post-cutover websocket validation no longer false-fails on an invalid test key
 
 1. [ ] Frontend Vercel deploy is green
 2. [ ] `php artisan deploy:verify` returns healthy or only expected non-critical degradations

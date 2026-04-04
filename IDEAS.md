@@ -39,6 +39,11 @@
 - Add a billing diagnostics page for admins that replays webhook payloads against a sandbox user, making Stripe rollout debugging safer after staged restorations.
 - Replace hard-coded plan presentation in the frontend with a shared generated contract from `config/premium.php` so product copy and backend price definitions never drift.
 
+## 2026-04-04 - After Hetzner Post-Deploy Smoke Checks
+- Add a small secrets-backed smoke-profile generator that rotates bearer tokens for user, merchant, and moderator smoke accounts so `smoke-check.sh` can run deeper probes without relying on long-lived manual tokens.
+- Extend the smoke-check script with a webhook replay mode that can safely POST saved Stripe test fixtures to a staging or sandbox backend, verifying payment handling without touching live billing.
+- Add a deploy-report artifact mode that writes JSON + Markdown summaries from `smoke-check.sh` and `php artisan deploy:verify`, making it easy to attach cutover evidence to releases or send it into Slack.
+
 ## 2026-04-04 - After Deployment Health & Verification Surface
 - Add a tiny operator dashboard that consumes `/api/health` plus the geo-service and websocket domains so a single internal page can show cross-service rollout status during cutovers.
 - Add a deploy script wrapper that runs `php artisan deploy:verify --json`, parses critical failures, and emits a red/green summary suitable for CI/CD or Slack notifications.

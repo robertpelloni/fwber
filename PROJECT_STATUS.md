@@ -1,57 +1,67 @@
-# PROJECT_STATUS.md - fwber v1.4.6 (Deployment Health & Verification Surface)
+# PROJECT_STATUS.md - fwber v1.4.7 (Hetzner Post-Deploy Smoke Checks)
 
 **Date:** 2026-04-04
-**Version:** 1.4.6 "Deployment Health & Verification Surface"
-**Status:** ✅ **VERIFIED, COMMITTED, AND READY FOR HETZNER CUTOVER**
+**Version:** 1.4.7 "Hetzner Post-Deploy Smoke Checks"
+**Status:** ✅ **VERIFIED, COMMITTED, AND BETTER PREPARED FOR HETZNER CUTOVER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release focused on the remaining pre-cutover gap: making deployment validation fast, repeatable, and machine-checkable.
+This release closed the next operational gap after adding health endpoints: it introduced a reusable shell-level smoke-check workflow for post-deploy validation.
 
 Delivered:
-- public backend health endpoints for ops and load balancers
-- centralized dependency health evaluation shared by HTTP and CLI flows
-- a deploy verification Artisan command for bootstrap/redeploy validation
-- deployment-doc updates so the live rollout process references the real health contract
+- a reusable Hetzner smoke-check script
+- opt-in deploy-script integration for automatic smoke checks after redeploys
+- optional authenticated smoke probes for premium, merchant, and moderation routes
+- optional websocket upgrade probing for Reverb
+- deployment doc updates so the rollout path references real smoke automation instead of only manual steps
 
-## 🏥 Backend Improvements
-- added `fwber-backend/app/Services/HealthStatusService.php`
-  - centralizes health checks for database, Redis, cache, storage, queue, and broadcast configuration
-  - marks Redis as critical only when the active runtime configuration actually depends on it
-- updated `fwber-backend/app/Http/Controllers/HealthController.php`
-  - now reports app version from active config
-  - now reuses the centralized health builder instead of ad-hoc checks
-- activated public API health routes in `fwber-backend/routes/api.php`
-  - `GET /api/health`
-  - `GET /api/health/liveness`
-  - `GET /api/health/readiness`
-  - `GET /api/health/metrics`
-- added `fwber-backend/app/Console/Commands/DeployVerifyCommand.php`
-  - `php artisan deploy:verify`
-  - `php artisan deploy:verify --json`
+## 🚀 Operations Improvements
+### Added `ops/hetzner/scripts/smoke-check.sh`
+This script verifies:
+- frontend reachability
+- `php artisan deploy:verify --json` when run on the server with the backend checkout present
+- `GET /api/health`
+- `GET /api/health/liveness`
+- `GET /api/health/readiness`
+- invalid-login contract (`422 Invalid credentials`)
+- public roast preview contract
+- geo nearby endpoint contract
 
-## 📋 Deployment & Operations Improvements
-Updated deployment documentation now explicitly includes:
-- `php artisan deploy:verify` in the redeploy sequence
-- `/api/health*` checks in the post-cutover validation checklist
-- healthier alignment between in-repo ops templates and runtime verification steps
+Optional env-driven checks:
+- `FWBER_USER_BEARER_TOKEN` → premium plans + status
+- `FWBER_MERCHANT_BEARER_TOKEN` → merchant dashboard
+- `FWBER_MODERATOR_BEARER_TOKEN` → moderation dashboard + merchant queue
+- `FWBER_REVERB_APP_KEY` → real websocket upgrade probe
 
-Key docs updated:
+### Updated `ops/hetzner/scripts/deploy-backend.sh`
+The deploy script now:
+- runs `php artisan deploy:verify` directly in the deploy sequence
+- supports `FWBER_RUN_SMOKE_CHECK=1` to execute the smoke-check script automatically after service restarts
+
+## 📚 Documentation Improvements
+Updated rollout guidance in:
 - `DEPLOY.md`
 - `docs/ai/deployment/hetzner-vercel-production.md`
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+- `docs/SUBMODULE_DASHBOARD.md`
+
+Added AI DevKit implementation/testing notes:
+- `docs/ai/implementation/post-deploy-smoke-check-script.md`
+- `docs/ai/testing/post-deploy-smoke-check-script.md`
 
 ## ✅ Validation
-- Backend tests passed:
-  - `php artisan test tests/Feature/HealthEndpointsTest.php tests/Feature/MerchantTrustModerationTest.php tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
-  - Result: **34 passed**
-- CLI deployment verification passed locally:
+- Shell syntax validation passed:
+  - `bash -n ops/hetzner/scripts/smoke-check.sh`
+  - `bash -n ops/hetzner/scripts/deploy-backend.sh`
+- Previous deploy-health validation remains in place:
   - `php artisan deploy:verify --json`
-  - Result: **healthy** with only expected non-critical Redis degradation in the local environment
+  - `tests/Feature/HealthEndpointsTest.php`
 
 ## ✅ Why This Matters
-The project is now much closer to frictionless Hetzner cutover. Instead of relying on a loose manual checklist, operators have:
-- a stable health endpoint contract for Nginx/load balancers/uptime monitors
-- a single CLI command for post-deploy sanity checking
-- a shared source of truth for what "healthy" means in the restored fwber stack
+The project now has a stronger progression of deploy confidence:
+1. health contract inside the backend (`/api/health*`)
+2. local/server verification command (`php artisan deploy:verify`)
+3. shell-level public smoke-check automation (`smoke-check.sh`)
+
+That sequence makes live Hetzner cutover and future redeploys materially safer and easier to repeat.

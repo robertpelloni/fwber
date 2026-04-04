@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.7] - 2026-04-04 — Hetzner Post-Deploy Smoke Checks
+
+### Added
+- Added `ops/hetzner/scripts/smoke-check.sh`, a reusable post-deploy smoke-check script that validates frontend reachability, `/api/health*`, invalid-login behavior, public roast preview behavior, and the geo-service nearby contract.
+- Added optional smoke-check support for authenticated premium, merchant, and moderation surfaces via env-provided bearer tokens, so live rollout validation can grow deeper without hardcoding credentials into the repo.
+- Added optional Reverb websocket upgrade probing via `openssl s_client` when `FWBER_REVERB_APP_KEY` is supplied, giving operators a real handshake-level signal instead of only checking that the websocket hostname resolves.
+- Added AI DevKit implementation/testing notes for the smoke-check automation under `docs/ai/implementation/post-deploy-smoke-check-script.md` and `docs/ai/testing/post-deploy-smoke-check-script.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` to run `php artisan deploy:verify` as part of the default deploy path and to support opt-in smoke-check execution through `FWBER_RUN_SMOKE_CHECK=1`.
+- Updated deployment and dashboard documentation so Hetzner cutover guidance now references the smoke-check automation alongside `php artisan deploy:verify` and `/api/health*`.
+
 ## [1.4.6] - 2026-04-04 — Deployment Health & Verification Surface
 
 ### Added
