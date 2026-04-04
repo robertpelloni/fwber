@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.3.7
+> **Current Global Version:** 1.3.8
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -24,13 +24,13 @@ fwber/
 ## 📦 Active Logical Packages
 
 ### 1. `fwber-backend`
-- **Version:** inherits global `1.3.7`
+- **Version:** inherits global `1.3.8`
 - **Role:** Core API and business logic.
 - **Owns:** auth, onboarding, profiles, photos, proximity matching, messages, block/report safety actions, notification APIs, E2E key backup/restore.
 - **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `1.3.7`
+- **Version:** inherits global `1.3.8`
 - **Role:** Main user-facing product surface.
 - **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
 - **Key stack:** Next.js app router, React, Tailwind CSS.
@@ -46,7 +46,7 @@ fwber/
 - **Notes:** frontend includes graceful fallbacks when WASM tooling or artifacts are unavailable.
 
 ### 5. `mobile`
-- **Version:** inherits global `1.3.7`
+- **Version:** inherits global `1.3.8`
 - **Role:** Native mobile shell for push notifications, secure token storage, NFC, and background location.
 - **Key stack:** Expo, React Native WebView, expo-notifications, expo-location.
 
@@ -63,4 +63,5 @@ fwber/
 - Active frontend pages no longer prefetch retired routes like `/roast` or `/rate-my-pussy`, and analytics event ingestion is live again in the simplified backend route set.
 - The index-optimization migration is now deployment-safe across retry scenarios because it checks both for pre-existing indexes and for missing referenced columns before altering tables.
 - AI and payment service providers have been restored into the active backend container graph as the first step of selective feature re-expansion.
+- The AI Wingman/roast route surface plus the public `/roast` page are active again, backed by the restored `viral_contents` table/model.
 - Archived systems remain preserved under `_archive/` and should not be treated as active dependencies unless explicitly restored.

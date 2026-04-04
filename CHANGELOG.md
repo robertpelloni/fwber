@@ -885,3 +885,13 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Re-registered the restored AI/payment providers in both `fwber-backend/bootstrap/providers.php` and `fwber-backend/config/app.php` so the Laravel app actually boots them in active runtime configuration.
 - Re-validated that the current core suite still passes after the restoration foundation landed: `php artisan test tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php` passed successfully.
+
+## [1.3.8] - 2026-04-04
+### Added
+- Restored `AiWingmanController`, `ViralContent`, and `2026_04_04_020000_restore_viral_contents_table.php`, bringing back the core non-federated AI roast/hype share flow.
+- Added the public `fwber-frontend/app/roast/page.tsx` page and reconnected homepage/share CTA links to the restored roast generator.
+
+### Fixed
+- Reintroduced the active Wingman API route surface in `fwber-backend/routes/api.php`, including public roast preview plus authenticated roast, vibe, fortune, nemesis, profile-analysis, compatibility, ice-breaker, reply, draft-analysis, and date-idea endpoints.
+- Hardened `AiWingmanService` date-idea generation so it degrades gracefully when the venue system has not yet been restored, instead of crashing on missing venue schema.
+- Added `AiWingmanRestoreTest` and re-validated the restored AI slice alongside the retained core/migration suite; backend tests and frontend production build both passed.

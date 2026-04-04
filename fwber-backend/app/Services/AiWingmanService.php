@@ -7,6 +7,7 @@ use App\Models\Venue;
 use App\Services\Ai\Llm\LlmManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class AiWingmanService
 {
@@ -129,8 +130,10 @@ class AiWingmanService
             // Fetch nearby venues if location is provided (simplified for now)
             // In a real implementation, we would use geospatial search
             $venues = [];
-            if ($location) {
-                // Placeholder: Fetch top 5 active venues
+            if ($location && Schema::hasTable('venues')) {
+                // Venue-powered date ideas are optional during staged restoration.
+                // If the venue system has not been restored yet, the AI still works
+                // with profile/location context instead of crashing on a missing table.
                 $venues = Venue::where('is_active', true)->limit(5)->get();
             }
 

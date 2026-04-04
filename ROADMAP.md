@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.3.7 "Restoration Foundation: AI + Payments"
+> **Current Version:** 1.3.8 "AI Surface Restoration"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,8 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.3.7)
+### Phase 5: Production Scale (COMPLETED - v1.3.8)
+- **AI Surface Restoration:** Restored `AiWingmanController`, `ViralContent`, the `viral_contents` schema, and the public `/roast` page, reconnecting active UI and API flows for roast/hype generation.
 - **Restoration Foundation:** `AiServiceProvider` and `PaymentServiceProvider` are restored to the active backend, preparing safe reactivation of AI and monetization systems without unresolved container dependencies.
 - **Migration Column Guards:** The `optimize_core_indexes` migration now skips index definitions whose required columns are missing, preventing deploy failures on drifted schemas like `photos` tables missing `order`.
 - **Deployment Migration Idempotency:** The `optimize_core_indexes` migration now checks for existing indexes before creation, so partial MySQL deploys can be retried without duplicate-key failures.
@@ -59,6 +60,6 @@ The platform is now **100% focused on its core identity**:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Phase B Restore — AI Surface:** Restore active Wingman/roast backend route surface now that `AiServiceProvider` is back.
-2. **Phase C Restore — Premium/Payments:** Restore premium/payment backend route surface now that payment gateway bindings are active again.
+1. **Phase C Restore — Premium/Payments:** Restore premium/payment backend route surface now that payment gateway bindings are active again.
+2. **Phase D Restore — Marketplace/Merchant:** Restore merchant/marketplace route surface and UI after premium/payment primitives are active.
 3. **Redeploy After Column Guard Fix:** Re-run deployment and confirm the migration now survives both duplicate-index and missing-column drift scenarios.

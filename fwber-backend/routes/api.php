@@ -31,6 +31,7 @@ if (! app()->isProduction()) {
 // Lightweight analytics ingestion is intentionally public/optional-auth so page-view
 // tracking from the web shell can succeed before login and without generating 404 noise.
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
+Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic']);
 
 Route::middleware('auth:sanctum')->group(function () {
     
@@ -94,6 +95,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('messages/{userId}', [\App\Http\Controllers\MessageController::class, 'index']);
     Route::post('messages/{messageId}/read', [\App\Http\Controllers\MessageController::class, 'markAsRead']);
+
+    // AI Wingman
+    Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
+    Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
+    Route::post('wingman/draft-analysis/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'analyzeDraft']);
+    Route::get('wingman/profile-analysis', [\App\Http\Controllers\AiWingmanController::class, 'getProfileAnalysis']);
+    Route::get('wingman/date-ideas/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getDateIdeas']);
+    Route::post('wingman/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastProfile']);
+    Route::match(['get', 'post'], 'wingman/vibe-check', [\App\Http\Controllers\AiWingmanController::class, 'checkVibe']);
+    Route::match(['get', 'post'], 'wingman/fortune', [\App\Http\Controllers\AiWingmanController::class, 'predictFortune']);
+    Route::match(['get', 'post'], 'wingman/cosmic-match', [\App\Http\Controllers\AiWingmanController::class, 'getCosmicMatch']);
+    Route::get('wingman/nemesis', [\App\Http\Controllers\AiWingmanController::class, 'findNemesis']);
+    Route::post('wingman/quirk-check', [\App\Http\Controllers\AiWingmanController::class, 'checkQuirk']);
+    Route::post('wingman/compatibility-audit/{targetId}', [\App\Http\Controllers\AiWingmanController::class, 'compatibilityAudit']);
 
     // WebSockets (Reverb)
     Route::get('websocket/token', [\App\Http\Controllers\WebSocketController::class, 'getToken']);
