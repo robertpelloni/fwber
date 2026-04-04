@@ -23,7 +23,8 @@ This document replaces the old DreamHost-first recommendation for current produc
 14. Review DNS appendix rows for `fwber.me`, `api.fwber.me`, `geo.fwber.me`, and `ws.fwber.me`
 15. Review drift-diff artifacts against the previous smoke run when available
 16. Review notification artifacts or webhook output if notification publishing is enabled
-17. Validate auth, roast, premium, merchant, websocket, and health endpoints
+17. Complete public DNS/TLS cutover for `api.fwber.me` and `geo.fwber.me`
+18. Validate auth, roast, premium, merchant, websocket, and health endpoints
 
 ## See Also
 - `DEPLOY.md`

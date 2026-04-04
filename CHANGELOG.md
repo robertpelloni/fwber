@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.4] - 2026-04-04 — Hetzner Backend Execution & Database Migration
+
+### Added
+- Added deployment execution notes in `docs/ai/deployment/hetzner-cutover-execution-status.md` to document the real Hetzner server actions completed during live infrastructure work.
+
+### Changed
+- Deployed the fwber backend stack to Hetzner at `5.161.250.43`, including repo checkout, backend dependency install, local MySQL provisioning, DreamHost database import, local Redis/Reverb/geo integration, and systemd activation for `fwber-queue`, `fwber-reverb`, and `fwber-geo`.
+- Upgraded the Hetzner host Rust toolchain via `rustup` so `fwber-geo` could build successfully with its `edition2024` manifest requirements.
+- Reconfigured the Hetzner backend runtime away from the temporary sqlite fallback and onto local MySQL plus Redis, matching the intended production topology much more closely.
+
+### Verified
+- Confirmed `php artisan deploy:verify --json` returns healthy on Hetzner using local MySQL + Redis.
+- Confirmed the geo service responds locally on `127.0.0.1:8081`.
+- Confirmed Reverb is listening on `127.0.0.1:8080` and a websocket handshake through nginx succeeds with `101 Switching Protocols` using the production-style app key.
+- Confirmed the queue worker, Reverb service, geo service, and Redis are active under systemd.
+
 ## [1.5.3] - 2026-04-04 — Smoke Report Notification Publisher
 
 ### Added

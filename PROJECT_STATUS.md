@@ -1,46 +1,48 @@
-# PROJECT_STATUS.md - fwber v1.5.3 (Smoke Report Notification Publisher)
+# PROJECT_STATUS.md - fwber v1.5.4 (Hetzner Backend Execution & Database Migration)
 
 **Date:** 2026-04-04
-**Version:** 1.5.3 "Smoke Report Notification Publisher"
-**Status:** ✅ **VERIFIED, COMMITTED, AND BETTER PREPARED FOR OPERATOR ALERTING**
+**Version:** 1.5.4 "Hetzner Backend Execution & Database Migration"
+**Status:** ✅ **HETZNER BACKEND DEPLOYED; PUBLIC API/GEO DNS CUTOVER STILL PENDING**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extended the deployment evidence system with compact publishable summaries.
+This release marks the first real live-server deployment execution wave for the Hetzner backend stack.
 
-Delivered:
-- a smoke-report notification publisher
-- local notification JSON/Markdown artifacts
-- optional webhook publishing support
-- deploy-script integration for notification artifact generation after smoke/diff creation
+Delivered on `5.161.250.43`:
+- cloned repo to `/var/www/fwber/repo`
+- installed missing PHP/Rust deployment dependencies
+- upgraded Rust toolchain so `fwber-geo` can build with `edition2024`
+- built `fwber-geo` release successfully
+- provisioned local Hetzner MySQL for fwber
+- imported the DreamHost fwber production database into Hetzner MySQL
+- switched Hetzner backend runtime to local MySQL + local Redis
+- enabled and started `fwber-queue`, `fwber-reverb`, and `fwber-geo`
+- verified local backend health, geo responses, Redis availability, and websocket handshake success
 
-## 🚀 Operations Improvements
-### Added `ops/hetzner/scripts/publish-smoke-report.py`
-This script consumes:
-- `smoke-check-summary.json`
-- optional `smoke-check-drift.json`
+## 🚀 Verified Hetzner Runtime State
+Confirmed on Hetzner:
+- `php artisan deploy:verify --json` → **healthy**
+- Redis → active
+- `fwber-queue` → active
+- `fwber-reverb` → active
+- `fwber-geo` → active
+- websocket upgrade through nginx → **`101 Switching Protocols`**
+- geo nearby endpoint locally → valid JSON response
 
-It produces:
-- `smoke-check-notification.json`
-- `smoke-check-notification.md`
-
-It can also optionally POST the payload to a webhook via:
-- `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`
-
-### Updated `ops/hetzner/scripts/deploy-backend.sh`
-When smoke checks run and Python is available, the deploy flow now also generates compact notification artifacts in the current report directory.
-
-## ✅ Validation
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
-- generated smoke summary + drift diff + notification artifacts end to end
-- validated JSON and Markdown notification outputs
+## ⚠️ Remaining External Cutover Work
+Still pending outside the repo/runtime itself:
+- repoint `api.fwber.me` to Hetzner
+- repoint `geo.fwber.me` to Hetzner
+- issue or confirm TLS certs for `api.fwber.me` and `geo.fwber.me` on Hetzner after DNS cutover
+- update any remaining external panel/DNS records so the new topology is actually public
 
 ## ✅ Why This Matters
-The deployment-hardening system now supports:
-1. detailed evidence
-2. drift comparison
-3. concise publishable summaries
+The fwber backend is no longer only “planned” for Hetzner — the runtime now actually exists there with:
+- local DB
+- local Redis
+- local queueing
+- local Reverb
+- local geo service
 
-That makes it easier to wire deploy results into chatops, incident threads, or release notes without manually summarizing large report bundles.
+That significantly reduces the remaining migration work to public DNS/TLS cutover rather than core application deployment.

@@ -1,175 +1,201 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.5.3
+> **Version Reached:** 1.5.4
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the autonomous deployment-hardening loop and delivered **v1.5.3 "Smoke Report Notification Publisher"**.
+This session moved beyond repo-only deployment preparation and completed the first real **live Hetzner fwber backend execution wave**, resulting in **v1.5.4 "Hetzner Backend Execution & Database Migration"**.
 
-After v1.5.2 added drift comparison, the next practical gap was communication: the deployment evidence system could produce rich artifacts, but operators still lacked a concise publishable summary for chatops or webhook-based notification flows.
-
-This release fixes that by adding:
-- a smoke-report notification publisher
-- compact notification JSON/Markdown artifacts
-- optional webhook publishing support
-- deploy-script integration so notification artifacts are generated after smoke and drift reports
+The user clarified the desired direction: move fwber off DreamHost and onto Hetzner. I used the provided Hetzner SSH access plus DreamHost shell credentials to execute the backend migration work directly.
 
 No processes were manually killed.
 
 ---
 
-## What Changed
+## What Changed On Hetzner (`5.161.250.43`)
 
-### 1. Added `ops/hetzner/scripts/publish-smoke-report.py`
-This new script consumes:
-- `smoke-check-summary.json`
-- optional `smoke-check-drift.json`
+### 1. Repo deployment
+- cloned `https://github.com/robertpelloni/fwber.git` into:
+  - `/var/www/fwber/repo`
 
-It generates:
-- `smoke-check-notification.json`
-- `smoke-check-notification.md`
+### 2. Installed missing runtime/build dependencies
+Installed on Hetzner:
+- `php8.4-sqlite3`
+- `cargo`
+- `rustc`
+- `sshpass`
 
-It can also optionally POST the resulting payload to a webhook using:
-- `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`
+Also installed/upgraded modern Rust via `rustup` because the distro Cargo was too old for the `fwber-geo` manifest’s `edition2024` requirement.
 
-### 2. Notification payload shape
-The publisher emits a concise payload containing:
-- markdown `text`
-- `report_dir`
-- overall status
-- summary counters
-- top diagnostics
-- drift summary when available
+### 3. DreamHost access verified
+Using the provided DreamHost credentials, I successfully opened an SSH session to:
+- `fwber@pdx1-shared-a1-33.dreamhost.com`
 
-This keeps the message compact enough for chat tools while still pointing back to the full report directory for deep inspection.
+This allowed direct inspection of the live DreamHost fwber backend `.env` and direct database export access.
 
-### 3. Updated `ops/hetzner/scripts/deploy-backend.sh`
-When smoke checks run and Python is available, the deploy flow now also generates notification artifacts in the current report directory.
+### 4. Local Hetzner MySQL provisioned
+Created on Hetzner:
+- database: `fwber_production`
+- user: `fwber@localhost`
 
-Python selection behavior remains:
-- `FWBER_PYTHON_BIN` if provided
-- otherwise `python3`
-- fallback to `python`
+### 5. DreamHost production database imported to Hetzner
+A direct DreamHost → Hetzner DB migration was executed by streaming `mysqldump` from DreamHost into the local Hetzner MySQL instance.
 
-### 4. Validation performed
-Executed:
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
+Important note:
+- `--no-tablespaces` was required because the DreamHost MySQL user did not have `PROCESS` privilege for the default tablespace dump behavior.
 
-Then validated end to end by generating:
-1. smoke summary
-2. drift diff
-3. notification artifacts
+### 6. Hetzner backend runtime moved onto local MySQL + local Redis
+The Hetzner backend `.env` was rewritten away from the temporary sqlite bootstrap fallback and onto:
+- local MySQL
+- local Redis
+- S3 media storage
+- production-style Reverb credentials aligned to the existing fwber app key
 
-Outputs were inspected and confirmed valid for:
-- notification JSON
-- notification Markdown
-- inclusion of drift summary when drift JSON exists
-- inclusion of top diagnostics from the current smoke report
+### 7. Built geo service successfully
+After Rust upgrade:
+- `fwber-geo` release build succeeded
 
-### 5. Documentation updated
-Updated:
-- `CHANGELOG.md`
-- `DEPLOY.md`
-- `PROJECT_STATUS.md`
-- `TODO.md`
-- `ROADMAP.md`
-- `MEMORY.md`
-- `HANDOFF.md`
-- `IDEAS.md`
-- `docs/SUBMODULE_DASHBOARD.md`
-- `docs/ai/deployment/hetzner-vercel-production.md`
-- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+### 8. Installed and enabled live systemd services
+Installed/enabled:
+- `fwber-queue`
+- `fwber-reverb`
+- `fwber-geo`
 
-Added:
-- `docs/ai/implementation/smoke-report-notification-publisher.md`
-- `docs/ai/testing/smoke-report-notification-publisher.md`
+All are active.
 
 ---
 
-## Validation
+## Live Verification Performed
 
-### Static validation
-Executed:
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
-- `git diff --check`
+### Laravel backend
+Executed on Hetzner:
+- `php artisan optimize:clear`
+- `php artisan migrate --force`
+- `php artisan optimize`
+- `php artisan deploy:verify --json`
 
-### End-to-end artifact validation
-Executed:
-- generated smoke-check summary artifacts
-- generated drift artifacts
-- generated notification artifacts from those reports
+Result:
+- **healthy**
+- backend now verifies against:
+  - MySQL
+  - Redis
+  - storage
+  - Reverb-configured broadcast path
 
-Validated:
-- `smoke-check-notification.json`
-- `smoke-check-notification.md`
-- drift-aware notification content
-- compact top-diagnostic summarization
+### Redis
+Confirmed:
+- active
+- listening on `127.0.0.1:6379`
 
-### Memory operations
-Executed:
-- searched AI DevKit memory for prior smoke-report publish/webhook knowledge
-- stored the v1.5.3 notification-publisher knowledge after implementation
+### Queue worker
+Confirmed:
+- `fwber-queue.service` active
+
+### Reverb
+Confirmed:
+- `fwber-reverb.service` active
+- listening on `127.0.0.1:8080`
+- websocket handshake through nginx succeeded with:
+  - `101 Switching Protocols`
+  - `X-Powered-By: Laravel Reverb`
+
+### Geo
+Confirmed:
+- `fwber-geo.service` active
+- listening on `127.0.0.1:8081`
+- local nearby query returns valid JSON
+
+---
+
+## Important Findings
+
+### 1. DreamHost MySQL was not a good long-term dependency for Hetzner runtime
+The public DreamHost MySQL hostname was not a good target for the Hetzner-hosted backend path.
+
+Conclusion:
+- migrating fwber DB state locally onto Hetzner was the correct simplification move
+
+### 2. `ws.fwber.me` is effectively ready on Hetzner
+Evidence now shows:
+- nginx working
+- TLS present for `ws.fwber.me`
+- Reverb listening locally
+- websocket handshake successful through nginx using the production-style app key
+
+### 3. Remaining blockers are now mostly public DNS/TLS cutover tasks
+The core fwber backend runtime is deployed on Hetzner.
+
+What still remains externally:
+- `api.fwber.me` DNS must point to Hetzner
+- `geo.fwber.me` DNS must point to Hetzner
+- `api.fwber.me` and `geo.fwber.me` TLS certs must be issued/validated on Hetzner after DNS cutover
+- DreamHost fwber backend can then be retired
 
 ---
 
 ## Files Changed This Session
 
-### Operations scripts
-- `ops/hetzner/scripts/publish-smoke-report.py`
-- `ops/hetzner/scripts/deploy-backend.sh`
+### Live infrastructure (not committed to repo)
+- Hetzner runtime environment on `5.161.250.43`
+- local MySQL provision + imported production data
+- systemd units installed/enabled
+- repo cloned to `/var/www/fwber/repo`
 
-### AI DevKit docs
-- `docs/ai/implementation/smoke-report-notification-publisher.md`
-- `docs/ai/testing/smoke-report-notification-publisher.md`
-
-### Deployment / release docs
+### Repo docs / release tracking
+- `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
-- `DEPLOY.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
 - `ROADMAP.md`
 - `MEMORY.md`
 - `HANDOFF.md`
 - `IDEAS.md`
+- `DEPLOY.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `docs/ai/deployment/hetzner-vercel-production.md`
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+- `docs/ai/deployment/hetzner-cutover-execution-status.md`
 
-### Version tracking
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
+---
+
+## Validation
+
+### Static / repo-side
+- updated docs and release metadata to reflect the real infrastructure state
+
+### Live / Hetzner-side
+Validated:
+- repo present on Hetzner
+- dependencies installed
+- geo built successfully
+- local MySQL provisioned
+- DreamHost DB imported
+- Redis active
+- queue active
+- Reverb active
+- geo active
+- websocket handshake successful
+- `php artisan deploy:verify --json` healthy
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.5.3`
-- **Recommended Commit Message:** `feat: add smoke-report notification publishing (v1.5.3)`
+- **Target Version:** `1.5.4`
+- **Recommended Commit Message:** `feat: execute hetzner backend deployment and migrate fwber database (v1.5.4)`
 
 ---
 
 ## Current Best Next Steps
-1. **Redeploy the backend serving `api.fwber.me`**
-   - health routes are still missing there
-2. **Fix `geo.fwber.me` routing/DNS**
-   - geo is still resolving/responding through the wrong hosting topology
-3. **Provide a real deploy notification target**
-   - set `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` if you want chat/webhook delivery beyond local artifacts
-4. **Provision smoke credentials and websocket key access**
-   - user token
-   - merchant token
-   - moderator token
-   - Reverb app key
-5. **Run the full live deploy path**
+1. **Repoint public DNS for `api.fwber.me` to Hetzner**
+2. **Repoint public DNS for `geo.fwber.me` to Hetzner**
+3. **Issue or confirm TLS certs for `api.fwber.me` and `geo.fwber.me` on Hetzner**
+4. **Run the full smoke-enabled deploy path after DNS cutover**
    - `FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh`
-   - review smoke summary, drift diff, notification summary, diagnostics, fingerprints, and DNS appendix before sign-off
-6. **Then run live Stripe verification**
-   - premium purchase
-   - marketplace purchase
-   - webhook handling
+5. **Verify Vercel frontend → Hetzner API path end to end**
+6. **Retire DreamHost fwber backend once cutover is stable**
 
-The deployment evidence pipeline is now stronger because it can not only collect and compare evidence, but also condense that evidence into a publishable operator summary.
+The repo is no longer only deployment-prepared. The fwber backend now actually exists and runs on Hetzner with local MySQL, local Redis, Reverb, queue, and geo services active.

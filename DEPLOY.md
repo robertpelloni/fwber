@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-04
-> **Version:** 1.5.3
+> **Version:** 1.5.4
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -267,6 +267,7 @@ Automation support now exists in:
 - DNS resolution appendix inside the generated smoke-check reports (resolved addresses per public host)
 - drift-diff artifacts comparing the newest smoke report with the previous one when available
 - compact notification artifacts (and optional webhook publishing) summarizing smoke + drift state
+- live Hetzner backend execution with local MySQL import and active queue/reverb/geo services
 
 1. [ ] Frontend Vercel deploy is green
 2. [ ] `php artisan deploy:verify` returns healthy or only expected non-critical degradations

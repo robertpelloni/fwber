@@ -1,29 +1,29 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.5.3
+> **Version:** 1.5.4
 > **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Deployment & Verification
-- [ ] **Hetzner VPS Provisioning Execution**: Complete server creation, DNS cutover, package install, env setup, and service configuration using the deployment docs plus `ops/hetzner/` templates.
-- [ ] **Redeploy After Restoration Phases**: Re-run deployment now that AI, premium/billing, marketplace/merchant, geo-aware merchant discovery, merchant trust scoring, merchant review prioritization, deployment health verification, smoke-check automation, report artifacts, remediation diagnostics, endpoint fingerprinting, DNS appendix reporting, drift diffing, and notification publishing are restored on top of the migration-hardening work.
-- [ ] **Fix Live Health Route Drift**: The current reachable `api.fwber.me` deployment still returns `404` for `/api/health`, `/api/health/liveness`, and `/api/health/readiness`; current smoke data shows this traffic resolves to and is served from **Apache at `75.119.202.57`**.
-- [ ] **Fix Live Geo Domain Drift**: The current reachable `geo.fwber.me/nearby` contract returns a Vercel deployment-not-found `404`; smoke data now shows `geo.fwber.me` resolves to **`216.198.79.65|64.29.17.1`** and responds via **Vercel at `64.29.17.1`** instead of a geo microservice host.
-- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in an authenticated deployment environment with real secrets.
-- [ ] **Provision Smoke-Test Tokens/Keys**: Create or document production-safe smoke-test accounts/tokens plus the Reverb app key path so `ops/hetzner/scripts/smoke-check.sh` can run its optional authenticated and websocket probes in production.
+- [ ] **Public DNS Cutover for API**: Repoint `api.fwber.me` to Hetzner (`5.161.250.43`) so the now-deployed Hetzner backend becomes the public API.
+- [ ] **Public DNS Cutover for Geo**: Repoint `geo.fwber.me` to Hetzner (`5.161.250.43`) so the live geo hostname reaches the deployed Rust geo service instead of the current wrong target.
+- [ ] **Issue/Confirm Hetzner TLS for API + Geo**: After DNS cutover, issue or validate `api.fwber.me` and `geo.fwber.me` certificates on Hetzner and enable the final nginx vhosts.
+- [ ] **Run Full Hetzner Smoke Cutover**: Execute the smoke-enabled deploy flow on Hetzner and review summary, drift, notification, diagnostics, fingerprints, and DNS appendix artifacts after public cutover.
+- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment.
+- [ ] **Provision Smoke-Test Tokens/Keys**: Create or document production-safe smoke-test accounts/tokens plus the Reverb app key path so the full authenticated/websocket smoke flow can run in production.
 - [ ] **Wire Chat/Webhook Notifications**: Provide a real `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` target if you want deploy notifications delivered automatically outside the report directory.
 
 ## 🟡 High: Product Polish
 - [ ] **Store Asset Production**: Execute the screenshot and copy plan in `mobile/STORE_ASSETS.md`.
 - [ ] **Real-Device Notification QA**: Verify foreground, background, and cold-start notification flows on physical iOS/Android devices now that routes and toasts are standardized.
-- [ ] **Production Login 500 Root Cause Audit**: Inspect live backend logs for the production `/api/auth/login` 500 so the server-side failure itself is fixed, not just the frontend error handling.
+- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is validated, decommission the old DreamHost fwber backend path and remove stale DNS/provider dependencies.
 
 ## ✅ Recently Completed
+- [x] **Hetzner Backend Execution & Database Migration**: Deployed fwber backend services on Hetzner, provisioned local MySQL, imported DreamHost production data, and verified Redis/Reverb/geo/queue health locally.
 - [x] **Smoke Report Notification Publisher**: Added compact notification artifact generation and optional webhook publishing for smoke + drift report summaries.
 - [x] **Smoke Report Drift Diff**: Added comparison tooling that highlights summary, diagnostic, fingerprint, and DNS changes between smoke-check runs.
 - [x] **DNS Resolution Appendix & Host Mapping**: Smoke-check reports now capture resolved addresses for frontend, API, geo, and websocket hosts.
-- [x] **Endpoint Fingerprints & Host Signals**: Smoke-check reports now capture remote IPs, server headers, redirect targets, content types, and body excerpts for each endpoint.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*
