@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.3.4
+> **Current Global Version:** 1.3.5
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -24,13 +24,13 @@ fwber/
 ## 📦 Active Logical Packages
 
 ### 1. `fwber-backend`
-- **Version:** inherits global `1.3.4`
+- **Version:** inherits global `1.3.5`
 - **Role:** Core API and business logic.
 - **Owns:** auth, onboarding, profiles, photos, proximity matching, messages, block/report safety actions, notification APIs, E2E key backup/restore.
 - **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `1.3.4`
+- **Version:** inherits global `1.3.5`
 - **Role:** Main user-facing product surface.
 - **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
 - **Key stack:** Next.js app router, React, Tailwind CSS.
@@ -46,7 +46,7 @@ fwber/
 - **Notes:** frontend includes graceful fallbacks when WASM tooling or artifacts are unavailable.
 
 ### 5. `mobile`
-- **Version:** inherits global `1.3.4`
+- **Version:** inherits global `1.3.5`
 - **Role:** Native mobile shell for push notifications, secure token storage, NFC, and background location.
 - **Key stack:** Expo, React Native WebView, expo-notifications, expo-location.
 
@@ -61,4 +61,5 @@ fwber/
 - Notification routes are now standardized across backend payloads, notification drawer links, and toast CTA actions.
 - The frontend Sentry integration now follows current App Router instrumentation conventions and no longer emits Sentry-specific build warnings.
 - Active frontend pages no longer prefetch retired routes like `/roast` or `/rate-my-pussy`, and analytics event ingestion is live again in the simplified backend route set.
+- The index-optimization migration is now deployment-safe across retry scenarios because it checks for pre-existing indexes before altering tables.
 - Archived systems remain preserved under `_archive/` and should not be treated as active dependencies unless explicitly restored.

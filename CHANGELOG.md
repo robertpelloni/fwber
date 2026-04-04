@@ -863,3 +863,11 @@ All notable changes to this project will be documented in this file.
 - Hardened auth response parsing in `fwber-frontend/lib/auth-context.tsx` so malformed or HTML server error bodies now degrade into readable login/register/2FA error messages instead of crashing with JSON parse exceptions.
 - Added `NotificationSettingsAndAnalyticsTest` and re-verified the backend slice with 25 passing tests across notification, safety, analytics, and core auth/match/message flows.
 - Reconfirmed the frontend production build after the console-error sweep: `npm run build --prefix fwber-frontend` passed successfully.
+
+## [1.3.5] - 2026-04-04
+### Fixed
+- Hardened `2026_04_03_212041_optimize_core_indexes.php` so it becomes idempotent across deploy retries, skipping index creation when the target index already exists instead of crashing with MySQL duplicate-key errors.
+- Added cross-driver index detection logic for MySQL/MariaDB, SQLite, and PostgreSQL inside the migration so the deployment fix is not limited to one local environment.
+- Added `OptimizeCoreIndexesMigrationTest` to explicitly re-run the migration after it has already been applied, verifying the retry path that failed in deployment.
+- Re-validated the backend slice with 26 passing tests across migration idempotency, analytics/settings routing, notifications, safety, and the retained core dating flow.
+- Added safe frontend storage wrappers and routed analytics session persistence through them so restricted browser contexts no longer need to explode with storage-access exceptions during startup.

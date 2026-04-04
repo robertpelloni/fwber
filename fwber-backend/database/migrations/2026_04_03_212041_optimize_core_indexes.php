@@ -2,72 +2,85 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Some deploy targets partially applied this migration before failing, leaving
+     * behind one or more indexes. Re-running the raw `$table->index(...)` calls
+     * would then explode with MySQL duplicate-key errors such as:
+     * `Duplicate key name 'idx_user_profiles_location'`.
+     *
+     * The migration is therefore intentionally idempotent: each index is added
+     * only when it does not already exist on the active connection.
      */
     public function up(): void
     {
-        $driver = DB::getDriverName();
-
         // 1. user_profiles
-        Schema::table('user_profiles', function (Blueprint $table) use ($driver) {
-            $table->index(['latitude', 'longitude'], 'idx_user_profiles_location');
-            $table->index(['travel_latitude', 'travel_longitude'], 'idx_user_profiles_travel_location');
-            $table->index('gender', 'idx_user_profiles_gender');
-            $table->index('birthdate', 'idx_user_profiles_birthdate');
-            $table->index('is_travel_mode', 'idx_user_profiles_travel_mode');
-            
-            // Composite index for fast matchmaking queries
-            $table->index(['gender', 'birthdate'], 'idx_user_profiles_matchmaking');
-        });
+        $this->addIndexIfMissing('user_profiles', 'idx_user_profiles_location', fn (Blueprint $table) => $table->index(['latitude', 'longitude'], 'idx_user_profiles_location'));
+        $this->addIndexIfMissing('user_profiles', 'idx_user_profiles_travel_location', fn (Blueprint $table) => $table->index(['travel_latitude', 'travel_longitude'], 'idx_user_profiles_travel_location'));
+        $this->addIndexIfMissing('user_profiles', 'idx_user_profiles_gender', fn (Blueprint $table) => $table->index('gender', 'idx_user_profiles_gender'));
+        $this->addIndexIfMissing('user_profiles', 'idx_user_profiles_birthdate', fn (Blueprint $table) => $table->index('birthdate', 'idx_user_profiles_birthdate'));
+        $this->addIndexIfMissing('user_profiles', 'idx_user_profiles_travel_mode', fn (Blueprint $table) => $table->index('is_travel_mode', 'idx_user_profiles_travel_mode'));
+        $this->addIndexIfMissing('user_profiles', 'idx_user_profiles_matchmaking', fn (Blueprint $table) => $table->index(['gender', 'birthdate'], 'idx_user_profiles_matchmaking'));
 
         // 2. user_matches
-        Schema::table('user_matches', function (Blueprint $table) use ($driver) {
-            // Already has unique constraint on [user1_id, user2_id]
-            // We need a reverse lookup index for user2_id
-            $table->index('user2_id', 'idx_user_matches_user2');
-            $table->index('is_active', 'idx_user_matches_active');
-            
-            // Compound for the exact query: where user1 or user2 = X and active = 1
-            $table->index(['user1_id', 'is_active'], 'idx_user_matches_u1_active');
-            $table->index(['user2_id', 'is_active'], 'idx_user_matches_u2_active');
-        });
+        $this->addIndexIfMissing('user_matches', 'idx_user_matches_user2', fn (Blueprint $table) => $table->index('user2_id', 'idx_user_matches_user2'));
+        $this->addIndexIfMissing('user_matches', 'idx_user_matches_active', fn (Blueprint $table) => $table->index('is_active', 'idx_user_matches_active'));
+        $this->addIndexIfMissing('user_matches', 'idx_user_matches_u1_active', fn (Blueprint $table) => $table->index(['user1_id', 'is_active'], 'idx_user_matches_u1_active'));
+        $this->addIndexIfMissing('user_matches', 'idx_user_matches_u2_active', fn (Blueprint $table) => $table->index(['user2_id', 'is_active'], 'idx_user_matches_u2_active'));
 
         // 3. match_actions
-        Schema::table('match_actions', function (Blueprint $table) use ($driver) {
-            // Already has unique constraint on [user_id, target_user_id]
-            // Needs reverse lookup for check for mutual matches
-            $table->index('target_user_id', 'idx_match_actions_target');
-            $table->index(['target_user_id', 'action'], 'idx_match_actions_target_action');
-        });
+        $this->addIndexIfMissing('match_actions', 'idx_match_actions_target', fn (Blueprint $table) => $table->index('target_user_id', 'idx_match_actions_target'));
+        $this->addIndexIfMissing('match_actions', 'idx_match_actions_target_action', fn (Blueprint $table) => $table->index(['target_user_id', 'action'], 'idx_match_actions_target_action'));
 
         // 4. messages
-        Schema::table('messages', function (Blueprint $table) use ($driver) {
-            // Already has index on [sender_id, receiver_id]
-            // Needs specific indexes for message retrieval and unread counts
-            $table->index(['receiver_id', 'sender_id', 'created_at'], 'idx_msgs_conversation');
-            $table->index(['receiver_id', 'read_at'], 'idx_msgs_unread');
-            $table->index('created_at', 'idx_msgs_created');
-        });
+        $this->addIndexIfMissing('messages', 'idx_msgs_conversation', fn (Blueprint $table) => $table->index(['receiver_id', 'sender_id', 'created_at'], 'idx_msgs_conversation'));
+        $this->addIndexIfMissing('messages', 'idx_msgs_unread', fn (Blueprint $table) => $table->index(['receiver_id', 'read_at'], 'idx_msgs_unread'));
+        $this->addIndexIfMissing('messages', 'idx_msgs_created', fn (Blueprint $table) => $table->index('created_at', 'idx_msgs_created'));
 
         // 5. photos
-        Schema::table('photos', function (Blueprint $table) use ($driver) {
-            // To quickly fetch a user's primary/ordered photos
-            $table->index(['user_id', 'is_primary'], 'idx_photos_user_primary');
-            $table->index(['user_id', 'order'], 'idx_photos_user_order');
-        });
+        $this->addIndexIfMissing('photos', 'idx_photos_user_primary', fn (Blueprint $table) => $table->index(['user_id', 'is_primary'], 'idx_photos_user_primary'));
+        $this->addIndexIfMissing('photos', 'idx_photos_user_order', fn (Blueprint $table) => $table->index(['user_id', 'order'], 'idx_photos_user_order'));
 
         // 6. proximity_artifacts
-        Schema::table('proximity_artifacts', function (Blueprint $table) use ($driver) {
-            $table->index('type', 'idx_artifacts_type');
-            $table->index('expires_at', 'idx_artifacts_expiry');
-            $table->index(['latitude', 'longitude'], 'idx_artifacts_location');
+        $this->addIndexIfMissing('proximity_artifacts', 'idx_artifacts_type', fn (Blueprint $table) => $table->index('type', 'idx_artifacts_type'));
+        $this->addIndexIfMissing('proximity_artifacts', 'idx_artifacts_expiry', fn (Blueprint $table) => $table->index('expires_at', 'idx_artifacts_expiry'));
+        $this->addIndexIfMissing('proximity_artifacts', 'idx_artifacts_location', fn (Blueprint $table) => $table->index(['latitude', 'longitude'], 'idx_artifacts_location'));
+    }
+
+    private function addIndexIfMissing(string $tableName, string $indexName, callable $definition): void
+    {
+        if (! Schema::hasTable($tableName) || $this->hasIndex($tableName, $indexName)) {
+            return;
+        }
+
+        Schema::table($tableName, function (Blueprint $table) use ($definition) {
+            $definition($table);
         });
+    }
+
+    private function hasIndex(string $tableName, string $indexName): bool
+    {
+        $driver = DB::getDriverName();
+
+        return match ($driver) {
+            'mysql', 'mariadb' => (bool) DB::table('information_schema.statistics')
+                ->whereRaw('table_schema = DATABASE()')
+                ->where('table_name', $tableName)
+                ->where('index_name', $indexName)
+                ->exists(),
+            'sqlite' => collect(DB::select("PRAGMA index_list('{$tableName}')"))
+                ->contains(fn ($index) => ($index->name ?? null) === $indexName),
+            'pgsql' => (bool) DB::table('pg_indexes')
+                ->whereRaw('schemaname = current_schema()')
+                ->where('tablename', $tableName)
+                ->where('indexname', $indexName)
+                ->exists(),
+            default => false,
+        };
     }
 
     /**

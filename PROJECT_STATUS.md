@@ -1,36 +1,37 @@
-# PROJECT_STATUS.md - fwber v1.3.4 (Console Error Sweep)
+# PROJECT_STATUS.md - fwber v1.3.5 (Deployment Migration Idempotency)
 
 **Date:** 2026-04-04
-**Version:** 1.3.4 "Console Error Sweep"
+**Version:** 1.3.5 "Deployment Migration Idempotency"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
 ## 🎯 What This Release Solved
-This release targeted real browser-console issues observed against production-style usage.
+This release directly addressed the deployment failure caused by the `2026_04_03_212041_optimize_core_indexes` migration crashing on MySQL with:
 
-The reported problems broke down into four buckets:
-1. stale homepage/share links were prefetching removed routes like `/roast` and `/rate-my-pussy`
-2. frontend analytics was posting to `/api/analytics/events`, but the active backend route set did not expose that endpoint
-3. notification preferences had a hidden frontend/backend route mismatch
-4. login failures with malformed/non-JSON server responses were surfacing as raw JSON parse exceptions instead of actionable auth errors
+- `SQLSTATE[42000]: Duplicate key name 'idx_user_profiles_location'`
 
-## 🧹 Console/Error Hardening Delivered
-- **Removed stale retired-route prefetches:** replaced homepage calls-to-action that were still pointing at archived routes, and updated share CTA fallback routing to use active pages.
-- **Restored analytics ingestion endpoint:** registered `POST /api/analytics/events` publicly so the lightweight page-view client no longer generates 404 noise before login.
-- **Fixed notification-preference route contract:** backend now exposes `PUT /api/notification-preferences/{type}`, which matches the existing frontend client behavior.
-- **Hardened auth response parsing:** login/register/wallet/2FA flows now safely handle non-JSON error bodies and surface readable fallback messages instead of throwing `Unexpected non-whitespace character after JSON...` parser errors.
+That failure pattern means the deployment target already had at least one of the intended indexes, likely from a partial prior migration attempt. Re-running the migration then exploded because the migration was written as a one-shot schema mutation instead of an idempotent deployment-safe step.
+
+## 🛠️ Migration Hardening
+- **Made the core index optimization migration idempotent:** each index is now created only if it does not already exist on the active connection.
+- **Cross-driver index detection added:** the migration now checks existing indexes for:
+  - MySQL / MariaDB
+  - SQLite
+  - PostgreSQL
+- **Production deploy safety improved:** a partially applied migration can now be re-run without failing on duplicate-key errors.
+
+## 🧰 Storage Access Hardening
+- **Restricted-browser resilience:** introduced `fwber-frontend/lib/browser-storage.ts` and routed analytics session storage through safe wrappers so restricted contexts can fail gracefully instead of throwing noisy storage-access exceptions during page load.
 
 ## ✅ Validation
-- **Backend tests passed:**
-  - `php artisan test tests/Feature/NotificationSettingsAndAnalyticsTest.php tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
-  - Result: **25 passed**
-- **Frontend production build passed:**
-  - `npm run build --prefix fwber-frontend`
+- **Regression test added:** `tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+- **Backend validation passed:**
+  - `php artisan test tests/Feature/OptimizeCoreIndexesMigrationTest.php tests/Feature/NotificationSettingsAndAnalyticsTest.php tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
+  - Result: **26 passed**
 
 ## ✅ Release Focus
-- [x] Eliminate stale-link 404 prefetches from active pages.
-- [x] Restore the active analytics ingestion API route.
-- [x] Repair notification settings route mismatch.
-- [x] Make auth error parsing resilient to malformed/non-JSON responses.
-- [x] Re-verify backend tests and frontend build.
+- [x] Rework `optimize_core_indexes` so retries are safe after partial deploy application.
+- [x] Detect existing indexes before attempting to create them.
+- [x] Add regression coverage that re-runs the migration successfully.
+- [x] Re-verify the backend core suite slice after the migration hardening.
