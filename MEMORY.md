@@ -1,5 +1,11 @@
 # MEMORY.md
 
+## 2026-04-04 — v1.3.2 Notification Route Consistency
+- Notification UX can drift even when each individual layer "works." The backend payload shape, toast CTA logic, notification drawer links, and target page behavior must all agree on the same route contract.
+- Database notifications should carry explicit `type`, `title`, `body`, `url`, and actor identifiers instead of relying on frontend inference from PHP class names.
+- The `/messages` page did not previously honor `?user=` routing, which meant notification links could point somewhere technically valid but still fail to land the user in the intended conversation.
+- A small shared helper (`fwber-frontend/lib/notifications.ts`) is enough to eliminate most frontend notification routing drift.
+
 ## 2026-04-04 — v1.3.1 Foreground Notification UX
 - Expo foreground notifications were already reaching `mobile/app/index.js`, but there was no user-facing surface inside the WebView. Native events must be explicitly bridged into browser space if the product shell is WebView-first.
 - The cleanest approach is to reuse the existing `ToastProvider` instead of building a second native-only overlay system.

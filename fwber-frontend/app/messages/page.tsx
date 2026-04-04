@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { getConversations, type Conversation } from '@/lib/api/messages'
@@ -22,7 +22,7 @@ import AppHeader from '@/components/AppHeader'
 
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
-  const { showError } = useToast()
+  const { showError, showInfo } = useToast()
   const { videoSignals } = useWebSocket()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
@@ -35,6 +35,8 @@ export default function MessagesPage() {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [isAROpen, setIsAROpen] = useState(false)
   const [incomingCall, setIncomingCall] = useState<{ callerId: string } | null>(null)
+  const [requestedUserId, setRequestedUserId] = useState<number | null>(null)
+  const missingConversationNoticeRef = useRef<number | null>(null)
 
   const loadConversations = useCallback(async () => {
     if (!token) return
@@ -52,10 +54,40 @@ export default function MessagesPage() {
   }, [token])
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const value = new URLSearchParams(window.location.search).get('user')
+    setRequestedUserId(value ? Number(value) : null)
+  }, [])
+
+  useEffect(() => {
     if (isAuthenticated && token) {
       loadConversations()
     }
   }, [isAuthenticated, token, loadConversations])
+
+  useEffect(() => {
+    if (!requestedUserId || conversations.length === 0) {
+      return
+    }
+
+    const matchingConversation = conversations.find(
+      (conversation) => conversation.other_user?.id === requestedUserId,
+    )
+
+    if (matchingConversation) {
+      missingConversationNoticeRef.current = null
+      setSelectedConversation(matchingConversation)
+      return
+    }
+
+    if (missingConversationNoticeRef.current !== requestedUserId) {
+      missingConversationNoticeRef.current = requestedUserId
+      showInfo('Conversation unavailable', 'We could not find an active conversation for that notification yet.')
+    }
+  }, [conversations, requestedUserId, showInfo])
 
   useEffect(() => {
     const lastSignal = videoSignals[videoSignals.length - 1];

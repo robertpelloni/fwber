@@ -1,40 +1,40 @@
-# PROJECT_STATUS.md - fwber v1.3.1 (Foreground Notification UX)
+# PROJECT_STATUS.md - fwber v1.3.2 (Notification Route Consistency)
 
 **Date:** 2026-04-04
-**Version:** 1.3.1 "Foreground Notification UX"
+**Version:** 1.3.2 "Notification Route Consistency"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## 🔔 Native-to-Web Foreground Push Bridge
-This release focused on the last obvious gap in the mobile notification experience: **what happens when a push arrives while the app is already open**.
+## 🎯 What This Release Solved
+This release completed the audit of notification destinations across the product. Before this pass, different notification surfaces were making different routing assumptions:
+- native push payloads
+- database notifications returned by `/api/notifications`
+- notification bell links
+- foreground toast CTA actions
+- the `/messages` screen itself
 
-Previously:
-- Expo received foreground pushes in `mobile/app/index.js`
-- the app logged them to the native console
-- but the user saw nothing inside the WebView unless they later checked the OS tray
+That fragmentation creates a subtle but dangerous UX bug class: users tap a notification and land somewhere generic or inconsistent depending on which transport delivered it.
 
-Now:
-- the Expo shell converts foreground notifications into a browser `CustomEvent`
-- the WebView dispatches `fwber:native-notification`
-- the Next.js app consumes that event and renders an in-app toast immediately
-- message and match pushes include direct actions that route the user into the correct page
-
-## ✅ UX Improvements Delivered
-- **Foreground push toasts:** open mobile sessions now receive immediate visual feedback for new matches and new messages.
-- **Actionable toasts:** taps on the toast CTA route directly to `/matches` or `/messages` without forcing the user through the notification tray.
-- **Cold-start routing guard:** the native shell now checks `Notifications.getLastNotificationResponseAsync()` on launch so notification opens remain reliable when the app was resumed from a push.
-- **Shared toast system reuse:** the native bridge feeds the existing `ToastProvider`, keeping the UX consistent with the rest of the app instead of inventing a second notification UI.
+## 🔔 Notification Route Consistency
+- **Canonical notification routing helper added:** `fwber-frontend/lib/notifications.ts` now normalizes notification types and computes routes/action labels from shared logic.
+- **Backend notification payloads standardized:** `NewMessageNotification` and `NewMatchNotification` now emit consistent `type`, `title`, `body`, `url`, `user_id`, and `user_name` fields for database and push surfaces.
+- **Message notifications are now conversation-aware:** message pushes route to `/messages?user={senderId}` instead of dropping users on a generic inbox screen.
+- **Messages page now honors notification routing:** `fwber-frontend/app/messages/page.tsx` reads the requested user from the URL and auto-selects the matching conversation when it exists.
+- **Notification bell and native toast CTA logic now agree:** both surfaces route through the same helper, reducing drift.
 
 ## ✅ Validation
-- **Frontend production build succeeded:**
+- **Backend tests passed:**
+  - `php artisan test tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
+  - Result: **23 passed**
+- **Frontend build passed:**
   - `npm run build --prefix fwber-frontend`
-- Notes:
-  - build completed successfully
-  - Sentry emitted existing configuration deprecation warnings, but they did not block compilation
+  - Result: successful production build
+  - Note: existing Sentry warnings remain non-blocking
 
 ## ✅ Release Focus
-- [x] Bridge native foreground pushes into the web UI.
-- [x] Show actionable match/message toasts during active mobile sessions.
-- [x] Preserve deep-link routing when the app launches from a tapped push.
-- [x] Re-verify the frontend production build after the bridge landed.
+- [x] Standardize backend notification payload fields.
+- [x] Create shared frontend notification route logic.
+- [x] Make notification taps open the intended conversation when possible.
+- [x] Add backend regression coverage for notification route shape.
+- [x] Re-verify backend tests and frontend production build.

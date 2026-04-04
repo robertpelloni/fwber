@@ -837,3 +837,14 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Hardened notification-launch routing in the mobile shell by checking `Notifications.getLastNotificationResponseAsync()` during startup, preserving deep links when the app is opened from a tapped push after being backgrounded or cold-started.
 - Re-verified the frontend production build after the bridge landed: `npm run build --prefix fwber-frontend` completed successfully, with only pre-existing Sentry configuration warnings.
+
+## [1.3.2] - 2026-04-04
+### Added
+- Added `fwber-frontend/lib/notifications.ts` to centralize notification-type normalization, route resolution, and CTA label generation so the notification drawer and native foreground toast bridge no longer drift.
+- Added `fwber-backend/tests/Feature/NotificationRoutingTest.php` to verify the notifications endpoint exposes consistent message and match payloads, including route-ready URLs.
+
+### Fixed
+- Standardized `NewMessageNotification` and `NewMatchNotification` database/push payloads around explicit `type`, `title`, `body`, `url`, `user_id`, and `user_name` fields instead of forcing the frontend to infer behavior from PHP class names.
+- Upgraded message notifications to route directly into `/messages?user={senderId}` and updated the `/messages` page to auto-select the requested conversation when present.
+- Updated the notification drawer and native foreground toast bridge to use shared route logic, ensuring users land in the same destination regardless of whether they tapped a push, a toast CTA, or a notification bell item.
+- Re-verified both backend and frontend integrity: `php artisan test tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php` passed with 23 tests, and `npm run build --prefix fwber-frontend` completed successfully.

@@ -52,7 +52,12 @@ class NewMessageNotification extends Notification implements ShouldQueue
             ->title('New Message from '.$this->sender->name)
             ->body('You have a new encrypted message.')
             ->action('Reply', 'reply_message')
-            ->data(['url' => '/messages']);
+            ->data([
+                'url' => '/messages?user='.$this->sender->id,
+                'type' => 'message',
+                'user_id' => $this->sender->id,
+                'user_name' => $this->sender->name,
+            ]);
     }
 
     /**
@@ -63,7 +68,12 @@ class NewMessageNotification extends Notification implements ShouldQueue
         return (new ExpoMessage())
             ->title('New Message from '.$this->sender->name)
             ->body('You have a new encrypted message.')
-            ->data(['url' => '/messages', 'type' => 'new_message'])
+            ->data([
+                'url' => '/messages?user='.$this->sender->id,
+                'type' => 'message',
+                'user_id' => $this->sender->id,
+                'user_name' => $this->sender->name,
+            ])
             ->priority('high');
     }
 
@@ -75,9 +85,15 @@ class NewMessageNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
+            'type' => 'message',
+            'title' => 'New Message from '.$this->sender->name,
+            'body' => $this->messageContent,
+            'message' => $this->messageContent,
+            'url' => '/messages?user='.$this->sender->id,
+            'user_id' => $this->sender->id,
+            'user_name' => $this->sender->name,
             'sender_id' => $this->sender->id,
             'sender_name' => $this->sender->name,
-            'message' => $this->messageContent,
             'chatroom_id' => $this->chatroomId,
         ];
     }

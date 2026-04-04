@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ToastProvider'
+import { getNotificationActionLabel, getNotificationRoute, normalizeNotificationType } from '@/lib/notifications'
 
 interface NativeNotificationPayload {
   title?: string
@@ -38,8 +39,8 @@ export default function NativeForegroundNotificationBridge() {
 
       const title = detail.title?.trim() || 'New activity'
       const body = detail.body?.trim() || 'Open fwber to view the latest update.'
-      const targetUrl = typeof detail.data?.url === 'string' ? detail.data.url : undefined
       const notificationType = typeof detail.data?.type === 'string' ? detail.data.type : 'system'
+      const targetUrl = getNotificationRoute({ type: notificationType, data: detail.data })
       const notificationKey = JSON.stringify({ title, body, targetUrl, notificationType, receivedAt: detail.receivedAt })
 
       if (notificationKey === lastNotificationKeyRef.current) {
@@ -48,19 +49,21 @@ export default function NativeForegroundNotificationBridge() {
 
       lastNotificationKeyRef.current = notificationKey
 
-      const action = targetUrl
+      const action = targetUrl !== '#'
         ? {
-            label: targetUrl.startsWith('/messages') ? 'Open Messages' : targetUrl.startsWith('/matches') ? 'View Match' : 'Open',
+            label: getNotificationActionLabel({ type: notificationType, data: detail.data }),
             onClick: () => router.push(targetUrl),
           }
         : undefined
 
-      if (notificationType === 'new_match') {
+      const normalizedType = normalizeNotificationType(notificationType)
+
+      if (normalizedType === 'match') {
         showMatch(title, body, action)
         return
       }
 
-      if (notificationType === 'new_message') {
+      if (normalizedType === 'message') {
         showMessage(title, body, action)
         return
       }

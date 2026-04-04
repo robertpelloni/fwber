@@ -58,7 +58,12 @@ class NewMatchNotification extends Notification implements ShouldQueue
             ->title('New Match!')
             ->body("You matched with {$this->matchedUser->name}!")
             ->action('View Match', 'view_match')
-            ->data(['url' => '/matches']);
+            ->data([
+                'url' => '/matches',
+                'type' => 'match',
+                'user_id' => $this->matchedUser->id,
+                'user_name' => $this->matchedUser->name,
+            ]);
     }
 
     /**
@@ -69,7 +74,12 @@ class NewMatchNotification extends Notification implements ShouldQueue
         return (new ExpoMessage())
             ->title('New Match!')
             ->body("You matched with {$this->matchedUser->name}!")
-            ->data(['url' => '/matches', 'type' => 'new_match'])
+            ->data([
+                'url' => '/matches',
+                'type' => 'match',
+                'user_id' => $this->matchedUser->id,
+                'user_name' => $this->matchedUser->name,
+            ])
             ->priority('high');
     }
 
@@ -82,7 +92,12 @@ class NewMatchNotification extends Notification implements ShouldQueue
             title: 'New Match!',
             body: "You matched with {$this->matchedUser->name}!",
         )))
-            ->data(['url' => '/matches', 'type' => 'new_match'])
+            ->data([
+                'url' => '/matches',
+                'type' => 'match',
+                'user_id' => (string) $this->matchedUser->id,
+                'user_name' => $this->matchedUser->name,
+            ])
             ->custom([
                 'android' => [
                     'notification' => [
@@ -100,9 +115,15 @@ class NewMatchNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
+            'type' => 'match',
+            'title' => 'New Match!',
+            'body' => 'You matched with '.$this->matchedUser->name.'!',
+            'message' => 'You matched with '.$this->matchedUser->name.'!',
+            'url' => '/matches',
+            'user_id' => $this->matchedUser->id,
+            'user_name' => $this->matchedUser->name,
             'matched_user_id' => $this->matchedUser->id,
             'matched_user_name' => $this->matchedUser->name,
-            'message' => 'You matched with '.$this->matchedUser->name.'!',
         ];
     }
 }
