@@ -1,0 +1,15 @@
+[Unit]
+Description=fwber Reverb WebSocket Server
+After=network.target redis-server.service
+
+[Service]
+User=deploy
+Group=deploy
+Restart=always
+WorkingDirectory=/var/www/fwber/repo/fwber-backend
+ExecStart=/usr/bin/php /var/www/fwber/repo/fwber-backend/artisan reverb:start --host=127.0.0.1 --port=8080
+StandardOutput=append:/var/log/fwber-reverb.log
+StandardError=append:/var/log/fwber-reverb-error.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=fwber Laravel Queue Worker
+After=network.target redis-server.service mysql.service
+
+[Service]
+User=deploy
+Group=deploy
+Restart=always
+WorkingDirectory=/var/www/fwber/repo/fwber-backend
+ExecStart=/usr/bin/php /var/www/fwber/repo/fwber-backend/artisan queue:work --sleep=3 --tries=3 --timeout=120
+StandardOutput=append:/var/log/fwber-queue.log
+StandardError=append:/var/log/fwber-queue-error.log
+
+[Install]
+WantedBy=multi-user.target

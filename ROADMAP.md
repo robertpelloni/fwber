@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.4.1 "Hetzner Deployment Docs Refresh"
+> **Current Version:** 1.4.2 "Hetzner Ops Templates & CI Env Alignment"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,8 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.4.1)
+### Phase 5: Production Scale (COMPLETED - v1.4.2)
+- **Hetzner Ops Templates & CI Env Alignment:** Added copy-ready Hetzner Nginx/systemd/script assets under `ops/hetzner/` and corrected frontend CI/env examples to match the active API + Reverb contract.
 - **Hetzner Deployment Docs Refresh:** Replaced DreamHost-first deployment guidance with Vercel frontend + Hetzner VPS backend documentation across root ops docs and deployment references, aligning operations with the restored active stack.
 - **Marketplace & Merchant Restoration:** Restored compact merchant commerce infrastructure with merchant registration/profile/dashboard/inventory/analytics endpoints, merchant storefront pages, purchase/redemption flow, digital receipts, and `merchant_profiles` / `merchant_inventories` / `merchant_payments` / `inventory_redemptions` schema.
 - **Premium & Billing Restoration:** Restored `PremiumController`, `StripeWebhookController`, `Payment`, `Subscription`, the `payments`/`subscriptions` schema, `/premium`, `/settings/subscription`, `/premium/success`, and the repaired who-likes-you premium flow.
@@ -63,6 +64,6 @@ The platform is now **100% focused on its core identity**:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology and validate restored AI, premium, and merchant systems in the new environment.
+1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the new `ops/hetzner/` templates and validate restored AI, premium, and merchant systems in the new environment.
 2. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
 3. **Geo-Aware Merchant Ranking:** Add real merchant location persistence so nearby marketplace and AR overlays can rank by actual merchant distance.

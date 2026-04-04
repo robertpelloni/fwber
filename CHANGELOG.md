@@ -926,3 +926,12 @@ All notable changes to this project will be documented in this file.
 - Rewrote `DEPLOY.md` around the Vercel frontend + Hetzner VPS backend topology.
 - Converted `docs/deployment/DREAMHOST_DEPLOYMENT.md` into a legacy-reference notice instead of an active recommendation.
 - Updated Stripe rollout and Cloudflare edge-caching docs so they now reference the Hetzner/Vercel production model and restored merchant billing surface.
+
+## [1.4.2] - 2026-04-04
+### Added
+- Added `ops/hetzner/nginx/*`, `ops/hetzner/systemd/*`, and `ops/hetzner/scripts/*` as copy-ready operational assets for Hetzner provisioning and deployment.
+
+### Fixed
+- Corrected `.github/workflows/frontend-build.yml` so CI now uses the real frontend runtime contract (`NEXT_PUBLIC_API_URL` without `/api`, and Reverb host/port/scheme vars).
+- Corrected `fwber-frontend/.env.production.example` to remove stale `/api` suffix usage and legacy Mercure-oriented realtime configuration.
+- Updated Hetzner deployment docs to point directly at the new operational templates.

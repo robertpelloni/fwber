@@ -83,6 +83,11 @@ Use dedicated service units for:
 
 This is preferred over ad-hoc `nohup` background processes because production should survive shell disconnects and system reboots predictably.
 
+Copy-ready templates now exist in:
+- `ops/hetzner/systemd/fwber-queue.service`
+- `ops/hetzner/systemd/fwber-reverb.service`
+- `ops/hetzner/systemd/fwber-geo.service`
+
 ## 6. Environment Variable Split
 
 ### Vercel frontend env
@@ -109,6 +114,16 @@ GEO_SCREENER_URL=https://geo.fwber.me
 ```
 
 ## 7. Deployment Order
+
+Copy-ready bootstrap and deploy scripts now exist in:
+- `ops/hetzner/scripts/bootstrap-ubuntu.sh`
+- `ops/hetzner/scripts/deploy-backend.sh`
+
+Nginx virtual host templates exist in:
+- `ops/hetzner/nginx/api.fwber.me.conf`
+- `ops/hetzner/nginx/ws.fwber.me.conf`
+- `ops/hetzner/nginx/geo.fwber.me.conf`
+
 
 1. Provision Hetzner VPS
 2. Secure SSH + firewall
