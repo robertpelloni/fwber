@@ -1,6 +1,6 @@
 # Hetzner + Vercel Production Blueprint
 
-> **Version:** 1.4.8
+> **Version:** 1.4.9
 > **Status:** Recommended deployment topology for restored fwber stack
 
 This document captures the production topology now recommended for fwber after the phased restoration of:
@@ -147,6 +147,7 @@ After cutover:
 - [ ] `php artisan deploy:verify` reports healthy critical services
 - [ ] `ops/hetzner/scripts/smoke-check.sh` passes with the appropriate env tokens/keys
 - [ ] JSON/Markdown smoke-check reports are archived for the cutover run
+- [ ] smoke-check diagnostics are reviewed and any flagged remediation items are addressed before sign-off
 - [ ] `/api/health`, `/api/health/liveness`, and `/api/health/readiness` respond correctly
 - [ ] auth routes behave correctly
 - [ ] websocket connection succeeds

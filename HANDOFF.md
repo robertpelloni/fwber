@@ -1,20 +1,19 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.4.8
+> **Version Reached:** 1.4.9
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the autonomous deployment-hardening loop and delivered **v1.4.8 "Smoke Check Report Artifacts & Live Drift Detection"**.
+This session continued the autonomous deployment-hardening loop and delivered **v1.4.9 "Smoke Check Diagnostics & Remediation Hints"**.
 
-After v1.4.7 introduced a reusable Hetzner smoke-check script, the next practical weakness was obvious: smoke runs still vanished into terminal scrollback. There was no durable artifact to attach to cutover notes, compare between deploys, or preserve as evidence when a live environment drifted.
+After v1.4.8 added smoke-check report artifacts, the next practical gap was clear: the reports preserved evidence, but they still expected an operator to manually interpret the failure pattern.
 
-This release fixes that by adding:
-- JSON smoke-check reports
-- Markdown smoke-check reports
-- timestamped report directories during deploy-script runs
-- a real public smoke-check execution against the currently reachable fwber domains
-- documented live findings showing that public deployment drift still exists on health and geo routing
+This release makes the smoke-check reports more operationally useful by adding:
+- structured diagnostics in the JSON report
+- a remediation section in the Markdown report
+- heuristic triage for common live drift signatures
+- another real public smoke-check run to confirm the diagnostics match the currently reachable fwber domains
 
 No processes were manually killed.
 
@@ -22,34 +21,50 @@ No processes were manually killed.
 
 ## What Changed
 
-### 1. `ops/hetzner/scripts/smoke-check.sh` now writes report artifacts
-Added support for:
-- `FWBER_REPORT_DIR`
-- `FWBER_REPORT_JSON_PATH`
-- `FWBER_REPORT_MD_PATH`
+### 1. `ops/hetzner/scripts/smoke-check.sh` now generates deployment diagnostics
+The script now analyzes the captured case log after a smoke run and produces diagnostics with:
+- severity
+- title
+- finding
+- remediation guidance
 
-When enabled, the script now emits:
+These diagnostics are included in:
 - `smoke-check-summary.json`
 - `smoke-check-summary.md`
 
-It also now records each pass/warn/fail as a structured case before printing it, which means one run produces both:
-- console-readable output
-- archive-friendly report output
+### 2. Current heuristics added
+#### Backend route drift on `api.fwber.me`
+Triggered when:
+- `/api/health`
+- `/api/health/liveness`
+- `/api/health/readiness`
+all fail with `404`
 
-### 2. `ops/hetzner/scripts/deploy-backend.sh` now preserves smoke evidence
-When:
-- `FWBER_RUN_SMOKE_CHECK=1`
+Interpretation:
+- the reachable backend is likely stale or serving an older route set
 
-The deploy script now creates timestamped report folders under:
-- `logs/deploy-reports/<timestamp>/`
+#### Geo domain drift / Vercel misrouting
+Triggered when:
+- the geo endpoint fails
+- the response body contains `deployment could not be found on Vercel`
 
-The root can be overridden with:
-- `FWBER_DEPLOY_REPORT_DIR=/custom/path`
+Interpretation:
+- `geo.fwber.me` is still pointed at the wrong target for the intended Hetzner topology
 
-This matters because repeated deploys now leave behind concrete evidence instead of overwriting one ambiguous output stream.
+#### Incomplete authenticated smoke coverage
+Triggered when smoke tokens are missing for premium / merchant / moderation probes.
 
-### 3. Real live smoke validation was executed
-I ran:
+#### Partial-health narrowing signal
+Triggered when:
+- invalid-login still passes
+- public roast preview still passes
+- health or geo checks fail
+
+Interpretation:
+- the public deployment is partially healthy, so remediation should focus on routing/deploy alignment instead of a full outage assumption
+
+### 3. Real public validation was executed again
+Executed:
 
 ```bash
 FWBER_SKIP_LOCAL_ARTISAN=1 \
@@ -58,37 +73,16 @@ FWBER_REPORT_DIR=<tmp> \
 bash ops/hetzner/scripts/smoke-check.sh
 ```
 
-That run produced the new JSON and Markdown reports successfully and surfaced important live-environment findings:
+Observed:
+- frontend reachability still passes
+- invalid-login still passes
+- public roast preview still passes
+- `/api/health*` still fails with `404`
+- `geo.fwber.me/nearby` still fails with a Vercel deployment-not-found `404`
 
-#### Passes
-- frontend reachability → `307`
-- invalid-login contract → `422`
-- public roast preview → `200`
+The updated reports now explicitly interpret those failures rather than only recording them.
 
-#### Failures
-- `https://api.fwber.me/api/health` → `404 route not found`
-- `https://api.fwber.me/api/health/liveness` → `404 route not found`
-- `https://api.fwber.me/api/health/readiness` → `404 route not found`
-- `https://geo.fwber.me/nearby?...` → `404` with `The deployment could not be found on Vercel.`
-
-#### Warnings (intentional for the run)
-- local artisan verification skipped
-- websocket probe skipped
-- authenticated premium/merchant/moderation probes skipped because no tokens were supplied
-
-### 4. A report-writer regression was found and fixed in the same session
-The first live report-writing attempt exposed a shell formatting issue:
-- dash-prefixed `printf` format strings in the Markdown writer were interpreted as options by the shell
-
-Fix applied:
-- switched those report-writer calls to `printf -- ...`
-
-After the fix:
-- JSON report generation succeeded
-- Markdown report generation succeeded
-- failing smoke runs still preserved artifacts correctly
-
-### 5. Documentation was updated around both the feature and the live findings
+### 4. Documentation updated
 Updated:
 - `CHANGELOG.md`
 - `DEPLOY.md`
@@ -97,13 +91,14 @@ Updated:
 - `ROADMAP.md`
 - `MEMORY.md`
 - `IDEAS.md`
+- `HANDOFF.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `docs/ai/deployment/hetzner-vercel-production.md`
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
 
 Added:
-- `docs/ai/implementation/smoke-check-report-artifacts.md`
-- `docs/ai/testing/smoke-check-report-artifacts.md`
+- `docs/ai/implementation/smoke-check-diagnostics-and-remediation.md`
+- `docs/ai/testing/smoke-check-diagnostics-and-remediation.md`
 
 ---
 
@@ -112,38 +107,33 @@ Added:
 ### Static validation
 Executed:
 - `bash -n ops/hetzner/scripts/smoke-check.sh`
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
 - `git diff --check`
-
-Result:
-- all passed after the report-writer fix
 
 ### Live smoke validation
 Executed:
 - `FWBER_SKIP_LOCAL_ARTISAN=1 FWBER_SKIP_WEBSOCKET=1 FWBER_REPORT_DIR=<tmp> bash ops/hetzner/scripts/smoke-check.sh`
 
-Result:
-- reports successfully generated
-- real deployment drift detected on `/api/health*`
-- real deployment drift detected on `geo.fwber.me`
-- core auth error contract and public roast route still healthy
+Validated:
+- the script still fails correctly on real live drift
+- JSON report includes a `diagnostics` array
+- Markdown report includes a `Diagnostics & Recommended Actions` section
+- the generated diagnostics match the observed public-domain failure pattern
 
 ### Memory operations
 Executed:
-- searched AI DevKit memory for prior smoke-check/report-artifact knowledge
-- stored the new v1.4.8 deployment automation knowledge after implementation/validation
+- searched AI DevKit memory for prior smoke-check diagnostics knowledge
+- will store the v1.4.9 diagnostics/remediation knowledge after this implementation
 
 ---
 
 ## Files Changed This Session
 
-### Operations scripts
+### Operations script
 - `ops/hetzner/scripts/smoke-check.sh`
-- `ops/hetzner/scripts/deploy-backend.sh`
 
 ### AI DevKit docs
-- `docs/ai/implementation/smoke-check-report-artifacts.md`
-- `docs/ai/testing/smoke-check-report-artifacts.md`
+- `docs/ai/implementation/smoke-check-diagnostics-and-remediation.md`
+- `docs/ai/testing/smoke-check-diagnostics-and-remediation.md`
 
 ### Deployment / release docs
 - `CHANGELOG.md`
@@ -167,27 +157,27 @@ Executed:
 ---
 
 ## Git / Release
-- **Target Version:** `1.4.8`
-- **Recommended Commit Message:** `feat: add smoke-check report artifacts and detect live deploy drift (v1.4.8)`
+- **Target Version:** `1.4.9`
+- **Recommended Commit Message:** `feat: add smoke-check diagnostics and remediation hints (v1.4.9)`
 
 ---
 
 ## Current Best Next Steps
-1. **Redeploy the live backend that serves `api.fwber.me`**
-   - the new health routes are not present on the currently reachable deployment
+1. **Redeploy the backend serving `api.fwber.me`**
+   - the diagnostics strongly suggest route drift / stale backend rollout
 2. **Fix `geo.fwber.me` routing**
-   - it is currently resolving to a Vercel-style deployment-not-found response instead of a geo microservice
+   - the diagnostics strongly suggest the geo subdomain is still pointed at Vercel or another wrong target
 3. **Provision smoke credentials and websocket key access**
    - user token
    - merchant token
    - moderator token
    - Reverb app key
-4. **Run the full smoke/deploy ladder live**
+4. **Run the full deploy + smoke path live**
    - `FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh`
-   - archive the generated reports
+   - review the generated diagnostics before sign-off
 5. **Then run live Stripe verification**
    - premium purchase
    - marketplace purchase
    - webhook handling
 
-The repo is now stronger not just because the automation improved, but because the automation immediately produced actionable live-environment findings.
+The smoke-check system is now not just a validator and not just an artifact writer. It is also a lightweight deploy-triage assistant.

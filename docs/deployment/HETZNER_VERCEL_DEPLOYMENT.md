@@ -18,7 +18,8 @@ This document replaces the old DreamHost-first recommendation for current produc
 9. Run `php artisan deploy:verify`
 10. Run `ops/hetzner/scripts/smoke-check.sh` (with env tokens/keys if needed)
 11. Archive the generated JSON/Markdown smoke-check reports for the cutover run
-12. Validate auth, roast, premium, merchant, websocket, and health endpoints
+12. Review the smoke-check diagnostics/recommended actions before sign-off
+13. Validate auth, roast, premium, merchant, websocket, and health endpoints
 
 ## See Also
 - `DEPLOY.md`
