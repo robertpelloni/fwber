@@ -1,191 +1,106 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.3.2
+> **Version Reached:** 1.3.3
 > **Current Model:** GPT
 
 ## Executive Summary
-This session shipped **v1.3.2 "Notification Route Consistency"**.
+This session shipped **v1.3.3 "Sentry Build Modernization"**.
 
-The previous session solved the foreground notification visibility problem, but the audit uncovered a second, more subtle issue: **notification destinations were inconsistent across transports**.
+The frontend build had become technically green but operationally noisy. Every production build emitted Sentry-specific deprecation/action warnings, which is exactly the kind of warning fatigue that hides real regressions later. I treated that as a production-hardening issue rather than cosmetic cleanup.
 
-Different layers had diverged:
-- native push payloads
-- database notifications returned by `/api/notifications`
-- notification bell links
-- foreground toast CTA actions
-- the `/messages` screen itself
+The main goals were:
+- modernize the Sentry App Router integration to current Next.js conventions
+- remove deprecated config/file patterns
+- re-run the production build until the Sentry warnings were gone
 
-That meant the system could technically deliver notifications while still dropping users into generic or inconsistent destinations depending on how the notification arrived. This release standardized the route contract end-to-end.
+That goal was achieved.
 
 ---
 
 ## What I Changed
 
-### 1. Standardized backend notification payloads
-**Files:**
-- `fwber-backend/app/Notifications/NewMessageNotification.php`
-- `fwber-backend/app/Notifications/NewMatchNotification.php`
+### 1. Replaced the placeholder server/edge instrumentation with a real App Router setup
+**File:** `fwber-frontend/instrumentation.ts`
 
-#### Problem
-Database notifications were relying on frontend inference from PHP notification class names because `toArray()` did not carry explicit route-ready metadata. That created drift between:
-- notification drawer behavior
-- push payload behavior
-- icon/type rendering
-- route destinations
+#### Previous state
+The file was effectively a commented-out placeholder. It did not provide the hook shape the current Sentry Next.js SDK expects, and build output was warning that `onRequestError` was missing.
+
+#### New state
+`instrumentation.ts` now:
+- imports Sentry
+- performs runtime-aware registration
+- loads `sentry.server.config` for `nodejs`
+- loads `sentry.edge.config` for `edge`
+- exports:
+  - `onRequestError = Sentry.captureRequestError`
+
+#### Why this matters
+This is the modern App Router integration point for server/edge request-error capture. Without it, Sentry warns every build and nested request error capture is incomplete.
+
+---
+
+### 2. Added modern client instrumentation entrypoint
+**File:** `fwber-frontend/instrumentation-client.ts`
+
+Created a proper App Router client instrumentation file which now:
+- initializes Sentry client-side
+- keeps replay integration setup
+- exports:
+  - `onRouterTransitionStart = Sentry.captureRouterTransitionStart`
+
+#### Why this matters
+The build was explicitly warning that navigation instrumentation required the router transition hook to be exported from `instrumentation-client.ts`. This now matches the current Sentry / Next.js expectation.
+
+---
+
+### 3. Retired the deprecated client config filename
+**File removed:** `fwber-frontend/sentry.client.config.ts`
+
+#### Why this mattered
+Sentry was warning that the old `sentry.client.config.ts` pattern is deprecated for this setup and should be renamed or moved into `instrumentation-client.ts`.
+
+I removed the old file after moving the client initialization into the new App Router-compatible location.
+
+---
+
+### 4. Removed deprecated Sentry webpack option usage
+**File:** `fwber-frontend/next.config.js`
+
+#### Previous state
+I had previously introduced a transitional Sentry webpack option that itself produced another deprecation warning.
 
 #### Fix
-I standardized both notifications around explicit fields.
-
-`NewMessageNotification` now includes:
-- `type: message`
-- `title`
-- `body`
-- `message`
-- `url: /messages?user={senderId}`
-- `user_id`
-- `user_name`
-- sender metadata
-
-`NewMatchNotification` now includes:
-- `type: match`
-- `title`
-- `body`
-- `message`
-- `url: /matches`
-- `user_id`
-- `user_name`
-- matched-user metadata
-
-I also aligned WebPush / Expo / FCM payloads with the same route contract.
-
-#### Why this matters
-The frontend should not be forced to guess behavior from `NewMessageNotification` vs `NewMatchNotification` class names. Route-critical notification metadata must be explicit.
-
----
-
-### 2. Created a shared frontend notification routing helper
-**File:** `fwber-frontend/lib/notifications.ts`
-
-Added centralized helpers for:
-- notification type normalization
-- route resolution
-- CTA label generation
-
-#### New shared functions
-- `normalizeNotificationType(...)`
-- `getNotificationRoute(...)`
-- `getNotificationActionLabel(...)`
-
-#### Why this matters
-Before this, routing logic was duplicated across surfaces. That duplication is exactly how drift happens. With a shared helper:
-- notification bell
-- native foreground notification bridge
-- future notification consumers
-
-all use the same destination logic.
-
----
-
-### 3. Unified notification bell routing with the shared helper
-**File:** `fwber-frontend/components/NotificationBell.tsx`
-
-Updated the notification drawer so it now:
-- accepts string notification types instead of assuming a tight frontend-only union
-- normalizes type values through the shared helper
-- derives destination URLs from the same logic used elsewhere
-
-#### Important bug fixed
-Previously, database notifications without a frontend-expected `type` could fall through to the wrong icon/link behavior because the backend response could surface PHP class-basename values. That is now normalized.
-
----
-
-### 4. Unified native foreground toast CTA routing with the same helper
-**File:** `fwber-frontend/components/NativeForegroundNotificationBridge.tsx`
-
-Updated the bridge so it now:
-- resolves the destination route through `getNotificationRoute(...)`
-- resolves CTA text through `getNotificationActionLabel(...)`
-- normalizes notification type consistently
+I removed the deprecated option entirely, leaving a cleaner config while preserving the rest of the build setup.
 
 #### Result
-Now these three surfaces agree:
-- tapped push
-- foreground in-app toast CTA
-- notification bell drawer item
-
-That consistency is the actual goal of a notification audit.
-
----
-
-### 5. Made the messages page honor notification routes
-**File:** `fwber-frontend/app/messages/page.tsx`
-
-#### Problem
-Even if a notification linked to `/messages?user=123`, the messages page did not previously use that query state to open the intended conversation.
-
-#### Fix
-Added logic to:
-- read `user` from the current URL on mount
-- locate the corresponding conversation after conversations are loaded
-- auto-select that conversation if present
-- show a one-time informational toast if no active conversation exists
-
-#### Important implementation note
-I initially used `useSearchParams()`, but Next.js production build failed because `/messages` needed a Suspense boundary for that hook in this setup.
-
-I corrected this by switching to a client-safe `window.location.search` read on mount, which restored build stability without introducing an additional Suspense wrapper.
-
-#### Why this matters
-A route is only meaningful if the target page actually honors it. This change completed the loop so message notifications can land users inside the intended conversation instead of the generic inbox shell.
-
----
-
-### 6. Added regression coverage for notification route shape
-**File:** `fwber-backend/tests/Feature/NotificationRoutingTest.php`
-
-Added a backend feature test that verifies `/api/notifications` exposes route-consistent message and match payloads.
-
-#### Extra implementation detail
-The simplified active schema did not currently guarantee a `notifications` table in this SQLite test environment, so the test explicitly creates it inside the test using `Schema::create(...)` before inserting route-shaped notification rows.
-
-That kept the regression focused on the endpoint contract rather than on unrelated schema-history baggage.
+The frontend build no longer emits the Sentry-specific warning noise that was present before this session.
 
 ---
 
 ## Validation Performed
-### Backend
-Executed:
-- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
-
-Result:
-- **23 passed**
-
-### Frontend
+### Frontend production build
 Executed:
 - `npm run build --prefix fwber-frontend`
 
 Result:
 - **Build completed successfully**
+- previous Sentry-specific warnings were eliminated
 
-Observed notes:
-- existing Sentry warnings remain
-- they are non-blocking
-- no processes were manually killed
+Remaining build note:
+- Next.js still prints the existing edge-runtime static-generation notice for relevant routes
+- that is not part of the Sentry problem and did not block the build
+
+No processes were manually killed.
 
 ---
 
 ## Files Changed This Session
-### Backend
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Notifications/NewMessageNotification.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Notifications/NewMatchNotification.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/NotificationRoutingTest.php`
-
-### Frontend
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/notifications.ts`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/NotificationBell.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/NativeForegroundNotificationBridge.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/messages/page.tsx`
+### Product code / config
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/instrumentation.ts`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/instrumentation-client.ts`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/next.config.js`
+- removed: `C:/Users/hyper/workspace/fwber/fwber-frontend/sentry.client.config.ts`
 
 ### Documentation / release tracking
 - `C:/Users/hyper/workspace/fwber/VERSION`
@@ -204,32 +119,33 @@ Observed notes:
 
 ## Important Findings / Analysis
 
-### 1. Notifications need a route contract, not just transport support
-A notification system is not complete when pushes arrive. It is complete when every entry point lands the user in the same intended destination.
+### 1. Warning fatigue is a real production risk
+A green build is not enough if the output is polluted with avoidable warnings. Teams eventually stop reading noisy build output, which means real regressions can slip by unnoticed.
 
-### 2. Database notifications should be explicit, not inferred
-Letting the frontend infer behavior from PHP class names is brittle. Database payloads should always carry explicit `type`, `title`, `body`, and `url` fields.
+### 2. App Router observability setup has stricter file conventions now
+The modern Sentry + Next.js integration expects:
+- `instrumentation.ts` for server/edge registration and request-error hooks
+- `instrumentation-client.ts` for browser init and router transition hooks
 
-### 3. Target pages must honor incoming route state
-The notification route audit would have remained incomplete if `/messages?user={id}` still landed on a generic inbox. Page behavior must participate in the contract too.
+Older `sentry.client.config.ts` conventions are now a liability in this repo shape.
 
-### 4. Build-time App Router constraints still matter during polish work
-The first pass with `useSearchParams()` broke the production build due to the missing Suspense boundary requirement. The corrected implementation preserved the same UX goal while keeping the build green.
+### 3. The best hardening work is often subtractive
+This session improved the project partly by removing deprecated patterns rather than adding more layers. Removing the obsolete file and deprecated config path was as important as adding the new hooks.
 
 ---
 
 ## Recommended Next Steps
-1. **Sentry Next.js instrumentation cleanup**
-   - current production build is green, but warnings still point to outdated config shape
-2. **Real-device notification verification**
-   - verify foreground/background/cold-start routing on physical devices now that routes are standardized
-3. **Store-release verification**
-   - continue with TestFlight / Play internal rollout confirmation when authenticated environment access is available
+1. **Real-device notification QA**
+   - now that notification routing is standardized and the build output is cleaner, validate foreground/background/cold-start flows on physical devices
+2. **Store pipeline verification**
+   - continue the go-to-market path by confirming TestFlight / Play Console delivery in authenticated environments
+3. **Optional Next.js edge-runtime audit**
+   - the remaining build note about edge runtime and static generation is non-blocking, but could be audited later for optimization clarity
 
 ---
 
 ## Git / Release
-- Version bumped to **1.3.2**
+- Version bumped to **1.3.3**
 - Next git action: commit these changes and push to `origin/main`
 
-This release finished the notification audit in a meaningful way. Notifications now have a consistent destination contract across backend payloads, native pushes, in-app toasts, and the notification drawer.
+This release was valuable because it removed stale observability debt from the active build pipeline. The project is not just feature-richer — it is cleaner, quieter, and easier to trust during production builds.

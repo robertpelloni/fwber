@@ -848,3 +848,9 @@ All notable changes to this project will be documented in this file.
 - Upgraded message notifications to route directly into `/messages?user={senderId}` and updated the `/messages` page to auto-select the requested conversation when present.
 - Updated the notification drawer and native foreground toast bridge to use shared route logic, ensuring users land in the same destination regardless of whether they tapped a push, a toast CTA, or a notification bell item.
 - Re-verified both backend and frontend integrity: `php artisan test tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php` passed with 23 tests, and `npm run build --prefix fwber-frontend` completed successfully.
+
+## [1.3.3] - 2026-04-04
+### Fixed
+- Modernized the frontend Sentry App Router integration by replacing the placeholder `instrumentation.ts` with real runtime registration plus `onRequestError`, adding `instrumentation-client.ts` with `onRouterTransitionStart`, and retiring the deprecated `sentry.client.config.ts` file.
+- Removed deprecated Sentry webpack option usage from `fwber-frontend/next.config.js`, eliminating the build-time Sentry deprecation/action warnings that were obscuring real signal in production builds.
+- Re-verified the frontend production build after the modernization: `npm run build --prefix fwber-frontend` now completes cleanly without the previous Sentry-specific warnings.

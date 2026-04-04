@@ -1,5 +1,13 @@
 # MEMORY.md
 
+## 2026-04-04 — v1.3.3 Sentry Build Modernization
+- The frontend build was green but noisy because the Sentry integration had drifted behind current Next.js App Router conventions.
+- The clean modern shape is:
+  - `instrumentation.ts` for server/edge registration plus `onRequestError`
+  - `instrumentation-client.ts` for browser init plus `onRouterTransitionStart`
+  - no legacy `sentry.client.config.ts`
+- Removing deprecated Sentry config patterns is worth doing because warning fatigue hides real build regressions.
+
 ## 2026-04-04 — v1.3.2 Notification Route Consistency
 - Notification UX can drift even when each individual layer "works." The backend payload shape, toast CTA logic, notification drawer links, and target page behavior must all agree on the same route contract.
 - Database notifications should carry explicit `type`, `title`, `body`, `url`, and actor identifiers instead of relying on frontend inference from PHP class names.
@@ -22,5 +30,3 @@
   - prevent messaging
   - deactivate existing matches
   - invalidate both users' caches
-- The frontend safety client had a contract mismatch (`blocked_id` vs `user_id`) that made block UX unreliable even though the UI path existed.
-- The unblock controller existed before this session, but the route was missing from `routes/api.php`.

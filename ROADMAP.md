@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.3.2 "Notification Route Consistency"
+> **Current Version:** 1.3.3 "Sentry Build Modernization"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,8 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.3.2)
+### Phase 5: Production Scale (COMPLETED - v1.3.3)
+- **Sentry Build Modernization:** The Next.js App Router Sentry setup now uses modern `instrumentation.ts` and `instrumentation-client.ts` hooks, eliminating outdated warning noise from production builds.
 - **Notification Route Consistency:** Backend notification payloads, notification drawer links, foreground toast CTAs, and `/messages` routing now agree on shared destination logic.
 - **Conversation-Aware Message Notifications:** Message pushes now open the relevant conversation route (`/messages?user={id}`) instead of dropping users into a generic inbox.
 - **Foreground Notification UX:** Expo foreground pushes now bridge into the WebView and render in-app match/message toasts during active mobile sessions.
@@ -56,4 +57,4 @@ The platform is now **100% focused on its core identity**:
 ## 🎯 Next Immediate Milestones
 1. **TestFlight Beta:** Have actual users test the TestFlight IPA compiled by the new GitHub Actions workflow.
 2. **App Store Assets:** Generate fresh screenshots emphasizing the privacy-first, hyper-local nature of the simplified application.
-3. **Sentry Build Cleanup:** Modernize the Next.js Sentry instrumentation/config so production builds stop emitting known deprecation warnings.
+3. **Real-Device Notification QA:** Validate the full notification matrix on physical devices now that build warnings and route inconsistencies are resolved.

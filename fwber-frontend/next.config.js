@@ -61,6 +61,12 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['@tanstack/react-query', 'lucide-react'],
+    webpackBuildWorker: true,
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -166,7 +172,6 @@ const sentryWebpackPluginOptions = {
   silent: !process.env.CI,
   widenClientFileUpload: true,
   hideSourceMaps: true,
-  disableLogger: true,
 };
 
 module.exports = withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions);
