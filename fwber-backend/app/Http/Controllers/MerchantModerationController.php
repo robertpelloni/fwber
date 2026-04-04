@@ -41,15 +41,28 @@ class MerchantModerationController extends Controller
             ->orderByDesc('updated_at')
             ->paginate(20);
 
-        $merchants->getCollection()->transform(function (MerchantProfile $merchant) {
-            $trust = $this->merchantTrustService->calculate($merchant);
+        $merchants->setCollection(
+            $merchants->getCollection()
+                ->map(function (MerchantProfile $merchant) {
+                    $trust = $this->merchantTrustService->calculate($merchant);
+                    $priorityScore = $this->calculatePriorityScore($merchant, $trust['trust_score']);
 
-            return [
-                ...$merchant->toArray(),
-                'user' => $merchant->user?->only(['id', 'name', 'email']),
-                ...$trust,
-            ];
-        });
+                    return [
+                        ...$merchant->toArray(),
+                        'user' => $merchant->user?->only(['id', 'name', 'email']),
+                        ...$trust,
+                        'priority_score' => $priorityScore,
+                        'priority_tier' => match (true) {
+                            $priorityScore >= 75 => 'urgent',
+                            $priorityScore >= 50 => 'high',
+                            $priorityScore >= 25 => 'normal',
+                            default => 'low',
+                        },
+                    ];
+                })
+                ->sortByDesc('priority_score')
+                ->values()
+        );
 
         return response()->json($merchants);
     }
@@ -84,12 +97,32 @@ class MerchantModerationController extends Controller
             ],
         ]);
 
+        $freshMerchant = $merchant->fresh();
+
         return response()->json([
             'message' => 'Merchant verification updated successfully.',
             'merchant' => [
-                ...$merchant->fresh()->toArray(),
-                ...$this->merchantTrustService->calculate($merchant->fresh()),
+                ...$freshMerchant->toArray(),
+                ...$this->merchantTrustService->calculate($freshMerchant),
             ],
         ]);
+    }
+
+    protected function calculatePriorityScore(MerchantProfile $merchant, int $trustScore): int
+    {
+        $pendingBonus = $merchant->verification_status === 'pending' ? 35 : 0;
+        $commerceSignal = min(25, ((int) ($merchant->successful_orders_count ?? 0) * 5) + ((int) ($merchant->inventories_count ?? 0) * 2));
+        $profileSignal = 0;
+
+        if (filled($merchant->description)) {
+            $profileSignal += 5;
+        }
+        if (filled($merchant->location_name) || filled($merchant->address)) {
+            $profileSignal += 5;
+        }
+
+        $penalty = $merchant->verification_status === 'rejected' ? 20 : 0;
+
+        return max(0, min(100, (int) round($pendingBonus + $commerceSignal + $profileSignal + ($trustScore * 0.35) - $penalty)));
     }
 }

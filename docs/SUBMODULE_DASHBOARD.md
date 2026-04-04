@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.4.4
+> **Current Global Version:** 1.4.5
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -24,13 +24,13 @@ fwber/
 ## 📦 Active Logical Packages
 
 ### 1. `fwber-backend`
-- **Version:** inherits global `1.4.4`
+- **Version:** inherits global `1.4.5`
 - **Role:** Core API and business logic.
 - **Owns:** auth, onboarding, profiles, photos, proximity matching, messages, block/report safety actions, notification APIs, E2E key backup/restore.
 - **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `1.4.4`
+- **Version:** inherits global `1.4.5`
 - **Role:** Main user-facing product surface.
 - **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
 - **Key stack:** Next.js app router, React, Tailwind CSS.
@@ -46,7 +46,7 @@ fwber/
 - **Notes:** frontend includes graceful fallbacks when WASM tooling or artifacts are unavailable.
 
 ### 5. `mobile`
-- **Version:** inherits global `1.4.4`
+- **Version:** inherits global `1.4.5`
 - **Role:** Native mobile shell for push notifications, secure token storage, NFC, and background location.
 - **Key stack:** Expo, React Native WebView, expo-notifications, expo-location.
 
@@ -70,4 +70,5 @@ fwber/
 - Copy-ready Hetzner operational assets now live under `ops/hetzner/` for Nginx, systemd, and shell-based provisioning/deploy flows.
 - Merchant discovery is now geo-aware again through persisted storefront coordinates and distance-ranked nearby marketplace responses.
 - Merchant moderation and trust scoring are active again through restored moderation routes, trust-weighted ranking, and moderation dashboard merchant review tooling.
+- Merchant review prioritization is active through queue priority scoring, search, and inline note workflows.
 - Archived systems remain preserved under `_archive/` and should not be treated as active dependencies unless explicitly restored.

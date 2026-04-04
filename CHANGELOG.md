@@ -955,3 +955,12 @@ All notable changes to this project will be documented in this file.
 - Restored moderation API routes that the frontend moderation dashboard already expected, including dashboard, flagged-content, spoof, throttle, action, user-profile, and merchant-review endpoints.
 - Updated nearby marketplace ranking to blend trust score with proximity rather than relying only on raw distance.
 - Hardened `lib/api/moderation.ts` so it resolves `/api` correctly regardless of whether `NEXT_PUBLIC_API_URL` includes the suffix.
+
+## [1.4.5] - 2026-04-04
+### Added
+- Added merchant moderation queue priority scoring and priority tiers to help moderators review the highest-signal storefronts first.
+- Added merchant queue search and inline note workflows to the moderation dashboard.
+
+### Fixed
+- Extended merchant moderation API support so queue filtering/search is reflected in frontend moderation hooks and API clients.
+- Surfaced merchant priority and verification-note context in the moderation dashboard instead of forcing moderators through a flat queue.

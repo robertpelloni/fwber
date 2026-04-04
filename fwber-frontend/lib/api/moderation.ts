@@ -104,9 +104,9 @@ export const moderationApi = {
     return res.data;
   },
 
-  merchants: async (token: string, page: number = 1, status: string = 'pending') => {
+  merchants: async (token: string, page: number = 1, status: string = 'pending', search: string = '') => {
     const res = await axios.get(`${API_BASE_URL}/moderation/merchants`, {
-      params: { page, status },
+      params: { page, status, search },
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;

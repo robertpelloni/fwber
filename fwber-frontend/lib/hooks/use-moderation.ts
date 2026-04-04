@@ -58,12 +58,12 @@ export function useActions(page: number, token: string | null) {
   });
 }
 
-export function useMerchantVerificationQueue(page: number, status: string, token: string | null) {
+export function useMerchantVerificationQueue(page: number, status: string, search: string, token: string | null) {
   return useQuery({
-    queryKey: ['moderation', 'merchants', page, status],
+    queryKey: ['moderation', 'merchants', page, status, search],
     queryFn: () => {
       if (!token) throw new Error('Authentication required');
-      return moderationApi.merchants(token, page, status);
+      return moderationApi.merchants(token, page, status, search);
     },
     enabled: !!token,
   });

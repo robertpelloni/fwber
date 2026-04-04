@@ -35,10 +35,11 @@ class MerchantTrustModerationTest extends TestCase
             ->assertJsonPath('stats.pending_merchants', 1);
 
         $this->actingAs($moderator)
-            ->getJson('/api/moderation/merchants')
+            ->getJson('/api/moderation/merchants?search=Pending')
             ->assertOk()
             ->assertJsonPath('data.0.business_name', 'Pending Shop')
-            ->assertJsonPath('data.0.trust_tier', 'new');
+            ->assertJsonPath('data.0.trust_tier', 'new')
+            ->assertJsonPath('data.0.priority_tier', 'high');
 
         $this->actingAs($moderator)
             ->patchJson("/api/moderation/merchants/{$merchant->id}", [
@@ -51,6 +52,7 @@ class MerchantTrustModerationTest extends TestCase
         $this->assertDatabaseHas('merchant_profiles', [
             'id' => $merchant->id,
             'verification_status' => 'verified',
+            'verification_notes' => 'Merchant identity confirmed by moderator.',
             'verified_by' => $moderator->id,
         ]);
     }

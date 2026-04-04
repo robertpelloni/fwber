@@ -1,35 +1,32 @@
-# PROJECT_STATUS.md - fwber v1.4.4 (Merchant Trust Scoring & Moderation)
+# PROJECT_STATUS.md - fwber v1.4.5 (Merchant Review Prioritization)
 
 **Date:** 2026-04-04
-**Version:** 1.4.4 "Merchant Trust Scoring & Moderation"
+**Version:** 1.4.5 "Merchant Review Prioritization"
 **Status:** ✅ **VERIFIED, COMMITTED, AND READY FOR HETZNER CUTOVER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release completes the next planned product-side follow-up after geo-aware merchant ranking: **merchant verification / trust scoring**.
+This release extends the newly restored merchant moderation system with queue prioritization and faster operator workflows.
 
 Delivered:
-- compact merchant trust scoring service
-- merchant verification review endpoints for moderators/admins
-- moderation dashboard support for reviewing merchant storefronts
-- trust-aware nearby marketplace ranking that considers both distance and merchant trust
-- trust score/tier surfaced through merchant API responses and storefront UI
-- moderator compatibility fix via `User::is_moderator` accessor
+- merchant moderation queue now computes `priority_score` and `priority_tier`
+- moderation queue now supports search across merchant name, category, location, and address
+- moderation dashboard merchant tab now includes search, priority badges, and inline review notes handling
+- nearby marketplace ranking continues to use trust + proximity, while merchant review tooling now better surfaces which storefronts deserve attention first
 
 ## 🏪 Backend Improvements
-- added `MerchantTrustService`
-- added `MerchantModerationController`
-- `MerchantProfile` now supports `verification_notes`, `verified_by`, and `verified_at`
-- moderation routes restored for dashboard, flagged content, spoof detections, throttles, actions, users, and merchants
-- moderation dashboard stats now include `pending_merchants`
-- nearby marketplace ranking now uses a blended score from merchant trust + proximity instead of proximity alone
+- `MerchantModerationController` now computes merchant review priority and sorts queue results by priority score
+- merchant review queue supports `search` filtering
+- moderation dashboard remains guarded against missing moderation-support tables
 
 ## 🌐 Frontend Improvements
-- moderation dashboard now has a **Merchants** review tab with pending/verified/rejected filters and verify/reject/reset actions
-- merchant dashboard/profile/storefront views now expose trust score and verification context
-- moderation API layer now supports merchant review queue and merchant verification mutations
-- moderation API base URL handling was hardened so it works whether `NEXT_PUBLIC_API_URL` includes `/api` or not
+- moderation dashboard merchant tab now includes:
+  - search field
+  - priority score/tier badge
+  - latest verification notes display
+  - inline moderator note editing via blur-save behavior
+- moderation hooks/api now support merchant queue search
 
 ## ✅ Validation
 - Backend tests passed:
@@ -39,4 +36,4 @@ Delivered:
   - `npm run build --prefix fwber-frontend`
 
 ## ✅ Why This Matters
-Merchant discovery is now ranked by more than proximity alone. The restored commerce stack now has a real moderation and trust signal, which is much closer to production viability for public rollout.
+The merchant moderation queue is now more practical for real operations. Moderators can search, prioritize, and annotate merchant reviews much more effectively instead of working through a flat pending list.

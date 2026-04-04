@@ -28,6 +28,7 @@ export default function ModerationDashboard() {
   const [actionsPage, setActionsPage] = useState(1);
   const [merchantPage, setMerchantPage] = useState(1);
   const [merchantStatus, setMerchantStatus] = useState<'pending' | 'verified' | 'rejected' | 'all'>('pending');
+  const [merchantSearch, setMerchantSearch] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const dashboard = useModerationDashboard(token);
@@ -35,7 +36,7 @@ export default function ModerationDashboard() {
   const spoofs = useSpoofDetections(spoofsPage, token);
   const throttles = useThrottles(throttlesPage, token);
   const actions = useActions(actionsPage, token);
-  const merchants = useMerchantVerificationQueue(merchantPage, merchantStatus === 'all' ? '' : merchantStatus, token);
+  const merchants = useMerchantVerificationQueue(merchantPage, merchantStatus === 'all' ? '' : merchantStatus, merchantSearch, token);
   const userProfile = useUserModerationProfile(selectedUserId, token);
 
   const reviewFlag = useReviewFlagMutation();
@@ -160,6 +161,8 @@ export default function ModerationDashboard() {
             setPage={setMerchantPage}
             status={merchantStatus}
             setStatus={setMerchantStatus}
+            search={merchantSearch}
+            setSearch={setMerchantSearch}
             onReview={(merchantId, verificationStatus, verificationNotes) =>
               reviewMerchant.mutate({ merchantId, payload: { verification_status: verificationStatus, verification_notes: verificationNotes }, token: token! })
             }
@@ -527,6 +530,8 @@ function MerchantVerificationPanel({
   setPage,
   status,
   setStatus,
+  search,
+  setSearch,
   onReview,
   isPending,
 }: {
@@ -536,6 +541,8 @@ function MerchantVerificationPanel({
   setPage: (p: number) => void;
   status: 'pending' | 'verified' | 'rejected' | 'all';
   setStatus: (status: 'pending' | 'verified' | 'rejected' | 'all') => void;
+  search: string;
+  setSearch: (value: string) => void;
   onReview: (merchantId: number, verificationStatus: 'pending' | 'verified' | 'rejected', verificationNotes?: string) => void;
   isPending: boolean;
 }) {
@@ -544,7 +551,8 @@ function MerchantVerificationPanel({
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 border-b px-4 py-3">
+      <div className="border-b px-4 py-3 space-y-3">
+        <div className="flex flex-wrap gap-2">
         {(['pending', 'verified', 'rejected', 'all'] as const).map((value) => (
           <button
             key={value}
@@ -554,6 +562,13 @@ function MerchantVerificationPanel({
             {value}
           </button>
         ))}
+        </div>
+        <input
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search merchant, category, location, or address"
+          className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-purple-400 focus:outline-none"
+        />
       </div>
       <ul className="divide-y">
         {data.data.map((merchant: any) => (
@@ -569,12 +584,20 @@ function MerchantVerificationPanel({
                   <span className={`rounded px-2 py-0.5 text-xs font-medium ${merchant.trust_score >= 80 ? 'bg-green-100 text-green-700' : merchant.trust_score >= 55 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
                     Trust {merchant.trust_score} · {merchant.trust_tier}
                   </span>
+                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${merchant.priority_tier === 'urgent' ? 'bg-red-100 text-red-700' : merchant.priority_tier === 'high' ? 'bg-orange-100 text-orange-700' : merchant.priority_tier === 'normal' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>
+                    Priority {merchant.priority_score} · {merchant.priority_tier}
+                  </span>
                 </div>
                 <p className="mt-1 text-sm text-gray-600">{merchant.description || 'No merchant description provided.'}</p>
                 <div className="mt-2 text-xs text-gray-500">
                   {merchant.location_name || merchant.address || 'No location label'}
                   {merchant.user?.email ? ` · ${merchant.user.email}` : ''}
                 </div>
+                {merchant.verification_notes && (
+                  <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2 text-xs text-gray-600 border border-gray-200">
+                    <span className="font-semibold text-gray-700">Latest notes:</span> {merchant.verification_notes}
+                  </div>
+                )}
                 <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-500">
                   <span>Verification: {merchant.trust_breakdown?.verification ?? 0}</span>
                   <span>Profile: {merchant.trust_breakdown?.profile_completeness ?? 0}</span>
@@ -583,28 +606,41 @@ function MerchantVerificationPanel({
                   <span>Redemption: {merchant.trust_breakdown?.redemption_reliability ?? 0}</span>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  disabled={isPending}
-                  className="rounded bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
-                  onClick={() => onReview(merchant.id, 'verified', 'Merchant verified by moderator review')}
-                >
-                  <BadgeCheck className="h-4 w-4" /> Verify
-                </button>
-                <button
-                  disabled={isPending}
-                  className="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
-                  onClick={() => onReview(merchant.id, 'rejected', 'Merchant storefront rejected by moderator review')}
-                >
-                  <ShieldX className="h-4 w-4" /> Reject
-                </button>
-                <button
-                  disabled={isPending}
-                  className="rounded bg-gray-700 px-3 py-1.5 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
-                  onClick={() => onReview(merchant.id, 'pending', 'Merchant review reset to pending')}
-                >
-                  Reset
-                </button>
+              <div className="flex flex-col gap-2 lg:min-w-[20rem]">
+                <textarea
+                  defaultValue={merchant.verification_notes || ''}
+                  placeholder="Add moderator review notes"
+                  className="min-h-[5rem] rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-purple-400 focus:outline-none"
+                  onBlur={(event) => {
+                    const value = event.target.value.trim();
+                    if (value && value !== merchant.verification_notes) {
+                      onReview(merchant.id, merchant.verification_status, value);
+                    }
+                  }}
+                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    disabled={isPending}
+                    className="rounded bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+                    onClick={() => onReview(merchant.id, 'verified', 'Merchant verified by moderator review')}
+                  >
+                    <BadgeCheck className="h-4 w-4" /> Verify
+                  </button>
+                  <button
+                    disabled={isPending}
+                    className="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
+                    onClick={() => onReview(merchant.id, 'rejected', 'Merchant storefront rejected by moderator review')}
+                  >
+                    <ShieldX className="h-4 w-4" /> Reject
+                  </button>
+                  <button
+                    disabled={isPending}
+                    className="rounded bg-gray-700 px-3 py-1.5 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+                    onClick={() => onReview(merchant.id, 'pending', 'Merchant review reset to pending')}
+                  >
+                    Reset
+                  </button>
+                </div>
               </div>
             </div>
           </li>
