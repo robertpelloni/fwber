@@ -1,6 +1,6 @@
 # Hetzner + Vercel Production Blueprint
 
-> **Version:** 1.4.7
+> **Version:** 1.4.8
 > **Status:** Recommended deployment topology for restored fwber stack
 
 This document captures the production topology now recommended for fwber after the phased restoration of:
@@ -119,6 +119,7 @@ Copy-ready bootstrap and deploy scripts now exist in:
 - `ops/hetzner/scripts/bootstrap-ubuntu.sh`
 - `ops/hetzner/scripts/deploy-backend.sh`
 - `ops/hetzner/scripts/smoke-check.sh`
+- timestamped smoke-check reports under `logs/deploy-reports/` when `FWBER_RUN_SMOKE_CHECK=1`
 
 Nginx virtual host templates exist in:
 - `ops/hetzner/nginx/api.fwber.me.conf`
@@ -145,6 +146,7 @@ Nginx virtual host templates exist in:
 After cutover:
 - [ ] `php artisan deploy:verify` reports healthy critical services
 - [ ] `ops/hetzner/scripts/smoke-check.sh` passes with the appropriate env tokens/keys
+- [ ] JSON/Markdown smoke-check reports are archived for the cutover run
 - [ ] `/api/health`, `/api/health/liveness`, and `/api/health/readiness` respond correctly
 - [ ] auth routes behave correctly
 - [ ] websocket connection succeeds

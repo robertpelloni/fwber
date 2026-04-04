@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.8] - 2026-04-04 — Smoke Check Report Artifacts & Live Drift Detection
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` with optional JSON and Markdown report artifact output via `FWBER_REPORT_DIR`, `FWBER_REPORT_JSON_PATH`, and `FWBER_REPORT_MD_PATH`, making each smoke run easier to archive, share, and attach to release or cutover notes.
+- Added AI DevKit implementation/testing notes for the report-artifact layer under `docs/ai/implementation/smoke-check-report-artifacts.md` and `docs/ai/testing/smoke-check-report-artifacts.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` so opt-in smoke-check runs now create timestamped report directories under `logs/deploy-reports/` (or `FWBER_DEPLOY_REPORT_DIR`) and preserve run summaries automatically.
+- Hardened the Markdown report writer in `smoke-check.sh` so report generation works even when checks fail and lines begin with dash-prefixed text.
+- Updated deployment docs to describe the new report artifact paths and how to use them during Hetzner cutover.
+
+### Verified
+- Ran the smoke-check script against the currently reachable public deployment targets with report generation enabled and discovered live-environment drift: `/api/health*` is still returning `404` on `api.fwber.me`, while `geo.fwber.me/nearby` currently returns a Vercel `404 deployment could not be found` response.
+- Confirmed the current public contract still passes invalid-login (`422`) and public roast preview (`200`) checks, which narrows the live deployment gap to specific routing/domain alignment issues rather than a total outage.
+
 ## [1.4.7] - 2026-04-04 — Hetzner Post-Deploy Smoke Checks
 
 ### Added

@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-04
-> **Version:** 1.4.7
+> **Version:** 1.4.8
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -166,6 +166,19 @@ Use the in-repo deploy script for the repeatable path:
 FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
 ```
 
+That path now writes timestamped smoke-check reports under:
+
+```bash
+/var/www/fwber/repo/logs/deploy-reports/<timestamp>/
+```
+
+Override the report root if needed:
+
+```bash
+FWBER_DEPLOY_REPORT_DIR=/var/log/fwber-deploy-reports \
+FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
+```
+
 If you need the manual equivalent, it remains:
 
 ```bash
@@ -248,6 +261,7 @@ Always verify the following after a major version bump or infrastructure move:
 Automation support now exists in:
 - `ops/hetzner/scripts/smoke-check.sh`
 - `ops/hetzner/scripts/deploy-backend.sh` (`FWBER_RUN_SMOKE_CHECK=1`)
+- timestamped smoke-check report artifacts under `logs/deploy-reports/` (or `FWBER_DEPLOY_REPORT_DIR`)
 
 1. [ ] Frontend Vercel deploy is green
 2. [ ] `php artisan deploy:verify` returns healthy or only expected non-critical degradations
