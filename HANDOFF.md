@@ -1,174 +1,210 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.3.8
+> **Version Reached:** 1.3.9
 > **Current Model:** GPT
 
 ## Executive Summary
-This session shipped **v1.3.8 "AI Surface Restoration"**.
+This session shipped **v1.3.9 "Premium & Billing Restoration"**.
 
-After restoring the AI/payment provider foundation in v1.3.7, I proceeded with the next safest visible restoration slice: the **AI Wingman / roast / hype surface**.
+After v1.3.8 restored the AI Wingman / roast surface, I proceeded with the next planned restoration slice: the **premium / billing route surface and user-facing premium pages**.
 
-This was chosen because:
-- `AiWingmanService` still existed in active code
-- frontend hooks (`useAiWingman`, `wingmanApi`, roast helper APIs) still existed
-- share pages still understood roast/hype content types
-- the blast radius is smaller than restoring marketplace or premium first
+This phase was intentionally rebuilt as a **compact billing slice** rather than resurrecting the full archived token/referral/economy stack. The goal was to restore real premium functionality safely:
+- premium plan visibility
+- premium status/history
+- premium purchase flow
+- who-likes-you unlock path
+- Stripe webhook re-entry point
 
-The result is that the non-federated AI layer is back online in active runtime, including a public `/roast` page.
+without dragging governance, federation, or bloated token systems back into active runtime.
 
 ---
 
 ## What I Changed
 
-### 1. Restored `ViralContent` model
-**File:** `fwber-backend/app/Models/ViralContent.php`
-
-Why:
-- the restored Wingman/roast flows need a persistence model for shareable AI outputs
-- the share page already understands `share_id` semantics
-
-This model was restored from archive as a lightweight share-record for:
-- roast
-- hype
-- vibe
-- fortune
-- cosmic match
-- nemesis
-- quirk analysis
-- compatibility audit
-
----
-
-### 2. Restored `viral_contents` schema in active migrations
-**File:** `fwber-backend/database/migrations/2026_04_04_020000_restore_viral_contents_table.php`
-
-Why:
-- model restoration is not enough without an active schema path
-- I chose a fresh active migration rather than reviving archived migration history wholesale
-
-Behavior:
-- creates the table only if missing
-- includes:
-  - `id` (uuid)
-  - `user_id`
-  - `type`
-  - `content`
-  - `views`
-  - `reward_claimed`
-
-This makes the restore safer than blindly reactivating old migration chains.
-
----
-
-### 3. Restored `AiWingmanController` into active backend
-**File:** `fwber-backend/app/Http/Controllers/AiWingmanController.php`
-
-Restored endpoints include:
-- public roast preview
-- authenticated roast/hype
-- profile analysis
-- vibe check
-- fortune
-- cosmic match
-- nemesis
-- quirk check
-- compatibility audit
-- ice breakers
-- reply suggestions
-- draft analysis
-- date ideas
-
-I did not just copy blindly. I adapted it to current active models/services and added guard behavior.
-
-#### Important guard added
-`saveViralContent(...)` now checks:
-- `Schema::hasTable('viral_contents')`
-
-So if a deploy target has not migrated yet, the AI response still works and simply returns `share_id = null` instead of hard failing.
-
----
-
-### 4. Reintroduced active Wingman routes
-**File:** `fwber-backend/routes/api.php`
-
-Restored:
-- `POST /api/public/roast`
-- authenticated `wingman/*` route surface
-
-I also used `Route::match(['get', 'post'], ...)` for some endpoints like:
-- vibe-check
-- fortune
-- cosmic-match
-
-Why:
-- existing frontend callers were inconsistent between `GET` and `POST`
-- this avoids unnecessary breakage during staged restoration
-
----
-
-### 5. Hardened venue-dependent date idea generation
-**File:** `fwber-backend/app/Services/AiWingmanService.php`
-
-#### Problem
-`AiWingmanService::suggestDateIdeas()` references `Venue`, but the venue system has not been restored yet in the current phased plan.
-
-#### Fix
-Added:
-- `Schema::hasTable('venues')`
-
-Now date ideas degrade gracefully if venue restoration has not happened yet.
-
-Why this matters:
-- staged restoration should not require restoring every dependency tree at once
-- this lets the AI surface come back online before the venue system is restored
-
----
-
-### 6. Restored a public roast page in the frontend
-**File:** `fwber-frontend/app/roast/page.tsx`
-
-This new page supports two flows:
-
-#### Authenticated flow
-- generates roast/hype from the user’s real profile via restored `/wingman/roast`
-
-#### Public preview flow
-- allows guests to enter:
-  - name
-  - job/vibe
-  - standout trait
-- calls restored `/public/roast`
-
-#### UX included
-- roast/hype mode tabs
-- copy/share actions
-- share-link display when available
-- clear CTA structure for signed-in vs public users
-
----
-
-### 7. Reconnected visible frontend entry points
+### 1. Restored compact billing models
 **Files:**
-- `fwber-frontend/app/page.tsx`
-- `fwber-frontend/app/share/[id]/share-content.tsx`
-
-Restored:
-- homepage “Roast My Profile” CTA back to `/roast`
-- share CTA for roast/hype content back to `/roast`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/Payment.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/Subscription.php`
 
 Why:
-- restoring the route without restoring entry points would leave the feature technically available but practically invisible
+- premium restoration needed a real persistence layer for status/history
+- the active frontend already had premium hooks and billing UI assumptions
+- using tiny focused models is much safer than reactivating the full archived financial subsystem
+
+These models only restore what this phase actually needs:
+- payment ledger rows
+- subscription lifecycle rows
+- history/settings visibility
+- Stripe transaction identifiers for reconciliation
+
+---
+
+### 2. Restored billing schema in active migrations
+**Files:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_030000_restore_payments_table.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_030100_restore_subscriptions_table.php`
+
+Why:
+- premium restoration cannot stop at routes/controllers; it needs active schema support
+- fresh active migrations are safer than reviving long archived migration chains
+
+Important safety behavior:
+- both migrations are idempotent at the table-presence level
+- they only create the table if it does not already exist
+- they restore indexes needed for payment/subscription lookup performance
+
+---
+
+### 3. Restored `PremiumController`
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/PremiumController.php`
+
+Restored endpoints/behaviors:
+- premium plans
+- premium status
+- premium history
+- purchase initiation
+- premium purchase completion
+- who-likes-you premium gate / unlock
+
+Key implementation decisions:
+- billing writes are guarded with `Schema::hasTable(...)` so partially migrated environments degrade gracefully
+- mock-mode purchases are supported intentionally when `services.payment.driver=mock`
+- this keeps local/dev/test premium UX alive without Stripe secrets
+- purchase success updates:
+  - `users.tier`
+  - `users.tier_expires_at`
+  - `users.unlimited_swipes`
+  - `payments`
+  - `subscriptions`
+
+#### Important subtle fix
+The controller now defaults null tier state to `free` for stability because some factories or older rows may not explicitly set a tier value.
+
+---
+
+### 4. Restored minimal `StripeWebhookController`
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/StripeWebhookController.php`
+
+Why:
+- the deployment docs and payment gateway surface assume Stripe webhook re-entry exists
+- restoring premium purchase without restoring webhook support would leave production reconciliation incomplete
+
+This controller is intentionally compact and scoped only to premium lifecycle handling:
+- `payment_intent.succeeded`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+
+It does **not** restore the full archived referral / token-commission complexity.
+
+---
+
+### 5. Reintroduced premium routes into active API
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/routes/api.php`
+
+Added:
+- `GET /api/premium/plans`
+- `GET /api/premium/status`
+- `GET /api/premium/history`
+- `POST /api/premium/initiate`
+- `POST /api/premium/purchase`
+- `GET /api/premium/who-likes-you`
+- `POST /api/stripe/webhook`
+
+This completes the active premium route surface again.
+
+---
+
+### 6. Reworked premium upgrade modal
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/PremiumUpgradeModal.tsx`
+
+What changed:
+- removed dependency on the absent wallet/token-balance flow for this phase
+- now supports:
+  - Stripe Elements flow when `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is configured
+  - mock-gateway fallback when Stripe is unavailable
+
+Why:
+- the old modal depended on broader wallet/token infrastructure not yet restored
+- this phase only needed a robust premium purchase path, not the full token economy
+
+This was a major simplification that keeps the UX usable now instead of waiting for future marketplace/wallet restoration.
+
+---
+
+### 7. Restored user-visible premium pages
+**Files:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/premium/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/settings/subscription/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/premium/success/page.tsx`
+
+#### `/premium`
+Restored as the active premium landing/upgrade page with:
+- Gold feature presentation
+- live premium status panel
+- entry into the upgrade modal
+- navigation into who-likes-you and billing settings
+
+#### `/settings/subscription`
+Restored as the settings-facing billing page with:
+- current plan status
+- payment history
+- subscription history
+- upgrade CTA
+
+#### `/premium/success`
+Added as the success return target for Stripe Elements confirmation.
+
+---
+
+### 8. Repaired `/who-likes-you`
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/who-likes-you/page.tsx`
+
+This was important.
+
+#### Previous issue
+The page:
+- used the generic API client
+- permanently blurred all users
+- could mis-handle premium gating semantics
+
+#### New behavior
+- performs a direct fetch with bearer token for this specific premium-gated call
+- correctly interprets `403` as **upgrade required**, not session expiry
+- shows an upsell card when locked
+- shows actual admirers when premium is active
+- only blurs cards if the backend explicitly marks them locked
+
+This was one of the most important product-polish fixes in this phase.
+
+---
+
+### 9. Extended premium frontend hooks
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/hooks/use-premium.ts`
+
+Added/restored support for:
+- plans
+- history
+- richer premium status typing
+- purchase payloads with plan/payment intent/payment method ids
+
+This makes the restored frontend less brittle and easier to build on in later phases.
 
 ---
 
 ## Validation Performed
 ### Backend
 Executed:
-- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
 
 Result:
-- **23 passed**
+- **26 passed**
 
 ### Frontend
 Executed:
@@ -176,7 +212,12 @@ Executed:
 
 Result:
 - **Build completed successfully**
-- `/roast` now appears in the production route map
+- confirmed active routes include:
+  - `/premium`
+  - `/premium/success`
+  - `/settings/subscription`
+  - `/who-likes-you`
+  - `/roast`
 
 No processes were manually killed.
 
@@ -184,17 +225,22 @@ No processes were manually killed.
 
 ## Files Changed This Session
 ### Backend
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/ViralContent.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/AiWingmanController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Services/AiWingmanService.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_020000_restore_viral_contents_table.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/PremiumController.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/StripeWebhookController.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/Payment.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/Subscription.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_030000_restore_payments_table.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_030100_restore_subscriptions_table.php`
 - `C:/Users/hyper/workspace/fwber/fwber-backend/routes/api.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/AiWingmanRestoreTest.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/PremiumRestoreTest.php`
 
 ### Frontend
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/roast/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/share/[id]/share-content.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/PremiumUpgradeModal.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/hooks/use-premium.ts`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/premium/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/premium/success/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/settings/subscription/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/who-likes-you/page.tsx`
 
 ### Documentation / release tracking
 - `C:/Users/hyper/workspace/fwber/VERSION`
@@ -206,6 +252,7 @@ No processes were manually killed.
 - `C:/Users/hyper/workspace/fwber/TODO.md`
 - `C:/Users/hyper/workspace/fwber/ROADMAP.md`
 - `C:/Users/hyper/workspace/fwber/MEMORY.md`
+- `C:/Users/hyper/workspace/fwber/IDEAS.md`
 - `C:/Users/hyper/workspace/fwber/docs/SUBMODULE_DASHBOARD.md`
 - `C:/Users/hyper/workspace/fwber/HANDOFF.md`
 
@@ -213,29 +260,35 @@ No processes were manually killed.
 
 ## Important Findings / Analysis
 
-### 1. AI was one of the best restoration wedges
-The repo still had enough active AI infrastructure that a meaningful restore was possible without reviving federation/governance/journal systems.
+### 1. Compact billing restoration is the right strategy
+Restoring premium did **not** require reviving the full archived token/referral economy. A narrow slice (`payments`, `subscriptions`, premium controller, webhook, pages) was enough to restore real product value safely.
 
-### 2. Staged restoration benefits from schema/runtime guards
-The venue guard in `AiWingmanService` is a good pattern for future restore phases: restore one system cleanly without forcing all neighboring archived systems back at the same time.
+### 2. Mock gateway support is essential during phased restoration
+Without mock fallback, the premium UX would remain untestable in local/dev environments until real Stripe credentials are available.
 
-### 3. Fresh active migrations are safer than reviving whole archived migration chains
-For `viral_contents`, a new active migration was the safer path compared with resurrecting old archived migrations wholesale.
+### 3. Premium gating is not the same as auth failure
+This mattered a lot on `/who-likes-you`. A generic API client that treats `403` like session expiry can produce broken UX for legitimate premium locks.
+
+### 4. Fresh active migrations remain the safest restoration pattern
+As with `viral_contents`, new active migrations for `payments` and `subscriptions` were safer than reviving entire archived migration chains wholesale.
 
 ---
 
 ## Recommended Next Steps
-1. **Phase C — Restore premium/payment route surface**
-   - now that payment provider bindings are active, restore premium/payment controllers and core routes
-2. **Phase D — Restore marketplace/merchant surface**
-   - after premium/payment primitives are stable
-3. **Continue deploy verification**
-   - migration-hardening work still matters alongside restoration
+1. **Phase D — Restore Marketplace / Merchant surface**
+   - merchant dashboard
+   - merchant inventory
+   - storefront route surface
+   - merchant payment plumbing tied into the now-restored billing primitives
+2. **Production Stripe verification**
+   - test real checkout + webhook end-to-end in an authenticated environment
+3. **Redeploy**
+   - verify restored AI + premium surfaces behave correctly on the hardened migration path
 
 ---
 
 ## Git / Release
-- Version bumped to **1.3.8**
+- Version bumped to **1.3.9**
 - Next git action: commit these changes and push to `origin/main`
 
-This release marks the first true user-visible restoration after the simplification. AI roast/hype is live again in active runtime without bringing back federation, governance, or journal baggage.
+This release completes the second major restoration slice after the simplification: AI is back, premium/billing is back, and the next clean restoration target is marketplace/merchant.

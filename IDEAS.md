@@ -34,3 +34,7 @@
 - **Message Edit/Unsend:** Provide a 5-minute window to unsend or edit E2E encrypted messages (handling the CRDT conflict resolution).
 - **Federated "Blocklists":** ActivityPub allows for importing shared blocklists (#Fediblock). Implementing a tool to import community blocklists would protect users proactively.
 - **Read Receipts toggle:** Users should have the option to disable read receipts globally or per-match for privacy.
+## 2026-04-04 - After Premium Restoration
+- Add a unified entitlement layer that can answer "is feature X premium/verified/merchant gated?" from one backend service instead of spreading gating rules across controllers.
+- Add a billing diagnostics page for admins that replays webhook payloads against a sandbox user, making Stripe rollout debugging safer after staged restorations.
+- Replace hard-coded plan presentation in the frontend with a shared generated contract from `config/premium.php` so product copy and backend price definitions never drift.

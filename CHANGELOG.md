@@ -895,3 +895,14 @@ All notable changes to this project will be documented in this file.
 - Reintroduced the active Wingman API route surface in `fwber-backend/routes/api.php`, including public roast preview plus authenticated roast, vibe, fortune, nemesis, profile-analysis, compatibility, ice-breaker, reply, draft-analysis, and date-idea endpoints.
 - Hardened `AiWingmanService` date-idea generation so it degrades gracefully when the venue system has not yet been restored, instead of crashing on missing venue schema.
 - Added `AiWingmanRestoreTest` and re-validated the restored AI slice alongside the retained core/migration suite; backend tests and frontend production build both passed.
+
+## [1.3.9] - 2026-04-04
+### Added
+- Restored `Payment`, `Subscription`, `PremiumController`, and `StripeWebhookController`, plus active migrations for `payments` and `subscriptions` so premium billing has a real persistence layer again.
+- Added premium-facing frontend routes `/premium`, `/premium/success`, and `/settings/subscription` to expose plan details, upgrade entry, and billing history in active UI.
+- Added `PremiumRestoreTest` to validate the restored premium plan/status/purchase/who-likes-you flow.
+
+### Fixed
+- Reintroduced the premium API route surface in `fwber-backend/routes/api.php`, including plan/status/history/purchase routes and `POST /api/stripe/webhook`.
+- Reworked `PremiumUpgradeModal` to support Stripe Elements when configured and a mock-gateway fallback when Stripe is unavailable, allowing local validation without live secrets.
+- Repaired `/who-likes-you` so premium-gated 403 responses no longer risk being misinterpreted as auth expiry, and unlocked users now render without a permanent blur overlay.

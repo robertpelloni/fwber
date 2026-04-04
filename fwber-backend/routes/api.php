@@ -32,6 +32,7 @@ if (! app()->isProduction()) {
 // tracking from the web shell can succeed before login and without generating 404 noise.
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic']);
+Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 
 Route::middleware('auth:sanctum')->group(function () {
     
@@ -95,6 +96,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('messages/{userId}', [\App\Http\Controllers\MessageController::class, 'index']);
     Route::post('messages/{messageId}/read', [\App\Http\Controllers\MessageController::class, 'markAsRead']);
+
+    // Premium / Billing
+    Route::get('premium/plans', [\App\Http\Controllers\PremiumController::class, 'plans']);
+    Route::get('premium/status', [\App\Http\Controllers\PremiumController::class, 'getPremiumStatus']);
+    Route::get('premium/history', [\App\Http\Controllers\PremiumController::class, 'history']);
+    Route::post('premium/initiate', [\App\Http\Controllers\PremiumController::class, 'initiatePurchase']);
+    Route::post('premium/purchase', [\App\Http\Controllers\PremiumController::class, 'purchasePremium']);
+    Route::get('premium/who-likes-you', [\App\Http\Controllers\PremiumController::class, 'getWhoLikesYou']);
 
     // AI Wingman
     Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
