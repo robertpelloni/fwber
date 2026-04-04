@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
-import { Heart, Users, MessageSquare, TrendingUp, Clock, Target } from 'lucide-react';
+import { Heart, Users, MessageSquare, TrendingUp, Clock, Target, Crown, Flame, Store, Gavel } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
 import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
@@ -113,6 +113,53 @@ export default function DashboardPage() {
                     <ActionButton href="/settings" label="Settings" icon="⚙️" color="gray" />
                   </div>
                 </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Restored sections</h3>
+                  <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                    The restored premium, AI, merchant, and moderation surfaces live here so they are visible from the dashboard instead of being buried in direct URLs.
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <FeatureSurfaceCard
+                      href="/premium"
+                      title="Gold Premium"
+                      description="Upgrade, check billing status, and jump into who-likes-you without hunting for hidden links."
+                      icon={<Crown className="h-5 w-5" />}
+                      accent="yellow"
+                    />
+                    <FeatureSurfaceCard
+                      href="/roast"
+                      title="Profile Roast"
+                      description="Use the restored AI roast surface to get punchy public profile feedback and rewrites."
+                      icon={<Flame className="h-5 w-5" />}
+                      accent="orange"
+                    />
+                    <FeatureSurfaceCard
+                      href={user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'}
+                      title={user?.role === 'merchant' ? 'Merchant Portal' : 'Become a Merchant'}
+                      description={user?.role === 'merchant' ? 'Run storefront inventory, redemptions, analytics, and trust status.' : 'Open a storefront, list redeemable items, and show up in nearby marketplace results.'}
+                      icon={<Store className="h-5 w-5" />}
+                      accent="purple"
+                    />
+                    {(user as { is_moderator?: boolean } | null)?.is_moderator ? (
+                      <FeatureSurfaceCard
+                        href="/moderation"
+                        title="Moderation"
+                        description="Open the moderation dashboard for reports, merchant review, and trust tooling."
+                        icon={<Gavel className="h-5 w-5" />}
+                        accent="slate"
+                      />
+                    ) : (
+                      <FeatureSurfaceCard
+                        href="/settings/subscription"
+                        title="Billing & Access"
+                        description="Review your current plan, past billing activity, and upgrade paths from one place."
+                        icon={<Crown className="h-5 w-5" />}
+                        accent="blue"
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-6">
@@ -197,4 +244,38 @@ function ActionButton({ href, label, icon, color }: { href: string; label: strin
       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
     </Link>
   );
+}
+
+function FeatureSurfaceCard({
+  href,
+  title,
+  description,
+  icon,
+  accent,
+}: {
+  href: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  accent: 'yellow' | 'orange' | 'purple' | 'slate' | 'blue';
+}) {
+  const accentClasses = {
+    yellow: 'border-yellow-200 bg-yellow-50/80 text-yellow-700 dark:border-yellow-900/40 dark:bg-yellow-950/20 dark:text-yellow-300',
+    orange: 'border-orange-200 bg-orange-50/80 text-orange-700 dark:border-orange-900/40 dark:bg-orange-950/20 dark:text-orange-300',
+    purple: 'border-purple-200 bg-purple-50/80 text-purple-700 dark:border-purple-900/40 dark:bg-purple-950/20 dark:text-purple-300',
+    slate: 'border-slate-200 bg-slate-50/80 text-slate-700 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-300',
+    blue: 'border-blue-200 bg-blue-50/80 text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-300',
+  }
+
+  return (
+    <Link href={href} prefetch={false} className="block">
+      <div className="h-full rounded-2xl border border-gray-200 p-4 transition-all hover:-translate-y-0.5 hover:border-purple-300 hover:shadow-md dark:border-gray-700 dark:hover:border-purple-700">
+        <div className={`inline-flex rounded-xl border px-3 py-2 ${accentClasses[accent]}`}>
+          {icon}
+        </div>
+        <h4 className="mt-4 text-base font-semibold text-gray-900 dark:text-white">{title}</h4>
+        <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">{description}</p>
+      </div>
+    </Link>
+  )
 }

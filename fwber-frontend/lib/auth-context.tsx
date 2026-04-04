@@ -9,6 +9,7 @@ interface User {
   id: number
   email: string
   role?: string
+  is_moderator?: boolean
   name: string
   emailVerifiedAt: string | null
   createdAt: string

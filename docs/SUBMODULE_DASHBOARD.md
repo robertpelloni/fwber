@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.5.6
+> **Current Global Version:** 1.5.8
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -58,6 +58,7 @@ fwber/
 - Backend, frontend, mobile shell, and deployment docs now reflect the simplified core dating product.
 - CI/CD workflows are present under `.github/workflows/`.
 - The mobile shell now bridges foreground Expo pushes into the web app toast layer for active-session notification UX.
+- The frontend app shell now exposes restored Gold, Roast, Merchant, and moderator sections directly in authenticated navigation instead of hiding them behind direct URLs.
 - Notification routes are now standardized across backend payloads, notification drawer links, and toast CTA actions.
 - The frontend Sentry integration now follows current App Router instrumentation conventions and no longer emits Sentry-specific build warnings.
 - Active frontend pages no longer prefetch retired routes like `/roast` or `/rate-my-pussy`, and analytics event ingestion is live again in the simplified backend route set.

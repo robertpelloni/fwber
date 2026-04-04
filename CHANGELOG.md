@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.8] - 2026-04-04 — Restored Feature Navigation Surface
+
+### Fixed
+- Surfaced the restored sections directly inside the authenticated app instead of leaving them discoverable only by direct URL or deep settings paths.
+- Added a new "Restored features" area to the main app sidebar/mobile nav for Gold Premium, Roast, Merchant, and moderation surfaces.
+- Added a dedicated restored-sections card grid on the dashboard so signed-in users can actually reach the restored feature set immediately after login.
+- Updated Settings to expose the restored premium, merchant, AI roast, and moderation entry points more clearly.
+
 ## [1.5.7] - 2026-04-04 — Hetzner Script Executable Bits
 
 ### Changed

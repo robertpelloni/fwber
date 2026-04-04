@@ -22,7 +22,11 @@ import {
     Settings,
     LogOut,
     Shield,
-    CircleHelp
+    CircleHelp,
+    Crown,
+    Flame,
+    Store,
+    Gavel
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -61,6 +65,24 @@ const accountLinks: NavItem[] = [
     { href: '/settings', label: 'Settings', icon: Settings },
     { href: '/settings/account', label: 'Account', icon: User },
 ]
+
+function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null): NavItem[] {
+    const links: NavItem[] = [
+        { href: '/premium', label: 'Gold', icon: Crown },
+        { href: '/roast', label: 'Roast', icon: Flame },
+        {
+            href: user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register',
+            label: user?.role === 'merchant' ? 'Merchant' : 'Sell Local',
+            icon: Store,
+        },
+    ]
+
+    if (user?.is_moderator) {
+        links.push({ href: '/moderation', label: 'Moderation', icon: Gavel })
+    }
+
+    return links
+}
 
 function isActivePath(pathname: string, href: string) {
     if (href === '/dashboard') {
@@ -113,6 +135,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
     const userInitial = userDisplayName.charAt(0).toUpperCase()
     const homeHref = user ? '/dashboard' : '/'
     const shouldShowBackButton = pathname !== homeHref
+    const exploreLinks = getExploreLinks(user as { role?: string; is_moderator?: boolean } | null)
 
     const handleLogout = () => {
         logout()
@@ -286,6 +309,21 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                             })}
                         </nav>
 
+                        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950/60">
+                            <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+                                Restored features
+                            </p>
+                            <div className="space-y-1">
+                                {exploreLinks.map((link) => {
+                                    const active = isActivePath(pathname, link.href)
+
+                                    return renderNavLink(link, getNavLinkClasses(active, true), {
+                                        onClick: () => setMobileMenuOpen(false),
+                                    })
+                                })}
+                            </div>
+                        </div>
+
                         <div className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
                             <div className="mb-3 flex items-center gap-3 px-3">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-orange-500 text-base font-bold text-white">
@@ -383,6 +421,19 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                         </nav>
 
                         <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/60">
+                            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
+                                Restored features
+                            </p>
+                            <div className="space-y-1">
+                                {exploreLinks.map((link) => {
+                                    const active = isActivePath(pathname, link.href)
+
+                                    return renderNavLink(link, getNavLinkClasses(active, true))
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/60">
                             <a
                                 href="/help"
                                 className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
