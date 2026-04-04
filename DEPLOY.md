@@ -224,6 +224,11 @@ Use cron or a persistent scheduler process:
 The detailed Hetzner/Vercel production blueprint lives in:
 - `docs/ai/deployment/hetzner-vercel-production.md`
 
+Ready-to-copy infrastructure templates also live in:
+- `ops/hetzner/nginx/`
+- `ops/hetzner/systemd/`
+- `ops/hetzner/scripts/`
+
 ---
 
 ## 9. Post-Deployment Verification

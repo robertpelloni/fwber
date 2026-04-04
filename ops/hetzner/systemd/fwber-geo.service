@@ -1,0 +1,16 @@
+[Unit]
+Description=fwber Rust Geo Service
+After=network.target
+
+[Service]
+User=deploy
+Group=deploy
+Restart=always
+WorkingDirectory=/var/www/fwber/repo/fwber-geo
+Environment=RUST_LOG=info
+ExecStart=/var/www/fwber/repo/fwber-geo/target/release/fwber-geo
+StandardOutput=append:/var/log/fwber-geo.log
+StandardError=append:/var/log/fwber-geo-error.log
+
+[Install]
+WantedBy=multi-user.target
