@@ -7,6 +7,7 @@ use App\Events\Matches\MatchActionRecorded;
 use App\Http\Requests\MatchActionRequest;
 use App\Http\Requests\MatchFilterRequest;
 use App\Http\Resources\MatchResource;
+use App\Models\Block;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Services\AIMatchingService;
@@ -98,12 +99,19 @@ class MatchController extends Controller
 
         $conversations = TaggedCache::remember(["matches_list:user_{$user->id}"], $cacheKey, function () use ($user) {
             $matches = DB::table('user_matches')
-                ->where('user1_id', $user->id)
-                ->orWhere('user2_id', $user->id)
+                ->where('is_active', true)
+                ->where(function ($query) use ($user) {
+                    $query->where('user1_id', $user->id)
+                        ->orWhere('user2_id', $user->id);
+                })
                 ->get();
+
+            $blockedUserIds = Block::relatedBlockedUserIds($user->id);
 
             $userIds = $matches->map(function ($match) use ($user) {
                 return $match->user1_id === $user->id ? $match->user2_id : $match->user1_id;
+            })->reject(function ($id) use ($blockedUserIds) {
+                return in_array($id, $blockedUserIds, true);
             });
 
             $users = User::with(['profile', 'photos'])->whereIn('id', $userIds)->get();
@@ -151,6 +159,10 @@ class MatchController extends Controller
 
         if ($user->id === $targetUserId) {
             return response()->json(['message' => 'Cannot perform action on yourself'], 400);
+        }
+
+        if (Block::isBlockedBetween($user->id, (int) $targetUserId)) {
+            return response()->json(['message' => 'Cannot interact with a blocked user'], 403);
         }
 
         // --- EVENT SOURCING ---

@@ -114,6 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('blocks')->group(function (): void {
         Route::post('/', [\App\Http\Controllers\BlockController::class, 'store']);
         Route::get('/', [\App\Http\Controllers\BlockController::class, 'index']);
+        Route::delete('/{userId}', [\App\Http\Controllers\BlockController::class, 'destroy']);
     });
     Route::post('reports', [\App\Http\Controllers\ReportController::class, 'store']);
     Route::post('safety/panic', [\App\Http\Controllers\SafetyController::class, 'triggerPanic']);

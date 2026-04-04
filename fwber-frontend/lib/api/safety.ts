@@ -48,7 +48,7 @@ export async function blockUser(token: string, blockedId: number): Promise<Block
       'Accept': 'application/json',
     },
     body: JSON.stringify({
-      blocked_id: blockedId,
+      user_id: blockedId,
     }),
   });
 

@@ -1,51 +1,60 @@
 # FWBER Submodule & Repository Dashboard
 
-> **Generated on:** 2026-04-02
-> **Current Global Version:** 1.0.75
+> **Generated on:** 2026-04-04
+> **Current Global Version:** 1.3.0
 
-This dashboard lists all logical sub-packages, submodules, and referenced projects within the `fwber` repository. It explains the project directory structure to ensure all AI agents have immediate situational awareness.
+This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
 ## 🗂️ Project Directory Structure
 
 ```text
 fwber/
-├── docs/                      # Global documentation, AI instructions, architecture diagrams, testing strategies
-├── fwber-backend/             # Laravel 12 (PHP) core API, models, queues, and federation logic
-├── fwber-frontend/            # Next.js 16 (React) user-facing platform, real-time presence UI
-├── fwber-geo/                 # Rust microservice for high-speed geofencing and proximity calculations
-├── mobile/                    # React Native / Expo application for iOS/Android
-├── submodules/                # Directory for external git submodules (currently empty/monorepo managed)
-├── context_portal/            # Alembic/DB portal for context management
-├── .borg/                     # AI memory layer and context storage (LanceDB, jsonl)
+├── docs/                      # Product, deployment, AI workflow, testing, and architecture documentation
+├── fwber-backend/             # Laravel 12 API for auth, onboarding, matching, messaging, safety, notifications
+├── fwber-frontend/            # Next.js app-router web client for discovery, chat, profile, settings, safety
+├── fwber-geo/                 # Rust geospatial microservice for nearby-user lookup and geo screening
+├── fwber-wasm/                # Rust/WASM crypto helpers used by the web client where available
+├── kubernetes/helm/fwber/     # Helm chart for backend/frontend/geo/reverb/worker deployment
+├── mobile/                    # Expo / React Native shell wrapping the web experience with native capabilities
+├── _archive/                  # Retired systems preserved for reference, not active product scope
+├── submodules/                # Reserved location for external submodules (currently unused)
+└── .github/workflows/         # CI/CD automation for backend tests, frontend builds, and mobile release flows
 ```
 
-## 📦 Logical Packages & Submodules
+## 📦 Active Logical Packages
 
-### 1. `fwber-backend` (Core API)
-*   **Version:** Inherits Global `1.0.75`
-*   **Role:** The brain. Handles all user data, authentication, Match/Proximity algorithms, and ActivityPub federation (inbox/outbox).
-*   **Key Dependencies:**
-    *   Laravel 12
-    *   Stripe SDK (Payments/Subscriptions)
-    *   Pusher/Laravel Reverb (WebSockets for chat/proximity)
+### 1. `fwber-backend`
+- **Version:** inherits global `1.3.0`
+- **Role:** Core API and business logic.
+- **Owns:** auth, onboarding, profiles, photos, proximity matching, messages, block/report safety actions, notification APIs, E2E key backup/restore.
+- **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
-### 2. `fwber-frontend` (Web UI)
-*   **Version:** Inherits Global `1.0.75`
-*   **Role:** The face. Consumes the backend API.
-*   **Key Dependencies:**
-    *   Next.js 16 (App Router)
-    *   Framer Motion (Animations)
-    *   TailwindCSS (Styling)
+### 2. `fwber-frontend`
+- **Version:** inherits global `1.3.0`
+- **Role:** Main user-facing product surface.
+- **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
+- **Key stack:** Next.js app router, React, Tailwind CSS.
 
-### 3. `fwber-geo` (Spatial Engine)
-*   **Version:** 1.0.0 (Internal)
-*   **Role:** High-performance spatial querying (finding users within X meters). Written in Rust for speed.
-*   **Status:** Needs active integration checks with `fwber-backend`.
+### 3. `fwber-geo`
+- **Version:** internal service versioned alongside repo releases
+- **Role:** High-speed geospatial indexing and nearby-user lookup.
+- **Notes:** validated with the geo load test documented under `docs/ai/testing/geo-service-load-test.md`.
 
-### 4. External Git Submodules
-*   **Status:** No active external Git submodules configured in `.gitmodules`. All packages are currently tracked within the primary monorepo tree.
-*   **Action Required:** If any external projects (e.g., specific ActivityPub forks, custom Rust crates) are referenced heavily, they should be added to the `submodules/` directory via `git submodule add`.
+### 4. `fwber-wasm`
+- **Version:** internal package versioned alongside repo releases
+- **Role:** optional client-side crypto acceleration and benchmarking helpers.
+- **Notes:** frontend includes graceful fallbacks when WASM tooling or artifacts are unavailable.
 
-## 🔄 Sync Status
-- Upstream forks and main branches were successfully merged.
-- Next sync target: Implement deep E2E testing for the newly federated `ActivityPubKeyService`.
+### 5. `mobile`
+- **Version:** inherits global `1.3.0`
+- **Role:** Native mobile shell for push notifications, secure token storage, NFC, and background location.
+- **Key stack:** Expo, React Native WebView, expo-notifications, expo-location.
+
+## 🔄 External Submodules
+- **Status:** No active external git submodules are configured in `.gitmodules`.
+- **Policy:** keep the repo lean; add external submodules only when a dependency must be tracked as source rather than via package management.
+
+## ✅ Current Sync Reality
+- Backend, frontend, mobile shell, and deployment docs now reflect the simplified core dating product.
+- CI/CD workflows are present under `.github/workflows/`.
+- Archived systems remain preserved under `_archive/` and should not be treated as active dependencies unless explicitly restored.

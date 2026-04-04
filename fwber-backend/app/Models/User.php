@@ -125,4 +125,16 @@ class User extends Authenticatable
     {
         return $this->deviceTokens()->pluck('token')->toArray();
     }
+
+    public function blockedUsers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'blocks', 'blocker_id', 'blocked_id')
+            ->withTimestamps();
+    }
+
+    public function blockedByUsers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'blocks', 'blocked_id', 'blocker_id')
+            ->withTimestamps();
+    }
 }

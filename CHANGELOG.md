@@ -819,3 +819,12 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **Global E2E Key Recovery Alert:** Introduced an omnipresent `<E2ERecoveryAlert />` component injected into the root `<ProtectedRoute />`. If a user logs in on a new device (without local IndexedDB keys) but a remote AES-GCM backup exists, they are aggressively prompted to restore their keys. This ensures zero data loss of encrypted media or chat history when users upgrade phones or clear cache.
 - **Native Push Notification Deep Links:** The React Native (`mobile/app/index.js`) shell now actively listens to `expo-notifications` click events. Tapping a "New Match!" or "New Message" native OS push notification now instantly intercepts the attached JSON payload and executes a JavaScript injection `window.location.href = ...` to seamlessly deep-link the user directly into the corresponding internal WebView component.
+
+## [1.3.0] - 2026-04-04
+### Fixed
+- Hardened the safety graph so blocking a user now deactivates any active match, removes both sides of stale match-action records, and flushes both users' match caches to prevent ghost conversations or rediscovery.
+- Fixed the frontend/backend block API contract mismatch by sending `user_id` from `fwber-frontend/lib/api/safety.ts`, matching `StoreBlockRequest` instead of the old broken `blocked_id` payload.
+- Exposed the previously unreachable unblock controller through `DELETE /api/blocks/{userId}` in the active API route set.
+- Updated match discovery and established-match retrieval to exclude blocked relationships consistently, and prevented new match actions against blocked users.
+- Removed active discovery-path assumptions about archived `followedTopics` relations and guarded legacy `date_feedback` scoring so fresh installs and SQLite tests no longer crash on removed tables.
+- Added `BlockSafetyFlowTest` coverage proving blocking hides established matches, prevents messaging, and removes blocked users from discovery; verified alongside `CoreDatingFlowTest` with 22 passing tests.

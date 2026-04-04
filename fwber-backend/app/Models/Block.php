@@ -37,4 +37,30 @@ class Block extends Model
             $q->where('blocker_id', $b)->where('blocked_id', $a);
         })->exists();
     }
+
+    /**
+     * Return every user ID that is blocked by or has blocked the given user.
+     *
+     * Why this exists:
+     * - discovery feeds must not surface users involved in a block relationship
+     * - established match lists must hide severed conversations immediately
+     * - keeping the logic here avoids copy/paste query drift across controllers/services
+     *
+     * @return array<int>
+     */
+    public static function relatedBlockedUserIds(int $userId): array
+    {
+        $blockedByCurrentUser = self::where('blocker_id', $userId)
+            ->pluck('blocked_id')
+            ->all();
+
+        $blockingCurrentUser = self::where('blocked_id', $userId)
+            ->pluck('blocker_id')
+            ->all();
+
+        return array_values(array_unique([
+            ...$blockedByCurrentUser,
+            ...$blockingCurrentUser,
+        ]));
+    }
 }

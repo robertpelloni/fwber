@@ -1,21 +1,24 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.2.8  
+> **Version:** 1.3.0  
 > **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Go-to-Market
-- [ ] **TestFlight Verification**: Ensure the GitHub Actions CI/CD pipeline pushes the `.ipa` directly to App Store Connect.
-- [ ] **Play Console Verification**: Ensure the `.aab` lands in Google Play internal testing rails.
+- [ ] **TestFlight Verification**: Confirm the GitHub Actions / EAS pipeline successfully deposits the `.ipa` into App Store Connect.
+- [ ] **Play Console Verification**: Confirm the mobile release workflow successfully lands the `.aab` in Google Play internal testing.
 
-## 🟡 High: Feature Polish
-- [ ] **Asset Production**: Have the design team execute the screenshot blueprints outlined in `mobile/STORE_ASSETS.md` to finalize the native store listings.
+## 🟡 High: Product Polish
+- [ ] **Store Asset Production**: Execute the screenshot and copy plan in `mobile/STORE_ASSETS.md`.
+- [ ] **Foreground Notification UX**: Add polished in-app toast handling when pushes arrive while the app is already open so mobile users get contextual feedback without needing to tap the OS notification tray.
 
 ## ✅ Recently Completed
-- [x] **Native Push Deep Links**: Engineered `mobile/app/index.js` to parse push notification JSON payloads and directly route the WebView to the correct chat or match.
-- [x] **Global E2E Recovery UX**: Moved the key recovery alert out of the dashboard and into a persistent `<E2ERecoveryAlert />` inside the root `<ProtectedRoute />`.
-- [x] **CI/CD Automation**: Deployed GitHub Actions for automated backend tests, frontend Next.js builds, and Expo/EAS native mobile deployments.
+- [x] **Trust & Safety Hardening**: Blocking now severs discovery visibility, active matches, and messaging access rather than acting as a superficial UI flag.
+- [x] **Frontend Safety Contract Fix**: `fwber-frontend/lib/api/safety.ts` now sends the backend-required `user_id` payload for blocks.
+- [x] **Unblock API Exposure**: Registered `DELETE /api/blocks/{userId}` so the existing backend unblock controller is actually reachable.
+- [x] **Discovery Stability Cleanup**: Removed active matching-path assumptions about archived `followedTopics` relations and the old `date_feedback` table.
+- [x] **Safety Regression Coverage**: Added `tests/Feature/BlockSafetyFlowTest.php` and verified it passes alongside `CoreDatingFlowTest.php`.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*
