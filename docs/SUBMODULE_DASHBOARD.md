@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.5.5
+> **Current Global Version:** 1.5.6
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -77,6 +77,7 @@ fwber/
 - Smoke-check/diff outputs can now also be condensed into compact notification artifacts and optionally posted to a webhook for chatops-style deploy summaries.
 - The fwber backend runtime is now actually deployed on Hetzner with local MySQL, Redis, Reverb, queue, and geo services active; the remaining migration work is primarily public DNS/TLS cutover.
 - The deploy script now also handles non-root operator execution more safely by auto-using `sudo` for systemd/nginx actions when required.
+- The smoke-check websocket probe now uses a valid RFC-compliant handshake key, eliminating a post-cutover false-negative seen during live Hetzner validation.
 - Merchant discovery is now geo-aware again through persisted storefront coordinates and distance-ranked nearby marketplace responses.
 - Merchant moderation and trust scoring are active again through restored moderation routes, trust-weighted ranking, and moderation dashboard merchant review tooling.
 - Merchant review prioritization is active through queue priority scoring, search, and inline note workflows.

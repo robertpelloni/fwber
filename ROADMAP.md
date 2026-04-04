@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.5.5 "Deploy Script Privilege Hardening"
+> **Current Version:** 1.5.6 "WebSocket Smoke Handshake Fix"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.5.5)
+### Phase 5: Production Scale (COMPLETED - v1.5.6)
+- **WebSocket Smoke Handshake Fix:** Corrected the smoke-check websocket probe to use a valid RFC-compliant handshake key so public post-cutover smoke runs no longer report false-negative websocket failures.
 - **Deploy Script Privilege Hardening:** Hardened `deploy-backend.sh` so it auto-uses `sudo` for systemd/nginx actions when run by a non-root operator like `deploy`.
 - **Hetzner Backend Execution & Database Migration:** Deployed fwber backend runtime to Hetzner, installed missing dependencies, upgraded Rust, built `fwber-geo`, provisioned local MySQL, imported DreamHost production data, and enabled `fwber-queue`, `fwber-reverb`, and `fwber-geo` under systemd.
 - **Smoke Report Notification Publisher:** Added `publish-smoke-report.py` plus deploy integration so smoke + drift artifacts can be condensed into compact notification JSON/Markdown outputs and optionally POSTed to a webhook.
@@ -83,7 +84,7 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Run Final Public Smoke Cutover:** Execute the smoke-enabled deploy path against the now-Hetzner-hosted fwber runtime and review summary, drift, notification, diagnostics, fingerprints, and DNS appendix artifacts.
+1. **Re-run Final Public Smoke Cutover:** Execute the smoke-enabled deploy path now that the websocket probe is corrected and confirm a clean end-to-end post-cutover summary.
 2. **Verify Public Frontend → API Path:** Confirm the Vercel frontend is using the Hetzner-hosted `api.fwber.me` path cleanly after DNS cutover.
 3. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in the Hetzner-hosted backend environment.
 4. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

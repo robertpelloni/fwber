@@ -1,35 +1,29 @@
-# PROJECT_STATUS.md - fwber v1.5.5 (Deploy Script Privilege Hardening)
+# PROJECT_STATUS.md - fwber v1.5.6 (WebSocket Smoke Handshake Fix)
 
 **Date:** 2026-04-04
-**Version:** 1.5.5 "Deploy Script Privilege Hardening"
-**Status:** ✅ **DEPLOY SCRIPT HARDENED AFTER LIVE HETZNER EXECUTION**
+**Version:** 1.5.6 "WebSocket Smoke Handshake Fix"
+**Status:** ✅ **PUBLIC HETZNER CUTOVER VALIDATION TUNED AFTER LIVE SMOKE TESTING**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes a real live-deploy edge case discovered during Hetzner execution.
+This release fixes a false-negative discovered during the first full public Hetzner smoke run after cutover.
 
 Delivered:
-- deploy script now handles non-root execution more safely
-- service restarts and nginx reload now automatically use `sudo` when needed
+- corrected websocket smoke handshake key in the smoke-check script
+- removed a probe-side failure that was masking an otherwise healthy `ws.fwber.me` endpoint
 
 ## 🚀 Operations Improvements
 Updated:
-- `ops/hetzner/scripts/deploy-backend.sh`
+- `ops/hetzner/scripts/smoke-check.sh`
 
-Behavior now:
-- if run as `root`, it behaves normally
-- if run as a non-root operator like `deploy`, it automatically prefixes service restart/reload calls with `sudo`
+The websocket probe now uses a valid RFC-compliant `Sec-WebSocket-Key`, matching the successful manual handshake that already proved Reverb/nginx were functioning correctly.
 
 ## ✅ Why This Matters
-During the live Hetzner deployment, the deploy script successfully completed:
-- git pull
-- composer install
-- migrations
-- optimize
-- deploy verification
-- geo build
+The previous live smoke run showed:
+- API healthy
+- geo healthy
+- websocket endpoint healthy when tested manually
+- but smoke script websocket probe failed with `400 Invalid Sec-WebSocket-Key`
 
-but then failed at the service-restart stage because the `deploy` user did not have direct permission to run `systemctl` without elevation.
-
-This release removes that friction and makes the script more realistic for normal operator usage.
+That meant the failure was in the probe, not the service. This release fixes that mismatch so the smoke summary can reflect the real runtime state.

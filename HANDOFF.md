@@ -1,17 +1,18 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.5.5
+> **Version Reached:** 1.5.6
 > **Current Model:** GPT
 
 ## Executive Summary
-This session completed the public Hetzner fwber cutover mechanics after the user confirmed DNS updates, then fixed a real deploy-script privilege issue discovered during live execution, resulting in **v1.5.5 "Deploy Script Privilege Hardening"**.
+This session completed the public Hetzner cutover validation loop and then fixed the last probe-side issue uncovered during the first full smoke run, resulting in **v1.5.6 "WebSocket Smoke Handshake Fix"**.
 
-The most important live outcomes are:
-- `api.fwber.me` now resolves to Hetzner and serves the Hetzner backend over HTTPS
-- `geo.fwber.me` now resolves to Hetzner and serves the deployed geo service over HTTPS
-- `ws.fwber.me` already worked and continues to succeed with real websocket upgrade handshakes
-- the Hetzner deploy script was hardened so operators can run it as `deploy` without failing at the `systemctl` stage
+The major reality now is:
+- `api.fwber.me` publicly serves the Hetzner backend over HTTPS
+- `geo.fwber.me` publicly serves the Hetzner geo service over HTTPS
+- `ws.fwber.me` publicly succeeds with real websocket upgrades
+- the first full smoke-enabled deploy run succeeded almost entirely, but exposed a false-negative websocket probe bug
+- that probe bug has now been fixed in the repo by switching to a valid RFC-compliant `Sec-WebSocket-Key`
 
 No processes were manually killed.
 
@@ -19,45 +20,62 @@ No processes were manually killed.
 
 ## What Happened Live
 
-### 1. Public DNS propagation confirmed
-Confirmed from both local and Hetzner perspectives:
-- `api.fwber.me` → `5.161.250.43`
-- `geo.fwber.me` → `5.161.250.43`
-- `ws.fwber.me` → `5.161.250.43`
+### 1. Public cutover verification succeeded
+Confirmed publicly:
+- `https://api.fwber.me/api/health` → `200 OK`, healthy
+- `https://geo.fwber.me/nearby?...` → valid JSON response
+- websocket handshake against `ws.fwber.me` → `101 Switching Protocols`
 
-### 2. Hetzner TLS/public nginx cutover completed for API + geo
-Created and enabled nginx vhosts for:
-- `api.fwber.me`
-- `geo.fwber.me`
+### 2. First full smoke-enabled deploy run succeeded almost fully
+After pulling the latest deploy-script hardening onto Hetzner and configuring minimal sudoers for the `deploy` user’s fwber service actions, I ran the smoke-enabled deploy path from the `deploy` account.
 
-Then issued Let's Encrypt certificates on Hetzner for:
-- `api.fwber.me`
-- `geo.fwber.me`
+The deploy completed:
+- git pull
+- composer install
+- migrations
+- optimize
+- deploy verification
+- geo build
+- service restarts
 
-Result:
-- public HTTPS is now active on both hosts
+The smoke report then showed:
+- Local artisan deploy verification → pass
+- frontend reachability → pass
+- API health/liveness/readiness → pass
+- invalid-login contract → pass
+- public roast preview → pass
+- geo nearby endpoint → pass
+- authenticated smoke checks → warnings only (expected, no tokens yet)
 
-### 3. Public service validation succeeded
-#### API
-Public check now returns healthy:
-- `https://api.fwber.me/api/health` → `200 OK`
+### 3. Probe-level websocket bug discovered
+The only failing smoke item was:
+- websocket upgrade probe → `400 Invalid Sec-WebSocket-Key`
 
-#### Geo
-Public check now returns valid JSON:
-- `https://geo.fwber.me/nearby?...` → JSON response
+Important finding:
+- manual websocket testing had already proven `ws.fwber.me` was healthy
+- therefore the issue was not Reverb/nginx
+- the issue was the smoke probe itself using a bad websocket key
 
-#### Websocket
-Public websocket handshake succeeded via `ws.fwber.me` using the live Reverb app key.
+### 4. Repo fix implemented
+Updated:
+- `ops/hetzner/scripts/smoke-check.sh`
 
-### 4. Real deploy-script issue discovered and fixed
-After cutover, I ran the deploy path via the `deploy` user and found:
-- build/install/migrate/optimize/deploy-verify all succeeded
-- but the script failed at service restart because `systemctl` required elevated privileges
+Change:
+- replaced the invalid websocket test key with a valid RFC-compliant `Sec-WebSocket-Key`
 
-Fix implemented in repo:
-- `ops/hetzner/scripts/deploy-backend.sh` now auto-detects non-root execution and prefixes systemd/nginx actions with `sudo` when needed
+This removes a false-negative from future public smoke runs.
 
-This was the correct fix because real operators often run deploys as a deploy account rather than root.
+---
+
+## Additional Live Ops Work
+### Minimal sudoers fix for deploy user
+To allow the `deploy` user to use the hardened deploy script successfully, I added a focused sudoers rule on Hetzner permitting passwordless execution of:
+- `systemctl restart fwber-queue`
+- `systemctl restart fwber-reverb`
+- `systemctl restart fwber-geo`
+- `systemctl reload nginx`
+
+This was necessary because the deploy script is now privilege-aware, but `sudo` still needs an allowed path when the operator account has no interactive password entry.
 
 ---
 
@@ -65,31 +83,28 @@ This was the correct fix because real operators often run deploys as a deploy ac
 
 ### Public validation
 Confirmed:
-- `https://api.fwber.me/api/health` → healthy
-- `https://geo.fwber.me/nearby?...` → valid JSON
-- websocket handshake to `ws.fwber.me` → `101 Switching Protocols`
+- API public health endpoint healthy
+- geo public nearby endpoint healthy
+- websocket public handshake healthy
 
-### Hetzner local validation
-Confirmed:
-- MySQL healthy
-- Redis healthy
-- queue active
-- Reverb active
-- geo active
-- `php artisan deploy:verify --json` healthy
+### Deploy validation
+Confirmed from the `deploy` user path:
+- full deploy script can now reach service restart/reload successfully after privilege hardening + sudoers alignment
 
-### Deploy-script validation
-Executed:
-- deploy flow as `deploy`
-- discovered privilege failure at `systemctl`
-- patched script to use `sudo` when non-root
+### Smoke validation
+Confirmed from the first public smoke-enabled deploy run:
+- all major public checks passed
+- only websocket probe failed, and that was traced to the invalid smoke key rather than a runtime problem
+
+### Repo-side fix validation
+Validated the smoke-check websocket probe fix locally in repo logic and documented it for the next full rerun.
 
 ---
 
 ## Files Changed This Session
 
 ### Repo files
-- `ops/hetzner/scripts/deploy-backend.sh`
+- `ops/hetzner/scripts/smoke-check.sh`
 - `CHANGELOG.md`
 - `DEPLOY.md`
 - `PROJECT_STATUS.md`
@@ -97,40 +112,32 @@ Executed:
 - `ROADMAP.md`
 - `MEMORY.md`
 - `HANDOFF.md`
-- `IDEAS.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `docs/ai/deployment/hetzner-vercel-production.md`
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
 - version files
 
-### Live infrastructure state
-- Hetzner nginx now serves:
-  - `api.fwber.me`
-  - `geo.fwber.me`
-  - `ws.fwber.me`
-- Let's Encrypt certs issued on Hetzner for:
-  - `api.fwber.me`
-  - `geo.fwber.me`
-- fwber backend now publicly reachable from Hetzner
+### Live infrastructure changes
+- Hetzner public API + geo TLS verified active
+- focused sudoers rule added for `deploy` to manage fwber services/nginx reload without interactive password entry
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.5.5`
-- **Recommended Commit Message:** `fix: harden deploy script for non-root hetzner execution (v1.5.5)`
+- **Target Version:** `1.5.6`
+- **Recommended Commit Message:** `fix: correct websocket smoke probe after hetzner cutover (v1.5.6)`
 
 ---
 
 ## Current Best Next Steps
-1. **Re-run the full smoke-enabled deploy path after pulling v1.5.5 on Hetzner**
-   - now that the deploy script handles non-root service actions better
+1. **Pull v1.5.6 on Hetzner and re-run the full smoke-enabled deploy path**
+   - this should clear the false websocket smoke failure
 2. **Verify Vercel frontend → Hetzner API behavior end to end**
 3. **Run live Stripe verification**
    - premium purchase
    - merchant purchase
    - webhook handling
 4. **Set `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` if chat/webhook deploy notifications are wanted**
-5. **Retire the old DreamHost fwber backend path**
-   - after confidence is high that Hetzner public cutover is stable
+5. **Retire the old DreamHost fwber backend path and rotate migrated secrets**
 
-The fwber backend migration is now substantially complete: the app is publicly served from Hetzner, geo is publicly served from Hetzner, websockets work on Hetzner, and the remaining work is post-cutover validation/polish rather than fundamental infrastructure bring-up.
+The fwber public cutover is now effectively live on Hetzner; the remaining work is post-cutover validation, billing verification, notification wiring, and cleanup of legacy DreamHost dependencies.

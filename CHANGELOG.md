@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.6] - 2026-04-04 — WebSocket Smoke Handshake Fix
+
+### Fixed
+- Corrected the websocket smoke probe in `ops/hetzner/scripts/smoke-check.sh` to use a valid RFC-compliant `Sec-WebSocket-Key`, fixing the live Hetzner smoke-check failure where the websocket endpoint was healthy but the probe itself produced `400 Invalid Sec-WebSocket-Key`.
+- This turns the public smoke run from a false-negative websocket failure into a valid handshake test against `ws.fwber.me`.
+
 ## [1.5.5] - 2026-04-04 — Deploy Script Privilege Hardening
 
 ### Changed

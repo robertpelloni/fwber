@@ -676,7 +676,7 @@ check_websocket_upgrade() {
     printf 'Origin: %s\r\n' "$WS_ORIGIN"
     printf 'Connection: Upgrade\r\n'
     printf 'Upgrade: websocket\r\n'
-    printf 'Sec-WebSocket-Key: SGV0em5lclNtb2tlQ2hlY2s=\r\n'
+    printf 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n'
     printf 'Sec-WebSocket-Version: 13\r\n\r\n'
   } | openssl s_client -quiet -connect "${ws_host}:443" -servername "$ws_host" 2>/dev/null | head -n 1)"
 

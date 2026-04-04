@@ -25,7 +25,8 @@ This document replaces the old DreamHost-first recommendation for current produc
 16. Review notification artifacts or webhook output if notification publishing is enabled
 17. Complete public DNS/TLS cutover for `api.fwber.me` and `geo.fwber.me`
 18. Re-run the deploy script from the intended operator account and confirm privilege-safe service restarts
-19. Validate auth, roast, premium, merchant, websocket, and health endpoints
+19. Re-run websocket smoke validation and confirm no probe-side false negative remains
+20. Validate auth, roast, premium, merchant, websocket, and health endpoints
 
 ## See Also
 - `DEPLOY.md`
