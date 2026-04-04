@@ -1,0 +1,146 @@
+# Hetzner + Vercel Production Blueprint
+
+> **Version:** 1.4.1  
+> **Status:** Recommended deployment topology for restored fwber stack
+
+This document captures the production topology now recommended for fwber after the phased restoration of:
+- AI Wingman / Roast
+- Premium / Billing
+- Merchant / Marketplace
+
+## 1. Topology
+
+### Vercel
+Hosts:
+- `fwber.me`
+- `www.fwber.me`
+
+Role:
+- Next.js frontend only
+
+### Hetzner VPS
+Hosts:
+- `api.fwber.me` → Laravel backend
+- `ws.fwber.me` → Reverb websocket server
+- `geo.fwber.me` → Rust geo service
+
+Role:
+- API
+- queue workers
+- scheduler
+- Redis
+- MySQL
+- Stripe webhook processing
+- restored AI/premium/merchant runtime
+
+## 2. Suggested Hetzner Sizes
+
+### Recommended practical target
+- 4–8 vCPU
+- 8–16 GB RAM
+- 80–160+ GB NVMe
+
+### Stronger shared-host target
+If the same machine may also host `bobsgame.com` services:
+- 8 vCPU
+- 16 GB RAM
+- 160+ GB NVMe
+
+### Minimum starter
+- 2 vCPU
+- 8 GB RAM
+
+This minimum can work, but may require resizing sooner if realtime traffic, builds, workers, and geo indexing increase together.
+
+## 3. DNS
+
+Create records:
+- `fwber.me` → Vercel
+- `www.fwber.me` → Vercel
+- `api.fwber.me` → Hetzner VPS IP
+- `ws.fwber.me` → Hetzner VPS IP
+- `geo.fwber.me` → Hetzner VPS IP
+
+## 4. Services on the VPS
+
+Install:
+- Nginx
+- PHP 8.4 + PHP-FPM
+- Composer
+- Node.js LTS
+- MySQL
+- Redis
+- Rust toolchain
+- Certbot
+- systemd-managed services
+
+## 5. systemd Services
+
+Use dedicated service units for:
+- `fwber-queue`
+- `fwber-reverb`
+- `fwber-geo`
+
+This is preferred over ad-hoc `nohup` background processes because production should survive shell disconnects and system reboots predictably.
+
+## 6. Environment Variable Split
+
+### Vercel frontend env
+```env
+NEXT_PUBLIC_APP_URL=https://fwber.me
+NEXT_PUBLIC_API_URL=https://api.fwber.me
+NEXT_PUBLIC_REVERB_HOST=ws.fwber.me
+NEXT_PUBLIC_REVERB_SCHEME=https
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+```
+
+### Backend env
+```env
+APP_URL=https://api.fwber.me
+FRONTEND_URL=https://fwber.me
+QUEUE_CONNECTION=redis
+CACHE_STORE=redis
+SESSION_DRIVER=redis
+PAYMENT_DRIVER=stripe
+STRIPE_SECRET=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+GEO_SCREENER_ENABLED=true
+GEO_SCREENER_URL=https://geo.fwber.me
+```
+
+## 7. Deployment Order
+
+1. Provision Hetzner VPS
+2. Secure SSH + firewall
+3. Install stack
+4. Clone repo
+5. Configure backend env
+6. Run migrations
+7. Build and run geo service
+8. Start workers/reverb/scheduler
+9. Configure Nginx and TLS
+10. Configure Vercel env + frontend deploy
+11. Validate restored surfaces (`/roast`, `/premium`, `/merchant/*`, marketplace purchases)
+
+## 8. Validation Checklist
+
+After cutover:
+- [ ] auth routes behave correctly
+- [ ] websocket connection succeeds
+- [ ] geo endpoint is reachable
+- [ ] premium purchase path works
+- [ ] merchant registration works
+- [ ] storefront purchase creates receipt + redemption code
+- [ ] migrations complete cleanly with existing column/index drift guards
+
+## 9. Why This Topology
+
+This topology is recommended because fwber is no longer just a simple frontend + PHP site. It now again contains:
+- realtime sockets
+- queue workers
+- billing
+- merchant purchases
+- geo microservice
+- phased restored feature surfaces requiring stronger backend control
+
+That makes **Vercel frontend + Hetzner VPS backend** a better operational fit than legacy shared hosting guidance.

@@ -917,3 +917,12 @@ All notable changes to this project will be documented in this file.
 - Reintroduced merchant and marketplace API routes for merchant registration/profile/dashboard/inventory/analytics, public storefront browsing, authenticated purchases, and code redemption.
 - Rebuilt merchant navigation and settings entry points so the UI now points at active merchant routes instead of archived promotion pages.
 - Updated AR inventory browsing to use the restored nearby marketplace API instead of a hard-coded demo storefront.
+
+## [1.4.1] - 2026-04-04
+### Added
+- Added `docs/ai/deployment/hetzner-vercel-production.md` and `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md` as the new deployment blueprint for the restored fwber stack.
+
+### Changed
+- Rewrote `DEPLOY.md` around the Vercel frontend + Hetzner VPS backend topology.
+- Converted `docs/deployment/DREAMHOST_DEPLOYMENT.md` into a legacy-reference notice instead of an active recommendation.
+- Updated Stripe rollout and Cloudflare edge-caching docs so they now reference the Hetzner/Vercel production model and restored merchant billing surface.

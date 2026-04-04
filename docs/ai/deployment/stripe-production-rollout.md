@@ -1,12 +1,12 @@
 # Stripe Production Rollout Checklist
 
-> **Version:** 1.0.76  
+> **Version:** 1.4.1  
 > **Status:** Backend prepared, DevOps configuration required.
 
-The `fwber` platform integrates Stripe for the 200 FWB "Gold" subscription upgrade, including full webhook validation and an internal MLM-style referral token payout on renewal. The code is ready; this document serves as the operations-ready payout/reconciliation checklist and environment variable guide for production deployment.
+The active `fwber` platform now uses Stripe for restored premium billing and restored merchant marketplace purchases. This document serves as the operations-ready checklist for moving from mock billing to live billing in the recommended deployment topology: **Vercel frontend + Hetzner VPS backend**.
 
 ## 1. Environment Variable Configuration
-To flip the switch from mock to live, the following variables must be configured in Vercel (Frontend) and DreamHost (Backend).
+To flip the switch from mock to live, the following variables must be configured in Vercel (Frontend) and on the Hetzner-hosted backend.
 
 **Backend (`fwber-backend/.env`):**
 ```env
@@ -40,23 +40,20 @@ The backend `PremiumPlanCatalog` expects specific price IDs. You must create the
 3. Obtain the `price_...` ID.
 4. Ensure the backend config `config/premium.php` or `PremiumPlanCatalog.php` matches this live price ID.
 
-## 4. Operations-Ready Payout / Reconciliation Checklist
-When running a real-money system with virtual token rewards (FWB coins), reconciliation is critical to prevent token inflation and chargeback abuse.
+## 4. Operations-Ready Reconciliation Checklist
+When running a real-money system for both subscriptions and merchant purchases, reconciliation is critical.
 
-- [ ] **Daily Reconciliation:** Match the sum of successful `payment_intent.succeeded` logs in Laravel to the Daily Gross Volume in Stripe.
-- [ ] **Chargeback / Dispute Handling:** Currently, if a user charges back, the webhook controller does not automatically deduct FWB coins or revoke Gold status.
-  - *Action:* Configure Stripe to send `charge.dispute.created` webhooks, and map it to a new backend method to suspend the account.
-- [ ] **Referral Payout Audits:**
-  - `invoice.payment_succeeded` awards 10% / 5% token bounties up the referral tree. 
-  - Ensure the `ReferralCommissionService` logs its transactions clearly. Check the `referral_commissions` table weekly to ensure no cyclical referral loops are draining the reserve.
-- [ ] **Zero-Auth Fallback:** Verify that if Stripe goes down, the client-side `PremiumUpgradeModal` gracefully falls back to explaining the outage, rather than hanging indefinitely.
+- [ ] **Daily Reconciliation:** Match successful Stripe payment events to Laravel `payments` and `merchant_payments` ledgers.
+- [ ] **Chargeback / Dispute Handling:** Configure Stripe to send dispute events and decide whether premium access or merchant redemption issuance should be automatically suspended on chargeback.
+- [ ] **Webhook Idempotency:** Confirm repeated webhook deliveries do not create duplicate premium grants or merchant payment rows.
+- [ ] **Fallback Behavior:** Verify `PremiumUpgradeModal` and marketplace purchases fail clearly when Stripe is unavailable instead of silently hanging.
 
 ## 5. Live Testing (Pre-Launch)
-Before announcing to the public, do a $1 live transaction with a real card.
+Before announcing to the public, execute one real or Stripe-test premium purchase and one merchant marketplace purchase.
 1. Sign up as a new user.
-2. Purchase the $15 Gold plan.
-3. Wait 1 minute.
-4. Verify `token_balance` increased by 200 FWB.
-5. Verify `is_premium` is true.
+2. Purchase the Gold plan.
+3. Verify `/premium/status` reports active Gold and `subscriptions` contains an active row.
+4. Visit a merchant storefront and purchase one marketplace item.
+5. Verify a `merchant_payments` row and `inventory_redemptions` code are created.
 6. Cancel the subscription in Stripe.
-7. Verify `customer.subscription.deleted` webhook fires and sets `is_premium` back to false upon expiration.
+7. Verify `customer.subscription.deleted` updates premium state correctly.

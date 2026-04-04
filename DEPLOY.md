@@ -1,114 +1,267 @@
 # DEPLOY.md — The fwber Operations Guide
 
-> **Last Updated:** 2026-04-02
-> **Version:** 1.0.68
+> **Last Updated:** 2026-04-04
+> **Version:** 1.4.1
 
-This document serves as the single source of truth for deploying the fwber distributed architecture.
+This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
----
+- **Frontend:** Vercel
+- **Backend / Realtime / Geo / Data:** Hetzner VPS
 
-## 🚀 1. Production: Vercel (Frontend)
-
-The Next.js 16.1 frontend is optimized for deployment on Vercel Edge Network.
-
-1. **Dashboard Setup**: Import the GitHub repository into Vercel.
-2. **Root Directory**: Set the Root Directory to `fwber-frontend`.
-3. **Environment Variables**: Add the following to Vercel:
-   * `NEXT_PUBLIC_API_URL=https://api.fwber.me` (CRITICAL: Do not include `/api` at the end)
-   * `NEXT_PUBLIC_WS_URL=wss://ws.fwber.me`
-   * `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...` (required for live premium card checkout)
-4. **Build Settings**: 
-   * Build Command: `npm run build`
-   * Output Directory: `.next`
-5. **DNS**: Point your main domain (`www.fwber.me`) to Vercel via A Record (`76.76.21.21`) or CNAME.
+This replaces the older DreamHost-centered production recommendation.
 
 ---
 
-## 🐘 2. Production: DreamHost (Backend API)
+## 1. Recommended Production Topology
 
-DreamHost hosts the Laravel 12 API, Database, and WebSockets.
+### Frontend (`fwber.me`)
+Deploy `fwber-frontend` to **Vercel**.
 
-1. **PHP Version**: Ensure the domain is set to use PHP 8.3+.
-2. **Document Root**: Point the `api.fwber.me` subdomain's web directory to `/home/user/fwber/fwber-backend/public`.
-3. **Database**: MySQL 8+ hosted internally on DreamHost (`mysql.fwber.me`).
-4. **Environment (`.env`)**:
-   ```ini
-    APP_ENV=production
-    APP_DEBUG=false
-    APP_URL=https://api.fwber.me
-    PAYMENT_DRIVER=stripe
-    
-    CACHE_STORE=database
-    QUEUE_CONNECTION=database
-    SESSION_DRIVER=database
-    BROADCAST_DRIVER=reverb
-    STRIPE_KEY=pk_live_or_pk_test
-    STRIPE_SECRET=sk_live_or_sk_test
-    STRIPE_WEBHOOK_SECRET=whsec_...
-    
-    CORS_ALLOWED_ORIGINS="https://www.fwber.me,https://fwber.me"
-    ```
-5. **Deployment Command**:
-   ```bash
-   cd ~/fwber/fwber-backend && git pull origin main && php artisan config:clear && php artisan config:cache && php artisan migrate --force
-   ```
+### Hetzner VPS
+Host the following on a single production VPS initially:
+- `api.fwber.me` → Laravel backend
+- `ws.fwber.me` → Laravel Reverb websocket server
+- `geo.fwber.me` → Rust `fwber-geo` microservice
+- MySQL
+- Redis
+- queue workers
+- scheduler / cron
+
+### Suggested VPS Size
+- **Preferred:** 4–8 vCPU, 8–16 GB RAM, 80–160+ GB NVMe
+- **Best practical target:** 8 vCPU / 16 GB when sharing capacity with other projects like `bobsgame.com`
+- **Minimum acceptable starter:** 2 vCPU / 8 GB, with the expectation that you may resize upward later
 
 ---
 
-## 📡 3. Production: WebSockets (Laravel Reverb)
+## 2. DNS Layout
 
-The "Pulse" real-time engine requires a dedicated proxy setup on DreamHost.
+Point domains as follows:
 
-1. **Subdomain**: Create `ws.fwber.me` as a Fully Hosted domain in DreamHost.
-2. **DNS**: Point `ws.fwber.me` to the DreamHost server IP (NOT Vercel).
-3. **The Proxy Bridge**: Place this `.htaccess` in the `ws.fwber.me` root directory:
-   ```apache
-   RewriteEngine On
-   RewriteCond %{HTTP:Upgrade} =websocket [NC]
-   RewriteRule ^(.*) http://127.0.0.1:8080/$1 [P,L]
-   RewriteCond %{HTTP:Upgrade} !=websocket [NC]
-   RewriteRule ^(.*) http://127.0.0.1:8080/$1 [P,L]
-   ```
-4. **Start the Engine**: Run the daemon in the background:
-   ```bash
-   nohup php artisan reverb:start --host=0.0.0.0 --port=8080 > reverb.log 2>&1 &
-   ```
+- `fwber.me` → Vercel
+- `www.fwber.me` → Vercel
+- `api.fwber.me` → Hetzner VPS public IP
+- `ws.fwber.me` → Hetzner VPS public IP
+- `geo.fwber.me` → Hetzner VPS public IP
 
 ---
 
-## 🦀 4. Production: Rust Geo-Screener (Optional)
+## 3. Vercel Frontend Configuration
 
-For high-density scaling, run the `fwber-geo` microservice.
+### Vercel Project
+- **Root Directory:** `fwber-frontend`
+- **Build Command:** `npm run build`
+- **Output Directory:** `.next`
 
-1. Compile: `cd fwber-geo && cargo build --release`
-2. Run: `nohup ./target/release/fwber-geo > geo.log 2>&1 &`
-3. Update backend `.env` to point to the Rust service URL.
+### Required Environment Variables
+```env
+NEXT_PUBLIC_APP_URL=https://fwber.me
+NEXT_PUBLIC_API_URL=https://api.fwber.me
+NEXT_PUBLIC_REVERB_HOST=ws.fwber.me
+NEXT_PUBLIC_REVERB_SCHEME=https
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+NEXT_PUBLIC_FRONTEND_VERSION=<current frontend version>
+NEXT_PUBLIC_PROJECT_VERSION=<current root version>
+```
+
+### Notes
+- Do **not** append `/api` to `NEXT_PUBLIC_API_URL`
+- Let Vercel own the apex/frontend DNS records
+- Keep backend-only secrets out of Vercel
 
 ---
 
-## 🩺 5. Post-Deployment Verification
+## 4. Hetzner Backend Stack
 
-Always run this checklist after a major version bump:
-1. [ ] Check `https://api.fwber.me/api/health` reports the correct version.
-2. [ ] Verify Vercel build is Green.
-3. [ ] Perform a test ZK-Identity verification (checks cryptography and DB).
-4. [ ] Upload a test photo (verifies AWS S3 credentials).
-5. [ ] Establish a test chat (verifies Reverb WebSocket persistence).
+Install and configure the following on Ubuntu 24.04 LTS:
+- Nginx
+- PHP 8.4 + PHP-FPM
+- Composer
+- Node.js LTS (for build tooling where needed)
+- MySQL
+- Redis
+- Rust toolchain (or deploy prebuilt geo binary)
+- systemd services for workers/reverb/geo
+- Certbot TLS certificates
+
+### Directory Convention
+Suggested path:
+```bash
+/var/www/fwber/repo/
+```
+
+Repository layout beneath it:
+- `/var/www/fwber/repo/fwber-backend`
+- `/var/www/fwber/repo/fwber-frontend`
+- `/var/www/fwber/repo/fwber-geo`
 
 ---
 
-## 💳 6. Stripe Billing Go-Live Checklist
+## 5. Backend Environment (`fwber-backend/.env`)
 
-Run this checklist before re-enabling billing in production:
-1. [ ] Confirm the frontend has `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
-2. [ ] Confirm the backend has `PAYMENT_DRIVER=stripe`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`.
-3. [ ] In the Stripe dashboard, register the production webhook endpoint that points at the backend webhook route.
-4. [ ] Subscribe the webhook to premium-relevant events:
+Use a production-oriented shape like:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://api.fwber.me
+FRONTEND_URL=https://fwber.me
+SESSION_DOMAIN=.fwber.me
+SANCTUM_STATEFUL_DOMAINS=fwber.me,www.fwber.me
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=fwber
+DB_USERNAME=fwber
+DB_PASSWORD=CHANGE_ME
+
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+SESSION_DRIVER=redis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=fwber
+REVERB_APP_KEY=CHANGE_ME
+REVERB_APP_SECRET=CHANGE_ME
+REVERB_HOST=ws.fwber.me
+REVERB_PORT=443
+REVERB_SCHEME=https
+
+GEO_SCREENER_ENABLED=true
+GEO_SCREENER_URL=https://geo.fwber.me
+
+PAYMENT_DRIVER=stripe
+STRIPE_KEY=sk_live_...
+STRIPE_SECRET=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+### Important Notes
+- `QUEUE_CONNECTION=redis` is now preferred over older database-queue guidance
+- `CACHE_STORE=redis` and `SESSION_DRIVER=redis` are the production recommendation
+- backend production should assume active restored systems exist: AI, premium billing, merchant marketplace, websockets, geo
+
+---
+
+## 6. Deployment Commands
+
+### Initial Backend Bring-Up
+```bash
+cd /var/www/fwber/repo/fwber-backend
+composer install --no-dev --optimize-autoloader
+php artisan key:generate
+php artisan migrate --force
+php artisan storage:link
+php artisan optimize:clear
+php artisan optimize
+```
+
+### Re-Deploy Sequence
+```bash
+cd /var/www/fwber/repo
+git pull origin main
+
+cd fwber-backend
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan optimize:clear
+php artisan optimize
+
+cd ../fwber-geo
+cargo build --release
+
+sudo systemctl restart fwber-queue
+sudo systemctl restart fwber-reverb
+sudo systemctl restart fwber-geo
+sudo systemctl reload nginx
+```
+
+---
+
+## 7. Long-Running Services
+
+Run the following under `systemd`:
+
+### Queue Worker
+```bash
+php artisan queue:work --sleep=3 --tries=3 --timeout=120
+```
+
+### Reverb
+```bash
+php artisan reverb:start --host=127.0.0.1 --port=8080
+```
+
+### Geo Service
+```bash
+/var/www/fwber/repo/fwber-geo/target/release/fwber-geo
+```
+
+### Scheduler
+Use cron or a persistent scheduler process:
+```cron
+* * * * * cd /var/www/fwber/repo/fwber-backend && /usr/bin/php artisan schedule:run >> /var/log/fwber-scheduler.log 2>&1
+```
+
+---
+
+## 8. Nginx Proxy Layout
+
+### `api.fwber.me`
+- Serve Laravel `public/`
+- Pass PHP to `php8.4-fpm`
+
+### `ws.fwber.me`
+- Reverse proxy to Reverb on `127.0.0.1:8080`
+- Ensure websocket upgrade headers are passed through
+
+### `geo.fwber.me`
+- Reverse proxy to Rust geo service on `127.0.0.1:8081`
+
+The detailed Hetzner/Vercel production blueprint lives in:
+- `docs/ai/deployment/hetzner-vercel-production.md`
+
+---
+
+## 9. Post-Deployment Verification
+
+Always verify the following after a major version bump or infrastructure move:
+
+1. [ ] Frontend Vercel deploy is green
+2. [ ] `https://api.fwber.me/api/auth/login` returns expected validation/auth behavior
+3. [ ] `/roast` works against the live API
+4. [ ] `/premium` upgrade initiation works
+5. [ ] `/merchant/register` and `/merchant/dashboard` work
+6. [ ] `wss://ws.fwber.me` accepts websocket traffic
+7. [ ] `https://geo.fwber.me` responds successfully
+8. [ ] queue workers are processing jobs
+9. [ ] scheduler is firing recurring tasks
+10. [ ] migrations complete without duplicate-index or missing-column drift failures
+
+---
+
+## 10. Stripe Billing Go-Live Checklist
+
+Run this checklist before enabling live billing:
+
+1. [ ] Confirm frontend Vercel env contains `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+2. [ ] Confirm backend `.env` contains `PAYMENT_DRIVER=stripe`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`
+3. [ ] Register the production Stripe webhook endpoint: `https://api.fwber.me/api/stripe/webhook`
+4. [ ] Subscribe to premium and commerce relevant events:
    - `payment_intent.succeeded`
    - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
-5. [ ] Verify `/premium` and `/settings/subscription` open the Stripe modal instead of granting Gold directly.
-6. [ ] Complete one real or Stripe-test premium purchase and confirm the webhook marks Gold active.
-7. [ ] Verify referral commission rows and FWBcoin rewards are recorded for both direct and second-level uplines.
-8. [ ] Decide whether cash commissions stay ledger-only for manual ops or move to Stripe Connect payouts with KYC/tax handling.
+5. [ ] Verify `/premium` opens Stripe checkout when configured
+6. [ ] Verify marketplace purchases stop using mock mode and require real payment confirmation in production
+7. [ ] Complete one live/test premium purchase and one marketplace purchase
+8. [ ] Verify webhook-driven state changes are reflected in premium status and merchant payment history
+
+---
+
+## 11. Legacy Note
+
+Earlier DreamHost deployment guidance should now be treated as **legacy reference only**. fwber’s active production recommendation is **Hetzner VPS + Vercel frontend**.

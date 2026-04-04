@@ -1,0 +1,22 @@
+# Deploying fwber to Hetzner + Vercel
+
+This document replaces the old DreamHost-first recommendation for current production planning.
+
+## Recommended Layout
+- **Vercel:** `fwber-frontend`
+- **Hetzner VPS:** `fwber-backend`, `fwber-geo`, MySQL, Redis, workers, Reverb
+
+## Minimum Steps
+1. Provision Hetzner VPS (Ubuntu 24.04)
+2. Point `api.fwber.me`, `ws.fwber.me`, and `geo.fwber.me` to the VPS IP
+3. Configure Vercel project for `fwber-frontend`
+4. Install backend stack on the VPS
+5. Configure Laravel `.env`
+6. Run migrations and optimize caches
+7. Start queue, reverb, and geo services under `systemd`
+8. Issue TLS certificates
+9. Validate auth, roast, premium, merchant, and websocket flows
+
+## See Also
+- `DEPLOY.md`
+- `docs/ai/deployment/hetzner-vercel-production.md`

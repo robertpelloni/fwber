@@ -1,61 +1,49 @@
-# PROJECT_STATUS.md - fwber v1.4.0 (Marketplace & Merchant Restoration)
+# PROJECT_STATUS.md - fwber v1.4.1 (Hetzner Deployment Docs Refresh)
 
 **Date:** 2026-04-04
-**Version:** 1.4.0 "Marketplace & Merchant Restoration"
-**Status:** ✅ **LOCAL RELEASE VERIFIED AND PUSHED**
+**Version:** 1.4.1 "Hetzner Deployment Docs Refresh"
+**Status:** ✅ **DOCUMENTED, VERIFIED, AND READY FOR VPS EXECUTION**
 
 ---
 
-## 🎯 What This Release Restored
-This release completes the next planned restoration slice after AI and premium: the **merchant / marketplace surface**.
+## 🎯 What This Release Delivered
+This release converts deployment guidance from legacy DreamHost-centric instructions into the new recommended production architecture:
 
-Restored in active runtime:
-- merchant registration, profile, dashboard, inventory, analytics, and redemption backend endpoints
-- marketplace storefront and purchase backend endpoints
-- merchant schema (`merchant_profiles`, `merchant_inventories`, `merchant_payments`, `inventory_redemptions`)
-- merchant models and user relations
-- `/merchant/register`
-- `/merchant/dashboard`
-- `/merchant/inventory`
-- `/merchant/profile`
-- `/merchant/analytics`
-- `/marketplace/[merchantId]`
-- digital receipt UI and repaired AR inventory feed integration
-- settings entry into the merchant portal
+- **Frontend:** Vercel
+- **Backend / Realtime / Geo / Data:** Hetzner VPS
 
-## 🏪 Backend Restoration
-- **Controllers restored:**
-  - `fwber-backend/app/Http/Controllers/MerchantController.php`
-  - `fwber-backend/app/Http/Controllers/MerchantInventoryController.php`
-  - `fwber-backend/app/Http/Controllers/MerchantAnalyticsController.php`
-- **Models restored:**
-  - `MerchantProfile`
-  - `MerchantInventory`
-  - `MerchantPayment`
-  - `InventoryRedemption`
-- **Schema restored:**
-  - `2026_04_04_040000_restore_merchant_marketplace_tables.php`
-- **Route surface restored:** merchant portal registration/profile/dashboard/inventory/analytics routes plus public marketplace browsing and authenticated purchase endpoints.
-- **Payment integration strategy:** marketplace purchases intentionally use the same compact payment gateway pattern restored in v1.3.9 so mock mode remains usable locally while Stripe-backed purchases remain possible in production.
+It does not change active app runtime behavior; it updates the operational docs so the restored AI, premium, and merchant systems can be deployed on the infrastructure path we now actually recommend.
 
-## 🌐 Frontend Restoration
-- **New merchant pages:** register, dashboard, inventory, profile, analytics
-- **New storefront page:** `app/marketplace/[merchantId]/page.tsx`
-- **Restored commerce component:** `components/marketplace/DigitalReceipt.tsx`
-- **Navigation restored:** merchant entry added back into settings and merchant header navigation rebuilt around active merchant routes instead of dead promotions pages.
-- **AR repair:** `InventoryARView.tsx` now uses the restored nearby marketplace API instead of a hard-coded demo storefront.
+## 📚 Deployment Documentation Updated
+- `DEPLOY.md` fully rewritten around Hetzner + Vercel
+- new `docs/ai/deployment/hetzner-vercel-production.md`
+- new `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+- `docs/deployment/DREAMHOST_DEPLOYMENT.md` converted to legacy-reference notice
+- `docs/ai/deployment/stripe-production-rollout.md` updated to account for premium + marketplace Stripe usage and Hetzner-hosted backend
+- `docs/ai/deployment/cloudflare-edge-caching.md` updated to reference Vercel + Hetzner instead of Vercel + DreamHost
+
+## ✅ Why This Matters
+After restoring:
+- AI surface
+- premium billing
+- merchant marketplace
+
+…the old DreamHost deployment narrative was no longer aligned with the actual active stack. fwber now expects stronger control over:
+- Redis-backed queues/sessions/cache
+- Reverb websocket runtime
+- Rust geo service
+- Stripe webhooks
+- merchant/premium billing ledgers
+
+This release closes that documentation gap.
 
 ## ✅ Validation
-- **Backend tests passed:**
-  - `php artisan test tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
-  - Result: **28 passed**
-- **Frontend production build passed:**
-  - `npm run build --prefix fwber-frontend`
-  - Result: merchant and marketplace pages all appear in the production route map.
+- Merchant + premium + AI + core backend tests were already green in the prior release wave.
+- Frontend production build had already passed with merchant and premium routes visible.
+- This release is documentation-focused and prepares the next real-world step: executing the Hetzner/Vercel deployment.
 
 ## ✅ Release Focus
-- [x] Restore merchant/marketplace schema/models/controller surface.
-- [x] Reintroduce merchant registration, inventory, redemption, analytics, and storefront routes.
-- [x] Restore user-visible merchant portal pages and storefront UI.
-- [x] Restore digital receipts and repair AR inventory browsing.
-- [x] Re-verify backend tests and frontend production build.
+- [x] Replace DreamHost-first deployment guidance with Hetzner/Vercel guidance.
+- [x] Add dedicated production blueprint docs for the new topology.
+- [x] Update Stripe and Cloudflare deployment docs to match the new hosting strategy.
+- [x] Mark DreamHost deployment docs as legacy reference rather than active recommendation.

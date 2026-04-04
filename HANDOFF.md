@@ -1,271 +1,178 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.4.0
+> **Version Reached:** 1.4.1
 > **Current Model:** GPT
 
 ## Executive Summary
-This session shipped **v1.4.0 "Marketplace & Merchant Restoration"**.
+This session produced two consecutive deliverables:
 
-After restoring AI in v1.3.8 and premium/billing in v1.3.9, I proceeded with the next planned restoration slice: the **merchant / marketplace surface**.
+1. **v1.4.0 — Marketplace & Merchant Restoration**
+2. **v1.4.1 — Hetzner Deployment Docs Refresh**
 
-The implementation intentionally followed the same compact-phased strategy used in the previous two restores:
-- restore only the minimum viable active merchant commerce layer
-- avoid reactivating the full archived promotions / token-economy / merchant-sprawl stack in one unsafe sweep
-- keep purchases compatible with the existing compact payment gateway strategy
+The code restore work is now complete for the currently requested post-simplification restoration slices that were explicitly in scope:
+- AI / Wingman / Roast
+- Premium / Billing
+- Merchant / Marketplace
 
-This means the repository now has an active non-federated, non-governance, non-journal commerce layer again:
+After shipping the merchant restore, I immediately followed with a docs-focused release because the existing deployment guidance was still heavily DreamHost-oriented and had become misaligned with the active stack and with the user’s current infrastructure decision process.
+
+The repository now reflects the new recommended production topology:
+- **Frontend:** Vercel
+- **Backend / Realtime / Geo / Data:** Hetzner VPS
+
+---
+
+# PART A — v1.4.0 Marketplace & Merchant Restoration
+
+## What shipped
+Restored active merchant commerce runtime:
 - merchant registration
 - merchant profile
 - merchant dashboard
-- merchant inventory CRUD-lite
-- storefront browsing
+- merchant inventory management
+- marketplace storefront browsing
 - purchases
 - redemptions
 - analytics
 - digital receipts
 
----
+## Backend restored
+### Models
+- `MerchantProfile`
+- `MerchantInventory`
+- `MerchantPayment`
+- `InventoryRedemption`
 
-## What I Changed
+### Controllers
+- `MerchantController`
+- `MerchantInventoryController`
+- `MerchantAnalyticsController`
 
-### 1. Restored compact merchant models
-**Files:**
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantProfile.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantInventory.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantPayment.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/InventoryRedemption.php`
+### Migration
+- `2026_04_04_040000_restore_merchant_marketplace_tables.php`
 
-Why:
-- the merchant restore needed a real data model, not just frontend pages and placeholder routes
-- these models provide the smallest coherent commerce slice:
-  - merchant identity
-  - items for sale
-  - purchase ledger
-  - redemption proof
-
-This intentionally avoids reviving the broader archived merchant/promo/token infrastructure all at once.
-
----
-
-### 2. Restored active marketplace schema
-**File:**
-- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_040000_restore_merchant_marketplace_tables.php`
-
-Restored tables:
-- `merchant_profiles`
-- `merchant_inventories`
-- `merchant_payments`
-- `inventory_redemptions`
-
-Why:
-- merchant restoration needed a safe active migration path
-- I used a fresh active migration rather than resurrecting multiple archived migration chains
-
-Important behavior:
-- table creation is guarded with `Schema::hasTable(...)`
-- this keeps deploy retries and partially restored environments from failing hard
-- this matches the same safe pattern already used for AI and premium restoration
-
----
-
-### 3. Restored merchant backend route surface
-**Files:**
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantInventoryController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantAnalyticsController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/routes/api.php`
-
-#### `MerchantController`
-Restored:
+### Route surface
+Added active routes for:
 - merchant registration
 - merchant profile fetch/update
-- merchant dashboard summary
+- merchant dashboard
+- merchant inventory CRUD-lite
+- merchant analytics
+- nearby marketplace browsing
+- storefront by merchant ID
+- authenticated storefront purchase
+- merchant redemption code processing
 
-Also promotes the user role to `merchant` when registration succeeds.
+## Frontend restored
+### New pages
+- `/merchant/register`
+- `/merchant/dashboard`
+- `/merchant/inventory`
+- `/merchant/profile`
+- `/merchant/analytics`
+- `/marketplace/[merchantId]`
 
-#### `MerchantInventoryController`
-Restored:
-- public nearby inventory listing
-- public storefront by merchant id
-- merchant-owned inventory listing
-- create/update/archive inventory item
-- purchase inventory item
-- redeem code
+### Restored component
+- `components/marketplace/DigitalReceipt.tsx`
 
-#### `MerchantAnalyticsController`
-Restored:
-- compact merchant analytics summary
-- revenue/orders/redemption metrics
-- top item list
-- recent payment and redemption history
+### Navigation repairs
+- `MerchantHeader.tsx` updated to point at live merchant routes
+- `settings/page.tsx` gained a commerce entry for merchant onboarding/portal access
 
----
+### AR repair
+- `InventoryARView.tsx` now uses the restored nearby marketplace API instead of a hard-coded demo merchant
 
-## Important implementation decision: payment reuse
-Marketplace purchases reuse the same **compact payment gateway strategy** restored in v1.3.9.
-
-Why this matters:
-- mock mode works locally without live Stripe credentials
-- production Stripe compatibility remains possible later
-- we do not need to resurrect the full archived merchant-specific payments subsystem to make storefront purchases usable now
-
-This was the right call for phased restoration.
-
----
-
-### 4. Restored merchant relations on `User`
-**File:**
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/User.php`
-
-Added:
-- `merchantProfile()`
-- `merchantPurchases()`
-
-Why:
-- merchant registration and dashboard logic depend on a user → merchant profile relationship
-- storefront purchase history also benefits from a clean payer relationship
-
----
-
-### 5. Restored merchant and marketplace frontend pages
-**Files:**
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/register/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/dashboard/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/inventory/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/profile/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/analytics/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/marketplace/[merchantId]/page.tsx`
-
-What was restored:
-- merchant onboarding/registration UI
-- merchant dashboard summary UI
-- inventory management UI
-- merchant profile editing UI
-- analytics UI
-- public-ish storefront browsing + purchase UI
-
-This makes the restore fully user-visible and not merely backend-only.
-
----
-
-### 6. Restored receipt UX
-**File:**
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/marketplace/DigitalReceipt.tsx`
-
-Why:
-- merchant purchases need a clear post-purchase artifact
-- NFC payment flows still referenced this component and it was missing
-
-This also repairs a missing component hole from earlier simplification fallout.
-
----
-
-### 7. Repaired merchant navigation and settings entry points
-**Files:**
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/MerchantHeader.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/settings/page.tsx`
-
-#### MerchantHeader fix
-The surviving merchant header still pointed at archived promotion pages.
-I updated it to point at active merchant routes:
-- dashboard
-- inventory
-- analytics
-- profile
-- billing
-
-#### Settings fix
-Added a commerce section that now links to:
-- merchant portal (if already merchant)
-- become a merchant (if not)
-
-This matters because backend restore without navigation restore leaves the feature practically hidden.
-
----
-
-### 8. Repaired AR inventory browsing integration
-**File:**
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/ar/InventoryARView.tsx`
-
-Changed:
-- removed hard-coded demo merchant assumption
-- now consumes restored `marketplace/nearby`
-
-Important note:
-- exact merchant geo persistence is still deferred
-- the AR overlay currently positions nearby items relative to the user as a fallback demonstration because the compact merchant restore does not yet persist/store exact merchant coordinates
-
-That was an intentional compromise to restore the feature safely without forcing a larger geo-merchant schema expansion immediately.
-
----
-
-### 9. Restored merchant API helpers and analytics hooks
-**Files:**
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/merchant.ts`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/marketplace.ts`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/hooks/use-merchant-analytics.ts`
-
-This aligns the frontend contract with the newly restored active merchant backend.
-
----
-
-## Validation Performed
+## Validation performed
 ### Backend
-Executed:
-- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+Ran:
+- `php artisan test tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
 
 Result:
 - **28 passed**
 
 ### Frontend
-Executed:
+Ran:
 - `npm run build --prefix fwber-frontend`
 
 Result:
-- **Build completed successfully**
-- confirmed new route map includes:
-  - `/merchant/register`
-  - `/merchant/dashboard`
-  - `/merchant/inventory`
-  - `/merchant/profile`
-  - `/merchant/analytics`
-  - `/marketplace/[merchantId]`
+- build passed
+- merchant routes appeared in route map
 
-No processes were manually killed.
+## Git
+- **Commit:** `6684e6621`
+- **Message:** `feat: restore merchant marketplace surfaces and digital receipts (v1.4.0)`
+- pushed to `origin/main`
 
 ---
 
-## Files Changed This Session
-### Backend
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantProfile.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantInventory.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantPayment.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/InventoryRedemption.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantInventoryController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantAnalyticsController.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/User.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_040000_restore_merchant_marketplace_tables.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/routes/api.php`
-- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/MerchantRestoreTest.php`
+# PART B — v1.4.1 Hetzner Deployment Docs Refresh
 
-### Frontend
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/register/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/dashboard/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/inventory/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/profile/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/analytics/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/marketplace/[merchantId]/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/marketplace/DigitalReceipt.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/MerchantHeader.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/settings/page.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/ar/InventoryARView.tsx`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/merchant.ts`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/marketplace.ts`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/hooks/use-merchant-analytics.ts`
+## Why this was necessary
+After restoring AI, premium, and merchant systems, the repository’s deployment story was out of date.
 
-### Documentation / release tracking
+The old docs still implied a DreamHost-centered production architecture even though the active stack now depends much more naturally on:
+- stronger process control
+- Redis-backed queues/cache/sessions
+- Reverb as a managed long-running service
+- Rust geo runtime
+- Stripe webhooks for premium and merchant purchases
+
+The user also explicitly shifted toward Hetzner during the conversation, so deployment documentation needed to be corrected now rather than later.
+
+## What changed
+### Rewrote root ops guide
+**File:**
+- `C:/Users/hyper/workspace/fwber/DEPLOY.md`
+
+Changes:
+- removed DreamHost-first framing
+- established the new recommended topology:
+  - Vercel frontend
+  - Hetzner VPS backend/realtime/geo/data
+- updated env guidance, service model, deploy sequence, DNS expectations, and Stripe go-live notes
+
+### Added new deployment blueprints
+**Files:**
+- `C:/Users/hyper/workspace/fwber/docs/ai/deployment/hetzner-vercel-production.md`
+- `C:/Users/hyper/workspace/fwber/docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+
+These capture:
+- topology
+- DNS split
+- service roles
+- VPS sizing guidance
+- deployment order
+- validation checklist
+
+### Deprecated old DreamHost deployment doc
+**File:**
+- `C:/Users/hyper/workspace/fwber/docs/deployment/DREAMHOST_DEPLOYMENT.md`
+
+This file now clearly states it is **legacy reference only** and points readers to the Hetzner/Vercel docs.
+
+### Updated supporting deployment docs
+**Files:**
+- `docs/ai/deployment/stripe-production-rollout.md`
+- `docs/ai/deployment/cloudflare-edge-caching.md`
+
+Key improvements:
+- Stripe docs now account for both premium billing and merchant marketplace purchases
+- hosting references updated from DreamHost backend to Hetzner-hosted backend services
+- Cloudflare strategy now references Vercel + Hetzner instead of Vercel + DreamHost
+
+---
+
+## Files changed in v1.4.1
+### Core deployment docs
+- `C:/Users/hyper/workspace/fwber/DEPLOY.md`
+- `C:/Users/hyper/workspace/fwber/docs/ai/deployment/hetzner-vercel-production.md`
+- `C:/Users/hyper/workspace/fwber/docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
+- `C:/Users/hyper/workspace/fwber/docs/deployment/DREAMHOST_DEPLOYMENT.md`
+- `C:/Users/hyper/workspace/fwber/docs/ai/deployment/stripe-production-rollout.md`
+- `C:/Users/hyper/workspace/fwber/docs/ai/deployment/cloudflare-edge-caching.md`
+
+### Release tracking / docs sync
 - `C:/Users/hyper/workspace/fwber/VERSION`
 - `C:/Users/hyper/workspace/fwber/VERSION.md`
 - `C:/Users/hyper/workspace/fwber/fwber-backend/VERSION`
@@ -275,41 +182,52 @@ No processes were manually killed.
 - `C:/Users/hyper/workspace/fwber/TODO.md`
 - `C:/Users/hyper/workspace/fwber/ROADMAP.md`
 - `C:/Users/hyper/workspace/fwber/MEMORY.md`
-- `C:/Users/hyper/workspace/fwber/IDEAS.md`
 - `C:/Users/hyper/workspace/fwber/docs/SUBMODULE_DASHBOARD.md`
 - `C:/Users/hyper/workspace/fwber/HANDOFF.md`
 
 ---
 
-## Important Findings / Analysis
+## Important findings
 
-### 1. Compact commerce restoration was the correct strategy
-As with premium, the merchant surface did not require reviving all archived systems. A focused merchant profile + inventory + payment + redemption slice was enough to restore real product value safely.
+### 1. Deployment docs had become misleading
+The old DreamHost deployment framing no longer matched the actual active stack. Once the restored feature set includes websockets, Redis-first ops, merchant billing, and Rust geo, deployment guidance is part of the product, not mere housekeeping.
 
-### 2. Navigation cleanup is critical during restoration
-Old merchant header links still targeted dead promotions pages. Route restoration alone is not enough; entry points must be reconnected or users never really get the feature back.
+### 2. Hetzner/Vercel is now the correct default recommendation
+The repository now reflects the architecture that best fits the restored system:
+- Vercel for the frontend
+- Hetzner VPS for API/realtime/geo/data
 
-### 3. Payment reuse reduces restoration risk
-Leveraging the compact payment gateway pattern from premium restoration prevented duplication and kept local mock-mode validation intact.
-
-### 4. Nearby merchant geo can wait for a later phase
-The AR/nearby merchant experience is now hooked to a real API, but exact merchant geolocation should be its own follow-up improvement rather than an unbounded dependency explosion during this phase.
-
----
-
-## Recommended Next Steps
-1. **Deployment execution on Hetzner/Vercel**
-   - stand up the new VPS topology
-   - validate restored AI, premium, and merchant systems in the new production-like environment
-2. **Production Stripe verification**
-   - test both premium and merchant purchase flows against live credentials
-3. **Geo-aware merchant ranking follow-up**
-   - add real merchant location persistence for better nearby marketplace/AR ranking
+### 3. Stripe docs had to expand beyond premium-only assumptions
+Marketplace commerce restoration means Stripe operations are no longer only about Gold subscriptions.
 
 ---
 
-## Git / Release
-- Version bumped to **1.4.0**
-- Next git action: commit these changes and push to `origin/main`
+## Recommended next steps
+1. **Provision Hetzner VPS**
+   - user was in the process of signing up during this session
+2. **Execute deployment blueprint**
+   - DNS
+   - Nginx
+   - PHP-FPM
+   - MySQL
+   - Redis
+   - workers
+   - Reverb
+   - geo service
+3. **Run live production verification**
+   - auth
+   - roast
+   - premium purchase
+   - merchant registration and storefront purchase
+   - Stripe webhook flow
 
-This release completes the third major restoration slice after the simplification: AI is back, premium is back, and merchant commerce is back. The next highest-value step is deployment execution on the new Hetzner environment.
+---
+
+## Git / Release status
+- **v1.4.0 commit pushed:** `6684e6621`
+- **v1.4.1 changes are documented locally in this handoff and should be committed next**
+
+### Recommended next commit
+- `chore: align deployment docs with hetzner and vercel production topology (v1.4.1)`
+
+The active app now has its requested restored user-facing surfaces back online in code, and the ops docs now align with the new recommended hosting strategy.
