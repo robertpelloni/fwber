@@ -1,67 +1,63 @@
-# PROJECT_STATUS.md - fwber v1.4.7 (Hetzner Post-Deploy Smoke Checks)
+# PROJECT_STATUS.md - fwber v1.4.8 (Smoke Check Report Artifacts & Live Drift Detection)
 
 **Date:** 2026-04-04
-**Version:** 1.4.7 "Hetzner Post-Deploy Smoke Checks"
-**Status:** ✅ **VERIFIED, COMMITTED, AND BETTER PREPARED FOR HETZNER CUTOVER**
+**Version:** 1.4.8 "Smoke Check Report Artifacts & Live Drift Detection"
+**Status:** ✅ **VERIFIED, COMMITTED, AND EVEN BETTER PREPARED FOR HETZNER CUTOVER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release closed the next operational gap after adding health endpoints: it introduced a reusable shell-level smoke-check workflow for post-deploy validation.
+This release upgraded the new smoke-check automation from a console-only tool into a reusable deployment evidence generator.
 
 Delivered:
-- a reusable Hetzner smoke-check script
-- opt-in deploy-script integration for automatic smoke checks after redeploys
-- optional authenticated smoke probes for premium, merchant, and moderation routes
-- optional websocket upgrade probing for Reverb
-- deployment doc updates so the rollout path references real smoke automation instead of only manual steps
+- JSON and Markdown smoke-check report artifacts
+- deploy-script support for timestamped report directories
+- real public smoke-check execution against the currently reachable fwber domains
+- concrete detection of live deployment drift affecting health endpoints and geo routing
 
 ## 🚀 Operations Improvements
-### Added `ops/hetzner/scripts/smoke-check.sh`
-This script verifies:
-- frontend reachability
-- `php artisan deploy:verify --json` when run on the server with the backend checkout present
-- `GET /api/health`
-- `GET /api/health/liveness`
-- `GET /api/health/readiness`
-- invalid-login contract (`422 Invalid credentials`)
-- public roast preview contract
-- geo nearby endpoint contract
+### Extended `ops/hetzner/scripts/smoke-check.sh`
+New capabilities:
+- `FWBER_REPORT_DIR` for automatic report generation
+- `FWBER_REPORT_JSON_PATH` for explicit JSON output path
+- `FWBER_REPORT_MD_PATH` for explicit Markdown output path
+- case-by-case result recording for passes, warnings, and failures
+- machine-readable run summaries suitable for release notes or future Slack/CI integrations
 
-Optional env-driven checks:
-- `FWBER_USER_BEARER_TOKEN` → premium plans + status
-- `FWBER_MERCHANT_BEARER_TOKEN` → merchant dashboard
-- `FWBER_MODERATOR_BEARER_TOKEN` → moderation dashboard + merchant queue
-- `FWBER_REVERB_APP_KEY` → real websocket upgrade probe
+Generated artifacts:
+- `smoke-check-summary.json`
+- `smoke-check-summary.md`
 
 ### Updated `ops/hetzner/scripts/deploy-backend.sh`
-The deploy script now:
-- runs `php artisan deploy:verify` directly in the deploy sequence
-- supports `FWBER_RUN_SMOKE_CHECK=1` to execute the smoke-check script automatically after service restarts
+When `FWBER_RUN_SMOKE_CHECK=1` is used, the deploy script now creates a timestamped report directory under:
+- `logs/deploy-reports/<timestamp>/`
 
-## 📚 Documentation Improvements
-Updated rollout guidance in:
-- `DEPLOY.md`
-- `docs/ai/deployment/hetzner-vercel-production.md`
-- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
-- `docs/SUBMODULE_DASHBOARD.md`
+This can be overridden with:
+- `FWBER_DEPLOY_REPORT_DIR=/custom/path`
 
-Added AI DevKit implementation/testing notes:
-- `docs/ai/implementation/post-deploy-smoke-check-script.md`
-- `docs/ai/testing/post-deploy-smoke-check-script.md`
+## 🌐 Real Public Validation Findings
+I ran the smoke-check script against the currently reachable public deployment targets with report generation enabled.
+
+Observed results:
+- frontend reachability: **pass** (`307` redirect)
+- invalid-login contract: **pass** (`422`)
+- public roast preview: **pass** (`200`)
+- `/api/health`: **fail** (`404` route not found)
+- `/api/health/liveness`: **fail** (`404` route not found)
+- `/api/health/readiness`: **fail** (`404` route not found)
+- `geo.fwber.me/nearby`: **fail** (`404` Vercel deployment not found)
+
+## ✅ Why This Matters
+This release did more than improve tooling; it surfaced the next concrete live-environment blockers:
+1. the pushed health routes are not yet reflected on the reachable `api.fwber.me` deployment
+2. the `geo.fwber.me` domain is not currently pointing at a working geo-service deployment
+
+That is exactly the kind of deployment drift the smoke-check/report layer was meant to expose quickly.
 
 ## ✅ Validation
 - Shell syntax validation passed:
   - `bash -n ops/hetzner/scripts/smoke-check.sh`
   - `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- Previous deploy-health validation remains in place:
-  - `php artisan deploy:verify --json`
-  - `tests/Feature/HealthEndpointsTest.php`
-
-## ✅ Why This Matters
-The project now has a stronger progression of deploy confidence:
-1. health contract inside the backend (`/api/health*`)
-2. local/server verification command (`php artisan deploy:verify`)
-3. shell-level public smoke-check automation (`smoke-check.sh`)
-
-That sequence makes live Hetzner cutover and future redeploys materially safer and easier to repeat.
+- Smoke-check report generation validated end to end with:
+  - `FWBER_SKIP_LOCAL_ARTISAN=1 FWBER_SKIP_WEBSOCKET=1 FWBER_REPORT_DIR=<tmp> bash ops/hetzner/scripts/smoke-check.sh`
+- JSON and Markdown report files were successfully emitted and inspected

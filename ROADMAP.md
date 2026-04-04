@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.4.7 "Hetzner Post-Deploy Smoke Checks"
+> **Current Version:** 1.4.8 "Smoke Check Report Artifacts & Live Drift Detection"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.4.7)
+### Phase 5: Production Scale (COMPLETED - v1.4.8)
+- **Smoke Check Report Artifacts & Live Drift Detection:** Extended `ops/hetzner/scripts/smoke-check.sh` to emit JSON/Markdown reports, updated the deploy script to preserve timestamped run artifacts, and used the new automation to detect current live drift on `/api/health*` and `geo.fwber.me`.
 - **Hetzner Post-Deploy Smoke Checks:** Added `ops/hetzner/scripts/smoke-check.sh`, optional authenticated and websocket probes, and deploy-script integration through `FWBER_RUN_SMOKE_CHECK=1` so public-contract validation can be repeated after real deploys.
 - **Deployment Health & Verification Surface:** Added `/api/health`, `/api/health/liveness`, `/api/health/readiness`, `/api/health/metrics`, centralized dependency health evaluation, and `php artisan deploy:verify` so Hetzner cutover validation is consistent and scriptable.
 - **Merchant Review Prioritization:** Added merchant moderation queue priority scoring, queue search, and inline review-note handling so storefront moderation is operationally practical.
@@ -75,7 +76,7 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the `ops/hetzner/` templates, then verify the stack with `php artisan deploy:verify` and `ops/hetzner/scripts/smoke-check.sh` before deeper UX testing.
-2. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
-3. **Smoke-Test Credential Strategy:** Provision safe premium/merchant/moderator smoke tokens and Reverb key access so the optional smoke-check probes can run at full depth.
-4. **Merchant Verification Automation:** Add optional workflow automation or admin shortcuts beyond the manual prioritization tooling once real moderation volume starts flowing.
+1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the `ops/hetzner/` templates, then verify the stack with `php artisan deploy:verify`, `ops/hetzner/scripts/smoke-check.sh`, and the generated report artifacts before deeper UX testing.
+2. **Fix Current Live Routing Drift:** Ensure the reachable `api.fwber.me` backend actually serves `/api/health*` and that `geo.fwber.me` points to a live geo-service deployment rather than a Vercel 404.
+3. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
+4. **Smoke-Test Credential Strategy:** Provision safe premium/merchant/moderator smoke tokens and Reverb key access so the optional smoke-check probes can run at full depth.

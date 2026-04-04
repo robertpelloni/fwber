@@ -10,6 +10,7 @@ REPO_ROOT="/var/www/fwber/repo"
 BACKEND_DIR="$REPO_ROOT/fwber-backend"
 GEO_DIR="$REPO_ROOT/fwber-geo"
 SMOKE_CHECK_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/smoke-check.sh"
+REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 
 cd "$REPO_ROOT"
 git pull origin main
@@ -32,7 +33,14 @@ systemctl restart fwber-geo
 systemctl reload nginx
 
 if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
-  FWBER_BACKEND_DIR="$BACKEND_DIR" "$SMOKE_CHECK_SCRIPT"
+  REPORT_DIR="$REPORT_DIR_ROOT/$(date -u +%Y%m%dT%H%M%SZ)"
+  mkdir -p "$REPORT_DIR"
+
+  FWBER_BACKEND_DIR="$BACKEND_DIR" \
+  FWBER_REPORT_DIR="$REPORT_DIR" \
+  "$SMOKE_CHECK_SCRIPT"
+
+  echo "Smoke-check reports written to $REPORT_DIR"
 else
   echo "Smoke check skipped. Set FWBER_RUN_SMOKE_CHECK=1 to run ops/hetzner/scripts/smoke-check.sh after deploy."
 fi
