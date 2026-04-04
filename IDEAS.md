@@ -39,6 +39,11 @@
 - Add a billing diagnostics page for admins that replays webhook payloads against a sandbox user, making Stripe rollout debugging safer after staged restorations.
 - Replace hard-coded plan presentation in the frontend with a shared generated contract from `config/premium.php` so product copy and backend price definitions never drift.
 
+## 2026-04-04 - After DNS Resolution Appendix & Host Mapping
+- Extend the smoke-check script with a webhook replay mode that can safely POST saved Stripe test fixtures to a staging or sandbox backend, verifying payment handling without touching live billing.
+- Add a Slack/webhook publisher that posts the generated JSON + Markdown deploy evidence after each smoke-checked redeploy, including failing health/geodomain findings, remediation diagnostics, endpoint fingerprints, and DNS mappings.
+- Add a drift-diff mode that compares the latest smoke-check DNS/fingerprint report against the previous successful deploy report and highlights exactly what changed.
+
 ## 2026-04-04 - After Endpoint Fingerprints & Host Signals
 - Add a DNS-resolution appendix to the smoke-check report so each host records A/CNAME answers alongside the current endpoint fingerprints.
 - Extend the smoke-check script with a webhook replay mode that can safely POST saved Stripe test fixtures to a staging or sandbox backend, verifying payment handling without touching live billing.

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2026-04-04 — DNS Resolution Appendix & Host Mapping
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` with a DNS appendix that resolves the frontend, API, geo, and websocket hosts and records them in both JSON and Markdown smoke-check reports.
+- Added a `dns_records` section to `smoke-check-summary.json` and a `DNS Resolution Appendix` section to `smoke-check-summary.md`.
+- Added AI DevKit implementation/testing notes for the DNS appendix layer under `docs/ai/implementation/dns-resolution-appendix-and-host-mapping.md` and `docs/ai/testing/dns-resolution-appendix-and-host-mapping.md`.
+
+### Changed
+- Smoke-check reports now connect hostname resolution with HTTP responder fingerprints, making live routing drift easier to prove without extra manual DNS commands.
+- Re-ran the public smoke check and confirmed concrete host mappings: `api.fwber.me` resolves to `75.119.202.57`, while `geo.fwber.me` currently resolves to `216.198.79.65|64.29.17.1`, reinforcing the geo-domain drift diagnosis.
+
 ## [1.5.0] - 2026-04-04 — Endpoint Fingerprints & Host Signals
 
 ### Added

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.5.0 "Endpoint Fingerprints & Host Signals"
+> **Current Version:** 1.5.1 "DNS Resolution Appendix & Host Mapping"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.5.0)
+### Phase 5: Production Scale (COMPLETED - v1.5.1)
+- **DNS Resolution Appendix & Host Mapping:** Extended smoke-check reports with resolved-address capture for frontend, API, geo, and websocket hosts so DNS drift can be documented alongside HTTP fingerprints and diagnostics.
 - **Endpoint Fingerprints & Host Signals:** Extended smoke-check reports with per-endpoint remote IPs, server headers, redirect targets, content types, and body excerpts so live routing drift can be fingerprinted, not just inferred.
 - **Smoke Check Diagnostics & Remediation Hints:** Extended smoke-check reports with structured diagnostics and recommended next actions for stale backend routes, geo-domain drift, incomplete authenticated coverage, and partial-health signals.
 - **Smoke Check Report Artifacts & Live Drift Detection:** Extended `ops/hetzner/scripts/smoke-check.sh` to emit JSON/Markdown reports, updated the deploy script to preserve timestamped run artifacts, and used the new automation to detect current live drift on `/api/health*` and `geo.fwber.me`.
