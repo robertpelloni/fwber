@@ -20,7 +20,8 @@ This document replaces the old DreamHost-first recommendation for current produc
 11. Archive the generated JSON/Markdown smoke-check reports for the cutover run
 12. Review the smoke-check diagnostics/recommended actions before sign-off
 13. Review endpoint fingerprints (remote IP, server header, redirect/location behavior)
-14. Validate auth, roast, premium, merchant, websocket, and health endpoints
+14. Review DNS appendix rows for `fwber.me`, `api.fwber.me`, `geo.fwber.me`, and `ws.fwber.me`
+15. Validate auth, roast, premium, merchant, websocket, and health endpoints
 
 ## See Also
 - `DEPLOY.md`

@@ -58,9 +58,10 @@ warn_count=0
 case_log_file="$(mktemp)"
 diagnostic_log_file="$(mktemp)"
 snapshot_log_file="$(mktemp)"
+dns_log_file="$(mktemp)"
 
 cleanup() {
-  rm -f "$case_log_file" "$diagnostic_log_file" "$snapshot_log_file"
+  rm -f "$case_log_file" "$diagnostic_log_file" "$snapshot_log_file" "$dns_log_file"
 }
 
 trap cleanup EXIT
@@ -134,6 +135,25 @@ add_snapshot() {
     "$body_excerpt" >> "$snapshot_log_file"
 }
 
+add_dns_record() {
+  local label="$1"
+  local host="$2"
+  local resolver="$3"
+  local addresses="$4"
+  local notes="$5"
+
+  resolver="${resolver:-—}"
+  addresses="${addresses:-—}"
+  notes="${notes:-—}"
+
+  printf '%s\t%s\t%s\t%s\t%s\n' \
+    "$label" \
+    "$host" \
+    "$resolver" \
+    "$addresses" \
+    "$notes" >> "$dns_log_file"
+}
+
 require_command() {
   local command_name="$1"
 
@@ -158,6 +178,72 @@ markdown_escape() {
   value=${value//|/\\|}
   value=${value//$'\n'/<br>}
   printf '%s' "$value"
+}
+
+extract_host() {
+  local url="$1"
+  local host="${url#*://}"
+  host="${host%%/*}"
+  host="${host%%:*}"
+  printf '%s' "$host"
+}
+
+resolve_host_with_python() {
+  local host="$1"
+  local python_cmd="$2"
+
+  "$python_cmd" - "$host" <<'PY'
+import socket
+import sys
+
+host = sys.argv[1]
+try:
+    infos = socket.getaddrinfo(host, None)
+    addresses = sorted({info[4][0] for info in infos})
+    print("|".join(addresses))
+except Exception as exc:
+    print(f"ERROR:{exc}")
+    raise SystemExit(2)
+PY
+}
+
+resolve_dns_targets() {
+  local -a targets=(
+    "frontend|$(extract_host "$FRONTEND_URL")"
+    "api|$(extract_host "$API_URL")"
+    "geo|$(extract_host "$GEO_URL")"
+    "websocket|$(extract_host "$WS_URL")"
+  )
+
+  local python_cmd=''
+  if command -v python3 >/dev/null 2>&1; then
+    python_cmd='python3'
+  elif command -v python >/dev/null 2>&1; then
+    python_cmd='python'
+  fi
+
+  local target
+  for target in "${targets[@]}"; do
+    local label="${target%%|*}"
+    local host="${target#*|}"
+
+    if [[ -z "$host" ]]; then
+      continue
+    fi
+
+    if [[ -n "$python_cmd" ]]; then
+      local resolve_output=''
+      if resolve_output="$(resolve_host_with_python "$host" "$python_cmd" 2>/dev/null)"; then
+        add_dns_record "$label" "$host" "$python_cmd/socket.getaddrinfo" "$resolve_output" 'resolved successfully'
+      else
+        add_dns_record "$label" "$host" "$python_cmd/socket.getaddrinfo" '—' "resolution failed: $resolve_output"
+      fi
+    else
+      add_dns_record "$label" "$host" 'unavailable' '—' 'python3/python not available for DNS resolution'
+      warn_case 'DNS resolution appendix' 'Skipped because neither python3 nor python is available.'
+      break
+    fi
+  done
 }
 
 ensure_report_paths() {
@@ -269,6 +355,24 @@ write_json_report() {
         "$(json_escape "$body_excerpt")"
     done < "$snapshot_log_file"
 
+    printf '\n  ],\n'
+    printf '  "dns_records": [\n'
+
+    local first_dns_record=1
+    while IFS=$'\t' read -r label host resolver addresses notes; do
+      if [[ "$first_dns_record" -eq 0 ]]; then
+        printf ',\n'
+      fi
+
+      first_dns_record=0
+      printf '    {"label":"%s","host":"%s","resolver":"%s","addresses":"%s","notes":"%s"}' \
+        "$(json_escape "$label")" \
+        "$(json_escape "$host")" \
+        "$(json_escape "$resolver")" \
+        "$(json_escape "$addresses")" \
+        "$(json_escape "$notes")"
+    done < "$dns_log_file"
+
     printf '\n  ]\n'
     printf '}\n'
   } > "$REPORT_JSON_PATH"
@@ -326,6 +430,19 @@ write_markdown_report() {
         "$(markdown_escape "$location_header")" \
         "$(markdown_escape "$effective_url")"
     done < "$snapshot_log_file"
+
+    printf -- '\n## DNS Resolution Appendix\n\n'
+    printf -- '| Label | Host | Resolver | Addresses | Notes |\n'
+    printf -- '| --- | --- | --- | --- | --- |\n'
+
+    while IFS=$'\t' read -r label host resolver addresses notes; do
+      printf -- '| %s | %s | %s | %s | %s |\n' \
+        "$(markdown_escape "$label")" \
+        "$(markdown_escape "$host")" \
+        "$(markdown_escape "$resolver")" \
+        "$(markdown_escape "$addresses")" \
+        "$(markdown_escape "$notes")"
+    done < "$dns_log_file"
 
     printf -- '\n## Diagnostics & Recommended Actions\n\n'
 
@@ -612,6 +729,7 @@ main() {
   run_http_check 'Geo nearby endpoint' GET "$GEO_QUERY_URL" '200' '"users"'
   check_websocket_upgrade
   run_optional_authenticated_checks
+  resolve_dns_targets
   build_diagnostics
 
   echo
