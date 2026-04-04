@@ -7,26 +7,26 @@
 ---
 
 ## 🎯 What This Release Delivered
-This release extends the newly restored merchant moderation system with queue prioritization and faster operator workflows.
+This release extends the restored merchant moderation system with practical review-ops improvements so moderators can process storefronts more effectively.
 
 Delivered:
-- merchant moderation queue now computes `priority_score` and `priority_tier`
-- moderation queue now supports search across merchant name, category, location, and address
-- moderation dashboard merchant tab now includes search, priority badges, and inline review notes handling
-- nearby marketplace ranking continues to use trust + proximity, while merchant review tooling now better surfaces which storefronts deserve attention first
+- merchant moderation queue priority scoring and priority tiers
+- merchant moderation queue search across business name, category, location, and address
+- merchant moderation dashboard improvements for faster review triage
+- inline verification-note editing workflow in the moderation UI
 
 ## 🏪 Backend Improvements
-- `MerchantModerationController` now computes merchant review priority and sorts queue results by priority score
-- merchant review queue supports `search` filtering
-- moderation dashboard remains guarded against missing moderation-support tables
+- `MerchantModerationController` now computes `priority_score` and `priority_tier`
+- merchant moderation queue supports `search` filtering
+- queue results are sorted by priority score instead of only raw recency
 
 ## 🌐 Frontend Improvements
 - moderation dashboard merchant tab now includes:
-  - search field
-  - priority score/tier badge
-  - latest verification notes display
-  - inline moderator note editing via blur-save behavior
-- moderation hooks/api now support merchant queue search
+  - search box
+  - priority badge
+  - verification notes display
+  - inline note editing behavior
+- moderation hooks and API clients now support queue search
 
 ## ✅ Validation
 - Backend tests passed:
@@ -36,4 +36,4 @@ Delivered:
   - `npm run build --prefix fwber-frontend`
 
 ## ✅ Why This Matters
-The merchant moderation queue is now more practical for real operations. Moderators can search, prioritize, and annotate merchant reviews much more effectively instead of working through a flat pending list.
+Merchant review is no longer just technically present; it is now operationally usable. Moderators can triage likely-high-value or urgent storefronts first and quickly locate merchants in the queue.

@@ -1,9 +1,9 @@
 # MEMORY.md
 
 ## 2026-04-04 — v1.4.5 Merchant Review Prioritization
-- Once trust scoring existed, the next operator bottleneck was queue usability: moderators needed search, prioritization, and quick notes to make merchant review practical.
-- The moderation dashboard already had enough structure to support a merchant queue, so extending it with priority and inline note editing was a high-leverage improvement.
-- Search support across merchant name/category/location/address is a meaningful quality-of-life feature for real moderation operations.
+- Merchant moderation became much more usable once the queue exposed search, priority, and faster note handling.
+- After trust scoring, the real bottleneck was no longer ranking logic but moderator throughput.
+- Priority scoring based on pending state, commerce evidence, profile completeness, and trust score is a practical bridge between a simple queue and a heavier future review-automation system.
 
 ## 2026-04-04 — v1.4.4 Merchant Trust Scoring & Moderation
 - Merchant proximity alone was not enough for a credible marketplace restore; adding a compact trust score based on verification, completeness, inventory depth, and fulfilled commerce evidence made nearby ranking materially better.
