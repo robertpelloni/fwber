@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.4.5
+> **Current Global Version:** 1.4.7
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -68,6 +68,7 @@ fwber/
 - Merchant commerce is active again through restored merchant schema, merchant portal routes/pages, storefront purchases, redemption codes, and digital receipts.
 - Active deployment guidance now targets **Vercel + Hetzner**; DreamHost docs are retained only as legacy reference.
 - Copy-ready Hetzner operational assets now live under `ops/hetzner/` for Nginx, systemd, and shell-based provisioning/deploy flows.
+- Hetzner operations now also include a reusable `ops/hetzner/scripts/smoke-check.sh` script that verifies the public deploy contract, optional authenticated surfaces, and optional Reverb websocket upgrades.
 - Merchant discovery is now geo-aware again through persisted storefront coordinates and distance-ranked nearby marketplace responses.
 - Merchant moderation and trust scoring are active again through restored moderation routes, trust-weighted ranking, and moderation dashboard merchant review tooling.
 - Merchant review prioritization is active through queue priority scoring, search, and inline note workflows.

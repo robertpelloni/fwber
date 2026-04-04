@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-04
-> **Version:** 1.4.1
+> **Version:** 1.4.7
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -160,6 +160,14 @@ php artisan optimize
 ```
 
 ### Re-Deploy Sequence
+Use the in-repo deploy script for the repeatable path:
+
+```bash
+FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
+```
+
+If you need the manual equivalent, it remains:
+
 ```bash
 cd /var/www/fwber/repo
 git pull origin main
@@ -178,6 +186,7 @@ sudo systemctl restart fwber-queue
 sudo systemctl restart fwber-reverb
 sudo systemctl restart fwber-geo
 sudo systemctl reload nginx
+/var/www/fwber/repo/ops/hetzner/scripts/smoke-check.sh
 ```
 
 ---
@@ -235,6 +244,10 @@ Ready-to-copy infrastructure templates also live in:
 ## 9. Post-Deployment Verification
 
 Always verify the following after a major version bump or infrastructure move:
+
+Automation support now exists in:
+- `ops/hetzner/scripts/smoke-check.sh`
+- `ops/hetzner/scripts/deploy-backend.sh` (`FWBER_RUN_SMOKE_CHECK=1`)
 
 1. [ ] Frontend Vercel deploy is green
 2. [ ] `php artisan deploy:verify` returns healthy or only expected non-critical degradations

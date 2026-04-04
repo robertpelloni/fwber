@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.4.6 "Deployment Health & Verification Surface"
+> **Current Version:** 1.4.7 "Hetzner Post-Deploy Smoke Checks"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.4.6)
+### Phase 5: Production Scale (COMPLETED - v1.4.7)
+- **Hetzner Post-Deploy Smoke Checks:** Added `ops/hetzner/scripts/smoke-check.sh`, optional authenticated and websocket probes, and deploy-script integration through `FWBER_RUN_SMOKE_CHECK=1` so public-contract validation can be repeated after real deploys.
 - **Deployment Health & Verification Surface:** Added `/api/health`, `/api/health/liveness`, `/api/health/readiness`, `/api/health/metrics`, centralized dependency health evaluation, and `php artisan deploy:verify` so Hetzner cutover validation is consistent and scriptable.
 - **Merchant Review Prioritization:** Added merchant moderation queue priority scoring, queue search, and inline review-note handling so storefront moderation is operationally practical.
 - **Merchant Trust Scoring & Moderation:** Added merchant trust scoring, moderator review endpoints, moderation dashboard merchant queue, and trust-weighted nearby marketplace ranking so storefronts are ranked by more than proximity alone.
@@ -74,7 +75,7 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the `ops/hetzner/` templates, then verify the stack with `php artisan deploy:verify` and `/api/health*` before deeper UX testing.
+1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the `ops/hetzner/` templates, then verify the stack with `php artisan deploy:verify` and `ops/hetzner/scripts/smoke-check.sh` before deeper UX testing.
 2. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
-3. **Health Monitoring Wiring:** Once the live server exists, connect `/api/health` and readiness checks to uptime monitoring or deployment automation.
+3. **Smoke-Test Credential Strategy:** Provision safe premium/merchant/moderator smoke tokens and Reverb key access so the optional smoke-check probes can run at full depth.
 4. **Merchant Verification Automation:** Add optional workflow automation or admin shortcuts beyond the manual prioritization tooling once real moderation volume starts flowing.

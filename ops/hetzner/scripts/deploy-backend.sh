@@ -9,6 +9,7 @@ set -euo pipefail
 REPO_ROOT="/var/www/fwber/repo"
 BACKEND_DIR="$REPO_ROOT/fwber-backend"
 GEO_DIR="$REPO_ROOT/fwber-geo"
+SMOKE_CHECK_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/smoke-check.sh"
 
 cd "$REPO_ROOT"
 git pull origin main
@@ -18,6 +19,7 @@ composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear
 php artisan optimize
+php artisan deploy:verify
 
 if [ -d "$GEO_DIR" ]; then
   cd "$GEO_DIR"
@@ -28,5 +30,11 @@ systemctl restart fwber-queue
 systemctl restart fwber-reverb
 systemctl restart fwber-geo
 systemctl reload nginx
+
+if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
+  FWBER_BACKEND_DIR="$BACKEND_DIR" "$SMOKE_CHECK_SCRIPT"
+else
+  echo "Smoke check skipped. Set FWBER_RUN_SMOKE_CHECK=1 to run ops/hetzner/scripts/smoke-check.sh after deploy."
+fi
 
 echo "fwber backend deployment complete."
