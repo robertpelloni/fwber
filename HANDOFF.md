@@ -1,19 +1,19 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.5.2
+> **Version Reached:** 1.5.3
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the autonomous deployment-hardening loop and delivered **v1.5.2 "Smoke Report Drift Diff"**.
+This session continued the autonomous deployment-hardening loop and delivered **v1.5.3 "Smoke Report Notification Publisher"**.
 
-After v1.5.1 added DNS evidence, the next operational gap was clear: each smoke report was rich on its own, but there was still no first-class way to compare the newest report with the previous one and see what changed across deploys.
+After v1.5.2 added drift comparison, the next practical gap was communication: the deployment evidence system could produce rich artifacts, but operators still lacked a concise publishable summary for chatops or webhook-based notification flows.
 
 This release fixes that by adding:
-- a smoke-report comparison tool
-- drift JSON artifacts
-- drift Markdown artifacts
-- deploy-script integration that attempts to compare the newest smoke report with the previous stored one
+- a smoke-report notification publisher
+- compact notification JSON/Markdown artifacts
+- optional webhook publishing support
+- deploy-script integration so notification artifacts are generated after smoke and drift reports
 
 No processes were manually killed.
 
@@ -21,46 +21,54 @@ No processes were manually killed.
 
 ## What Changed
 
-### 1. Added `ops/hetzner/scripts/compare-smoke-reports.py`
-This new script compares two `smoke-check-summary.json` files and emits:
-- `smoke-check-drift.json`
-- `smoke-check-drift.md`
+### 1. Added `ops/hetzner/scripts/publish-smoke-report.py`
+This new script consumes:
+- `smoke-check-summary.json`
+- optional `smoke-check-drift.json`
 
-It compares:
-- summary counters
+It generates:
+- `smoke-check-notification.json`
+- `smoke-check-notification.md`
+
+It can also optionally POST the resulting payload to a webhook using:
+- `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`
+
+### 2. Notification payload shape
+The publisher emits a concise payload containing:
+- markdown `text`
+- `report_dir`
 - overall status
-- diagnostic titles (new/resolved/unchanged)
-- endpoint fingerprint changes
-- DNS changes
+- summary counters
+- top diagnostics
+- drift summary when available
 
-### 2. Updated `ops/hetzner/scripts/deploy-backend.sh`
-When smoke checks are enabled and a previous report exists, the deploy script now tries to generate drift artifacts in the current report directory.
+This keeps the message compact enough for chat tools while still pointing back to the full report directory for deep inspection.
 
-Interpreter selection behavior:
-- use `FWBER_PYTHON_BIN` if supplied
+### 3. Updated `ops/hetzner/scripts/deploy-backend.sh`
+When smoke checks run and Python is available, the deploy flow now also generates notification artifacts in the current report directory.
+
+Python selection behavior remains:
+- `FWBER_PYTHON_BIN` if provided
 - otherwise `python3`
-- fallback to `python` when needed
+- fallback to `python`
 
-### 3. Validation performed
-Generated two smoke reports locally and compared them with:
+### 4. Validation performed
+Executed:
+- `bash -n ops/hetzner/scripts/deploy-backend.sh`
+- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
 
-```bash
-python3 ops/hetzner/scripts/compare-smoke-reports.py \
-  --previous <report-a>/smoke-check-summary.json \
-  --current <report-b>/smoke-check-summary.json \
-  --json-out <report-b>/smoke-check-drift.json \
-  --md-out <report-b>/smoke-check-drift.md
-```
+Then validated end to end by generating:
+1. smoke summary
+2. drift diff
+3. notification artifacts
 
-Observed behavior for the closely spaced runs:
-- summary stayed stable
-- diagnostics stayed stable
-- no endpoint fingerprint drift detected
-- no DNS drift detected
+Outputs were inspected and confirmed valid for:
+- notification JSON
+- notification Markdown
+- inclusion of drift summary when drift JSON exists
+- inclusion of top diagnostics from the current smoke report
 
-That is exactly what should happen for repeated checks against the same current environment.
-
-### 4. Documentation updated
+### 5. Documentation updated
 Updated:
 - `CHANGELOG.md`
 - `DEPLOY.md`
@@ -75,8 +83,8 @@ Updated:
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
 
 Added:
-- `docs/ai/implementation/smoke-report-drift-diff.md`
-- `docs/ai/testing/smoke-report-drift-diff.md`
+- `docs/ai/implementation/smoke-report-notification-publisher.md`
+- `docs/ai/testing/smoke-report-notification-publisher.md`
 
 ---
 
@@ -85,36 +93,37 @@ Added:
 ### Static validation
 Executed:
 - `bash -n ops/hetzner/scripts/deploy-backend.sh`
+- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
 - `git diff --check`
 
-### Comparison validation
+### End-to-end artifact validation
 Executed:
-- generated two smoke reports
-- ran `compare-smoke-reports.py`
-- inspected generated drift JSON and drift Markdown outputs
+- generated smoke-check summary artifacts
+- generated drift artifacts
+- generated notification artifacts from those reports
 
 Validated:
-- summary delta output
-- diagnostic drift output
-- endpoint fingerprint drift output
-- DNS drift output
+- `smoke-check-notification.json`
+- `smoke-check-notification.md`
+- drift-aware notification content
+- compact top-diagnostic summarization
 
 ### Memory operations
 Executed:
-- searched AI DevKit memory for prior smoke-report drift-diff knowledge
-- will store the v1.5.2 drift-comparison knowledge after implementation
+- searched AI DevKit memory for prior smoke-report publish/webhook knowledge
+- stored the v1.5.3 notification-publisher knowledge after implementation
 
 ---
 
 ## Files Changed This Session
 
 ### Operations scripts
-- `ops/hetzner/scripts/compare-smoke-reports.py`
+- `ops/hetzner/scripts/publish-smoke-report.py`
 - `ops/hetzner/scripts/deploy-backend.sh`
 
 ### AI DevKit docs
-- `docs/ai/implementation/smoke-report-drift-diff.md`
-- `docs/ai/testing/smoke-report-drift-diff.md`
+- `docs/ai/implementation/smoke-report-notification-publisher.md`
+- `docs/ai/testing/smoke-report-notification-publisher.md`
 
 ### Deployment / release docs
 - `CHANGELOG.md`
@@ -138,8 +147,8 @@ Executed:
 ---
 
 ## Git / Release
-- **Target Version:** `1.5.2`
-- **Recommended Commit Message:** `feat: add smoke-report drift diffing (v1.5.2)`
+- **Target Version:** `1.5.3`
+- **Recommended Commit Message:** `feat: add smoke-report notification publishing (v1.5.3)`
 
 ---
 
@@ -148,17 +157,19 @@ Executed:
    - health routes are still missing there
 2. **Fix `geo.fwber.me` routing/DNS**
    - geo is still resolving/responding through the wrong hosting topology
-3. **Provision smoke credentials and websocket key access**
+3. **Provide a real deploy notification target**
+   - set `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` if you want chat/webhook delivery beyond local artifacts
+4. **Provision smoke credentials and websocket key access**
    - user token
    - merchant token
    - moderator token
    - Reverb app key
-4. **Run the full live deploy path**
+5. **Run the full live deploy path**
    - `FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh`
-   - review smoke summary, diagnostics, fingerprints, DNS appendix, and drift diff before sign-off
-5. **Then run live Stripe verification**
+   - review smoke summary, drift diff, notification summary, diagnostics, fingerprints, and DNS appendix before sign-off
+6. **Then run live Stripe verification**
    - premium purchase
    - marketplace purchase
    - webhook handling
 
-The deployment evidence system is now stronger because it can compare one deploy’s smoke state against the previous one instead of treating every report as isolated.
+The deployment evidence pipeline is now stronger because it can not only collect and compare evidence, but also condense that evidence into a publishable operator summary.

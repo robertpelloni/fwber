@@ -1,45 +1,46 @@
-# PROJECT_STATUS.md - fwber v1.5.2 (Smoke Report Drift Diff)
+# PROJECT_STATUS.md - fwber v1.5.3 (Smoke Report Notification Publisher)
 
 **Date:** 2026-04-04
-**Version:** 1.5.2 "Smoke Report Drift Diff"
-**Status:** ✅ **VERIFIED, COMMITTED, AND PRESERVING INTER-DEPLOY EVIDENCE BETTER**
+**Version:** 1.5.3 "Smoke Report Notification Publisher"
+**Status:** ✅ **VERIFIED, COMMITTED, AND BETTER PREPARED FOR OPERATOR ALERTING**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extended the deployment evidence system with cross-run comparison.
+This release extended the deployment evidence system with compact publishable summaries.
 
 Delivered:
-- a smoke-report diff tool
-- drift JSON and Markdown artifacts
-- deploy-script integration that compares the newest smoke report against the previous saved one when available
+- a smoke-report notification publisher
+- local notification JSON/Markdown artifacts
+- optional webhook publishing support
+- deploy-script integration for notification artifact generation after smoke/diff creation
 
 ## 🚀 Operations Improvements
-### Added `ops/hetzner/scripts/compare-smoke-reports.py`
-This script compares two `smoke-check-summary.json` files and generates:
-- `smoke-check-drift.json`
-- `smoke-check-drift.md`
+### Added `ops/hetzner/scripts/publish-smoke-report.py`
+This script consumes:
+- `smoke-check-summary.json`
+- optional `smoke-check-drift.json`
 
-It compares:
-- summary counters
-- overall status
-- diagnostics
-- endpoint fingerprint changes
-- DNS changes
+It produces:
+- `smoke-check-notification.json`
+- `smoke-check-notification.md`
+
+It can also optionally POST the payload to a webhook via:
+- `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`
 
 ### Updated `ops/hetzner/scripts/deploy-backend.sh`
-When smoke checks are enabled and a previous smoke report exists, deploys now try to emit drift artifacts into the current report directory.
+When smoke checks run and Python is available, the deploy flow now also generates compact notification artifacts in the current report directory.
 
 ## ✅ Validation
 - `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- generated two smoke-check reports locally
-- compared them with `compare-smoke-reports.py`
-- validated both drift JSON and drift Markdown output
+- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
+- generated smoke summary + drift diff + notification artifacts end to end
+- validated JSON and Markdown notification outputs
 
 ## ✅ Why This Matters
-The smoke-check system no longer treats each deploy as an isolated moment. Operators can now answer:
-- what changed since the last deploy?
-- did any diagnostics resolve?
-- did server fingerprints or DNS mappings drift?
+The deployment-hardening system now supports:
+1. detailed evidence
+2. drift comparison
+3. concise publishable summaries
 
-That is a practical operational step toward safer Hetzner cutovers and redeploys.
+That makes it easier to wire deploy results into chatops, incident threads, or release notes without manually summarizing large report bundles.

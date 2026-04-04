@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.5.2 "Smoke Report Drift Diff"
+> **Current Version:** 1.5.3 "Smoke Report Notification Publisher"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.5.2)
+### Phase 5: Production Scale (COMPLETED - v1.5.3)
+- **Smoke Report Notification Publisher:** Added `publish-smoke-report.py` plus deploy integration so smoke + drift artifacts can be condensed into compact notification JSON/Markdown outputs and optionally POSTed to a webhook.
 - **Smoke Report Drift Diff:** Added `compare-smoke-reports.py` plus deploy integration so smoke reports can be compared across runs for summary, diagnostics, endpoint fingerprints, and DNS changes.
 - **DNS Resolution Appendix & Host Mapping:** Extended smoke-check reports with resolved-address capture for frontend, API, geo, and websocket hosts so DNS drift can be documented alongside HTTP fingerprints and diagnostics.
 - **Endpoint Fingerprints & Host Signals:** Extended smoke-check reports with per-endpoint remote IPs, server headers, redirect targets, content types, and body excerpts so live routing drift can be fingerprinted, not just inferred.
