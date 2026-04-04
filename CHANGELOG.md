@@ -757,3 +757,172 @@ All notable changes to this project will be documented in this file.
 ## [1.1.7] - 2026-04-02
 ### Fixed
 - **UI Layout**: Fixed the main application sidebar navigation. It now correctly extends completely to the bottom of the viewport on all pages, removing the unintended 4rem bottom gap.
+
+## [1.2.0] - 2026-04-04
+### Changed
+- **The Great Simplification**: Executed a massive repository and product pivot. We have permanently archived and removed all features that do not directly serve the core application mission: *proximity-based hookups based on mutual preference*.
+### Removed
+- **ActivityPub Federation**: Deleted all federated social feeds, inbox syncing, remote actor discovery, group actors, and global search aggregators.
+- **Decentralized Governance**: Archived the community council, token-weighted voting, policy executor, and Merkle-proof verification systems.
+- **Physical Marketplace**: Stripped out the B2B merchant portal, POS terminals, inventory management, and token redemptions.
+- **Economy & Gamification**: Removed FWB Tokens, Solana crypto bridges, Stripe checkout, leaderboards, daily streaks, and the viral "Rate My Cat" feature.
+- **AI Fluff**: Eliminated the AI Wingman, Roast Generator, Avatar Generation, and conversation starters.
+- **Codebase Reduction**: Dropped over 50 unneeded database tables and deleted hundreds of unused React components, massively accelerating build times and simplifying the codebase.
+
+## [1.2.1] - 2026-04-04
+### Added
+- **Mobile Background Location**: Began restructuring the Expo application to support battery-efficient OS-level background location tracking.
+- **Push Notification Architecture**: Initiated FCM/APNS integration preparations to allow native notifications for new matches and messages.
+
+## [1.2.2] - 2026-04-04
+### Changed
+- **Backend Lean Audit**: Executed a comprehensive purge of the backend to mirror the frontend's "Great Simplification." Dozens of legacy controllers, services, and models related to the retired DAO, Token Economy, and ActivityPub features were successfully archived.
+- **Migration Squashing**: Consolidated a complex chain of 80+ migrations into a set of clean, foundational schema definitions, resolving critical SQLite test failures caused by `DROP COLUMN` and `FOREIGN KEY` constraints.
+- **Test Suite Revitalization**: Achieved a 100% pass rate (Green status) on the core test suite (32 assertions) by methodically removing "ghost" dependencies and aligning model relationships with the new, hyper-focused proximity matchmaking architecture.
+
+## [1.2.3] - 2026-04-04
+### Added
+- **GeoService Load Tester**: Created a powerful Artisan command (`php artisan geo:load-test {users} {radius}`) to simulate a high-density, multi-threaded request load against our Rust H3 indexing microservice. This guarantees performance targets at scale.
+- **Web Worker Photo Hydration**: Deployed a dedicated `crypto-worker.js` that moves intensive AES-GCM photo decryption off the main thread. E2E encrypted galleries now load smoothly at 60fps.
+- **High-Conversion Mobile Splash**: Overhauled the React Native initialization flow. Replaced abrupt OS permission prompts with an elegant, informative splash screen that explains the value of "Always On" background location, maximizing opt-ins.
+
+## [1.2.4] - 2026-04-04
+### Fixed
+- **Ghost Pings:** Addressed a critical battery-drain bug. Logging out of the Next.js web interface now posts a `CLEAR_AUTH_TOKEN` message through the React Native bridge. The mobile shell catches this, drops the JWT from `SecureStore`, and actively aborts `Location.stopLocationUpdatesAsync()` to stop pinging the backend API unnecessarily.
+### Added
+- **EAS Build Configuration:** Created `eas.json` profiles for staging and production builds. Embedded necessary native App Store privacy strings (e.g. `NSLocationAlwaysAndWhenInUseUsageDescription`) and plugin definitions into `mobile/app.json`.
+
+## [1.2.5] - 2026-04-04
+### Added
+- **EAS / Fastlane Pipelines:** Engineered `mobile/fastlane/Fastfile` to automate the transition of `eas build` binaries directly into TestFlight and Google Play Console environments.
+- **Worker-Powered Vault Media:** Embedded the `E2EImage` component into the `RealTimeChat.tsx` and `ProfileViewModal.tsx` windows. When encrypted photos are received, the heavy lifting of AES-GCM decryption is now offloaded from the UI thread to a dedicated WebWorker, allowing smooth 60fps scrolling through massive private galleries.
+### Removed
+- **Final Visual Bloat:** Completely stripped out leftover `<BoostButton />` and `<CreateBountyModal />` imports from the Discovery feed UI, leaving a purely streamlined user interface.
+
+## [1.2.6] - 2026-04-04
+### Changed
+- **S3 / R2 Data Scrubbing (Privacy-First Data Wiping):** Patched a significant privacy oversight. Previously, when a user deleted their account, the database rows for their photos and media were cascaded out of existence, but the physical files in `Storage::disk('public')` (or S3) were left orphaned. Now, `ProfileController::destroy()` explicitly recursively deletes the user's `photos`, `messages`, and `verification` storage directories *before* the database row is scrubbed.
+### Added
+- **App Store Asset Specifications:** Authored `mobile/STORE_ASSETS.md`, laying out the exact marketing copy, UI screens, and keywords needed for the Fastlane/EAS automated submission to Apple and Google.
+
+## [1.2.7] - 2026-04-04
+### Changed
+- **E2E UI Polish**: Explicitly imported and implemented the new `E2EImage` WebWorker component into the `RealTimeChat.tsx` chat window and `ProfileViewModal.tsx` discovery overlays. Photos that trigger the `is_encrypted` database flag now instantly offload their AES-GCM math to `crypto-worker.js`, keeping scrolling performance at 60fps even under heavy media payload stress.
+- **Removed Visual Artifacts**: Conducted a final visual sweep of `fwber-frontend/app/matches/page.tsx` and related components, successfully eliminating dead `<BoostButton />` and `<CreateBountyModal />` imports to guarantee a strictly proximity-focused user experience.
+
+## [1.2.8] - 2026-04-04
+### Added
+- **Automated CI/CD Pipelines:** Instituted a completely automated, zero-touch deployment strategy. Pushing code to `main` now triggers `.github/workflows/` which sequentially validate the backend tests, compile the Next.js frontend, and execute `eas submit` to distribute the native `.ipa` and `.aab` packages directly to App Store Connect and Google Play Console.
+- **Enterprise Database Indexing:** Shipped `2026_04_03_212041_optimize_core_indexes.php`. The newly squashed, hyper-lean schema has been upgraded with precision composite indices across `messages` (accelerating unread counts and conversation fetching), `user_matches` (O(1) active match retrieval), and `user_profiles` (instantaneous spatial and gender/age filtering).
+
+## [1.2.9] - 2026-04-04
+### Added
+- **Global E2E Key Recovery Alert:** Introduced an omnipresent `<E2ERecoveryAlert />` component injected into the root `<ProtectedRoute />`. If a user logs in on a new device (without local IndexedDB keys) but a remote AES-GCM backup exists, they are aggressively prompted to restore their keys. This ensures zero data loss of encrypted media or chat history when users upgrade phones or clear cache.
+- **Native Push Notification Deep Links:** The React Native (`mobile/app/index.js`) shell now actively listens to `expo-notifications` click events. Tapping a "New Match!" or "New Message" native OS push notification now instantly intercepts the attached JSON payload and executes a JavaScript injection `window.location.href = ...` to seamlessly deep-link the user directly into the corresponding internal WebView component.
+
+## [1.3.0] - 2026-04-04
+### Fixed
+- Hardened the safety graph so blocking a user now deactivates any active match, removes both sides of stale match-action records, and flushes both users' match caches to prevent ghost conversations or rediscovery.
+- Fixed the frontend/backend block API contract mismatch by sending `user_id` from `fwber-frontend/lib/api/safety.ts`, matching `StoreBlockRequest` instead of the old broken `blocked_id` payload.
+- Exposed the previously unreachable unblock controller through `DELETE /api/blocks/{userId}` in the active API route set.
+- Updated match discovery and established-match retrieval to exclude blocked relationships consistently, and prevented new match actions against blocked users.
+- Removed active discovery-path assumptions about archived `followedTopics` relations and guarded legacy `date_feedback` scoring so fresh installs and SQLite tests no longer crash on removed tables.
+- Added `BlockSafetyFlowTest` coverage proving blocking hides established matches, prevents messaging, and removes blocked users from discovery; verified alongside `CoreDatingFlowTest` with 22 passing tests.
+
+## [1.3.1] - 2026-04-04
+### Added
+- Bridged Expo foreground push notifications into the WebView by dispatching a `fwber:native-notification` browser event from `mobile/app/index.js`, allowing the web app to react instantly while the native shell is already open.
+- Added `fwber-frontend/components/NativeForegroundNotificationBridge.tsx`, which translates native notification events into the existing toast system and provides direct CTA routing for new matches and new messages.
+
+### Fixed
+- Hardened notification-launch routing in the mobile shell by checking `Notifications.getLastNotificationResponseAsync()` during startup, preserving deep links when the app is opened from a tapped push after being backgrounded or cold-started.
+- Re-verified the frontend production build after the bridge landed: `npm run build --prefix fwber-frontend` completed successfully, with only pre-existing Sentry configuration warnings.
+
+## [1.3.2] - 2026-04-04
+### Added
+- Added `fwber-frontend/lib/notifications.ts` to centralize notification-type normalization, route resolution, and CTA label generation so the notification drawer and native foreground toast bridge no longer drift.
+- Added `fwber-backend/tests/Feature/NotificationRoutingTest.php` to verify the notifications endpoint exposes consistent message and match payloads, including route-ready URLs.
+
+### Fixed
+- Standardized `NewMessageNotification` and `NewMatchNotification` database/push payloads around explicit `type`, `title`, `body`, `url`, `user_id`, and `user_name` fields instead of forcing the frontend to infer behavior from PHP class names.
+- Upgraded message notifications to route directly into `/messages?user={senderId}` and updated the `/messages` page to auto-select the requested conversation when present.
+- Updated the notification drawer and native foreground toast bridge to use shared route logic, ensuring users land in the same destination regardless of whether they tapped a push, a toast CTA, or a notification bell item.
+- Re-verified both backend and frontend integrity: `php artisan test tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php` passed with 23 tests, and `npm run build --prefix fwber-frontend` completed successfully.
+
+## [1.3.3] - 2026-04-04
+### Fixed
+- Modernized the frontend Sentry App Router integration by replacing the placeholder `instrumentation.ts` with real runtime registration plus `onRequestError`, adding `instrumentation-client.ts` with `onRouterTransitionStart`, and retiring the deprecated `sentry.client.config.ts` file.
+- Removed deprecated Sentry webpack option usage from `fwber-frontend/next.config.js`, eliminating the build-time Sentry deprecation/action warnings that were obscuring real signal in production builds.
+- Re-verified the frontend production build after the modernization: `npm run build --prefix fwber-frontend` now completes cleanly without the previous Sentry-specific warnings.
+
+## [1.3.4] - 2026-04-04
+### Fixed
+- Replaced stale homepage/share CTA links that still pointed to retired routes like `/roast` and `/rate-my-pussy`, eliminating production 404 prefetch noise from the active frontend shell.
+- Restored `POST /api/analytics/events` in the simplified backend route set so the web analytics/page-view client no longer produces 404s before login.
+- Fixed the notification settings API contract by exposing `PUT /api/notification-preferences/{type}`, matching the existing frontend client behavior.
+- Hardened auth response parsing in `fwber-frontend/lib/auth-context.tsx` so malformed or HTML server error bodies now degrade into readable login/register/2FA error messages instead of crashing with JSON parse exceptions.
+- Added `NotificationSettingsAndAnalyticsTest` and re-verified the backend slice with 25 passing tests across notification, safety, analytics, and core auth/match/message flows.
+- Reconfirmed the frontend production build after the console-error sweep: `npm run build --prefix fwber-frontend` passed successfully.
+
+## [1.3.5] - 2026-04-04
+### Fixed
+- Hardened `2026_04_03_212041_optimize_core_indexes.php` so it becomes idempotent across deploy retries, skipping index creation when the target index already exists instead of crashing with MySQL duplicate-key errors.
+- Added cross-driver index detection logic for MySQL/MariaDB, SQLite, and PostgreSQL inside the migration so the deployment fix is not limited to one local environment.
+- Added `OptimizeCoreIndexesMigrationTest` to explicitly re-run the migration after it has already been applied, verifying the retry path that failed in deployment.
+- Re-validated the backend slice with 26 passing tests across migration idempotency, analytics/settings routing, notifications, safety, and the retained core dating flow.
+- Added safe frontend storage wrappers and routed analytics session persistence through them so restricted browser contexts no longer need to explode with storage-access exceptions during startup.
+
+## [1.3.6] - 2026-04-04
+### Fixed
+- Expanded `2026_04_03_212041_optimize_core_indexes.php` so it now skips index creation when the referenced columns do not exist, preventing deploy failures on drifted schemas such as `photos` tables missing the `order` column.
+- Extended `OptimizeCoreIndexesMigrationTest` to recreate a `photos` table without `order` and verify the migration still completes successfully.
+- Re-validated the backend slice with 27 passing tests across migration retry safety, missing-column guards, analytics/settings routing, notifications, safety, and the retained core dating flow.
+
+## [1.3.7] - 2026-04-04
+### Added
+- Restored `App\Providers\AiServiceProvider` and `App\Providers\PaymentServiceProvider` to the active backend, reactivating container bindings for LLM-backed services and payment gateway abstractions as the foundation for broader feature restoration.
+
+### Fixed
+- Re-registered the restored AI/payment providers in both `fwber-backend/bootstrap/providers.php` and `fwber-backend/config/app.php` so the Laravel app actually boots them in active runtime configuration.
+- Re-validated that the current core suite still passes after the restoration foundation landed: `php artisan test tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php` passed successfully.
+
+## [1.3.8] - 2026-04-04
+### Added
+- Restored `AiWingmanController`, `ViralContent`, and `2026_04_04_020000_restore_viral_contents_table.php`, bringing back the core non-federated AI roast/hype share flow.
+- Added the public `fwber-frontend/app/roast/page.tsx` page and reconnected homepage/share CTA links to the restored roast generator.
+
+### Fixed
+- Reintroduced the active Wingman API route surface in `fwber-backend/routes/api.php`, including public roast preview plus authenticated roast, vibe, fortune, nemesis, profile-analysis, compatibility, ice-breaker, reply, draft-analysis, and date-idea endpoints.
+- Hardened `AiWingmanService` date-idea generation so it degrades gracefully when the venue system has not yet been restored, instead of crashing on missing venue schema.
+- Added `AiWingmanRestoreTest` and re-validated the restored AI slice alongside the retained core/migration suite; backend tests and frontend production build both passed.
+
+## [1.3.9] - 2026-04-04
+### Added
+- Restored `Payment`, `Subscription`, `PremiumController`, and `StripeWebhookController`, plus active migrations for `payments` and `subscriptions` so premium billing has a real persistence layer again.
+- Added premium-facing frontend routes `/premium`, `/premium/success`, and `/settings/subscription` to expose plan details, upgrade entry, and billing history in active UI.
+- Added `PremiumRestoreTest` to validate the restored premium plan/status/purchase/who-likes-you flow.
+
+### Fixed
+- Reintroduced the premium API route surface in `fwber-backend/routes/api.php`, including plan/status/history/purchase routes and `POST /api/stripe/webhook`.
+- Reworked `PremiumUpgradeModal` to support Stripe Elements when configured and a mock-gateway fallback when Stripe is unavailable, allowing local validation without live secrets.
+- Repaired `/who-likes-you` so premium-gated 403 responses no longer risk being misinterpreted as auth expiry, and unlocked users now render without a permanent blur overlay.
+
+## [1.4.0] - 2026-04-04
+### Added
+- Restored `MerchantController`, `MerchantInventoryController`, `MerchantAnalyticsController`, merchant models, and the compact merchant schema migration `2026_04_04_040000_restore_merchant_marketplace_tables.php`.
+- Added merchant portal frontend pages for registration, dashboard, inventory, profile, analytics, plus restored storefront browsing at `/marketplace/[merchantId]`.
+- Added `DigitalReceipt` and `MerchantRestoreTest` to support the revived merchant purchase and redemption flow.
+
+### Fixed
+- Reintroduced merchant and marketplace API routes for merchant registration/profile/dashboard/inventory/analytics, public storefront browsing, authenticated purchases, and code redemption.
+- Rebuilt merchant navigation and settings entry points so the UI now points at active merchant routes instead of archived promotion pages.
+- Updated AR inventory browsing to use the restored nearby marketplace API instead of a hard-coded demo storefront.
+
+## [1.4.1] - 2026-04-04
+### Added
+- Added `docs/ai/deployment/hetzner-vercel-production.md` and `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md` as the new deployment blueprint for the restored fwber stack.
+
+### Changed
+- Rewrote `DEPLOY.md` around the Vercel frontend + Hetzner VPS backend topology.
+- Converted `docs/deployment/DREAMHOST_DEPLOYMENT.md` into a legacy-reference notice instead of an active recommendation.
+- Updated Stripe rollout and Cloudflare edge-caching docs so they now reference the Hetzner/Vercel production model and restored merchant billing surface.

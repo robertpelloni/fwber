@@ -1,9 +1,9 @@
 # Cloudflare Multi-Region Edge Caching Strategy
 
-> **Version:** 1.0.77  
+> **Version:** 1.4.1  
 > **Status:** Recommended configuration for production deployment.
 
-To achieve ultra-low latency for `fwber` users globally, we leverage Cloudflare's Global Edge Network in front of our Vercel (Frontend) and DreamHost (Backend) deployments.
+To achieve ultra-low latency for `fwber` users globally, we leverage Cloudflare's Global Edge Network in front of our Vercel frontend and Hetzner-hosted backend services.
 
 ## 1. Cloudflare Page Rules
 
