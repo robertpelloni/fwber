@@ -1,30 +1,20 @@
-# PROJECT_STATUS.md - fwber v1.5.9 (Live Dashboard API + Realtime Recovery)
+# PROJECT_STATUS.md - fwber v1.6.0 (GitHub Backend Deploy Switched to Hetzner)
 
 **Date:** 2026-04-04
-**Version:** 1.5.9 "Live Dashboard API + Realtime Recovery"
-**Status:** ✅ **LIVE FRONTEND CONTRACT DRIFT PATCHED FOR API + REALTIME**
+**Version:** 1.6.0 "GitHub Backend Deploy Switched to Hetzner"
+**Status:** ✅ **BACKEND IS LIVE ON HETZNER AND CI DEPLOY TARGET NOW MATCHES REAL INFRASTRUCTURE**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes the exact live issues reported from the signed-in app shell.
+This release fixes deployment automation drift.
 
 Delivered:
-- browser API calls now target the Hetzner backend instead of nonexistent Vercel-relative `/api/*` routes
-- missing dashboard stats/activity backend routes restored
-- realtime client defaults hardened for live `fwber.me` + `ws.fwber.me`
-- dashboard endpoints covered by backend tests
+- confirmed the live backend is deploying correctly on Hetzner via the in-repo deploy script
+- replaced the stale GitHub Actions backend deploy workflow that still pointed at DreamHost
+- aligned GitHub deployment automation with the actual Hetzner production topology
 
-## 🚀 User-Facing Impact
-This specifically addresses the observed live failures:
-- `GET https://www.fwber.me/api/dashboard/stats` → 404
-- `GET https://www.fwber.me/api/dashboard/activity` → 404
-- `GET https://www.fwber.me/api/security/keys/restore?...` → 404
-- persistent disconnected realtime badge when frontend env drift prevents correct Reverb wiring
-
-## ✅ Validation
-Validated with:
-- `php artisan test --filter=DashboardEndpointsTest`
-- `npm run build --prefix fwber-frontend`
-
-Both passed successfully.
+## ✅ Current Reality
+- Manual/SSH-driven Hetzner deploys are working.
+- The stale GitHub Action was still configured for DreamHost before this release.
+- The workflow now targets Hetzner instead.

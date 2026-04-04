@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2026-04-04 — GitHub Backend Deploy Switched to Hetzner
+
+### Changed
+- Replaced the stale GitHub Actions backend deployment workflow that still SSHed into DreamHost with a Hetzner-targeted deployment workflow.
+- `deploy-backend.yml` now deploys to Hetzner using `ops/hetzner/scripts/deploy-backend.sh` and new secrets (`HETZNER_HOST`, `HETZNER_USERNAME`, `HETZNER_SSH_KEY`, optional `HETZNER_PROJECT_PATH`, optional `HETZNER_REVERB_APP_KEY`).
+- Added workflow dispatch support and expanded path triggers so ops changes under `ops/hetzner/` can trigger the backend deploy pipeline.
+
 ## [1.5.9] - 2026-04-04 — Live Dashboard API + Realtime Recovery
 
 ### Fixed

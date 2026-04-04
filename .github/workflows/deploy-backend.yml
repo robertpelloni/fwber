@@ -1,25 +1,36 @@
-name: Deploy Backend
+name: Deploy Backend (Hetzner)
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'fwber-backend/**'
+      - 'ops/hetzner/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
-    - name: Deploy to DreamHost via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.DREAMHOST_HOST }}
-        username: ${{ secrets.DREAMHOST_USERNAME }}
-        key: ${{ secrets.DREAMHOST_SSH_KEY }}
-        port: 22
-        script: |
-          cd ${{ secrets.DREAMHOST_PROJECT_PATH }}
-          # Run the deployment script (it handles directory navigation)
-          bash fwber-backend/deploy.sh --env=production --force
+      - name: Deploy to Hetzner via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          HETZNER_PROJECT_PATH: ${{ secrets.HETZNER_PROJECT_PATH }}
+          HETZNER_REVERB_APP_KEY: ${{ secrets.HETZNER_REVERB_APP_KEY }}
+          FWBER_RUN_SMOKE_CHECK: ${{ vars.FWBER_RUN_SMOKE_CHECK }}
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          envs: HETZNER_PROJECT_PATH,HETZNER_REVERB_APP_KEY,FWBER_RUN_SMOKE_CHECK
+          script: |
+            set -euo pipefail
+            REPO_ROOT="${HETZNER_PROJECT_PATH:-/var/www/fwber/repo}"
+            export FWBER_REVERB_APP_KEY="${HETZNER_REVERB_APP_KEY:-}"
+            export FWBER_RUN_SMOKE_CHECK="${FWBER_RUN_SMOKE_CHECK:-0}"
+            cd "$REPO_ROOT"
+            ./ops/hetzner/scripts/deploy-backend.sh

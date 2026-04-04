@@ -1,17 +1,17 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.5.9
+> **Version:** 1.6.0
 > **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Deployment & Verification
-- [ ] **Deploy v1.5.9 Backend on Hetzner**: Pull the new dashboard-route/API-contract patch on Hetzner and run the deploy path so `/api/dashboard/*` is live publicly.
+- [ ] **Add Hetzner GitHub Secrets**: Configure `HETZNER_HOST`, `HETZNER_USERNAME`, `HETZNER_SSH_KEY`, and optionally `HETZNER_PROJECT_PATH` plus `HETZNER_REVERB_APP_KEY` in GitHub Actions secrets.
+- [ ] **Run GitHub Hetzner Deploy Workflow Once**: Trigger the updated backend deploy action manually and confirm it executes cleanly against the Hetzner server.
 - [ ] **Verify Live Frontend API Recovery**: Confirm the dashboard and E2E restore calls now hit `api.fwber.me` instead of `www.fwber.me/api/*` after Vercel finishes deploying the updated frontend.
 - [ ] **Verify Live Realtime Recovery**: Confirm the header connection badge reaches Connected on the live site and that private channel auth now goes to `api.fwber.me/broadcasting/auth`.
 - [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment.
-- [ ] **Wire Chat/Webhook Notifications**: Provide a real `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` target if you want deploy notifications delivered automatically outside the report directory.
-- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
+- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is fully validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
 
 ## 🟡 High: Product Polish
 - [ ] **Audit Remaining Dead Settings Links**: Continue replacing leftover settings entries that still point at retired/non-core surfaces with live restored or core destinations.
@@ -20,10 +20,10 @@
 - [ ] **DreamHost Secret Rotation / Cleanup**: Rotate migrated credentials where appropriate now that the backend and DB have been moved to Hetzner.
 
 ## ✅ Recently Completed
+- [x] **GitHub Backend Deploy Switched to Hetzner**: Replaced the stale DreamHost backend deployment workflow with a Hetzner-targeted GitHub Action using `ops/hetzner/scripts/deploy-backend.sh`.
 - [x] **Live Dashboard API + Realtime Recovery**: Fixed browser API origin drift, restored dashboard routes, hardened dashboard schema guards, and added live realtime defaults for fwber production hosts.
 - [x] **Restored Feature Navigation Surface**: Exposed Gold, Roast, Merchant, and moderator surfaces in the authenticated app sidebar, mobile nav, dashboard, and settings so restored systems are actually visible.
 - [x] **Hetzner Public Smoke Validation**: Full smoke-enabled deploy run now passes with 9 passes, 3 expected auth-token warnings, and 0 failures.
-- [x] **Hetzner Script Executable Bits**: Marked core Hetzner ops scripts executable in git so server pulls retain runnable permissions.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*
