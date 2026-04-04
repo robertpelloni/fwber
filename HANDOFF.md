@@ -1,65 +1,72 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.3.5
+> **Version Reached:** 1.3.6
 > **Current Model:** GPT
 
 ## Executive Summary
-This session shipped **v1.3.5 "Deployment Migration Idempotency"** in direct response to a real deployment failure:
+This session shipped **v1.3.6 "Migration Column-Guard Hardening"** in direct response to the follow-up deployment failure:
 
-- `SQLSTATE[42000]: Duplicate key name 'idx_user_profiles_location'`
-- failing inside `2026_04_03_212041_optimize_core_indexes`
+- `SQLSTATE[42000]: Key column 'order' doesn't exist in table`
+- triggered while creating `idx_photos_user_order`
 
-This was a classic partially-applied migration problem. The deploy target already had at least one of the intended indexes, likely because a previous migration run succeeded partway before stopping. The migration was then retried and attempted to create the same index again, causing MySQL to abort the deployment.
+This exposed the second half of the migration-hardening problem.
 
-I fixed the migration itself rather than assuming manual database cleanup.
+In v1.3.5 I fixed duplicate-index retry safety.
+In this session I fixed **schema-drift safety**.
+
+The deploy target clearly has a `photos` table shape that does not fully match the current local squashed schema. A performance-only migration should never block the entire deployment just because an optional indexed column is missing on one environment.
 
 ---
 
 ## What I Changed
 
-### 1. Made the `optimize_core_indexes` migration idempotent
+### 1. Added column guards to the index optimization migration
 **File:** `fwber-backend/database/migrations/2026_04_03_212041_optimize_core_indexes.php`
 
-#### Problem
-The migration was written as a sequence of unconditional `$table->index(...)` operations.
+#### Previous state
+The migration already checked whether an index existed before creating it.
 
-That works only if:
-- the migration has never partially applied before
-- the database schema is exactly as expected
-- deploy retries never happen mid-stream
+That solved:
+- duplicate-key deploy retries
 
-In real deployments, especially shared-hosting or interrupted deploy contexts, that assumption is unsafe.
+But it still assumed:
+- every referenced column existed on every deploy target
 
-#### Fix
-I rewrote the migration so each index is created only if it does **not** already exist.
+That assumption failed on the `photos` table where `order` was apparently missing.
+
+#### New behavior
+I expanded the migration so each index definition now requires:
+1. the target table exists
+2. the target index does not already exist
+3. **all referenced columns exist**
 
 Implemented:
-- `addIndexIfMissing(...)`
-- `hasIndex(...)`
+- `hasColumns(...)`
+- updated `addIndexIfMissing(...)` signature to accept the required column list
 
-#### Covered drivers
-`hasIndex(...)` now supports:
-- MySQL / MariaDB via `information_schema.statistics`
-- SQLite via `PRAGMA index_list(...)`
-- PostgreSQL via `pg_indexes`
+#### Result
+This migration now degrades safely when deploy targets have drifted table shapes.
 
-#### Why this matters
-This turns the migration from a fragile one-shot step into a deployment-safe infrastructure change. If a deploy fails halfway through, the next deploy can retry cleanly without duplicate-key crashes.
+Example fixed case:
+- `idx_photos_user_order` is skipped if `photos.order` is absent
+
+instead of crashing the deployment.
 
 ---
 
-### 2. Added a regression test that simulates the real failure mode
+### 2. Expanded regression coverage for the missing-column scenario
 **File:** `fwber-backend/tests/Feature/OptimizeCoreIndexesMigrationTest.php`
 
-#### What it does
-- uses `RefreshDatabase` so the migration is applied once
-- then explicitly requires the migration file and calls `up()` a second time
+Added a second test that:
+- drops and recreates `photos`
+- intentionally omits the `order` column
+- runs the migration again
+- verifies it does not fail
 
-That reproduces the exact retry scenario that broke deployment.
-
-#### Result
-The migration now survives a second run cleanly.
+This now covers both critical deployment paths:
+1. **re-run with existing indexes**
+2. **re-run on drifted schema missing indexed columns**
 
 ---
 
@@ -68,14 +75,13 @@ Executed:
 - `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/OptimizeCoreIndexesMigrationTest.php tests/Feature/NotificationSettingsAndAnalyticsTest.php tests/Feature/NotificationRoutingTest.php tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
 
 Result:
-- **26 passed**
+- **27 passed**
 
-This validated:
-- migration idempotency
-- analytics/settings contract repairs
-- notification routing consistency
-- block safety hardening
-- core auth/discovery/messaging flow
+Also re-ran frontend production build:
+- `npm run build --prefix fwber-frontend`
+
+Result:
+- successful production build
 
 No processes were manually killed.
 
@@ -85,10 +91,6 @@ No processes were manually killed.
 ### Backend
 - `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_03_212041_optimize_core_indexes.php`
 - `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/OptimizeCoreIndexesMigrationTest.php`
-
-### Frontend
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/browser-storage.ts`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/hooks/use-analytics.ts`
 
 ### Documentation / release tracking
 - `C:/Users/hyper/workspace/fwber/VERSION`
@@ -107,36 +109,34 @@ No processes were manually killed.
 
 ## Important Findings / Analysis
 
-### 1. Index/performance migrations must be retry-safe
-Schema additions like indexes are especially likely to be partially applied in interrupted deploys. If they are not idempotent, deploy retries turn a recoverable interruption into a blocker.
+### 1. Deployment-safe migrations need two layers of defense
+Performance/index migrations must be defensive against:
+1. **duplicate index creation** after partial application
+2. **missing referenced columns** on drifted deploy targets
 
-### 2. Manual DBA cleanup is the wrong first fix for this class of problem
-It would have been possible to tell the operator to manually drop the duplicate index or mark the migration as run. That is brittle and would leave the repo vulnerable to the same issue later. Fixing the migration itself is the durable solution.
+v1.3.5 fixed the first case.
+v1.3.6 fixed the second.
 
-### 3. The earlier production login 500 did not reproduce via a simple invalid-credentials curl
-As part of the ongoing audit, direct requests to:
-- `https://www.fwber.me/api/auth/login`
-- `https://api.fwber.me/api/auth/login`
+### 2. Performance migrations should degrade safely
+This migration does not define core business data; it adds performance indexes. That means the correct behavior under drift is to skip the impossible optimization, not to block the entire deployment.
 
-with invalid credentials returned healthy `422` JSON responses, not `500`. That strongly suggests the reported login failure is environment-specific, input-specific, or triggered by a different condition than a normal invalid login.
-
-### 4. Restricted-browser storage failures are worth softening even if they are not the primary blocker
-I also introduced safe storage wrappers for the analytics hook so restricted contexts can fail quietly instead of throwing startup-time storage-access errors into the console.
+### 3. The deploy target schema has drifted from the local squashed schema
+The missing `photos.order` column strongly suggests at least one production/deploy environment is not fully aligned with the current local migration history. This should be assumed elsewhere too when writing future migration hardening.
 
 ---
 
 ## Recommended Next Steps
-1. **Redeploy immediately after this migration fix**
-   - the duplicate-index blocker should now be cleared
-2. **Production login 500 root-cause audit**
-   - inspect live logs for the actual server-side failure behind `/api/auth/login`
-3. **Real-device notification QA**
-   - validate foreground/background/cold-start flows on physical devices
+1. **Redeploy immediately**
+   - the migration now protects against both duplicate-index and missing-column drift scenarios
+2. **Inspect the live schema after deploy**
+   - specifically compare the production `photos` table against the current local migration shape
+3. **Continue production login 500 root-cause audit**
+   - the frontend parsing layer is hardened, but the server-side cause still needs log inspection if it recurs
 
 ---
 
 ## Git / Release
-- Version bumped to **1.3.5**
+- Version bumped to **1.3.6**
 - Next git action: commit these changes and push to `origin/main`
 
-This release directly converts a deployment blocker into a retry-safe migration path. It is the kind of infrastructure hardening that keeps autonomous delivery moving instead of stalling on partial schema state.
+This release completed the migration hardening loop. The deployment blocker moved from "retry unsafe" to "schema drift unsafe," and that second failure mode is now covered too.

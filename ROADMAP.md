@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.3.5 "Deployment Migration Idempotency"
+> **Current Version:** 1.3.6 "Migration Column-Guard Hardening"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,8 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.3.5)
+### Phase 5: Production Scale (COMPLETED - v1.3.6)
+- **Migration Column Guards:** The `optimize_core_indexes` migration now skips index definitions whose required columns are missing, preventing deploy failures on drifted schemas like `photos` tables missing `order`.
 - **Deployment Migration Idempotency:** The `optimize_core_indexes` migration now checks for existing indexes before creation, so partial MySQL deploys can be retried without duplicate-key failures.
 - **Console Error Sweep:** Removed stale archived-route prefetches, restored analytics event ingestion, repaired notification settings routing, and hardened auth response parsing against malformed server bodies.
 - **Sentry Build Modernization:** The Next.js App Router Sentry setup now uses modern `instrumentation.ts` and `instrumentation-client.ts` hooks, eliminating outdated warning noise from production builds.
@@ -57,6 +58,6 @@ The platform is now **100% focused on its core identity**:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Redeploy After Migration Fix:** Re-run deployment and confirm the idempotent index migration clears the previous duplicate-key blocker.
+1. **Redeploy After Column Guard Fix:** Re-run deployment and confirm the migration now survives both duplicate-index and missing-column drift scenarios.
 2. **TestFlight Beta:** Have actual users test the TestFlight IPA compiled by the new GitHub Actions workflow.
 3. **Production Login 500 Root Cause:** Inspect live backend logs and fix the actual server-side failure behind `/api/auth/login`, now that the frontend parser no longer obscures the response.

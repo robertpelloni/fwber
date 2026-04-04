@@ -871,3 +871,9 @@ All notable changes to this project will be documented in this file.
 - Added `OptimizeCoreIndexesMigrationTest` to explicitly re-run the migration after it has already been applied, verifying the retry path that failed in deployment.
 - Re-validated the backend slice with 26 passing tests across migration idempotency, analytics/settings routing, notifications, safety, and the retained core dating flow.
 - Added safe frontend storage wrappers and routed analytics session persistence through them so restricted browser contexts no longer need to explode with storage-access exceptions during startup.
+
+## [1.3.6] - 2026-04-04
+### Fixed
+- Expanded `2026_04_03_212041_optimize_core_indexes.php` so it now skips index creation when the referenced columns do not exist, preventing deploy failures on drifted schemas such as `photos` tables missing the `order` column.
+- Extended `OptimizeCoreIndexesMigrationTest` to recreate a `photos` table without `order` and verify the migration still completes successfully.
+- Re-validated the backend slice with 27 passing tests across migration retry safety, missing-column guards, analytics/settings routing, notifications, safety, and the retained core dating flow.
