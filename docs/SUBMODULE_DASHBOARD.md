@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
 > **Generated on:** 2026-04-04
-> **Current Global Version:** 1.5.2
+> **Current Global Version:** 1.5.3
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -74,6 +74,7 @@ fwber/
 - Smoke-check reports now also capture endpoint fingerprints such as remote IPs, `Server` headers, redirect targets, and body excerpts for faster routing/debug analysis.
 - Smoke-check reports now also capture DNS resolution records for the public frontend/API/geo/websocket hosts, making host-to-responder drift easier to prove.
 - Smoke-check runs can now also be compared across deploys via drift JSON/Markdown artifacts, making it easier to detect what changed between report generations.
+- Smoke-check/diff outputs can now also be condensed into compact notification artifacts and optionally posted to a webhook for chatops-style deploy summaries.
 - Merchant discovery is now geo-aware again through persisted storefront coordinates and distance-ranked nearby marketplace responses.
 - Merchant moderation and trust scoring are active again through restored moderation routes, trust-weighted ranking, and moderation dashboard merchant review tooling.
 - Merchant review prioritization is active through queue priority scoring, search, and inline note workflows.

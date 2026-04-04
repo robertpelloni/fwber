@@ -11,6 +11,7 @@ BACKEND_DIR="$REPO_ROOT/fwber-backend"
 GEO_DIR="$REPO_ROOT/fwber-geo"
 SMOKE_CHECK_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/smoke-check.sh"
 COMPARE_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/compare-smoke-reports.py"
+PUBLISH_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/publish-smoke-report.py"
 REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
 
@@ -60,6 +61,27 @@ if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
     echo "Smoke-check drift reports written to $REPORT_DIR"
   else
     echo "Smoke-check drift comparison skipped because no previous report was available or compare-smoke-reports.py was missing."
+  fi
+
+  if [ -f "$CURRENT_REPORT_JSON" ] && [ -f "$PUBLISH_SMOKE_SCRIPT" ] && command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+    PUBLISH_ARGS=(
+      --summary-json "$CURRENT_REPORT_JSON"
+      --json-out "$REPORT_DIR/smoke-check-notification.json"
+      --md-out "$REPORT_DIR/smoke-check-notification.md"
+    )
+
+    if [ -f "$REPORT_DIR/smoke-check-drift.json" ]; then
+      PUBLISH_ARGS+=(--drift-json "$REPORT_DIR/smoke-check-drift.json")
+    fi
+
+    if [ -n "${FWBER_SMOKE_NOTIFY_WEBHOOK_URL:-}" ]; then
+      PUBLISH_ARGS+=(--webhook-url "$FWBER_SMOKE_NOTIFY_WEBHOOK_URL")
+    fi
+
+    "$PYTHON_BIN" "$PUBLISH_SMOKE_SCRIPT" "${PUBLISH_ARGS[@]}"
+    echo "Smoke-check notification artifacts written to $REPORT_DIR"
+  else
+    echo "Smoke-check notification publishing skipped because publish-smoke-report.py or Python was unavailable."
   fi
 
   echo "Smoke-check reports written to $REPORT_DIR"

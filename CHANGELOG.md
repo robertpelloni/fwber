@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.3] - 2026-04-04 — Smoke Report Notification Publisher
+
+### Added
+- Added `ops/hetzner/scripts/publish-smoke-report.py`, which converts the current smoke report (and optional drift report) into compact notification artifacts plus an optional webhook POST payload.
+- Added AI DevKit implementation/testing notes for the notification layer under `docs/ai/implementation/smoke-report-notification-publisher.md` and `docs/ai/testing/smoke-report-notification-publisher.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` so smoke-checked deploys now also generate `smoke-check-notification.json` and `smoke-check-notification.md`, and can optionally publish them via `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`.
+- Revalidated the end-to-end artifact pipeline: smoke summary, drift diff, and compact notification outputs can now be generated in sequence from the same report set.
+
 ## [1.5.2] - 2026-04-04 — Smoke Report Drift Diff
 
 ### Added
