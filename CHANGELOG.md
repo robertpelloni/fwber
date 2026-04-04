@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.7] - 2026-04-04 — Hetzner Script Executable Bits
+
+### Changed
+- Marked the Hetzner operations scripts as executable in git so fresh clones/pulls on the server retain runnable permissions for `deploy-backend.sh`, `smoke-check.sh`, `compare-smoke-reports.py`, and `publish-smoke-report.py`.
+- This fixes the live Hetzner issue where smoke execution could be silently skipped after pull because the script existence check required `-x` but the repo tracked the files as non-executable.
+
 ## [1.5.6] - 2026-04-04 — WebSocket Smoke Handshake Fix
 
 ### Fixed

@@ -1,29 +1,26 @@
-# PROJECT_STATUS.md - fwber v1.5.6 (WebSocket Smoke Handshake Fix)
+# PROJECT_STATUS.md - fwber v1.5.7 (Hetzner Script Executable Bits)
 
 **Date:** 2026-04-04
-**Version:** 1.5.6 "WebSocket Smoke Handshake Fix"
-**Status:** ✅ **PUBLIC HETZNER CUTOVER VALIDATION TUNED AFTER LIVE SMOKE TESTING**
+**Version:** 1.5.7 "Hetzner Script Executable Bits"
+**Status:** ✅ **LIVE HETZNER CUTOVER STABILIZATION CONTINUES**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes a false-negative discovered during the first full public Hetzner smoke run after cutover.
+This release fixes an operational packaging issue discovered on the live Hetzner server.
 
 Delivered:
-- corrected websocket smoke handshake key in the smoke-check script
-- removed a probe-side failure that was masking an otherwise healthy `ws.fwber.me` endpoint
+- Hetzner ops scripts are now tracked as executable in git
+- fresh clones/pulls retain runnable permissions for deploy/smoke/diff/publish scripts
 
 ## 🚀 Operations Improvements
-Updated:
+Updated git metadata for:
+- `ops/hetzner/scripts/deploy-backend.sh`
 - `ops/hetzner/scripts/smoke-check.sh`
-
-The websocket probe now uses a valid RFC-compliant `Sec-WebSocket-Key`, matching the successful manual handshake that already proved Reverb/nginx were functioning correctly.
+- `ops/hetzner/scripts/compare-smoke-reports.py`
+- `ops/hetzner/scripts/publish-smoke-report.py`
 
 ## ✅ Why This Matters
-The previous live smoke run showed:
-- API healthy
-- geo healthy
-- websocket endpoint healthy when tested manually
-- but smoke script websocket probe failed with `400 Invalid Sec-WebSocket-Key`
+During live Hetzner execution, a pulled repo could contain the correct scripts but still skip smoke execution because the deploy script gated on `-x` while the repo tracked the files as non-executable.
 
-That meant the failure was in the probe, not the service. This release fixes that mismatch so the smoke summary can reflect the real runtime state.
+This release removes that packaging-level footgun and makes future server pulls behave more predictably.
