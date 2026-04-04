@@ -1,95 +1,76 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.6.3
+> **Version Reached:** 1.6.1
 > **Current Model:** GPT
 
 ## Executive Summary
-After validating the GitHub Hetzner backend deploy, I continued into the next obvious problem: the repository still had several failing GitHub workflows, but most of those failures were workflow drift rather than product/runtime regressions.
+After switching GitHub backend deployment from DreamHost to Hetzner, I added the required Hetzner secrets and triggered the workflow.
 
-This session completed **v1.6.3 "Workflow Stabilization Sweep"**.
+The first real GitHub Hetzner deploy failed, but the failure was fully root-caused and patched in **v1.6.1 "GitHub Hetzner Deploy Rust Path Fix"**.
 
----
+### Root cause
+- Manual Hetzner deploys worked.
+- GitHub Actions deploys failed while building `fwber-geo`.
+- The SSH action runs a **non-login shell**, so the deploy user's rustup toolchain was not loaded.
+- That caused the script to use the old system Cargo (`1.75.0`) instead of the installed rustup Cargo required for the geo crate's `edition2024` manifest.
 
-## What Was Fixed
+### Fix
+Updated `ops/hetzner/scripts/deploy-backend.sh` to:
+- source `~/.cargo/env` when present
+- prepend `~/.cargo/bin` to `PATH`
 
-### 1. `backend-tests.yml`
-Problem:
-- the dedicated backend workflow tried to migrate during setup without forcing SQLite env values
-- GitHub Actions therefore attempted a MySQL connection and failed with `SQLSTATE[HY000] [2002] Connection refused`
-
-Fix:
-- set `DB_CONNECTION=sqlite`
-- set `DB_DATABASE=database/database.sqlite`
-- create the sqlite file before migrate
-- run `php artisan migrate:fresh` under those env vars
-
-Updated:
-- `.github/workflows/backend-tests.yml`
-
-### 2. `frontend-build.yml`
-Problem:
-- setup-node caching was configured with `cache: npm` but without `cache-dependency-path`
-- GitHub looked for a root lockfile instead of `fwber-frontend/package-lock.json`
-- this produced the lockfile-not-found failure in the modern dedicated frontend workflow
-
-Fix:
-- added:
-  - `cache-dependency-path: fwber-frontend/package-lock.json`
-
-Updated:
-- `.github/workflows/frontend-build.yml`
-
-### 3. `ci.yml`
-Problem:
-- the old monolithic CI workflow duplicated backend/frontend jobs that are already handled by dedicated workflows
-- those duplicates were creating extra red noise and obscuring the real deployment signal
-
-Fix:
-- rewrote `ci.yml` into a lightweight **Repository Hygiene** workflow only
-- retained:
-  - version consistency checks
-  - license checks
-  - env/secret hygiene checks
-  - stale-handoff-file hygiene checks
-- removed duplicated backend/frontend build jobs
-
-Updated:
-- `.github/workflows/ci.yml`
-
-### 4. `deploy.yml`
-Problem:
-- the old deployment pipeline was stale and auto-ran on pushes even though the real production deploy path is now:
-  - Hetzner backend workflow
-  - Vercel frontend workflow
-- it also contained outdated assumptions and created additional red noise
-
-Fix:
-- rewrote it into a **manual-only container publish** workflow
-- added clear summary output explaining it is not the primary production deployment path
-- retained optional Docker image publishing jobs behind manual inputs only
-
-Updated:
-- `.github/workflows/deploy.yml`
+This ensures CI-triggered SSH deployments and manual shells use the same Rust toolchain.
 
 ---
 
-## Why This Matters
-At this point the real backend deployment path is healthy and verified:
-- GitHub → Hetzner backend deploy is green
-- smoke validation is green
+## What Was Done This Session
 
-The remaining red GitHub badges were therefore mostly **automation drift**, not evidence that the product itself was broken.
+### 1. Verified GitHub CLI access
+Confirmed:
+- `gh` installed
+- authenticated access to `robertpelloni/fwber`
 
-This release reduces that false-negative CI noise and aligns repository automation with the actual stack.
+### 2. Created and installed Hetzner deploy secrets
+Added repository secrets:
+- `HETZNER_HOST`
+- `HETZNER_USERNAME`
+- `HETZNER_SSH_KEY`
+- `HETZNER_PROJECT_PATH`
+- `HETZNER_REVERB_APP_KEY`
+
+Added repository variable:
+- `FWBER_RUN_SMOKE_CHECK=1`
+
+### 3. Created dedicated GitHub Actions deploy key
+- generated a fresh SSH keypair for GitHub Actions
+- installed the public key in `/home/deploy/.ssh/authorized_keys` on Hetzner
+- verified SSH login for `deploy@5.161.250.43` using the new key
+
+### 4. Triggered the new GitHub Hetzner deploy workflow
+Triggered workflow:
+- `Deploy Backend (Hetzner)`
+
+The workflow now correctly reached Hetzner and began the real deploy.
+
+### 5. Root-caused the first workflow failure
+Failure details from GitHub logs:
+- composer install ran
+- migrations ran
+- deploy verify passed
+- failure happened on geo build
+- Cargo error showed system Cargo 1.75.0 lacking `edition2024` support
+
+### 6. Patched deploy script for CI shell behavior
+Updated:
+- `ops/hetzner/scripts/deploy-backend.sh`
+
+Added explicit rustup environment bootstrapping before `cargo build --release`.
 
 ---
 
 ## Files Changed
-- `.github/workflows/backend-tests.yml`
-- `.github/workflows/frontend-build.yml`
-- `.github/workflows/ci.yml`
-- `.github/workflows/deploy.yml`
+- `ops/hetzner/scripts/deploy-backend.sh`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -102,19 +83,15 @@ This release reduces that false-negative CI noise and aligns repository automati
 ---
 
 ## Git / Release
-- **Target Version:** `1.6.3`
-- **Recommended Commit Message:** `chore: stabilize github workflows after hetzner cutover (v1.6.3)`
+- **Target Version:** `1.6.1`
+- **Recommended Commit Message:** `fix: load rustup cargo path during github hetzner deploys (v1.6.1)`
 
 ---
 
-## Best Next Steps
-1. Commit and push `v1.6.3`
-2. Re-run:
-   - `Backend CI (Tests & Linting)`
-   - `Frontend Build & Deploy (Vercel)`
-   - `Repository Hygiene`
-3. Confirm those modern workflows go green
+## Best Next Step
+1. Commit and push `v1.6.1`
+2. Re-trigger `Deploy Backend (Hetzner)`
+3. Confirm GitHub Action succeeds end-to-end on Hetzner
 4. Continue live frontend verification for dashboard API + realtime recovery
-5. Continue production Stripe verification
 
 No processes were manually killed.

@@ -2,21 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.6.3] - 2026-04-04 — Workflow Stabilization Sweep
-
-### Changed
-- Fixed `backend-tests.yml` so GitHub Actions prepares and migrates against SQLite instead of accidentally trying to connect to MySQL during CI setup.
-- Fixed `frontend-build.yml` to cache against `fwber-frontend/package-lock.json`, eliminating the lockfile-not-found setup-node failure.
-- Simplified `ci.yml` into a lightweight repository-hygiene workflow instead of duplicating backend/frontend build jobs already covered by dedicated workflows.
-- Reworked `deploy.yml` into a manual-only container publish workflow so it no longer auto-fails on every push while the real production deployment is handled by Hetzner/Vercel-specific workflows.
-
-## [1.6.2] - 2026-04-04 — GitHub Hetzner Deploy Validation
-
-### Verified
-- Added the required GitHub repository secrets and variable for Hetzner backend deployment.
-- Triggered the Hetzner backend deploy workflow successfully from GitHub Actions after the rustup-path patch landed on the server.
-- Confirmed the workflow completed end-to-end with a green deploy, healthy backend verification, successful geo build, successful websocket smoke probe, and smoke summary of **9 passes / 3 expected auth-token warnings / 0 failures**.
-
 ## [1.6.1] - 2026-04-04 — GitHub Hetzner Deploy Rust Path Fix
 
 ### Fixed
