@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.2] - 2026-04-04 — GitHub Hetzner Deploy Validation
+
+### Verified
+- Added the required GitHub repository secrets and variable for Hetzner backend deployment.
+- Triggered the Hetzner backend deploy workflow successfully from GitHub Actions after the rustup-path patch landed on the server.
+- Confirmed the workflow completed end-to-end with a green deploy, healthy backend verification, successful geo build, successful websocket smoke probe, and smoke summary of **9 passes / 3 expected auth-token warnings / 0 failures**.
+
 ## [1.6.1] - 2026-04-04 — GitHub Hetzner Deploy Rust Path Fix
 
 ### Fixed

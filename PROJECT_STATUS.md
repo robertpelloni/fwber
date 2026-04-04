@@ -1,19 +1,23 @@
-# PROJECT_STATUS.md - fwber v1.6.1 (GitHub Hetzner Deploy Rust Path Fix)
+# PROJECT_STATUS.md - fwber v1.6.2 (GitHub Hetzner Deploy Validation)
 
 **Date:** 2026-04-04
-**Version:** 1.6.1 "GitHub Hetzner Deploy Rust Path Fix"
-**Status:** ✅ **GITHUB HETZNER DEPLOY FAILURE ROOT-CAUSED AND PATCHED**
+**Version:** 1.6.2 "GitHub Hetzner Deploy Validation"
+**Status:** ✅ **GITHUB BACKEND DEPLOY TO HETZNER IS NOW VERIFIED GREEN**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes the first real GitHub Hetzner deployment failure after switching CI away from DreamHost.
+This release records successful GitHub-side validation of the new Hetzner deployment automation.
 
 Delivered:
-- root-caused the GitHub deploy failure to non-login SSH sessions using the old system Cargo instead of rustup
-- patched the Hetzner deploy script to explicitly source rustup's cargo environment before geo builds
+- GitHub Hetzner secrets installed
+- GitHub Actions backend deploy workflow executed successfully
+- live smoke artifacts generated from the GitHub-triggered Hetzner deployment path
 
-## ✅ Why It Failed
-The server was correctly provisioned with a modern rustup toolchain, but GitHub Actions invoked the deploy script through a non-login SSH session, which did not load the deploy user's rustup PATH.
-
-That made `fwber-geo` build with the old system Cargo and fail on `edition2024`.
+## ✅ Validated Outcome
+Confirmed green:
+- workflow `Deploy Backend (Hetzner)`
+- healthy `php artisan deploy:verify`
+- successful `fwber-geo` build under GitHub-triggered SSH execution
+- successful websocket smoke probe
+- smoke summary: **9 passes, 3 expected warnings, 0 failures**
