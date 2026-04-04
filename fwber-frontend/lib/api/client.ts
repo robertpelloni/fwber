@@ -13,18 +13,30 @@ import type {
   PaginatedResponse,
 } from './types';
 
-// Ensure BASE_URL hits the Next.js proxy in browser, and absolute URL on server
-const getBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    // In the browser, ALWAYS use the local Next.js proxy to bypass CORS
-    return '/api';
-  }
-  // On the server (SSR), we need the absolute URL to hit DreamHost directly
-  const url = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
-  return url.replace(/\/$/, '') + '/api';
-};
+function normalizeApiOrigin(rawUrl?: string | null): string {
+  const fallbackOrigin = 'https://api.fwber.me'
 
-const BASE_URL = getBaseUrl();
+  if (!rawUrl) {
+    return fallbackOrigin
+  }
+
+  const trimmed = rawUrl.trim()
+  if (!trimmed) {
+    return fallbackOrigin
+  }
+
+  return trimmed.replace(/\/api\/?$/, '').replace(/\/$/, '') || fallbackOrigin
+}
+
+export function getPublicApiOrigin(): string {
+  return normalizeApiOrigin(process.env.NEXT_PUBLIC_API_URL)
+}
+
+export function getApiBaseUrl(): string {
+  return `${getPublicApiOrigin()}/api`
+}
+
+const BASE_URL = getApiBaseUrl()
 let currentAuthToken: string | null = null;
 
 export function setApiClientAuthToken(token: string | null): void {

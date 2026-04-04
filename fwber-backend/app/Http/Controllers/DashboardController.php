@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -41,15 +42,21 @@ class DashboardController extends Controller
             ->get()
             ->count();
 
-        // Get profile views
-        $profileViews = DB::table('profile_views')
-            ->where('viewed_user_id', $userId)
-            ->count();
+        // `profile_views` was part of broader product eras and may be absent on simplified or drifted
+        // production databases. Dashboard stats should degrade to zero instead of throwing a 500.
+        $profileViews = 0;
+        $todayViews = 0;
 
-        $todayViews = DB::table('profile_views')
-            ->where('viewed_user_id', $userId)
-            ->whereDate('created_at', Carbon::today())
-            ->count();
+        if (Schema::hasTable('profile_views')) {
+            $profileViews = DB::table('profile_views')
+                ->where('viewed_user_id', $userId)
+                ->count();
+
+            $todayViews = DB::table('profile_views')
+                ->where('viewed_user_id', $userId)
+                ->whereDate('created_at', Carbon::today())
+                ->count();
+        }
 
         // Calculate response rate
         $sentMessages = DB::table('messages')->where('sender_id', $userId)->count();

@@ -52,7 +52,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('user/two-factor-authentication', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'destroy']);
     Route::get('user/two-factor-qr-code', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'showQrCode']);
 
-    // Profile & Photos
+    // Dashboard / Profile / Photos
+    Route::get('dashboard/stats', [\App\Http\Controllers\DashboardController::class, 'getStats']);
+    Route::get('dashboard/activity', [\App\Http\Controllers\DashboardController::class, 'getActivity']);
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'show']);
     Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);

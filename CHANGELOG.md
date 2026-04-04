@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.9] - 2026-04-04 — Live Dashboard API + Realtime Recovery
+
+### Fixed
+- Corrected the browser API base handling so authenticated frontend requests go to `https://api.fwber.me/api/...` instead of incorrectly hitting Vercel-relative `/api/...` paths like `https://www.fwber.me/api/dashboard/stats`.
+- Restored missing backend routes for `/api/dashboard/stats` and `/api/dashboard/activity`, eliminating the live dashboard 404 spam.
+- Hardened `DashboardController` to tolerate simplified/drifted databases where `profile_views` may not exist, returning zero values instead of throwing a production error.
+- Hardened realtime client defaults so the live fwber frontend can fall back to `ws.fwber.me` and the correct API broadcast-auth origin when Vercel env drift leaves Reverb config incomplete.
+- Added backend coverage for the dashboard endpoints via `DashboardEndpointsTest`.
+
 ## [1.5.8] - 2026-04-04 — Restored Feature Navigation Surface
 
 ### Fixed

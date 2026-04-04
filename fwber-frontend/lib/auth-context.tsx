@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo, useCallback } from 'react'
 import { logAuth, setUserContext, clearUserContext } from './logger'
-import { setApiClientAuthToken } from './api/client'
+import { getApiBaseUrl, setApiClientAuthToken } from './api/client'
 
 // Types
 interface User {
@@ -73,7 +73,7 @@ interface AuthContextType extends AuthState {
   updateUser: (user: User) => void
 }
 
-const BROWSER_API_BASE_URL = '/api'
+const BROWSER_API_BASE_URL = getApiBaseUrl()
 
 function isTransientAuthResponse(status: number): boolean {
   return status >= 500 || status === 429
@@ -454,9 +454,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.isAuthenticated, state.token, state.user, state.isLoading])
 
   // Ensure browser requests use the Next.js proxy to avoid cross-origin session drift.
-  const API_BASE_URL = typeof window !== 'undefined'
-    ? BROWSER_API_BASE_URL
-    : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api')
+  const API_BASE_URL = BROWSER_API_BASE_URL
 
   // Login function
   const login = useCallback(async (email: string, password: string) => {

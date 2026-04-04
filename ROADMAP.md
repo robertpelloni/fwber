@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.5.8 "Restored Feature Navigation Surface"
+> **Current Version:** 1.5.9 "Live Dashboard API + Realtime Recovery"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.5.8)
+### Phase 5: Production Scale (COMPLETED - v1.5.9)
+- **Live Dashboard API + Realtime Recovery:** Fixed the browser API origin to hit `api.fwber.me`, restored missing dashboard routes, added schema guards for simplified databases, and hardened Reverb defaults so live frontend requests and realtime stop failing on production contract drift.
 - **Restored Feature Navigation Surface:** Exposed Gold Premium, Roast, Merchant, and moderator surfaces directly in the signed-in app shell via sidebar, mobile nav, dashboard cards, and clearer settings entry points so restored systems are actually reachable by users.
 - **Hetzner Script Executable Bits:** Marked the Hetzner ops scripts executable in git so server pulls retain runnable permissions for deploy, smoke, drift, and notification tooling.
 - **WebSocket Smoke Handshake Fix:** Corrected the smoke-check websocket probe to use a valid RFC-compliant handshake key so public post-cutover smoke runs no longer report false-negative websocket failures.
@@ -86,7 +87,7 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Verify Live Vercel Rollout of Restored Navigation:** Confirm the new restored-feature links and dashboard cards are visible on the public frontend after deployment.
-2. **Verify Public Frontend → API Path:** Confirm the Vercel frontend is using the Hetzner-hosted `api.fwber.me` path cleanly after DNS cutover.
+1. **Deploy and Verify v1.5.9 Live:** Confirm dashboard requests, E2E key restore checks, and realtime auth all use the correct `api.fwber.me` / `ws.fwber.me` production surfaces after deploy.
+2. **Verify Live Vercel Rollout of Restored Navigation:** Confirm the new restored-feature links and dashboard cards are visible on the public frontend after deployment.
 3. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in the Hetzner-hosted backend environment.
 4. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.
