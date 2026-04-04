@@ -57,9 +57,10 @@ fail_count=0
 warn_count=0
 case_log_file="$(mktemp)"
 diagnostic_log_file="$(mktemp)"
+snapshot_log_file="$(mktemp)"
 
 cleanup() {
-  rm -f "$case_log_file" "$diagnostic_log_file"
+  rm -f "$case_log_file" "$diagnostic_log_file" "$snapshot_log_file"
 }
 
 trap cleanup EXIT
@@ -99,6 +100,38 @@ add_diagnostic() {
   local remediation="$4"
 
   printf '%s\t%s\t%s\t%s\n' "$severity" "$title" "$finding" "$remediation" >> "$diagnostic_log_file"
+}
+
+add_snapshot() {
+  local label="$1"
+  local method="$2"
+  local url="$3"
+  local http_code="$4"
+  local remote_ip="$5"
+  local effective_url="$6"
+  local server_header="$7"
+  local content_type="$8"
+  local location_header="$9"
+  local body_excerpt="${10}"
+
+  remote_ip="${remote_ip:-—}"
+  effective_url="${effective_url:-—}"
+  server_header="${server_header:-—}"
+  content_type="${content_type:-—}"
+  location_header="${location_header:-—}"
+  body_excerpt="${body_excerpt:-—}"
+
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$label" \
+    "$method" \
+    "$url" \
+    "$http_code" \
+    "$remote_ip" \
+    "$effective_url" \
+    "$server_header" \
+    "$content_type" \
+    "$location_header" \
+    "$body_excerpt" >> "$snapshot_log_file"
 }
 
 require_command() {
@@ -213,6 +246,29 @@ write_json_report() {
         "$(json_escape "$remediation")"
     done < "$diagnostic_log_file"
 
+    printf '\n  ],\n'
+    printf '  "snapshots": [\n'
+
+    local first_snapshot=1
+    while IFS=$'\t' read -r label method url http_code remote_ip effective_url server_header content_type location_header body_excerpt; do
+      if [[ "$first_snapshot" -eq 0 ]]; then
+        printf ',\n'
+      fi
+
+      first_snapshot=0
+      printf '    {"label":"%s","method":"%s","url":"%s","http_code":"%s","remote_ip":"%s","effective_url":"%s","server_header":"%s","content_type":"%s","location_header":"%s","body_excerpt":"%s"}' \
+        "$(json_escape "$label")" \
+        "$(json_escape "$method")" \
+        "$(json_escape "$url")" \
+        "$(json_escape "$http_code")" \
+        "$(json_escape "$remote_ip")" \
+        "$(json_escape "$effective_url")" \
+        "$(json_escape "$server_header")" \
+        "$(json_escape "$content_type")" \
+        "$(json_escape "$location_header")" \
+        "$(json_escape "$body_excerpt")"
+    done < "$snapshot_log_file"
+
     printf '\n  ]\n'
     printf '}\n'
   } > "$REPORT_JSON_PATH"
@@ -255,6 +311,21 @@ write_markdown_report() {
         "$(markdown_escape "$label")" \
         "$(markdown_escape "$detail")"
     done < "$case_log_file"
+
+    printf -- '\n## Endpoint Fingerprints\n\n'
+    printf -- '| Check | HTTP | Remote IP | Server | Content-Type | Location | Effective URL |\n'
+    printf -- '| --- | --- | --- | --- | --- | --- | --- |\n'
+
+    while IFS=$'\t' read -r label method url http_code remote_ip effective_url server_header content_type location_header body_excerpt; do
+      printf -- '| %s | %s | %s | %s | %s | %s | %s |\n' \
+        "$(markdown_escape "$label")" \
+        "$(markdown_escape "$http_code")" \
+        "$(markdown_escape "$remote_ip")" \
+        "$(markdown_escape "$server_header")" \
+        "$(markdown_escape "$content_type")" \
+        "$(markdown_escape "$location_header")" \
+        "$(markdown_escape "$effective_url")"
+    done < "$snapshot_log_file"
 
     printf -- '\n## Diagnostics & Recommended Actions\n\n'
 
@@ -372,8 +443,10 @@ run_http_check() {
 
   local response_file
   local error_file
+  local headers_file
   response_file="$(mktemp)"
   error_file="$(mktemp)"
+  headers_file="$(mktemp)"
 
   local -a curl_args
   curl_args=(
@@ -381,8 +454,9 @@ run_http_check() {
     -X "$method"
     "$url"
     -H 'Accept: application/json'
+    -D "$headers_file"
     -o "$response_file"
-    -w '%{http_code}'
+    -w '%{http_code}\t%{remote_ip}\t%{url_effective}'
   )
 
   if [[ -n "$payload" ]]; then
@@ -396,18 +470,44 @@ run_http_check() {
     curl_args+=( -H "Authorization: Bearer $bearer_token" )
   fi
 
-  local http_code
-  if ! http_code="$(curl "${curl_args[@]}" 2>"$error_file")"; then
+  local curl_meta
+  if ! curl_meta="$(curl "${curl_args[@]}" 2>"$error_file")"; then
     local curl_error
     curl_error="$(tr '\n' ' ' < "$error_file")"
-    rm -f "$response_file" "$error_file"
+    add_snapshot "$label" "$method" "$url" 'connect_error' '' '' '' '' '' "$(printf '%s' "$curl_error" | head -c 240)"
+    rm -f "$response_file" "$error_file" "$headers_file"
     fail_case "$label" "Request failed to connect: ${curl_error:-curl error}"
     return
   fi
 
+  local http_code
+  local remote_ip
+  local effective_url
+  IFS=$'\t' read -r http_code remote_ip effective_url <<< "$curl_meta"
+
   local response_body
   response_body="$(cat "$response_file")"
-  rm -f "$response_file" "$error_file"
+
+  local server_header
+  local content_type
+  local location_header
+  server_header="$( { grep -i '^server:' "$headers_file" || true; } | tail -n 1 | cut -d':' -f2- | sed 's/^ *//' | tr -d '\r')"
+  content_type="$( { grep -i '^content-type:' "$headers_file" || true; } | tail -n 1 | cut -d':' -f2- | sed 's/^ *//' | tr -d '\r')"
+  location_header="$( { grep -i '^location:' "$headers_file" || true; } | tail -n 1 | cut -d':' -f2- | sed 's/^ *//' | tr -d '\r')"
+
+  add_snapshot \
+    "$label" \
+    "$method" \
+    "$url" \
+    "$http_code" \
+    "$remote_ip" \
+    "$effective_url" \
+    "$server_header" \
+    "$content_type" \
+    "$location_header" \
+    "$(printf '%s' "$response_body" | head -c 240)"
+
+  rm -f "$response_file" "$error_file" "$headers_file"
 
   local expected_code_matched=0
   local expected_code

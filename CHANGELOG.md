@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-04-04 — Endpoint Fingerprints & Host Signals
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` so every HTTP probe now records endpoint fingerprints including HTTP code, remote IP, effective URL, `Server` header, `Content-Type`, redirect location, and a response-body excerpt.
+- Added a `snapshots` array to `smoke-check-summary.json` and an `Endpoint Fingerprints` section to `smoke-check-summary.md`, turning smoke reports into stronger routing-debug artifacts.
+- Added AI DevKit implementation/testing notes for the fingerprinting layer under `docs/ai/implementation/endpoint-fingerprints-and-host-signals.md` and `docs/ai/testing/endpoint-fingerprints-and-host-signals.md`.
+
+### Changed
+- Hardened snapshot logging by normalizing empty values to `—`, preventing Bash field-parsing drift when optional headers like `Location` are absent.
+- Re-ran the public smoke check and confirmed the live environment is now fingerprinted more concretely: `api.fwber.me` health-route failures come back from **Apache** at `75.119.202.57`, while `geo.fwber.me` failures come back from **Vercel** at `64.29.17.1`.
+
 ## [1.4.9] - 2026-04-04 — Smoke Check Diagnostics & Remediation Hints
 
 ### Added
