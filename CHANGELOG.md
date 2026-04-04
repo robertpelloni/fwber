@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2026-04-04 — Smoke Report Drift Diff
+
+### Added
+- Added `ops/hetzner/scripts/compare-smoke-reports.py`, which compares two smoke-check JSON reports and emits `smoke-check-drift.json` plus `smoke-check-drift.md`.
+- Added AI DevKit implementation/testing notes for drift comparison under `docs/ai/implementation/smoke-report-drift-diff.md` and `docs/ai/testing/smoke-report-drift-diff.md`.
+
+### Changed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` so smoke-checked deploys now attempt to compare the current report with the previous saved report and write drift artifacts into the new report directory.
+- Revalidated the compare flow against two generated smoke reports and confirmed stable environments produce stable drift summaries with no unexpected fingerprint or DNS changes.
+
 ## [1.5.1] - 2026-04-04 — DNS Resolution Appendix & Host Mapping
 
 ### Added

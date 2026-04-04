@@ -1,6 +1,6 @@
 # Hetzner + Vercel Production Blueprint
 
-> **Version:** 1.5.1
+> **Version:** 1.5.2
 > **Status:** Recommended deployment topology for restored fwber stack
 
 This document captures the production topology now recommended for fwber after the phased restoration of:
@@ -150,6 +150,7 @@ After cutover:
 - [ ] smoke-check diagnostics are reviewed and any flagged remediation items are addressed before sign-off
 - [ ] endpoint fingerprint rows are reviewed so server headers / remote IPs match the expected Hetzner-Vercel topology
 - [ ] DNS appendix rows are reviewed so host resolution matches the intended Hetzner/Vercel split
+- [ ] drift-diff artifacts are reviewed against the previous smoke report when a prior deploy report exists
 - [ ] `/api/health`, `/api/health/liveness`, and `/api/health/readiness` respond correctly
 - [ ] auth routes behave correctly
 - [ ] websocket connection succeeds
