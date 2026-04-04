@@ -945,3 +945,13 @@ All notable changes to this project will be documented in this file.
 - Reworked `/api/marketplace/nearby` so it can filter and sort by real merchant distance when caller coordinates are provided.
 - Updated AR inventory browsing to use actual merchant coordinates from the API instead of synthetic offsets.
 - Allowed merchant registration to inherit location defaults from the user profile when explicit merchant coordinates are not supplied.
+
+## [1.4.4] - 2026-04-04
+### Added
+- Added `MerchantTrustService` and `MerchantModerationController` to compute merchant trust and support moderator review workflows.
+- Added a merchant verification queue to the moderation dashboard, including verify/reject/reset actions.
+
+### Fixed
+- Restored moderation API routes that the frontend moderation dashboard already expected, including dashboard, flagged-content, spoof, throttle, action, user-profile, and merchant-review endpoints.
+- Updated nearby marketplace ranking to blend trust score with proximity rather than relying only on raw distance.
+- Hardened `lib/api/moderation.ts` so it resolves `/api` correctly regardless of whether `NEXT_PUBLIC_API_URL` includes the suffix.

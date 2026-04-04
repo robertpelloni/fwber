@@ -160,6 +160,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{userId}', [\App\Http\Controllers\BlockController::class, 'destroy']);
     });
     Route::post('reports', [\App\Http\Controllers\ReportController::class, 'store']);
+    Route::get('moderation/dashboard', [\App\Http\Controllers\ModerationController::class, 'dashboard']);
+    Route::get('moderation/flagged-content', [\App\Http\Controllers\ModerationController::class, 'flaggedContent']);
+    Route::post('moderation/flags/{artifactId}/review', [\App\Http\Controllers\ModerationController::class, 'reviewFlag']);
+    Route::get('moderation/spoof-detections', [\App\Http\Controllers\ModerationController::class, 'spoofDetections']);
+    Route::post('moderation/spoofs/{detectionId}/review', [\App\Http\Controllers\ModerationController::class, 'reviewSpoof']);
+    Route::get('moderation/throttles', [\App\Http\Controllers\ModerationController::class, 'activeThrottles']);
+    Route::delete('moderation/throttles/{throttleId}', [\App\Http\Controllers\ModerationController::class, 'removeThrottle']);
+    Route::get('moderation/actions', [\App\Http\Controllers\ModerationController::class, 'actionHistory']);
+    Route::get('moderation/users/{userId}', [\App\Http\Controllers\ModerationController::class, 'userProfile']);
+    Route::get('moderation/merchants', [\App\Http\Controllers\MerchantModerationController::class, 'index']);
+    Route::patch('moderation/merchants/{merchantId}', [\App\Http\Controllers\MerchantModerationController::class, 'review']);
     Route::post('safety/panic', [\App\Http\Controllers\SafetyController::class, 'triggerPanic']);
     Route::get('safety/walk/active', [\App\Http\Controllers\SafetyController::class, 'getActiveWalk']);
     Route::post('safety/walk/start', [\App\Http\Controllers\SafetyController::class, 'startSafeWalk']);

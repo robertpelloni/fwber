@@ -58,6 +58,7 @@ export default function MarketplaceMerchantPage() {
                     <div className="inline-flex items-center gap-2"><Package className="h-4 w-4 text-emerald-600" />{merchant.data.items.length} items available</div>
                     {(merchant.data.merchant.location_name || merchant.data.merchant.address) && <div className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.location_name || merchant.data.merchant.address}</div>}
                     {merchant.data.merchant.latitude != null && merchant.data.merchant.longitude != null && <div className="inline-flex items-center gap-2"><Navigation className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.latitude.toFixed(4)}, {merchant.data.merchant.longitude.toFixed(4)}</div>}
+                    {merchant.data.merchant.trust_score != null && <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">Trust {merchant.data.merchant.trust_score} · {merchant.data.merchant.trust_tier}</div>}
                   </div>
                 </CardContent>
               </Card>
@@ -72,6 +73,7 @@ export default function MarketplaceMerchantPage() {
                     <CardContent className="space-y-4">
                       <div className="text-3xl font-black text-gray-900 dark:text-white">${Number(item.price_usd).toFixed(2)}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">Stock remaining: {item.stock_count}</div>
+                      {item.distance_m != null && <div className="text-xs text-gray-500 dark:text-gray-400">Approx. {Math.round(item.distance_m)}m away</div>}
                       <Button className="w-full" onClick={() => purchase(item.id, item.name, item.price_usd)} disabled={item.stock_count < 1}>
                         <ReceiptText className="mr-2 h-4 w-4" />
                         {item.stock_count < 1 ? 'Sold out' : 'Buy now'}

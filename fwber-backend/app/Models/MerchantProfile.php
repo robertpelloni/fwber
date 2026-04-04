@@ -24,11 +24,15 @@ class MerchantProfile extends Model
         'latitude',
         'longitude',
         'verification_status',
+        'verification_notes',
+        'verified_at',
+        'verified_by',
     ];
 
     protected $casts = [
         'latitude' => 'float',
         'longitude' => 'float',
+        'verified_at' => 'datetime',
     ];
 
     public function user()
@@ -44,5 +48,10 @@ class MerchantProfile extends Model
     public function payments()
     {
         return $this->hasMany(MerchantPayment::class);
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }

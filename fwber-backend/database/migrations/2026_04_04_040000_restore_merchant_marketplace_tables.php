@@ -27,6 +27,9 @@ return new class extends Migration
                 $table->decimal('latitude', 10, 8)->nullable();
                 $table->decimal('longitude', 11, 8)->nullable();
                 $table->string('verification_status')->default('pending');
+                $table->text('verification_notes')->nullable();
+                $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamp('verified_at')->nullable();
                 $table->timestamps();
 
                 $table->index(['latitude', 'longitude'], 'merchant_profiles_lat_lng_index');

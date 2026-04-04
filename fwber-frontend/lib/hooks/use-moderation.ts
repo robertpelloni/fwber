@@ -58,6 +58,17 @@ export function useActions(page: number, token: string | null) {
   });
 }
 
+export function useMerchantVerificationQueue(page: number, status: string, token: string | null) {
+  return useQuery({
+    queryKey: ['moderation', 'merchants', page, status],
+    queryFn: () => {
+      if (!token) throw new Error('Authentication required');
+      return moderationApi.merchants(token, page, status);
+    },
+    enabled: !!token,
+  });
+}
+
 export function useUserModerationProfile(userId: number | null, token: string | null) {
   return useQuery({
     queryKey: ['moderation', 'user', userId],
@@ -100,6 +111,19 @@ export function useRemoveThrottleMutation() {
       moderationApi.removeThrottle(throttleId, token),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['moderation'] });
+    },
+  });
+}
+
+export function useReviewMerchantMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ merchantId, payload, token }: { merchantId: number; payload: { verification_status: 'pending' | 'verified' | 'rejected'; verification_notes?: string }; token: string }) =>
+      moderationApi.reviewMerchant(merchantId, payload, token),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['moderation'] });
+      qc.invalidateQueries({ queryKey: ['merchant-dashboard'] });
+      qc.invalidateQueries({ queryKey: ['marketplace-merchant'] });
     },
   });
 }

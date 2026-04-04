@@ -11,11 +11,13 @@ import {
   useReviewFlagMutation,
   useReviewSpoofMutation,
   useRemoveThrottleMutation,
+  useReviewMerchantMutation,
+  useMerchantVerificationQueue,
   useUserModerationProfile,
 } from '@/lib/hooks/use-moderation';
-import { ShieldAlert, Flag, Gauge, Ban, CheckCircle2, Trash2, Zap, User, X, AlertTriangle, Clock, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Flag, Gauge, Ban, CheckCircle2, Trash2, Zap, User, X, AlertTriangle, Clock, RefreshCw, Store, BadgeCheck, ShieldX } from 'lucide-react';
 
-type Tab = 'flagged' | 'spoofs' | 'throttles' | 'actions';
+type Tab = 'flagged' | 'spoofs' | 'throttles' | 'actions' | 'merchants';
 
 export default function ModerationDashboard() {
   const { token } = useAuth();
@@ -24,6 +26,8 @@ export default function ModerationDashboard() {
   const [spoofsPage, setSpoofsPage] = useState(1);
   const [throttlesPage, setThrottlesPage] = useState(1);
   const [actionsPage, setActionsPage] = useState(1);
+  const [merchantPage, setMerchantPage] = useState(1);
+  const [merchantStatus, setMerchantStatus] = useState<'pending' | 'verified' | 'rejected' | 'all'>('pending');
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const dashboard = useModerationDashboard(token);
@@ -31,11 +35,13 @@ export default function ModerationDashboard() {
   const spoofs = useSpoofDetections(spoofsPage, token);
   const throttles = useThrottles(throttlesPage, token);
   const actions = useActions(actionsPage, token);
+  const merchants = useMerchantVerificationQueue(merchantPage, merchantStatus === 'all' ? '' : merchantStatus, token);
   const userProfile = useUserModerationProfile(selectedUserId, token);
 
   const reviewFlag = useReviewFlagMutation();
   const reviewSpoof = useReviewSpoofMutation();
   const removeThrottle = useRemoveThrottleMutation();
+  const reviewMerchant = useReviewMerchantMutation();
 
   if (!token) {
     return (
@@ -51,6 +57,7 @@ export default function ModerationDashboard() {
     { id: 'flagged', label: 'Flagged Content', icon: <Flag className="h-4 w-4" />, count: dashboard.data?.stats.flagged_artifacts },
     { id: 'spoofs', label: 'Geo-Spoofs', icon: <Zap className="h-4 w-4" />, count: dashboard.data?.stats.pending_spoof_detections },
     { id: 'throttles', label: 'Throttles', icon: <Gauge className="h-4 w-4" />, count: dashboard.data?.stats.active_throttles },
+    { id: 'merchants', label: 'Merchants', icon: <Store className="h-4 w-4" />, count: dashboard.data?.stats.pending_merchants },
     { id: 'actions', label: 'Actions', icon: <CheckCircle2 className="h-4 w-4" /> },
   ];
 
@@ -71,10 +78,11 @@ export default function ModerationDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <StatCard label="Flagged Posts" value={dashboard.data?.stats.flagged_artifacts ?? '—'} icon={<Flag className="h-5 w-5 text-red-500" />} variant="danger" />
         <StatCard label="Active Throttles" value={dashboard.data?.stats.active_throttles ?? '—'} icon={<Gauge className="h-5 w-5 text-yellow-500" />} variant="warning" />
         <StatCard label="High-Risk Spoofs" value={dashboard.data?.stats.pending_spoof_detections ?? '—'} icon={<Zap className="h-5 w-5 text-orange-500" />} variant="warning" />
+        <StatCard label="Pending Merchants" value={dashboard.data?.stats.pending_merchants ?? '—'} icon={<Store className="h-5 w-5 text-blue-500" />} variant="info" />
         <StatCard label="Actions Today" value={dashboard.data?.stats.moderation_actions_today ?? '—'} icon={<CheckCircle2 className="h-5 w-5 text-green-500" />} variant="success" />
       </div>
 
@@ -142,6 +150,20 @@ export default function ModerationDashboard() {
             onRemove={(throttleId) => removeThrottle.mutate({ throttleId, token: token! })}
             onViewUser={setSelectedUserId}
             isPending={removeThrottle.isPending}
+          />
+        )}
+        {activeTab === 'merchants' && (
+          <MerchantVerificationPanel
+            data={merchants.data}
+            isLoading={merchants.isLoading}
+            page={merchantPage}
+            setPage={setMerchantPage}
+            status={merchantStatus}
+            setStatus={setMerchantStatus}
+            onReview={(merchantId, verificationStatus, verificationNotes) =>
+              reviewMerchant.mutate({ merchantId, payload: { verification_status: verificationStatus, verification_notes: verificationNotes }, token: token! })
+            }
+            isPending={reviewMerchant.isPending}
           />
         )}
         {activeTab === 'actions' && (
@@ -494,6 +516,101 @@ function ActionsPanel({
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function MerchantVerificationPanel({
+  data,
+  isLoading,
+  page,
+  setPage,
+  status,
+  setStatus,
+  onReview,
+  isPending,
+}: {
+  data: PaginatedData<any> | undefined;
+  isLoading: boolean;
+  page: number;
+  setPage: (p: number) => void;
+  status: 'pending' | 'verified' | 'rejected' | 'all';
+  setStatus: (status: 'pending' | 'verified' | 'rejected' | 'all') => void;
+  onReview: (merchantId: number, verificationStatus: 'pending' | 'verified' | 'rejected', verificationNotes?: string) => void;
+  isPending: boolean;
+}) {
+  if (isLoading) return <LoadingState />;
+  if (!data?.data?.length) return <EmptyState message="No merchants match this review filter" icon={<Store className="h-8 w-8 text-gray-300" />} />;
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2 border-b px-4 py-3">
+        {(['pending', 'verified', 'rejected', 'all'] as const).map((value) => (
+          <button
+            key={value}
+            onClick={() => setStatus(value)}
+            className={`rounded-full px-3 py-1 text-sm font-medium ${status === value ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
+      <ul className="divide-y">
+        {data.data.map((merchant: any) => (
+          <li key={merchant.id} className="p-4 hover:bg-gray-50">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium text-gray-900">{merchant.business_name}</span>
+                  <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{merchant.category}</span>
+                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${merchant.verification_status === 'verified' ? 'bg-green-100 text-green-700' : merchant.verification_status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    {merchant.verification_status}
+                  </span>
+                  <span className={`rounded px-2 py-0.5 text-xs font-medium ${merchant.trust_score >= 80 ? 'bg-green-100 text-green-700' : merchant.trust_score >= 55 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                    Trust {merchant.trust_score} · {merchant.trust_tier}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm text-gray-600">{merchant.description || 'No merchant description provided.'}</p>
+                <div className="mt-2 text-xs text-gray-500">
+                  {merchant.location_name || merchant.address || 'No location label'}
+                  {merchant.user?.email ? ` · ${merchant.user.email}` : ''}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-500">
+                  <span>Verification: {merchant.trust_breakdown?.verification ?? 0}</span>
+                  <span>Profile: {merchant.trust_breakdown?.profile_completeness ?? 0}</span>
+                  <span>Catalog: {merchant.trust_breakdown?.catalog_depth ?? 0}</span>
+                  <span>Orders: {merchant.trust_breakdown?.successful_orders ?? 0}</span>
+                  <span>Redemption: {merchant.trust_breakdown?.redemption_reliability ?? 0}</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  disabled={isPending}
+                  className="rounded bg-green-600 px-3 py-1.5 text-sm text-white hover:bg-green-700 disabled:opacity-50 flex items-center gap-1"
+                  onClick={() => onReview(merchant.id, 'verified', 'Merchant verified by moderator review')}
+                >
+                  <BadgeCheck className="h-4 w-4" /> Verify
+                </button>
+                <button
+                  disabled={isPending}
+                  className="rounded bg-red-600 px-3 py-1.5 text-sm text-white hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
+                  onClick={() => onReview(merchant.id, 'rejected', 'Merchant storefront rejected by moderator review')}
+                >
+                  <ShieldX className="h-4 w-4" /> Reject
+                </button>
+                <button
+                  disabled={isPending}
+                  className="rounded bg-gray-700 px-3 py-1.5 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+                  onClick={() => onReview(merchant.id, 'pending', 'Merchant review reset to pending')}
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <Pagination page={page} lastPage={data.last_page ?? 1} setPage={setPage} />
     </div>
   );
 }

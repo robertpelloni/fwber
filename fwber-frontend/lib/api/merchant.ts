@@ -2,6 +2,12 @@ import { api } from './client'
 
 export type MerchantVerificationStatus = 'pending' | 'verified' | 'rejected'
 
+export interface MerchantTrustSummary {
+  trust_score: number
+  trust_tier: string
+  trust_breakdown: Record<string, number>
+}
+
 export interface MerchantProfile {
   id: number
   user_id: number
@@ -13,6 +19,9 @@ export interface MerchantProfile {
   latitude: number | null
   longitude: number | null
   verification_status: MerchantVerificationStatus
+  verification_notes?: string | null
+  verified_at?: string | null
+  verified_by?: number | null
   created_at: string
   updated_at: string
 }
@@ -33,6 +42,7 @@ export interface MerchantInventoryItem {
 
 export interface MerchantDashboardResponse {
   profile: MerchantProfile
+  trust: MerchantTrustSummary
   stats: {
     inventory_count: number
     active_items: number
@@ -104,11 +114,11 @@ export async function registerMerchant(data: MerchantRegistrationData) {
 }
 
 export async function getMerchantProfile() {
-  return api.get<{ profile: MerchantProfile }>('/merchant-portal/profile')
+  return api.get<{ profile: MerchantProfile; trust: MerchantTrustSummary }>('/merchant-portal/profile')
 }
 
 export async function updateMerchantProfile(data: Partial<MerchantRegistrationData>) {
-  return api.put<{ message: string; profile: MerchantProfile }>('/merchant-portal/profile', data)
+  return api.put<{ message: string; profile: MerchantProfile; trust: MerchantTrustSummary }>('/merchant-portal/profile', data)
 }
 
 export async function getMerchantDashboard() {

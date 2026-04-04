@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ReviewFlagRequest;
 use App\Http\Requests\ReviewSpoofRequest;
 use App\Models\GeoSpoofDetection;
+use App\Models\MerchantProfile;
 use App\Models\ModerationAction;
 use App\Models\ProximityArtifact;
 use App\Models\ShadowThrottle;
@@ -12,6 +13,7 @@ use App\Models\User;
 use App\Services\ShadowThrottleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ModerationController extends Controller
 {
@@ -40,10 +42,11 @@ class ModerationController extends Controller
         }
 
         $stats = [
-            'flagged_artifacts' => ProximityArtifact::where('is_flagged', true)->count(),
-            'active_throttles' => ShadowThrottle::active()->count(),
-            'pending_spoof_detections' => GeoSpoofDetection::unconfirmed()->highRisk()->count(),
-            'moderation_actions_today' => ModerationAction::whereDate('created_at', today())->count(),
+            'flagged_artifacts' => Schema::hasTable('proximity_artifacts') ? ProximityArtifact::where('is_flagged', true)->count() : 0,
+            'active_throttles' => Schema::hasTable('shadow_throttles') ? ShadowThrottle::active()->count() : 0,
+            'pending_spoof_detections' => Schema::hasTable('geo_spoof_detections') ? GeoSpoofDetection::unconfirmed()->highRisk()->count() : 0,
+            'pending_merchants' => Schema::hasTable('merchant_profiles') ? MerchantProfile::where('verification_status', 'pending')->count() : 0,
+            'moderation_actions_today' => Schema::hasTable('moderation_actions') ? ModerationAction::whereDate('created_at', today())->count() : 0,
         ];
 
         $recentActions = ModerationAction::with(['moderator', 'targetUser', 'targetArtifact'])

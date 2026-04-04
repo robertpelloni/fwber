@@ -8,12 +8,17 @@ use App\Models\MerchantPayment;
 use App\Models\MerchantProfile;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Services\MerchantTrustService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 class MerchantController extends Controller
 {
+    public function __construct(
+        protected MerchantTrustService $merchantTrustService,
+    ) {}
+
     public function register(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -41,6 +46,7 @@ class MerchantController extends Controller
         return response()->json([
             'message' => 'Merchant profile created successfully',
             'profile' => $profile,
+            'trust' => $this->merchantTrustService->calculate($profile),
             'user' => $user->fresh()->load('merchantProfile'),
         ]);
     }
@@ -53,7 +59,10 @@ class MerchantController extends Controller
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
-        return response()->json(['profile' => $profile]);
+        return response()->json([
+            'profile' => $profile,
+            'trust' => $this->merchantTrustService->calculate($profile),
+        ]);
     }
 
     public function updateProfile(Request $request): JsonResponse
@@ -75,10 +84,12 @@ class MerchantController extends Controller
         ]);
 
         $profile->update($validated + $this->resolveMerchantLocationDefaults($request->user(), $validated, false));
+        $freshProfile = $profile->fresh();
 
         return response()->json([
             'message' => 'Merchant profile updated successfully',
-            'profile' => $profile->fresh(),
+            'profile' => $freshProfile,
+            'trust' => $this->merchantTrustService->calculate($freshProfile),
         ]);
     }
 
@@ -123,6 +134,7 @@ class MerchantController extends Controller
 
         return response()->json([
             'profile' => $profile,
+            'trust' => $this->merchantTrustService->calculate($profile),
             'stats' => $stats,
             'recent_inventory' => $recentInventory,
             'recent_redemptions' => $recentRedemptions,

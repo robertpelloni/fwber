@@ -17,6 +17,7 @@ export default function MerchantProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isLocating, setIsLocating] = useState(false)
+  const [trust, setTrust] = useState<{ trust_score: number; trust_tier: string } | null>(null)
   const [form, setForm] = useState({
     business_name: '',
     category: '',
@@ -40,6 +41,7 @@ export default function MerchantProfilePage() {
           latitude: profile.latitude != null ? String(profile.latitude) : '',
           longitude: profile.longitude != null ? String(profile.longitude) : '',
         })
+        setTrust(result.trust)
       })
       .catch((error) => showError('Failed to load merchant profile', error instanceof Error ? error.message : 'Unable to load merchant profile.'))
       .finally(() => setIsLoading(false))
@@ -74,11 +76,12 @@ export default function MerchantProfilePage() {
   const save = async () => {
     setIsSaving(true)
     try {
-      await updateMerchantProfile({
+      const result = await updateMerchantProfile({
         ...form,
         latitude: form.latitude ? Number(form.latitude) : null,
         longitude: form.longitude ? Number(form.longitude) : null,
       })
+      setTrust(result.trust)
       showSuccess('Merchant profile updated', 'Your storefront details were saved.')
     } catch (error) {
       showError('Save failed', error instanceof Error ? error.message : 'Unable to save merchant profile.')
@@ -104,6 +107,13 @@ export default function MerchantProfilePage() {
                   <div className="space-y-2"><Label>Category</Label><Input value={form.category} onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))} /></div>
                   <div className="space-y-2"><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} rows={5} /></div>
                   <div className="space-y-2"><Label>Address</Label><Input value={form.address} onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))} /></div>
+
+                  {trust && (
+                    <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900/40 dark:bg-emerald-950/20">
+                      <div className="font-semibold text-gray-900 dark:text-white">Merchant trust score: {trust.trust_score}</div>
+                      <div className="text-gray-600 dark:text-gray-300">Current tier: {trust.trust_tier}</div>
+                    </div>
+                  )}
 
                   <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/40 dark:bg-blue-950/20">
                     <div className="mb-4 flex items-center justify-between gap-4">

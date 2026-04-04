@@ -147,4 +147,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(MerchantPayment::class, 'payer_id');
     }
+
+    public function getIsModeratorAttribute(): bool
+    {
+        return in_array($this->role, ['admin', 'moderator'], true);
+    }
 }

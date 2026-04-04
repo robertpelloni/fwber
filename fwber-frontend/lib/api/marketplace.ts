@@ -10,6 +10,9 @@ export interface MerchantSummary {
   latitude?: number | null
   longitude?: number | null
   verification_status?: string
+  trust_score?: number
+  trust_tier?: string
+  trust_breakdown?: Record<string, number>
 }
 
 export interface InventoryItem {

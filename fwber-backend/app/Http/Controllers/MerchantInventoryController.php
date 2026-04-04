@@ -6,6 +6,7 @@ use App\Models\InventoryRedemption;
 use App\Models\MerchantInventory;
 use App\Models\MerchantPayment;
 use App\Models\MerchantProfile;
+use App\Services\MerchantTrustService;
 use App\Services\Payment\PaymentGatewayInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,7 @@ class MerchantInventoryController extends Controller
 {
     public function __construct(
         protected PaymentGatewayInterface $paymentGateway,
+        protected MerchantTrustService $merchantTrustService,
     ) {}
 
     public function nearby(Request $request): JsonResponse
@@ -27,7 +29,10 @@ class MerchantInventoryController extends Controller
         $limit = min((int) $request->query('limit', 24), 100);
 
         $items = MerchantInventory::query()
-            ->with('merchant')
+            ->with(['merchant' => function ($query) {
+                $query->withCount('inventories')
+                    ->withCount(['payments as successful_orders_count' => fn ($payments) => $payments->where('status', 'succeeded')]);
+            }])
             ->where('is_available', true)
             ->where('stock_count', '>', 0)
             ->whereHas('merchant', function ($query) {
@@ -292,22 +297,31 @@ class MerchantInventoryController extends Controller
         $longitude = (float) $lng;
 
         return $items
-            ->map(function (MerchantInventory $item) use ($latitude, $longitude) {
+            ->map(function (MerchantInventory $item) use ($latitude, $longitude, $radiusMeters) {
                 $merchant = $item->merchant;
                 $merchantLat = (float) $merchant->latitude;
                 $merchantLng = (float) $merchant->longitude;
                 $distance = $this->distanceMeters($latitude, $longitude, $merchantLat, $merchantLng);
+                $trust = $this->merchantTrustService->calculate($merchant);
+                $proximityScore = max(0, 100 * (1 - min($distance, $radiusMeters) / max($radiusMeters, 1)));
+                $rankingScore = round(($trust['trust_score'] * 0.65) + ($proximityScore * 0.35), 1);
 
                 return [
                     ...$item->toArray(),
-                    'merchant' => $merchant?->toArray(),
+                    'merchant' => [
+                        ...$merchant?->toArray(),
+                        ...$trust,
+                    ],
                     'distance_m' => round($distance, 1),
                     'lat' => $merchantLat,
                     'lng' => $merchantLng,
+                    'trust_score' => $trust['trust_score'],
+                    'trust_tier' => $trust['trust_tier'],
+                    'ranking_score' => $rankingScore,
                 ];
             })
             ->filter(fn (array $item) => $item['distance_m'] <= $radiusMeters)
-            ->sortBy('distance_m')
+            ->sortByDesc('ranking_score')
             ->values();
     }
 

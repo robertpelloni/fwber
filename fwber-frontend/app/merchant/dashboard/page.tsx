@@ -54,12 +54,13 @@ export default function MerchantDashboardPage() {
                 </CardContent>
               </Card>
 
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                 {[
                   { label: 'Inventory items', value: data.stats.inventory_count, icon: Package },
                   { label: 'Active listings', value: data.stats.active_items, icon: Store },
                   { label: 'Pending redemptions', value: data.stats.pending_redemptions, icon: Ticket },
                   { label: 'Gross revenue', value: `$${Number(data.stats.gross_revenue).toFixed(2)}`, icon: DollarSign },
+                  { label: 'Trust score', value: data.trust.trust_score, icon: BarChart3 },
                 ].map((stat) => (
                   <Card key={stat.label}>
                     <CardContent className="flex items-center justify-between p-6">
