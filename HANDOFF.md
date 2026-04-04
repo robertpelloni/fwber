@@ -1,19 +1,21 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.4.9
+> **Version Reached:** 1.5.0
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the autonomous deployment-hardening loop and delivered **v1.4.9 "Smoke Check Diagnostics & Remediation Hints"**.
+This session continued the autonomous deployment-hardening loop and delivered **v1.5.0 "Endpoint Fingerprints & Host Signals"**.
 
-After v1.4.8 added smoke-check report artifacts, the next practical gap was clear: the reports preserved evidence, but they still expected an operator to manually interpret the failure pattern.
+After v1.4.9 added remediation diagnostics, the next practical gap was still obvious: the reports could explain likely causes, but they still did not preserve all the low-level routing evidence operators often want during deploy debugging.
 
-This release makes the smoke-check reports more operationally useful by adding:
-- structured diagnostics in the JSON report
-- a remediation section in the Markdown report
-- heuristic triage for common live drift signatures
-- another real public smoke-check run to confirm the diagnostics match the currently reachable fwber domains
+This release closes that gap by adding endpoint fingerprints to every smoke-checked HTTP probe, including:
+- remote IP
+- server header
+- content type
+- effective URL
+- redirect location
+- body excerpt
 
 No processes were manually killed.
 
@@ -21,49 +23,34 @@ No processes were manually killed.
 
 ## What Changed
 
-### 1. `ops/hetzner/scripts/smoke-check.sh` now generates deployment diagnostics
-The script now analyzes the captured case log after a smoke run and produces diagnostics with:
-- severity
-- title
-- finding
-- remediation guidance
+### 1. `ops/hetzner/scripts/smoke-check.sh` now records endpoint fingerprints
+Each HTTP probe now records a structured snapshot containing:
+- label
+- method
+- requested URL
+- HTTP status
+- remote IP
+- effective URL
+- `Server` header
+- `Content-Type`
+- `Location` header (or placeholder when absent)
+- body excerpt
 
-These diagnostics are included in:
-- `smoke-check-summary.json`
-- `smoke-check-summary.md`
+These are now emitted in:
+- `smoke-check-summary.json` as `snapshots`
+- `smoke-check-summary.md` under `Endpoint Fingerprints`
 
-### 2. Current heuristics added
-#### Backend route drift on `api.fwber.me`
-Triggered when:
-- `/api/health`
-- `/api/health/liveness`
-- `/api/health/readiness`
-all fail with `404`
+### 2. Empty snapshot values were normalized for stable parsing
+A regression surfaced during implementation:
+- optional headers like `Location` may be empty
+- Bash whitespace-delimited `read` parsing becomes unstable when middle fields are empty
 
-Interpretation:
-- the reachable backend is likely stale or serving an older route set
+Fix applied:
+- empty snapshot fields are normalized to `—` before being written to the snapshot log
 
-#### Geo domain drift / Vercel misrouting
-Triggered when:
-- the geo endpoint fails
-- the response body contains `deployment could not be found on Vercel`
+This stabilized both JSON and Markdown report rendering.
 
-Interpretation:
-- `geo.fwber.me` is still pointed at the wrong target for the intended Hetzner topology
-
-#### Incomplete authenticated smoke coverage
-Triggered when smoke tokens are missing for premium / merchant / moderation probes.
-
-#### Partial-health narrowing signal
-Triggered when:
-- invalid-login still passes
-- public roast preview still passes
-- health or geo checks fail
-
-Interpretation:
-- the public deployment is partially healthy, so remediation should focus on routing/deploy alignment instead of a full outage assumption
-
-### 3. Real public validation was executed again
+### 3. Real public smoke validation was executed again
 Executed:
 
 ```bash
@@ -73,14 +60,30 @@ FWBER_REPORT_DIR=<tmp> \
 bash ops/hetzner/scripts/smoke-check.sh
 ```
 
-Observed:
-- frontend reachability still passes
-- invalid-login still passes
-- public roast preview still passes
-- `/api/health*` still fails with `404`
-- `geo.fwber.me/nearby` still fails with a Vercel deployment-not-found `404`
+The fingerprinted results made the live drift much more concrete:
 
-The updated reports now explicitly interpret those failures rather than only recording them.
+#### Frontend
+- `fwber.me`
+- server header: **Vercel**
+- remote IP: **`216.198.79.1`**
+- behavior: redirects to `https://www.fwber.me/`
+
+#### API backend
+- `api.fwber.me`
+- server header: **Apache**
+- remote IP: **`75.119.202.57`**
+- behavior: auth invalid-login and public roast routes respond, but `/api/health*` still returns `404`
+
+#### Geo domain
+- `geo.fwber.me`
+- server header: **Vercel**
+- remote IP: **`64.29.17.1`**
+- behavior: `/nearby` returns Vercel deployment-not-found instead of geo-service output
+
+These fingerprints make it much easier to separate:
+- stale Apache-backed API deployment drift
+from
+- Vercel-backed geo-domain misrouting
 
 ### 4. Documentation updated
 Updated:
@@ -90,15 +93,15 @@ Updated:
 - `TODO.md`
 - `ROADMAP.md`
 - `MEMORY.md`
-- `IDEAS.md`
 - `HANDOFF.md`
+- `IDEAS.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `docs/ai/deployment/hetzner-vercel-production.md`
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
 
 Added:
-- `docs/ai/implementation/smoke-check-diagnostics-and-remediation.md`
-- `docs/ai/testing/smoke-check-diagnostics-and-remediation.md`
+- `docs/ai/implementation/endpoint-fingerprints-and-host-signals.md`
+- `docs/ai/testing/endpoint-fingerprints-and-host-signals.md`
 
 ---
 
@@ -114,15 +117,10 @@ Executed:
 - `FWBER_SKIP_LOCAL_ARTISAN=1 FWBER_SKIP_WEBSOCKET=1 FWBER_REPORT_DIR=<tmp> bash ops/hetzner/scripts/smoke-check.sh`
 
 Validated:
-- the script still fails correctly on real live drift
-- JSON report includes a `diagnostics` array
-- Markdown report includes a `Diagnostics & Recommended Actions` section
-- the generated diagnostics match the observed public-domain failure pattern
-
-### Memory operations
-Executed:
-- searched AI DevKit memory for prior smoke-check diagnostics knowledge
-- will store the v1.4.9 diagnostics/remediation knowledge after this implementation
+- JSON report includes `snapshots`
+- Markdown report includes `Endpoint Fingerprints`
+- endpoint fingerprints reflect real live target differences (`Apache` vs `Vercel`)
+- diagnostics and fingerprinting now reinforce each other instead of existing separately
 
 ---
 
@@ -132,8 +130,8 @@ Executed:
 - `ops/hetzner/scripts/smoke-check.sh`
 
 ### AI DevKit docs
-- `docs/ai/implementation/smoke-check-diagnostics-and-remediation.md`
-- `docs/ai/testing/smoke-check-diagnostics-and-remediation.md`
+- `docs/ai/implementation/endpoint-fingerprints-and-host-signals.md`
+- `docs/ai/testing/endpoint-fingerprints-and-host-signals.md`
 
 ### Deployment / release docs
 - `CHANGELOG.md`
@@ -157,27 +155,29 @@ Executed:
 ---
 
 ## Git / Release
-- **Target Version:** `1.4.9`
-- **Recommended Commit Message:** `feat: add smoke-check diagnostics and remediation hints (v1.4.9)`
+- **Target Version:** `1.5.0`
+- **Recommended Commit Message:** `feat: add endpoint fingerprints to smoke-check reports (v1.5.0)`
 
 ---
 
 ## Current Best Next Steps
 1. **Redeploy the backend serving `api.fwber.me`**
-   - the diagnostics strongly suggest route drift / stale backend rollout
+   - fingerprints show the current backend is Apache-served at `75.119.202.57`
+   - health routes are still missing there
 2. **Fix `geo.fwber.me` routing**
-   - the diagnostics strongly suggest the geo subdomain is still pointed at Vercel or another wrong target
+   - fingerprints show it is still Vercel-served at `64.29.17.1`
+   - this is inconsistent with the intended Hetzner geo-service topology
 3. **Provision smoke credentials and websocket key access**
    - user token
    - merchant token
    - moderator token
    - Reverb app key
-4. **Run the full deploy + smoke path live**
+4. **Run the full live deploy path**
    - `FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh`
-   - review the generated diagnostics before sign-off
+   - review diagnostics and fingerprints before sign-off
 5. **Then run live Stripe verification**
    - premium purchase
    - marketplace purchase
    - webhook handling
 
-The smoke-check system is now not just a validator and not just an artifact writer. It is also a lightweight deploy-triage assistant.
+The smoke-check system is now a better deploy-triage assistant because it preserves not only what failed and why it probably failed, but also exactly which host characteristics answered the request.
