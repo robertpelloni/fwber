@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.5] - 2026-04-04 — Deploy Script Privilege Hardening
+
+### Changed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so service restarts and nginx reloads automatically use `sudo` when the script is run as a non-root operator such as `deploy`, while still working normally when run as root.
+- This directly fixes the live Hetzner issue where deploy execution from the `deploy` account reached the systemctl stage successfully but failed on service restart due to insufficient privileges.
+
 ## [1.5.4] - 2026-04-04 — Hetzner Backend Execution & Database Migration
 
 ### Added

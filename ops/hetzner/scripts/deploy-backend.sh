@@ -14,6 +14,11 @@ COMPARE_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/compare-smoke-reports.py"
 PUBLISH_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/publish-smoke-report.py"
 REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
+SUDO_BIN=""
+
+if [ "$(id -u)" -ne 0 ]; then
+  SUDO_BIN="sudo"
+fi
 
 cd "$REPO_ROOT"
 git pull origin main
@@ -30,10 +35,10 @@ if [ -d "$GEO_DIR" ]; then
   cargo build --release
 fi
 
-systemctl restart fwber-queue
-systemctl restart fwber-reverb
-systemctl restart fwber-geo
-systemctl reload nginx
+$SUDO_BIN systemctl restart fwber-queue
+$SUDO_BIN systemctl restart fwber-reverb
+$SUDO_BIN systemctl restart fwber-geo
+$SUDO_BIN systemctl reload nginx
 
 if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
   mkdir -p "$REPORT_DIR_ROOT"

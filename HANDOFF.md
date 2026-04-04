@@ -1,201 +1,136 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.5.4
+> **Version Reached:** 1.5.5
 > **Current Model:** GPT
 
 ## Executive Summary
-This session moved beyond repo-only deployment preparation and completed the first real **live Hetzner fwber backend execution wave**, resulting in **v1.5.4 "Hetzner Backend Execution & Database Migration"**.
+This session completed the public Hetzner fwber cutover mechanics after the user confirmed DNS updates, then fixed a real deploy-script privilege issue discovered during live execution, resulting in **v1.5.5 "Deploy Script Privilege Hardening"**.
 
-The user clarified the desired direction: move fwber off DreamHost and onto Hetzner. I used the provided Hetzner SSH access plus DreamHost shell credentials to execute the backend migration work directly.
+The most important live outcomes are:
+- `api.fwber.me` now resolves to Hetzner and serves the Hetzner backend over HTTPS
+- `geo.fwber.me` now resolves to Hetzner and serves the deployed geo service over HTTPS
+- `ws.fwber.me` already worked and continues to succeed with real websocket upgrade handshakes
+- the Hetzner deploy script was hardened so operators can run it as `deploy` without failing at the `systemctl` stage
 
 No processes were manually killed.
 
 ---
 
-## What Changed On Hetzner (`5.161.250.43`)
+## What Happened Live
 
-### 1. Repo deployment
-- cloned `https://github.com/robertpelloni/fwber.git` into:
-  - `/var/www/fwber/repo`
+### 1. Public DNS propagation confirmed
+Confirmed from both local and Hetzner perspectives:
+- `api.fwber.me` → `5.161.250.43`
+- `geo.fwber.me` → `5.161.250.43`
+- `ws.fwber.me` → `5.161.250.43`
 
-### 2. Installed missing runtime/build dependencies
-Installed on Hetzner:
-- `php8.4-sqlite3`
-- `cargo`
-- `rustc`
-- `sshpass`
+### 2. Hetzner TLS/public nginx cutover completed for API + geo
+Created and enabled nginx vhosts for:
+- `api.fwber.me`
+- `geo.fwber.me`
 
-Also installed/upgraded modern Rust via `rustup` because the distro Cargo was too old for the `fwber-geo` manifest’s `edition2024` requirement.
-
-### 3. DreamHost access verified
-Using the provided DreamHost credentials, I successfully opened an SSH session to:
-- `fwber@pdx1-shared-a1-33.dreamhost.com`
-
-This allowed direct inspection of the live DreamHost fwber backend `.env` and direct database export access.
-
-### 4. Local Hetzner MySQL provisioned
-Created on Hetzner:
-- database: `fwber_production`
-- user: `fwber@localhost`
-
-### 5. DreamHost production database imported to Hetzner
-A direct DreamHost → Hetzner DB migration was executed by streaming `mysqldump` from DreamHost into the local Hetzner MySQL instance.
-
-Important note:
-- `--no-tablespaces` was required because the DreamHost MySQL user did not have `PROCESS` privilege for the default tablespace dump behavior.
-
-### 6. Hetzner backend runtime moved onto local MySQL + local Redis
-The Hetzner backend `.env` was rewritten away from the temporary sqlite bootstrap fallback and onto:
-- local MySQL
-- local Redis
-- S3 media storage
-- production-style Reverb credentials aligned to the existing fwber app key
-
-### 7. Built geo service successfully
-After Rust upgrade:
-- `fwber-geo` release build succeeded
-
-### 8. Installed and enabled live systemd services
-Installed/enabled:
-- `fwber-queue`
-- `fwber-reverb`
-- `fwber-geo`
-
-All are active.
-
----
-
-## Live Verification Performed
-
-### Laravel backend
-Executed on Hetzner:
-- `php artisan optimize:clear`
-- `php artisan migrate --force`
-- `php artisan optimize`
-- `php artisan deploy:verify --json`
+Then issued Let's Encrypt certificates on Hetzner for:
+- `api.fwber.me`
+- `geo.fwber.me`
 
 Result:
-- **healthy**
-- backend now verifies against:
-  - MySQL
-  - Redis
-  - storage
-  - Reverb-configured broadcast path
+- public HTTPS is now active on both hosts
 
-### Redis
-Confirmed:
-- active
-- listening on `127.0.0.1:6379`
+### 3. Public service validation succeeded
+#### API
+Public check now returns healthy:
+- `https://api.fwber.me/api/health` → `200 OK`
 
-### Queue worker
-Confirmed:
-- `fwber-queue.service` active
+#### Geo
+Public check now returns valid JSON:
+- `https://geo.fwber.me/nearby?...` → JSON response
 
-### Reverb
-Confirmed:
-- `fwber-reverb.service` active
-- listening on `127.0.0.1:8080`
-- websocket handshake through nginx succeeded with:
-  - `101 Switching Protocols`
-  - `X-Powered-By: Laravel Reverb`
+#### Websocket
+Public websocket handshake succeeded via `ws.fwber.me` using the live Reverb app key.
 
-### Geo
-Confirmed:
-- `fwber-geo.service` active
-- listening on `127.0.0.1:8081`
-- local nearby query returns valid JSON
+### 4. Real deploy-script issue discovered and fixed
+After cutover, I ran the deploy path via the `deploy` user and found:
+- build/install/migrate/optimize/deploy-verify all succeeded
+- but the script failed at service restart because `systemctl` required elevated privileges
+
+Fix implemented in repo:
+- `ops/hetzner/scripts/deploy-backend.sh` now auto-detects non-root execution and prefixes systemd/nginx actions with `sudo` when needed
+
+This was the correct fix because real operators often run deploys as a deploy account rather than root.
 
 ---
 
-## Important Findings
+## Validation
 
-### 1. DreamHost MySQL was not a good long-term dependency for Hetzner runtime
-The public DreamHost MySQL hostname was not a good target for the Hetzner-hosted backend path.
+### Public validation
+Confirmed:
+- `https://api.fwber.me/api/health` → healthy
+- `https://geo.fwber.me/nearby?...` → valid JSON
+- websocket handshake to `ws.fwber.me` → `101 Switching Protocols`
 
-Conclusion:
-- migrating fwber DB state locally onto Hetzner was the correct simplification move
+### Hetzner local validation
+Confirmed:
+- MySQL healthy
+- Redis healthy
+- queue active
+- Reverb active
+- geo active
+- `php artisan deploy:verify --json` healthy
 
-### 2. `ws.fwber.me` is effectively ready on Hetzner
-Evidence now shows:
-- nginx working
-- TLS present for `ws.fwber.me`
-- Reverb listening locally
-- websocket handshake successful through nginx using the production-style app key
-
-### 3. Remaining blockers are now mostly public DNS/TLS cutover tasks
-The core fwber backend runtime is deployed on Hetzner.
-
-What still remains externally:
-- `api.fwber.me` DNS must point to Hetzner
-- `geo.fwber.me` DNS must point to Hetzner
-- `api.fwber.me` and `geo.fwber.me` TLS certs must be issued/validated on Hetzner after DNS cutover
-- DreamHost fwber backend can then be retired
+### Deploy-script validation
+Executed:
+- deploy flow as `deploy`
+- discovered privilege failure at `systemctl`
+- patched script to use `sudo` when non-root
 
 ---
 
 ## Files Changed This Session
 
-### Live infrastructure (not committed to repo)
-- Hetzner runtime environment on `5.161.250.43`
-- local MySQL provision + imported production data
-- systemd units installed/enabled
-- repo cloned to `/var/www/fwber/repo`
-
-### Repo docs / release tracking
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
+### Repo files
+- `ops/hetzner/scripts/deploy-backend.sh`
 - `CHANGELOG.md`
+- `DEPLOY.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
 - `ROADMAP.md`
 - `MEMORY.md`
 - `HANDOFF.md`
 - `IDEAS.md`
-- `DEPLOY.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `docs/ai/deployment/hetzner-vercel-production.md`
 - `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
-- `docs/ai/deployment/hetzner-cutover-execution-status.md`
+- version files
 
----
-
-## Validation
-
-### Static / repo-side
-- updated docs and release metadata to reflect the real infrastructure state
-
-### Live / Hetzner-side
-Validated:
-- repo present on Hetzner
-- dependencies installed
-- geo built successfully
-- local MySQL provisioned
-- DreamHost DB imported
-- Redis active
-- queue active
-- Reverb active
-- geo active
-- websocket handshake successful
-- `php artisan deploy:verify --json` healthy
+### Live infrastructure state
+- Hetzner nginx now serves:
+  - `api.fwber.me`
+  - `geo.fwber.me`
+  - `ws.fwber.me`
+- Let's Encrypt certs issued on Hetzner for:
+  - `api.fwber.me`
+  - `geo.fwber.me`
+- fwber backend now publicly reachable from Hetzner
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.5.4`
-- **Recommended Commit Message:** `feat: execute hetzner backend deployment and migrate fwber database (v1.5.4)`
+- **Target Version:** `1.5.5`
+- **Recommended Commit Message:** `fix: harden deploy script for non-root hetzner execution (v1.5.5)`
 
 ---
 
 ## Current Best Next Steps
-1. **Repoint public DNS for `api.fwber.me` to Hetzner**
-2. **Repoint public DNS for `geo.fwber.me` to Hetzner**
-3. **Issue or confirm TLS certs for `api.fwber.me` and `geo.fwber.me` on Hetzner**
-4. **Run the full smoke-enabled deploy path after DNS cutover**
-   - `FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh`
-5. **Verify Vercel frontend → Hetzner API path end to end**
-6. **Retire DreamHost fwber backend once cutover is stable**
+1. **Re-run the full smoke-enabled deploy path after pulling v1.5.5 on Hetzner**
+   - now that the deploy script handles non-root service actions better
+2. **Verify Vercel frontend → Hetzner API behavior end to end**
+3. **Run live Stripe verification**
+   - premium purchase
+   - merchant purchase
+   - webhook handling
+4. **Set `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` if chat/webhook deploy notifications are wanted**
+5. **Retire the old DreamHost fwber backend path**
+   - after confidence is high that Hetzner public cutover is stable
 
-The repo is no longer only deployment-prepared. The fwber backend now actually exists and runs on Hetzner with local MySQL, local Redis, Reverb, queue, and geo services active.
+The fwber backend migration is now substantially complete: the app is publicly served from Hetzner, geo is publicly served from Hetzner, websockets work on Hetzner, and the remaining work is post-cutover validation/polish rather than fundamental infrastructure bring-up.

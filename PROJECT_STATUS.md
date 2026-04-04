@@ -1,48 +1,35 @@
-# PROJECT_STATUS.md - fwber v1.5.4 (Hetzner Backend Execution & Database Migration)
+# PROJECT_STATUS.md - fwber v1.5.5 (Deploy Script Privilege Hardening)
 
 **Date:** 2026-04-04
-**Version:** 1.5.4 "Hetzner Backend Execution & Database Migration"
-**Status:** ✅ **HETZNER BACKEND DEPLOYED; PUBLIC API/GEO DNS CUTOVER STILL PENDING**
+**Version:** 1.5.5 "Deploy Script Privilege Hardening"
+**Status:** ✅ **DEPLOY SCRIPT HARDENED AFTER LIVE HETZNER EXECUTION**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release marks the first real live-server deployment execution wave for the Hetzner backend stack.
+This release fixes a real live-deploy edge case discovered during Hetzner execution.
 
-Delivered on `5.161.250.43`:
-- cloned repo to `/var/www/fwber/repo`
-- installed missing PHP/Rust deployment dependencies
-- upgraded Rust toolchain so `fwber-geo` can build with `edition2024`
-- built `fwber-geo` release successfully
-- provisioned local Hetzner MySQL for fwber
-- imported the DreamHost fwber production database into Hetzner MySQL
-- switched Hetzner backend runtime to local MySQL + local Redis
-- enabled and started `fwber-queue`, `fwber-reverb`, and `fwber-geo`
-- verified local backend health, geo responses, Redis availability, and websocket handshake success
+Delivered:
+- deploy script now handles non-root execution more safely
+- service restarts and nginx reload now automatically use `sudo` when needed
 
-## 🚀 Verified Hetzner Runtime State
-Confirmed on Hetzner:
-- `php artisan deploy:verify --json` → **healthy**
-- Redis → active
-- `fwber-queue` → active
-- `fwber-reverb` → active
-- `fwber-geo` → active
-- websocket upgrade through nginx → **`101 Switching Protocols`**
-- geo nearby endpoint locally → valid JSON response
+## 🚀 Operations Improvements
+Updated:
+- `ops/hetzner/scripts/deploy-backend.sh`
 
-## ⚠️ Remaining External Cutover Work
-Still pending outside the repo/runtime itself:
-- repoint `api.fwber.me` to Hetzner
-- repoint `geo.fwber.me` to Hetzner
-- issue or confirm TLS certs for `api.fwber.me` and `geo.fwber.me` on Hetzner after DNS cutover
-- update any remaining external panel/DNS records so the new topology is actually public
+Behavior now:
+- if run as `root`, it behaves normally
+- if run as a non-root operator like `deploy`, it automatically prefixes service restart/reload calls with `sudo`
 
 ## ✅ Why This Matters
-The fwber backend is no longer only “planned” for Hetzner — the runtime now actually exists there with:
-- local DB
-- local Redis
-- local queueing
-- local Reverb
-- local geo service
+During the live Hetzner deployment, the deploy script successfully completed:
+- git pull
+- composer install
+- migrations
+- optimize
+- deploy verification
+- geo build
 
-That significantly reduces the remaining migration work to public DNS/TLS cutover rather than core application deployment.
+but then failed at the service-restart stage because the `deploy` user did not have direct permission to run `systemctl` without elevation.
+
+This release removes that friction and makes the script more realistic for normal operator usage.
