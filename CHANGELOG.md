@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.6] - 2026-04-04 — Deployment Health & Verification Surface
+
+### Added
+- Activated a public backend health surface at `/api/health`, `/api/health/liveness`, `/api/health/readiness`, and `/api/health/metrics`, giving deployment tooling and operators a stable way to verify the restored stack after Hetzner cutover.
+- Added `HealthStatusService` so HTTP health endpoints and command-line deployment verification share the same dependency checks instead of drifting apart over time.
+- Added `php artisan deploy:verify` with optional `--json` output to make server-side validation faster during bootstrap, redeploys, and incident triage.
+- Added backend regression coverage in `tests/Feature/HealthEndpointsTest.php` for the new health routes.
+
+### Changed
+- Refactored `HealthController` to use centralized health evaluation, report the active app version, and only treat Redis as critical when the active configuration actually depends on Redis-backed services.
+- Updated Hetzner/Vercel deployment docs so the redeploy and validation sequence explicitly includes `php artisan deploy:verify` and the new `/api/health*` endpoints.
+
 ## [1.0.74] - 2026-04-02 — ActivityPub Signed Outbound Delivery
 
 ### Fixed

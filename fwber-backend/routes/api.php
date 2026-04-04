@@ -30,6 +30,10 @@ if (! app()->isProduction()) {
 
 // Lightweight analytics ingestion is intentionally public/optional-auth so page-view
 // tracking from the web shell can succeed before login and without generating 404 noise.
+Route::get('health', [\App\Http\Controllers\HealthController::class, 'check']);
+Route::get('health/liveness', [\App\Http\Controllers\HealthController::class, 'liveness']);
+Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, 'readiness']);
+Route::get('health/metrics', [\App\Http\Controllers\HealthController::class, 'metrics']);
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic']);
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);

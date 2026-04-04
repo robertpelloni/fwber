@@ -169,6 +169,7 @@ composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear
 php artisan optimize
+php artisan deploy:verify
 
 cd ../fwber-geo
 cargo build --release
@@ -236,15 +237,17 @@ Ready-to-copy infrastructure templates also live in:
 Always verify the following after a major version bump or infrastructure move:
 
 1. [ ] Frontend Vercel deploy is green
-2. [ ] `https://api.fwber.me/api/auth/login` returns expected validation/auth behavior
-3. [ ] `/roast` works against the live API
-4. [ ] `/premium` upgrade initiation works
-5. [ ] `/merchant/register` and `/merchant/dashboard` work
-6. [ ] `wss://ws.fwber.me` accepts websocket traffic
-7. [ ] `https://geo.fwber.me` responds successfully
-8. [ ] queue workers are processing jobs
-9. [ ] scheduler is firing recurring tasks
-10. [ ] migrations complete without duplicate-index or missing-column drift failures
+2. [ ] `php artisan deploy:verify` returns healthy or only expected non-critical degradations
+3. [ ] `https://api.fwber.me/api/health` reports expected version and service state
+4. [ ] `https://api.fwber.me/api/auth/login` returns expected validation/auth behavior
+5. [ ] `/roast` works against the live API
+6. [ ] `/premium` upgrade initiation works
+7. [ ] `/merchant/register` and `/merchant/dashboard` work
+8. [ ] `wss://ws.fwber.me` accepts websocket traffic
+9. [ ] `https://geo.fwber.me` responds successfully
+10. [ ] queue workers are processing jobs
+11. [ ] scheduler is firing recurring tasks
+12. [ ] migrations complete without duplicate-index or missing-column drift failures
 
 ---
 

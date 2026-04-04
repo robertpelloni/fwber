@@ -1,39 +1,57 @@
-# PROJECT_STATUS.md - fwber v1.4.5 (Merchant Review Prioritization)
+# PROJECT_STATUS.md - fwber v1.4.6 (Deployment Health & Verification Surface)
 
 **Date:** 2026-04-04
-**Version:** 1.4.5 "Merchant Review Prioritization"
+**Version:** 1.4.6 "Deployment Health & Verification Surface"
 **Status:** ✅ **VERIFIED, COMMITTED, AND READY FOR HETZNER CUTOVER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extends the restored merchant moderation system with practical review-ops improvements so moderators can process storefronts more effectively.
+This release focused on the remaining pre-cutover gap: making deployment validation fast, repeatable, and machine-checkable.
 
 Delivered:
-- merchant moderation queue priority scoring and priority tiers
-- merchant moderation queue search across business name, category, location, and address
-- merchant moderation dashboard improvements for faster review triage
-- inline verification-note editing workflow in the moderation UI
+- public backend health endpoints for ops and load balancers
+- centralized dependency health evaluation shared by HTTP and CLI flows
+- a deploy verification Artisan command for bootstrap/redeploy validation
+- deployment-doc updates so the live rollout process references the real health contract
 
-## 🏪 Backend Improvements
-- `MerchantModerationController` now computes `priority_score` and `priority_tier`
-- merchant moderation queue supports `search` filtering
-- queue results are sorted by priority score instead of only raw recency
+## 🏥 Backend Improvements
+- added `fwber-backend/app/Services/HealthStatusService.php`
+  - centralizes health checks for database, Redis, cache, storage, queue, and broadcast configuration
+  - marks Redis as critical only when the active runtime configuration actually depends on it
+- updated `fwber-backend/app/Http/Controllers/HealthController.php`
+  - now reports app version from active config
+  - now reuses the centralized health builder instead of ad-hoc checks
+- activated public API health routes in `fwber-backend/routes/api.php`
+  - `GET /api/health`
+  - `GET /api/health/liveness`
+  - `GET /api/health/readiness`
+  - `GET /api/health/metrics`
+- added `fwber-backend/app/Console/Commands/DeployVerifyCommand.php`
+  - `php artisan deploy:verify`
+  - `php artisan deploy:verify --json`
 
-## 🌐 Frontend Improvements
-- moderation dashboard merchant tab now includes:
-  - search box
-  - priority badge
-  - verification notes display
-  - inline note editing behavior
-- moderation hooks and API clients now support queue search
+## 📋 Deployment & Operations Improvements
+Updated deployment documentation now explicitly includes:
+- `php artisan deploy:verify` in the redeploy sequence
+- `/api/health*` checks in the post-cutover validation checklist
+- healthier alignment between in-repo ops templates and runtime verification steps
+
+Key docs updated:
+- `DEPLOY.md`
+- `docs/ai/deployment/hetzner-vercel-production.md`
+- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
 
 ## ✅ Validation
 - Backend tests passed:
-  - `php artisan test tests/Feature/MerchantTrustModerationTest.php tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
-  - Result: **31 passed**
-- Frontend production build passed:
-  - `npm run build --prefix fwber-frontend`
+  - `php artisan test tests/Feature/HealthEndpointsTest.php tests/Feature/MerchantTrustModerationTest.php tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+  - Result: **34 passed**
+- CLI deployment verification passed locally:
+  - `php artisan deploy:verify --json`
+  - Result: **healthy** with only expected non-critical Redis degradation in the local environment
 
 ## ✅ Why This Matters
-Merchant review is no longer just technically present; it is now operationally usable. Moderators can triage likely-high-value or urgent storefronts first and quickly locate merchants in the queue.
+The project is now much closer to frictionless Hetzner cutover. Instead of relying on a loose manual checklist, operators have:
+- a stable health endpoint contract for Nginx/load balancers/uptime monitors
+- a single CLI command for post-deploy sanity checking
+- a shared source of truth for what "healthy" means in the restored fwber stack
