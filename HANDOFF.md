@@ -1,155 +1,212 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.4.2
+> **Version Reached:** 1.4.3
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued autonomous post-restoration hardening work after the merchant restore and deployment docs refresh.
+This session continued the autonomous post-restoration sequence and shipped the next missing follow-up after the merchant restore and Hetzner ops prep:
 
-Two already-pushed releases were in place at the start of this handoff chain:
-- **v1.4.0 — Marketplace & Merchant Restoration**
-- **v1.4.1 — Hetzner Deployment Docs Refresh**
+- **v1.4.3 — Geo-Aware Merchant Ranking**
 
-I then completed and pushed:
-- **v1.4.2 — Hetzner Ops Templates & CI Env Alignment**
+This closes the biggest product-side gap that remained in the restored merchant stack. Merchant commerce had already been restored structurally, but nearby discovery and AR still relied on fake relative positioning. That is no longer true.
 
-This latest release is infrastructure-focused. It does not change core runtime features, but it materially improves deployability by adding copy-ready ops assets and removing frontend env/config drift that could have caused avoidable deployment mistakes on the new Hetzner stack.
+The merchant system now supports:
+- persisted storefront coordinates
+- location-name labeling
+- automatic merchant-location inheritance from the user profile when omitted
+- distance-ranked nearby storefront responses
+- AR overlays using real merchant coordinates returned by the backend
 
 ---
 
-## v1.4.2 — What changed
+## What changed in v1.4.3
 
-### 1. Added concrete Hetzner operations assets
-Created a new operational asset tree:
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/nginx/api.fwber.me.conf`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/nginx/ws.fwber.me.conf`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/nginx/geo.fwber.me.conf`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/systemd/fwber-queue.service`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/systemd/fwber-reverb.service`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/systemd/fwber-geo.service`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/scripts/bootstrap-ubuntu.sh`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/scripts/deploy-backend.sh`
+### 1. Merchant profiles now own real storefront location data
+**Files:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantProfile.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_040000_restore_merchant_marketplace_tables.php`
+
+Added merchant profile fields:
+- `location_name`
+- `latitude`
+- `longitude`
+
+Also added model casts for latitude/longitude.
 
 Why this matters:
-- deployment docs are helpful, but actual provisioning is much faster and less error-prone when the repo contains copy-ready templates
-- these files turn the architecture guidance into executable operator assets
+- the merchant layer previously had no real owned geospatial identity
+- without this, “nearby marketplace” and AR overlays could not be meaningfully ranked
 
-#### Nginx templates
-Added dedicated vhost configs for:
-- API
-- websocket proxy
-- geo proxy
+---
 
-#### systemd units
-Added managed long-running service definitions for:
-- queue worker
-- Reverb
-- Rust geo service
+### 2. Merchant onboarding/update now supports location defaults and explicit geo input
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantController.php`
 
-#### shell scripts
+Key improvements:
+- registration now validates optional `location_name`, `latitude`, and `longitude`
+- profile updates also support those fields
+- if merchant coordinates are omitted during registration, the system now safely inherits defaults from the user’s existing `UserProfile`
+  - normal location when not in travel mode
+  - travel coordinates when travel mode is active
+
+Why this matters:
+- merchants should not be forced to re-enter a location if they already have an accurate user profile location
+- fallback inheritance is the safest phased-restoration behavior
+
+---
+
+### 3. Nearby marketplace endpoint now performs real distance sorting
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantInventoryController.php`
+
+Major change:
+- `GET /api/marketplace/nearby` now accepts:
+  - `lat`
+  - `lng`
+  - `radius`
+  - `limit`
+- when coordinates are supplied, the endpoint:
+  - computes Haversine distance in meters
+  - filters to the requested radius
+  - sorts by nearest merchant distance
+  - returns `distance_m`, `lat`, and `lng` alongside each item
+
+This moved nearby discovery from:
+- “latest available items with no real geo ordering”
+
+to:
+- “actual distance-ranked merchant inventory”
+
+That is a real functional improvement, not cosmetic polish.
+
+---
+
+### 4. Merchant registration UI now captures storefront coordinates
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/register/page.tsx`
+
 Added:
-- a base Ubuntu bootstrap script for a fresh Hetzner host
-- a backend deployment script that updates code, runs migrations, rebuilds geo, and restarts services
-
----
-
-### 2. Fixed frontend CI env drift
-**File:**
-- `C:/Users/hyper/workspace/fwber/.github/workflows/frontend-build.yml`
-
-Problem:
-- CI still used `NEXT_PUBLIC_API_URL=https://api.fwber.me/api`
-- CI also used old websocket variable names instead of the currently active Reverb env contract
-
-Fix:
-- changed to:
-  - `NEXT_PUBLIC_API_URL=https://api.fwber.me`
-  - `NEXT_PUBLIC_REVERB_HOST=ws.fwber.me`
-  - `NEXT_PUBLIC_REVERB_PORT=443`
-  - `NEXT_PUBLIC_REVERB_SCHEME=https`
+- `location_name`
+- `latitude`
+- `longitude`
+- “Use current location” button via browser geolocation
 
 Why this matters:
-- the frontend build workflow should reflect the actual production contract
-- leaving `/api` in the env base URL is explicitly against the current client expectations and can lead to subtle path duplication mistakes
+- UI completeness requirement: backend geo fields should be represented explicitly in the frontend
+- merchants now have a clear way to participate in nearby discovery intentionally
 
 ---
 
-### 3. Fixed frontend production env example drift
+### 5. Merchant profile UI now edits geo-aware storefront location
 **File:**
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/.env.production.example`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/profile/page.tsx`
 
-Problem:
-- it still used:
-  - `NEXT_PUBLIC_API_URL=https://api.fwber.me/api`
-  - old Mercure-oriented realtime guidance
+Added:
+- editable location label
+- editable coordinates
+- geolocation autofill button
+- messaging that this location powers nearby marketplace ranking and AR overlays
 
-Fix:
-- removed `/api` suffix
-- replaced Mercure-era guidance with active Reverb vars:
-  - `NEXT_PUBLIC_REVERB_HOST`
-  - `NEXT_PUBLIC_REVERB_PORT`
-  - `NEXT_PUBLIC_REVERB_SCHEME`
-
-Why this matters:
-- `.env.production.example` is often the first thing an operator copies from
-- stale env examples are a classic source of production misconfiguration
+This is important because merchant geo should not be a write-once hidden setup step.
 
 ---
 
-### 4. Updated deployment docs to point at the new ops assets
-**Files updated:**
-- `C:/Users/hyper/workspace/fwber/DEPLOY.md`
-- `C:/Users/hyper/workspace/fwber/docs/ai/deployment/hetzner-vercel-production.md`
+### 6. Merchant dashboard and storefront now show merchant location context
+**Files:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/dashboard/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/marketplace/[merchantId]/page.tsx`
 
-Added explicit references to:
-- `ops/hetzner/nginx/`
-- `ops/hetzner/systemd/`
-- `ops/hetzner/scripts/`
+Added visible display of:
+- merchant location label/address
+- coordinates when available
 
-This connects the high-level architecture docs to the actual files needed to execute them.
+This gives users and merchants real feedback that geo-aware discovery is actually configured.
+
+---
+
+### 7. AR inventory overlays now use real merchant coordinates
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/ar/InventoryARView.tsx`
+
+Before:
+- used fake relative offsets from the viewer position
+
+Now:
+- calls `marketplaceApi.getNearby({ lat, lng, radius, limit })`
+- filters for items with actual coordinates
+- positions overlays using real merchant latitude/longitude
+- shows merchant name in the AR overlay card
+- shows a graceful empty state when no nearby storefronts exist
+
+This is a major correction of the earlier temporary fallback.
+
+---
+
+### 8. Frontend merchant/marketplace API contracts updated
+**Files:**
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/merchant.ts`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/marketplace.ts`
+
+Updated to support:
+- merchant location fields
+- nearby inventory response fields (`distance_m`, `lat`, `lng`)
+- query params for nearby requests
+
+---
+
+### 9. Expanded tests to cover geo-aware merchant behavior
+**File:**
+- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/MerchantRestoreTest.php`
+
+Added coverage for:
+- merchant registration inheriting location from user profile
+- nearby marketplace endpoint sorting by distance when caller coordinates are supplied
+- previous merchant purchase/redeem analytics flow still working
+
+This meaningfully increased confidence that the merchant stack is not regressing as it becomes more realistic.
 
 ---
 
 ## Validation performed
-### Script syntax validation
+### Backend
 Executed:
-- `bash -n C:/Users/hyper/workspace/fwber/ops/hetzner/scripts/bootstrap-ubuntu.sh`
-- `bash -n C:/Users/hyper/workspace/fwber/ops/hetzner/scripts/deploy-backend.sh`
+- `cd C:/Users/hyper/workspace/fwber/fwber-backend && php artisan test tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
 
 Result:
-- passed syntax validation
+- **29 passed**
 
-### Frontend build validation
+### Frontend
 Executed:
 - `npm run build --prefix fwber-frontend`
 
 Result:
 - build passed successfully
-- route map still includes restored merchant and premium surfaces
+- merchant pages, marketplace page, and AR-related code remain production-build safe
 
 No processes were manually killed.
 
 ---
 
-## Files changed in v1.4.2
-### New ops assets
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/nginx/api.fwber.me.conf`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/nginx/ws.fwber.me.conf`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/nginx/geo.fwber.me.conf`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/systemd/fwber-queue.service`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/systemd/fwber-reverb.service`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/systemd/fwber-geo.service`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/scripts/bootstrap-ubuntu.sh`
-- `C:/Users/hyper/workspace/fwber/ops/hetzner/scripts/deploy-backend.sh`
+## Files changed in v1.4.3
+### Backend
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Models/MerchantProfile.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantController.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/app/Http/Controllers/MerchantInventoryController.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/database/migrations/2026_04_04_040000_restore_merchant_marketplace_tables.php`
+- `C:/Users/hyper/workspace/fwber/fwber-backend/tests/Feature/MerchantRestoreTest.php`
 
-### Config/doc alignment
-- `C:/Users/hyper/workspace/fwber/.github/workflows/frontend-build.yml`
-- `C:/Users/hyper/workspace/fwber/fwber-frontend/.env.production.example`
-- `C:/Users/hyper/workspace/fwber/DEPLOY.md`
-- `C:/Users/hyper/workspace/fwber/docs/ai/deployment/hetzner-vercel-production.md`
+### Frontend
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/merchant.ts`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/lib/api/marketplace.ts`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/register/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/profile/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/merchant/dashboard/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/app/marketplace/[merchantId]/page.tsx`
+- `C:/Users/hyper/workspace/fwber/fwber-frontend/components/ar/InventoryARView.tsx`
 
-### Versioning / docs sync
+### Release tracking / docs sync
 - `C:/Users/hyper/workspace/fwber/VERSION`
 - `C:/Users/hyper/workspace/fwber/VERSION.md`
 - `C:/Users/hyper/workspace/fwber/fwber-backend/VERSION`
@@ -166,34 +223,30 @@ No processes were manually killed.
 
 ## Important findings
 
-### 1. Ops templates are the missing bridge between docs and execution
-After the docs refresh, the next real bottleneck was lack of actual ready-to-copy service and Nginx definitions. That gap is now closed.
+### 1. Merchant discovery is now meaningfully restored, not just nominally restored
+The earlier merchant restore gave us storefronts and purchases, but nearby discovery remained a placeholder. This release closes that realism gap.
 
-### 2. Frontend env drift was a real deployment risk
-The CI workflow and `.env.production.example` had diverged from the active runtime contract. This could have caused incorrect path handling or websocket misconfiguration at deployment time.
+### 2. User-profile inheritance is the right merchant-location default
+This avoids needless friction while still allowing merchants to override storefront coordinates intentionally.
 
-### 3. The repo is now materially more ready for the Hetzner cutover
-There is still no live Hetzner environment configured from inside this session, but the repo now contains the exact assets needed for fast execution when the server is ready.
+### 3. AR behavior is now much closer to production usefulness
+Instead of pretending every item is nearby, the AR layer now consumes actual nearby inventory coordinates from the backend.
 
 ---
 
 ## Recommended next steps
-1. **Execute Hetzner provisioning**
-   - apply `ops/hetzner/scripts/bootstrap-ubuntu.sh`
-   - clone repo
-   - configure `.env`
-   - install Nginx + systemd assets
-2. **Deploy active backend stack**
-   - use `ops/hetzner/scripts/deploy-backend.sh`
-3. **Run live validation**
+1. **Execute Hetzner deployment**
+   - use the already-added `ops/hetzner/` assets
+2. **Run live validation on the new stack**
    - auth
    - roast
    - premium purchase flow
-   - merchant registration and storefront purchase
+   - merchant registration
+   - nearby marketplace response with real coordinates
+   - storefront purchase and redemption
    - websocket connectivity
-   - geo endpoint
-4. **Next code-side enhancement after deployment**
-   - real merchant location persistence for true nearby storefront ranking and better AR overlays
+3. **Next product-side enhancement after deployment**
+   - merchant verification / trust scoring layer
 
 ---
 
@@ -201,11 +254,12 @@ There is still no live Hetzner environment configured from inside this session, 
 ### Already pushed before this handoff section
 - `6684e6621` — `feat: restore merchant marketplace surfaces and digital receipts (v1.4.0)`
 - `11250c5ec` — `chore: align deployment docs with hetzner and vercel production topology (v1.4.1)`
+- `59f132e38` — `chore: add hetzner ops templates and fix frontend deployment env drift (v1.4.2)`
 
-### Pushed in this continuation
-- **v1.4.2** commit should now be created and pushed next from the current working tree if not already done at the time another agent reads this handoff.
+### Current working release
+- **v1.4.3** should be committed and pushed next if another agent picks up before git is finalized.
 
 ### Recommended commit message
-- `chore: add hetzner ops templates and fix frontend deployment env drift (v1.4.2)`
+- `feat: add geo-aware merchant ranking and real storefront coordinates (v1.4.3)`
 
-The codebase is now restored across the requested feature surfaces and significantly better prepared for the Hetzner/Vercel production cutover.
+The active repo now has restored AI, premium, and merchant surfaces, Hetzner-ready ops assets, and a merchant discovery layer that is spatially meaningful enough for real-world use.

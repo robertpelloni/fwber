@@ -9,6 +9,9 @@ export interface MerchantProfile {
   category: string
   description: string | null
   address: string | null
+  location_name: string | null
+  latitude: number | null
+  longitude: number | null
   verification_status: MerchantVerificationStatus
   created_at: string
   updated_at: string
@@ -82,6 +85,9 @@ export interface MerchantRegistrationData {
   category: string
   description?: string
   address?: string
+  location_name?: string
+  latitude?: number | null
+  longitude?: number | null
 }
 
 export interface CreateInventoryData {

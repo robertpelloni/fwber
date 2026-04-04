@@ -20,7 +20,15 @@ class MerchantProfile extends Model
         'description',
         'category',
         'address',
+        'location_name',
+        'latitude',
+        'longitude',
         'verification_status',
+    ];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function user()

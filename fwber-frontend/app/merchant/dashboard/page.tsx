@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { BarChart3, Package, Store, Ticket, DollarSign, ArrowRight } from 'lucide-react'
+import { BarChart3, Package, Store, Ticket, DollarSign, ArrowRight, MapPin } from 'lucide-react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import MerchantHeader from '@/components/MerchantHeader'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,10 +38,19 @@ export default function MerchantDashboardPage() {
                   <CardTitle className="text-3xl font-black">{data.profile.business_name}</CardTitle>
                   <CardDescription className="text-amber-50">{data.profile.description || 'Your local storefront control center.'}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-wrap gap-3 p-6">
-                  <Link href="/merchant/inventory"><Button><Package className="mr-2 h-4 w-4" />Manage inventory</Button></Link>
-                  <Link href="/merchant/profile"><Button variant="outline"><Store className="mr-2 h-4 w-4" />Edit profile</Button></Link>
-                  <Link href={data.storefront_path}><Button variant="outline">View storefront <ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+                <CardContent className="space-y-4 p-6">
+                  <div className="flex flex-wrap gap-3">
+                    <Link href="/merchant/inventory"><Button><Package className="mr-2 h-4 w-4" />Manage inventory</Button></Link>
+                    <Link href="/merchant/profile"><Button variant="outline"><Store className="mr-2 h-4 w-4" />Edit profile</Button></Link>
+                    <Link href={data.storefront_path}><Button variant="outline">View storefront <ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+                  </div>
+                  <div className="inline-flex flex-wrap items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-4 py-3 text-sm text-white/95">
+                    <MapPin className="h-4 w-4" />
+                    {data.profile.location_name || data.profile.address || 'No merchant location saved yet'}
+                    {data.profile.latitude != null && data.profile.longitude != null && (
+                      <span className="text-white/80">· {data.profile.latitude.toFixed(4)}, {data.profile.longitude.toFixed(4)}</span>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 

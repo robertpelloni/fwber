@@ -935,3 +935,13 @@ All notable changes to this project will be documented in this file.
 - Corrected `.github/workflows/frontend-build.yml` so CI now uses the real frontend runtime contract (`NEXT_PUBLIC_API_URL` without `/api`, and Reverb host/port/scheme vars).
 - Corrected `fwber-frontend/.env.production.example` to remove stale `/api` suffix usage and legacy Mercure-oriented realtime configuration.
 - Updated Hetzner deployment docs to point directly at the new operational templates.
+
+## [1.4.3] - 2026-04-04
+### Added
+- Added merchant storefront coordinate persistence (`location_name`, `latitude`, `longitude`) to the restored merchant profile model and migration path.
+- Added merchant onboarding/profile UI controls for geolocation capture and manual storefront coordinate editing.
+
+### Fixed
+- Reworked `/api/marketplace/nearby` so it can filter and sort by real merchant distance when caller coordinates are provided.
+- Updated AR inventory browsing to use actual merchant coordinates from the API instead of synthetic offsets.
+- Allowed merchant registration to inherit location defaults from the user profile when explicit merchant coordinates are not supplied.

@@ -6,6 +6,9 @@ export interface MerchantSummary {
   description?: string | null
   category?: string
   address?: string | null
+  location_name?: string | null
+  latitude?: number | null
+  longitude?: number | null
   verification_status?: string
 }
 
@@ -18,6 +21,10 @@ export interface InventoryItem {
   stock_count: number
   image_url?: string | null
   is_available: boolean
+  distance_m?: number | null
+  lat?: number | null
+  lng?: number | null
+  merchant?: MerchantSummary
 }
 
 export interface PurchaseResponse {
@@ -36,7 +43,7 @@ export interface PurchaseResponse {
 }
 
 export const marketplaceApi = {
-  getNearby: () => api.get<{ items: (InventoryItem & { merchant?: MerchantSummary })[] }>('/marketplace/nearby'),
+  getNearby: (params?: { lat?: number; lng?: number; radius?: number; limit?: number }) => api.get<{ items: (InventoryItem & { merchant?: MerchantSummary })[] }>('/marketplace/nearby', { params }),
 
   getInventory: (merchantId: string | number) =>
     api.get<{ merchant: MerchantSummary; items: InventoryItem[] }>(`/marketplace/${merchantId}`),

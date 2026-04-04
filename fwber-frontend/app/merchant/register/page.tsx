@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Store, Briefcase, MapPin, FileText } from 'lucide-react'
+import { Store, Briefcase, MapPin, FileText, LocateFixed } from 'lucide-react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import MerchantHeader from '@/components/MerchantHeader'
 import { Button } from '@/components/ui/button'
@@ -17,21 +17,55 @@ import { useAuth } from '@/lib/auth-context'
 export default function MerchantRegisterPage() {
   const router = useRouter()
   const { user, updateUser } = useAuth()
-  const { showError, showSuccess } = useToast()
+  const { showError, showSuccess, showInfo } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLocating, setIsLocating] = useState(false)
   const [form, setForm] = useState({
     business_name: user?.name ? `${user.name}'s Shop` : '',
     category: 'nightlife',
     description: '',
     address: '',
+    location_name: '',
+    latitude: '',
+    longitude: '',
   })
+
+  const useCurrentLocation = async () => {
+    if (!navigator.geolocation) {
+      showError('Location unavailable', 'This browser does not support geolocation for merchant discovery setup.')
+      return
+    }
+
+    setIsLocating(true)
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setForm((prev) => ({
+          ...prev,
+          latitude: position.coords.latitude.toFixed(6),
+          longitude: position.coords.longitude.toFixed(6),
+        }))
+        showInfo('Location captured', 'Latitude and longitude were filled from your device location.')
+        setIsLocating(false)
+      },
+      (error) => {
+        showError('Location failed', error.message || 'Unable to read your current location.')
+        setIsLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsSubmitting(true)
 
     try {
-      const response = await registerMerchant(form)
+      const response = await registerMerchant({
+        ...form,
+        latitude: form.latitude ? Number(form.latitude) : null,
+        longitude: form.longitude ? Number(form.longitude) : null,
+      })
       if (response.user) {
         updateUser(response.user)
       }
@@ -81,6 +115,38 @@ export default function MerchantRegisterPage() {
                 <div className="space-y-2">
                   <Label htmlFor="address" className="flex items-center gap-2"><MapPin className="h-4 w-4" />Address</Label>
                   <Input id="address" name="address" value={form.address} onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))} placeholder="123 Main St" />
+                </div>
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Nearby discovery location</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">This controls how your storefront appears in nearby marketplace and AR results.</p>
+                    </div>
+                    <Button type="button" variant="outline" onClick={useCurrentLocation} disabled={isLocating}>
+                      <LocateFixed className="mr-2 h-4 w-4" />
+                      {isLocating ? 'Locating…' : 'Use current location'}
+                    </Button>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2 md:col-span-3">
+                      <Label htmlFor="location_name">Location label</Label>
+                      <Input id="location_name" value={form.location_name} onChange={(e) => setForm((prev) => ({ ...prev, location_name: e.target.value }))} placeholder="Downtown Detroit" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="latitude">Latitude</Label>
+                      <Input id="latitude" value={form.latitude} onChange={(e) => setForm((prev) => ({ ...prev, latitude: e.target.value }))} placeholder="42.3314" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="longitude">Longitude</Label>
+                      <Input id="longitude" value={form.longitude} onChange={(e) => setForm((prev) => ({ ...prev, longitude: e.target.value }))} placeholder="-83.0458" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Why it matters</Label>
+                      <div className="rounded-md border border-dashed border-amber-300 px-3 py-2 text-sm text-gray-600 dark:border-amber-800 dark:text-gray-300">
+                        Nearby ranking uses this point to calculate real merchant distance.
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <Button type="submit" disabled={isSubmitting} className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white hover:from-amber-600 hover:to-orange-700">
                   {isSubmitting ? 'Creating merchant profile…' : 'Create merchant profile'}

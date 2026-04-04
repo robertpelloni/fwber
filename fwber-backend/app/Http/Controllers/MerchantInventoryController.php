@@ -9,6 +9,7 @@ use App\Models\MerchantProfile;
 use App\Services\Payment\PaymentGatewayInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -20,13 +21,24 @@ class MerchantInventoryController extends Controller
 
     public function nearby(Request $request): JsonResponse
     {
+        $lat = $request->query('lat');
+        $lng = $request->query('lng');
+        $radiusMeters = (float) $request->query('radius', 5000);
+        $limit = min((int) $request->query('limit', 24), 100);
+
         $items = MerchantInventory::query()
             ->with('merchant')
             ->where('is_available', true)
             ->where('stock_count', '>', 0)
+            ->whereHas('merchant', function ($query) {
+                $query->whereNotNull('latitude')->whereNotNull('longitude');
+            })
             ->latest()
-            ->limit(24)
             ->get();
+
+        $items = $this->sortAndFilterNearbyItems($items, $lat, $lng, $radiusMeters)
+            ->take($limit)
+            ->values();
 
         return response()->json([
             'items' => $items,
@@ -258,5 +270,64 @@ class MerchantInventoryController extends Controller
             'user_name' => $redemption->user?->name,
             'redeemed_at' => $redemption->redeemed_at,
         ]);
+    }
+
+    protected function sortAndFilterNearbyItems(Collection $items, mixed $lat, mixed $lng, float $radiusMeters): Collection
+    {
+        if (! is_numeric($lat) || ! is_numeric($lng)) {
+            return $items->map(function (MerchantInventory $item) {
+                $merchant = $item->merchant;
+
+                return [
+                    ...$item->toArray(),
+                    'merchant' => $merchant?->toArray(),
+                    'distance_m' => null,
+                    'lat' => $merchant?->latitude,
+                    'lng' => $merchant?->longitude,
+                ];
+            });
+        }
+
+        $latitude = (float) $lat;
+        $longitude = (float) $lng;
+
+        return $items
+            ->map(function (MerchantInventory $item) use ($latitude, $longitude) {
+                $merchant = $item->merchant;
+                $merchantLat = (float) $merchant->latitude;
+                $merchantLng = (float) $merchant->longitude;
+                $distance = $this->distanceMeters($latitude, $longitude, $merchantLat, $merchantLng);
+
+                return [
+                    ...$item->toArray(),
+                    'merchant' => $merchant?->toArray(),
+                    'distance_m' => round($distance, 1),
+                    'lat' => $merchantLat,
+                    'lng' => $merchantLng,
+                ];
+            })
+            ->filter(fn (array $item) => $item['distance_m'] <= $radiusMeters)
+            ->sortBy('distance_m')
+            ->values();
+    }
+
+    protected function distanceMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371000;
+
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lng1);
+        $latTo = deg2rad($lat2);
+        $lonTo = deg2rad($lng2);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(
+            pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)
+        ));
+
+        return $angle * $earthRadius;
     }
 }

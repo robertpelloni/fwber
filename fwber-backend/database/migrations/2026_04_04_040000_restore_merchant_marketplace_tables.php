@@ -23,8 +23,13 @@ return new class extends Migration
                 $table->text('description')->nullable();
                 $table->string('category')->index();
                 $table->string('address')->nullable();
+                $table->string('location_name')->nullable();
+                $table->decimal('latitude', 10, 8)->nullable();
+                $table->decimal('longitude', 11, 8)->nullable();
                 $table->string('verification_status')->default('pending');
                 $table->timestamps();
+
+                $table->index(['latitude', 'longitude'], 'merchant_profiles_lat_lng_index');
             });
         }
 

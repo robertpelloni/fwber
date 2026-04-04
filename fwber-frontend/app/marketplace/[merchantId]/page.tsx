@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Package, Store, MapPin, ReceiptText } from 'lucide-react'
+import { Package, Store, MapPin, ReceiptText, Navigation } from 'lucide-react'
 import AppHeader from '@/components/AppHeader'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { Button } from '@/components/ui/button'
@@ -56,7 +56,8 @@ export default function MarketplaceMerchantPage() {
                 <CardContent className="space-y-3 p-6">
                   <div className="flex flex-wrap gap-4 text-sm text-gray-700 dark:text-gray-300">
                     <div className="inline-flex items-center gap-2"><Package className="h-4 w-4 text-emerald-600" />{merchant.data.items.length} items available</div>
-                    {merchant.data.merchant.address && <div className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.address}</div>}
+                    {(merchant.data.merchant.location_name || merchant.data.merchant.address) && <div className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.location_name || merchant.data.merchant.address}</div>}
+                    {merchant.data.merchant.latitude != null && merchant.data.merchant.longitude != null && <div className="inline-flex items-center gap-2"><Navigation className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.latitude.toFixed(4)}, {merchant.data.merchant.longitude.toFixed(4)}</div>}
                   </div>
                 </CardContent>
               </Card>
