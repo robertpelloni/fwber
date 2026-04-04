@@ -1,59 +1,45 @@
-# PROJECT_STATUS.md - fwber v1.5.1 (DNS Resolution Appendix & Host Mapping)
+# PROJECT_STATUS.md - fwber v1.5.2 (Smoke Report Drift Diff)
 
 **Date:** 2026-04-04
-**Version:** 1.5.1 "DNS Resolution Appendix & Host Mapping"
-**Status:** ✅ **VERIFIED, COMMITTED, AND PROVIDING STRONGER DNS + ROUTING EVIDENCE**
+**Version:** 1.5.2 "Smoke Report Drift Diff"
+**Status:** ✅ **VERIFIED, COMMITTED, AND PRESERVING INTER-DEPLOY EVIDENCE BETTER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extended the smoke-check reports again by adding a DNS resolution appendix for the key public hosts.
+This release extended the deployment evidence system with cross-run comparison.
 
 Delivered:
-- DNS appendix in JSON and Markdown smoke reports
-- resolved-address capture for frontend, API, geo, and websocket hosts
-- stronger cross-checking between hostname resolution and actual HTTP responder fingerprints
+- a smoke-report diff tool
+- drift JSON and Markdown artifacts
+- deploy-script integration that compares the newest smoke report against the previous saved one when available
 
 ## 🚀 Operations Improvements
-### Extended `ops/hetzner/scripts/smoke-check.sh`
-Smoke reports now also preserve DNS resolution records for:
-- frontend host
-- API host
-- geo host
-- websocket host
+### Added `ops/hetzner/scripts/compare-smoke-reports.py`
+This script compares two `smoke-check-summary.json` files and generates:
+- `smoke-check-drift.json`
+- `smoke-check-drift.md`
 
-Each record includes:
-- label
-- host
-- resolver used
-- resolved addresses
-- notes
+It compares:
+- summary counters
+- overall status
+- diagnostics
+- endpoint fingerprint changes
+- DNS changes
 
-### Report output improvements
-- `smoke-check-summary.json` now includes `dns_records`
-- `smoke-check-summary.md` now includes a `DNS Resolution Appendix`
-
-## 🌐 Real Public Validation Findings (Now Including DNS)
-The latest live smoke-check run confirms:
-- `fwber.me` resolves to **`216.198.79.1|216.198.79.65`**
-- `api.fwber.me` resolves to **`75.119.202.57`**
-- `geo.fwber.me` resolves to **`216.198.79.65|64.29.17.1`**
-- `ws.fwber.me` resolves to **`69.163.180.228`**
-
-Combined with the endpoint fingerprints, this strengthens the current diagnosis:
-- API drift is tied to the Apache-served backend at `75.119.202.57`
-- geo drift is tied to host resolution and responder behavior that still points into the wrong hosting topology
+### Updated `ops/hetzner/scripts/deploy-backend.sh`
+When smoke checks are enabled and a previous smoke report exists, deploys now try to emit drift artifacts into the current report directory.
 
 ## ✅ Validation
-- `bash -n ops/hetzner/scripts/smoke-check.sh`
-- live smoke-check execution with report artifacts enabled
-- JSON `dns_records` inspection
-- Markdown `DNS Resolution Appendix` inspection
+- `bash -n ops/hetzner/scripts/deploy-backend.sh`
+- generated two smoke-check reports locally
+- compared them with `compare-smoke-reports.py`
+- validated both drift JSON and drift Markdown output
 
 ## ✅ Why This Matters
-The smoke-check system now captures:
-1. DNS resolution
-2. HTTP responder fingerprints
-3. remediation diagnostics
+The smoke-check system no longer treats each deploy as an isolated moment. Operators can now answer:
+- what changed since the last deploy?
+- did any diagnostics resolve?
+- did server fingerprints or DNS mappings drift?
 
-That is a significantly better deploy-debug package than raw health checks alone.
+That is a practical operational step toward safer Hetzner cutovers and redeploys.
