@@ -27,6 +27,10 @@ set -euo pipefail
 # When FWBER_REPORT_DIR is set, the script emits:
 #   smoke-check-summary.json
 #   smoke-check-summary.md
+#
+# The report now also includes remediation-oriented diagnostics for common
+# deployment drift signatures such as stale backend routes or a geo subdomain
+# still pointing at Vercel instead of the Hetzner-hosted geo service.
 
 API_URL="${FWBER_API_URL:-https://api.fwber.me/api}"
 FRONTEND_URL="${FWBER_FRONTEND_URL:-https://fwber.me}"
@@ -52,9 +56,10 @@ pass_count=0
 fail_count=0
 warn_count=0
 case_log_file="$(mktemp)"
+diagnostic_log_file="$(mktemp)"
 
 cleanup() {
-  rm -f "$case_log_file"
+  rm -f "$case_log_file" "$diagnostic_log_file"
 }
 
 trap cleanup EXIT
@@ -87,6 +92,15 @@ fail_case() {
   record_case 'fail' "$1" "$2"
 }
 
+add_diagnostic() {
+  local severity="$1"
+  local title="$2"
+  local finding="$3"
+  local remediation="$4"
+
+  printf '%s\t%s\t%s\t%s\n' "$severity" "$title" "$finding" "$remediation" >> "$diagnostic_log_file"
+}
+
 require_command() {
   local command_name="$1"
 
@@ -103,6 +117,13 @@ json_escape() {
   value=${value//$'\n'/\\n}
   value=${value//$'\r'/\\r}
   value=${value//$'\t'/\\t}
+  printf '%s' "$value"
+}
+
+markdown_escape() {
+  local value="$1"
+  value=${value//|/\\|}
+  value=${value//$'\n'/<br>}
   printf '%s' "$value"
 }
 
@@ -175,6 +196,23 @@ write_json_report() {
         "$(json_escape "$detail")"
     done < "$case_log_file"
 
+    printf '\n  ],\n'
+    printf '  "diagnostics": [\n'
+
+    local first_diagnostic=1
+    while IFS=$'\t' read -r severity title finding remediation; do
+      if [[ "$first_diagnostic" -eq 0 ]]; then
+        printf ',\n'
+      fi
+
+      first_diagnostic=0
+      printf '    {"severity":"%s","title":"%s","finding":"%s","remediation":"%s"}' \
+        "$(json_escape "$severity")" \
+        "$(json_escape "$title")" \
+        "$(json_escape "$finding")" \
+        "$(json_escape "$remediation")"
+    done < "$diagnostic_log_file"
+
     printf '\n  ]\n'
     printf '}\n'
   } > "$REPORT_JSON_PATH"
@@ -212,8 +250,28 @@ write_markdown_report() {
     printf -- '| --- | --- | --- |\n'
 
     while IFS=$'\t' read -r level label detail; do
-      printf -- '| %s | %s | %s |\n' "$level" "$label" "$detail"
+      printf -- '| %s | %s | %s |\n' \
+        "$(markdown_escape "$level")" \
+        "$(markdown_escape "$label")" \
+        "$(markdown_escape "$detail")"
     done < "$case_log_file"
+
+    printf -- '\n## Diagnostics & Recommended Actions\n\n'
+
+    if [[ ! -s "$diagnostic_log_file" ]]; then
+      printf -- '- No additional remediation diagnostics were generated for this run.\n'
+    else
+      local index=1
+      while IFS=$'\t' read -r severity title finding remediation; do
+        printf -- '### %s. %s (%s)\n\n' \
+          "$index" \
+          "$(markdown_escape "$title")" \
+          "$(markdown_escape "$severity")"
+        printf -- '- **Finding:** %s\n' "$(markdown_escape "$finding")"
+        printf -- '- **Recommended Action:** %s\n\n' "$(markdown_escape "$remediation")"
+        index=$((index + 1))
+      done < "$diagnostic_log_file"
+    fi
   } > "$REPORT_MD_PATH"
 
   info "Wrote Markdown smoke-check report to $REPORT_MD_PATH"
@@ -223,6 +281,55 @@ write_reports() {
   ensure_report_paths
   write_json_report
   write_markdown_report
+}
+
+build_diagnostics() {
+  if grep -Fq $'fail	API health endpoint	Returned HTTP 404' "$case_log_file" \
+    && grep -Fq $'fail	API liveness endpoint	Returned HTTP 404' "$case_log_file" \
+    && grep -Fq $'fail	API readiness endpoint	Returned HTTP 404' "$case_log_file"; then
+    add_diagnostic \
+      'critical' \
+      'Backend route drift on api.fwber.me' \
+      'All public health routes returned 404 even though other backend routes were reachable, which strongly suggests the live backend is serving an older code version or an unexpected route set.' \
+      'Redeploy the backend currently serving api.fwber.me from the latest main branch, then re-run php artisan deploy:verify and the smoke check. Also verify that Nginx is pointing at the intended fwber-backend/public directory and that route/config caches were rebuilt during deploy.'
+  fi
+
+  if grep -Fq $'fail	Geo nearby endpoint	' "$case_log_file" \
+    && grep -Fq 'deployment could not be found on Vercel' "$case_log_file"; then
+    add_diagnostic \
+      'critical' \
+      'Geo domain is still pointing at Vercel or a missing Vercel target' \
+      'The geo smoke probe hit a Vercel deployment-not-found response instead of a Hetzner-hosted geo microservice response.' \
+      'Update DNS and/or the reverse-proxy target for geo.fwber.me so it points at the Rust geo service on the Hetzner VPS, then confirm the Nginx geo virtual host proxies to 127.0.0.1:8081.'
+  fi
+
+  if grep -Fq $'warn	Premium authenticated smoke checks	Skipped because FWBER_USER_BEARER_TOKEN is not set.' "$case_log_file" \
+    || grep -Fq $'warn	Merchant authenticated smoke checks	Skipped because FWBER_MERCHANT_BEARER_TOKEN is not set.' "$case_log_file" \
+    || grep -Fq $'warn	Moderation authenticated smoke checks	Skipped because FWBER_MODERATOR_BEARER_TOKEN is not set.' "$case_log_file"; then
+    add_diagnostic \
+      'medium' \
+      'Authenticated smoke coverage is incomplete' \
+      'Some premium, merchant, or moderation smoke probes were skipped because smoke-test bearer tokens were not supplied.' \
+      'Provision production-safe smoke-test accounts and tokens for user, merchant, and moderator roles so the smoke script can verify privileged surfaces after deploys.'
+  fi
+
+  if grep -Fq $'warn	Websocket upgrade probe	Skipped because FWBER_REVERB_APP_KEY is not set.' "$case_log_file"; then
+    add_diagnostic \
+      'medium' \
+      'Realtime verification is not running at handshake depth' \
+      'The websocket smoke probe was skipped because the Reverb app key was not supplied to the script.' \
+      'Expose FWBER_REVERB_APP_KEY to the deployment smoke environment so the script can verify a real websocket upgrade instead of leaving realtime untested.'
+  fi
+
+  if grep -Fq $'pass	Invalid-login contract check	Returned HTTP 422.' "$case_log_file" \
+    && grep -Fq $'pass	Public roast preview check	Returned HTTP 200.' "$case_log_file" \
+    && (grep -Fq $'fail	API health endpoint	' "$case_log_file" || grep -Fq $'fail	Geo nearby endpoint	' "$case_log_file"); then
+    add_diagnostic \
+      'info' \
+      'Live deployment is partially healthy, not fully down' \
+      'Auth validation and public roast preview still responded correctly during the smoke run, which narrows the problem to specific deployment/routing drift instead of a total public outage.' \
+      'Focus remediation on backend rollout alignment and geo-domain routing before spending time on broad outage debugging.'
+  fi
 }
 
 check_local_artisan() {
@@ -405,6 +512,7 @@ main() {
   run_http_check 'Geo nearby endpoint' GET "$GEO_QUERY_URL" '200' '"users"'
   check_websocket_upgrade
   run_optional_authenticated_checks
+  build_diagnostics
 
   echo
   info "Smoke-check summary: passes=$pass_count warnings=$warn_count failures=$fail_count"

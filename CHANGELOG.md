@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.9] - 2026-04-04 — Smoke Check Diagnostics & Remediation Hints
+
+### Added
+- Extended `ops/hetzner/scripts/smoke-check.sh` to analyze smoke-run outcomes and emit structured remediation diagnostics in both JSON and Markdown report outputs.
+- Added AI DevKit implementation/testing notes for the diagnostics layer under `docs/ai/implementation/smoke-check-diagnostics-and-remediation.md` and `docs/ai/testing/smoke-check-diagnostics-and-remediation.md`.
+
+### Changed
+- Smoke-check reports now translate common failure patterns into concrete next steps, including stale backend route detection on `api.fwber.me`, geo-domain drift pointing at Vercel, incomplete authenticated smoke coverage, and “partial health” narrowing hints when only selected public surfaces fail.
+
+### Verified
+- Re-ran the smoke-check script against the currently reachable public domains and confirmed the new diagnostics correctly identified backend route drift on `/api/health*`, `geo.fwber.me` misrouting, incomplete authenticated coverage, and the fact that auth error handling + public roast preview remain healthy.
+
 ## [1.4.8] - 2026-04-04 — Smoke Check Report Artifacts & Live Drift Detection
 
 ### Added

@@ -1,63 +1,51 @@
-# PROJECT_STATUS.md - fwber v1.4.8 (Smoke Check Report Artifacts & Live Drift Detection)
+# PROJECT_STATUS.md - fwber v1.4.9 (Smoke Check Diagnostics & Remediation Hints)
 
 **Date:** 2026-04-04
-**Version:** 1.4.8 "Smoke Check Report Artifacts & Live Drift Detection"
-**Status:** ✅ **VERIFIED, COMMITTED, AND EVEN BETTER PREPARED FOR HETZNER CUTOVER**
+**Version:** 1.4.9 "Smoke Check Diagnostics & Remediation Hints"
+**Status:** ✅ **VERIFIED, COMMITTED, AND PRODUCING BETTER DEPLOY TRIAGE SIGNALS**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release upgraded the new smoke-check automation from a console-only tool into a reusable deployment evidence generator.
+This release upgraded the smoke-check reporting layer again by making it explain likely causes and recommended next actions, not just raw failures.
 
 Delivered:
-- JSON and Markdown smoke-check report artifacts
-- deploy-script support for timestamped report directories
-- real public smoke-check execution against the currently reachable fwber domains
-- concrete detection of live deployment drift affecting health endpoints and geo routing
+- structured deployment diagnostics inside smoke-check reports
+- remediation guidance for common deploy-drift signatures
+- another real public smoke-check run proving the diagnostics work against live fwber domain behavior
 
 ## 🚀 Operations Improvements
 ### Extended `ops/hetzner/scripts/smoke-check.sh`
-New capabilities:
-- `FWBER_REPORT_DIR` for automatic report generation
-- `FWBER_REPORT_JSON_PATH` for explicit JSON output path
-- `FWBER_REPORT_MD_PATH` for explicit Markdown output path
-- case-by-case result recording for passes, warnings, and failures
-- machine-readable run summaries suitable for release notes or future Slack/CI integrations
+Reports now include:
+- a `diagnostics` array in JSON output
+- a `Diagnostics & Recommended Actions` section in Markdown output
 
-Generated artifacts:
-- `smoke-check-summary.json`
-- `smoke-check-summary.md`
+Current heuristics cover:
+- backend route drift on `api.fwber.me`
+- geo domain misrouting / Vercel deployment drift
+- incomplete authenticated smoke coverage
+- partial-health narrowing hints when some public routes still work
 
-### Updated `ops/hetzner/scripts/deploy-backend.sh`
-When `FWBER_RUN_SMOKE_CHECK=1` is used, the deploy script now creates a timestamped report directory under:
-- `logs/deploy-reports/<timestamp>/`
-
-This can be overridden with:
-- `FWBER_DEPLOY_REPORT_DIR=/custom/path`
-
-## 🌐 Real Public Validation Findings
-I ran the smoke-check script against the currently reachable public deployment targets with report generation enabled.
-
-Observed results:
-- frontend reachability: **pass** (`307` redirect)
+## 🌐 Real Public Validation Findings (Still Current)
+The latest public smoke-check run continues to show:
+- frontend reachability: **pass** (`307`)
 - invalid-login contract: **pass** (`422`)
 - public roast preview: **pass** (`200`)
-- `/api/health`: **fail** (`404` route not found)
-- `/api/health/liveness`: **fail** (`404` route not found)
-- `/api/health/readiness`: **fail** (`404` route not found)
-- `geo.fwber.me/nearby`: **fail** (`404` Vercel deployment not found)
+- `/api/health*`: **fail** (`404` route not found)
+- `geo.fwber.me/nearby`: **fail** (Vercel deployment-not-found `404`)
 
-## ✅ Why This Matters
-This release did more than improve tooling; it surfaced the next concrete live-environment blockers:
-1. the pushed health routes are not yet reflected on the reachable `api.fwber.me` deployment
-2. the `geo.fwber.me` domain is not currently pointing at a working geo-service deployment
-
-That is exactly the kind of deployment drift the smoke-check/report layer was meant to expose quickly.
+The difference now is that the smoke-check reports explicitly translate those failures into recommended next steps.
 
 ## ✅ Validation
-- Shell syntax validation passed:
-  - `bash -n ops/hetzner/scripts/smoke-check.sh`
-  - `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- Smoke-check report generation validated end to end with:
-  - `FWBER_SKIP_LOCAL_ARTISAN=1 FWBER_SKIP_WEBSOCKET=1 FWBER_REPORT_DIR=<tmp> bash ops/hetzner/scripts/smoke-check.sh`
-- JSON and Markdown report files were successfully emitted and inspected
+- `bash -n ops/hetzner/scripts/smoke-check.sh`
+- `git diff --check`
+- live smoke-check execution with report artifacts enabled
+- generated reports inspected to confirm diagnostics were present and correct
+
+## ✅ Why This Matters
+This is a practical operator-experience improvement. During a real rollout, it is much more useful for the script to say:
+- the backend looks stale
+- the geo domain still points at Vercel
+- the deployment is partially healthy rather than broadly down
+
+than to leave an operator interpreting raw JSON/HTTP fragments under time pressure.
