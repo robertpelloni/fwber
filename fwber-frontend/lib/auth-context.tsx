@@ -78,6 +78,33 @@ function isTransientAuthResponse(status: number): boolean {
   return status >= 500 || status === 429
 }
 
+async function parseAuthResponse(response: Response): Promise<Record<string, any>> {
+  const contentType = response.headers.get('content-type') || ''
+
+  if (contentType.includes('application/json')) {
+    return await response.json()
+  }
+
+  const rawText = await response.text()
+
+  if (!rawText) {
+    return {}
+  }
+
+  try {
+    return JSON.parse(rawText)
+  } catch {
+    return {
+      message: rawText
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 400) || 'Unexpected server response',
+      raw: rawText.slice(0, 1000),
+    }
+  }
+}
+
 function restoreCachedAuth(
   userStr: string | null,
   token: string | null,
@@ -326,7 +353,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (!response.ok) {
             if (response.status === 403) {
-              const data = await response.json();
+              const data = await parseAuthResponse(response);
               if (data.code === 'GLOBAL_BAN') {
                   dispatch({ type: 'BANNED' });
                   return;
@@ -449,7 +476,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       clearTimeout(timeoutId);
 
-      const data = await response.json()
+      const data = await parseAuthResponse(response)
 
       if (!response.ok) {
         logAuth.login(email, false, data.message)
@@ -494,7 +521,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ wallet_address: walletAddress, signature, message }),
       })
 
-      const data = await response.json()
+      const data = await parseAuthResponse(response)
 
       if (!response.ok) {
         logAuth.login(walletAddress, false, data.message)
@@ -537,7 +564,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       })
 
-      const data = await response.json()
+      const data = await parseAuthResponse(response)
 
       if (!response.ok) {
         throw new Error(data.message || 'Two factor verification failed')
@@ -598,7 +625,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: body,
       })
 
-      const data = await response.json()
+      const data = await parseAuthResponse(response)
 
       if (!response.ok) {
         logAuth.register(email, false, data.message)

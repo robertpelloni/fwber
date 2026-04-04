@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.3.3 "Sentry Build Modernization"
+> **Current Version:** 1.3.4 "Console Error Sweep"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,8 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.3.3)
+### Phase 5: Production Scale (COMPLETED - v1.3.4)
+- **Console Error Sweep:** Removed stale archived-route prefetches, restored analytics event ingestion, repaired notification settings routing, and hardened auth response parsing against malformed server bodies.
 - **Sentry Build Modernization:** The Next.js App Router Sentry setup now uses modern `instrumentation.ts` and `instrumentation-client.ts` hooks, eliminating outdated warning noise from production builds.
 - **Notification Route Consistency:** Backend notification payloads, notification drawer links, foreground toast CTAs, and `/messages` routing now agree on shared destination logic.
 - **Conversation-Aware Message Notifications:** Message pushes now open the relevant conversation route (`/messages?user={id}`) instead of dropping users into a generic inbox.
@@ -57,4 +58,4 @@ The platform is now **100% focused on its core identity**:
 ## 🎯 Next Immediate Milestones
 1. **TestFlight Beta:** Have actual users test the TestFlight IPA compiled by the new GitHub Actions workflow.
 2. **App Store Assets:** Generate fresh screenshots emphasizing the privacy-first, hyper-local nature of the simplified application.
-3. **Real-Device Notification QA:** Validate the full notification matrix on physical devices now that build warnings and route inconsistencies are resolved.
+3. **Production Login 500 Root Cause:** Inspect live backend logs and fix the actual server-side failure behind `/api/auth/login`, now that the frontend parser no longer obscures the response.

@@ -277,7 +277,7 @@ export function ShareContent({ id }: { id: string }) {
         className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black via-black to-transparent z-50 pointer-events-none"
       >
         <div className="max-w-2xl mx-auto pointer-events-auto">
-          <Link href={data.type === 'roast' || data.type === 'hype' ? "/roast" : "/auth/register"} className="block w-full">
+          <Link href="/register" className="block w-full">
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

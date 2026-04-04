@@ -28,6 +28,10 @@ if (! app()->isProduction()) {
     });
 }
 
+// Lightweight analytics ingestion is intentionally public/optional-auth so page-view
+// tracking from the web shell can succeed before login and without generating 404 noise.
+Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
+
 Route::middleware('auth:sanctum')->group(function () {
     
     // Auth (Logged In)
@@ -104,7 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('notifications/count', [\App\Http\Controllers\NotificationController::class, 'count']);
     Route::post('notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
     Route::get('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
-    Route::put('notification-preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
+    Route::put('notification-preferences/{type}', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
     Route::prefix('device-tokens')->group(function (): void {
         Route::post('/', [\App\Http\Controllers\DeviceTokenController::class, 'store']);
         Route::delete('/{token}', [\App\Http\Controllers\DeviceTokenController::class, 'destroy']);

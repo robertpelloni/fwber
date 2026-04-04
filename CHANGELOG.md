@@ -854,3 +854,12 @@ All notable changes to this project will be documented in this file.
 - Modernized the frontend Sentry App Router integration by replacing the placeholder `instrumentation.ts` with real runtime registration plus `onRequestError`, adding `instrumentation-client.ts` with `onRouterTransitionStart`, and retiring the deprecated `sentry.client.config.ts` file.
 - Removed deprecated Sentry webpack option usage from `fwber-frontend/next.config.js`, eliminating the build-time Sentry deprecation/action warnings that were obscuring real signal in production builds.
 - Re-verified the frontend production build after the modernization: `npm run build --prefix fwber-frontend` now completes cleanly without the previous Sentry-specific warnings.
+
+## [1.3.4] - 2026-04-04
+### Fixed
+- Replaced stale homepage/share CTA links that still pointed to retired routes like `/roast` and `/rate-my-pussy`, eliminating production 404 prefetch noise from the active frontend shell.
+- Restored `POST /api/analytics/events` in the simplified backend route set so the web analytics/page-view client no longer produces 404s before login.
+- Fixed the notification settings API contract by exposing `PUT /api/notification-preferences/{type}`, matching the existing frontend client behavior.
+- Hardened auth response parsing in `fwber-frontend/lib/auth-context.tsx` so malformed or HTML server error bodies now degrade into readable login/register/2FA error messages instead of crashing with JSON parse exceptions.
+- Added `NotificationSettingsAndAnalyticsTest` and re-verified the backend slice with 25 passing tests across notification, safety, analytics, and core auth/match/message flows.
+- Reconfirmed the frontend production build after the console-error sweep: `npm run build --prefix fwber-frontend` passed successfully.
