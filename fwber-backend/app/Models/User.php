@@ -137,4 +137,14 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class, 'blocks', 'blocked_id', 'blocker_id')
             ->withTimestamps();
     }
+
+    public function merchantProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(MerchantProfile::class);
+    }
+
+    public function merchantPurchases(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(MerchantPayment::class, 'payer_id');
+    }
 }

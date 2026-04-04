@@ -11,11 +11,11 @@ import {
   Home,
   Menu,
   X,
-  PlusCircle,
   BarChart3,
   LogOut,
-  LayoutDashboard,
-  Store
+  Package,
+  Store,
+  UserRound
 } from 'lucide-react'
 
 interface MerchantHeaderProps {
@@ -25,10 +25,10 @@ interface MerchantHeaderProps {
 
 const navLinks = [
   { href: '/merchant/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/merchant/promotions', label: 'Promotions', icon: LayoutDashboard },
+  { href: '/merchant/inventory', label: 'Inventory', icon: Package },
   { href: '/merchant/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/merchant/profile', label: 'Profile', icon: Store },
-  { href: '/merchant/promotions/new', label: 'New Promotion', icon: PlusCircle },
+  { href: '/merchant/profile', label: 'Profile', icon: UserRound },
+  { href: '/premium', label: 'Billing', icon: Store },
 ]
 
 export default function MerchantHeader({ title = 'fwber Merchant', showNav = true }: MerchantHeaderProps) {

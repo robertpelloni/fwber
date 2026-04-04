@@ -1,260 +1,134 @@
+import { api } from './client'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-
-export type MerchantVerificationStatus = 'pending' | 'verified' | 'rejected';
+export type MerchantVerificationStatus = 'pending' | 'verified' | 'rejected'
 
 export interface MerchantProfile {
-  id: number;
-  user_id: number;
-  business_name: string;
-  category: string;
-  description: string | null;
-  address: string | null;
-  verification_status: MerchantVerificationStatus;
-  created_at: string;
-  updated_at: string;
+  id: number
+  user_id: number
+  business_name: string
+  category: string
+  description: string | null
+  address: string | null
+  verification_status: MerchantVerificationStatus
+  created_at: string
+  updated_at: string
 }
 
-export interface Promotion {
-  id: number;
-  merchant_id: number;
-  title: string;
-  description: string | null;
-  promo_code?: string | null;
-  discount_value: string;
-  lat: number;
-  lng: number;
-  radius: number;
-  token_cost: number;
-  starts_at: string;
-  expires_at: string;
-  is_active: boolean;
-  views?: number;
-  clicks?: number;
-  redemptions?: number;
-  created_at: string;
-  updated_at: string;
+export interface MerchantInventoryItem {
+  id: number
+  merchant_profile_id: number
+  name: string
+  description: string | null
+  price_usd: string | number
+  stock_count: number
+  image_url?: string | null
+  is_available: boolean
+  pending_redemptions_count?: number
+  created_at?: string
+  updated_at?: string
 }
 
-export interface PromotionMetrics {
-  views: number;
-  clicks: number;
-  redemptions: number;
-  conversion_rate: number;
+export interface MerchantDashboardResponse {
+  profile: MerchantProfile
+  stats: {
+    inventory_count: number
+    active_items: number
+    total_stock: number
+    pending_redemptions: number
+    redeemed_count: number
+    gross_revenue: number
+  }
+  recent_inventory: MerchantInventoryItem[]
+  recent_redemptions: Array<{
+    id: number
+    redemption_code: string
+    redeemed_at: string | null
+    created_at: string
+    inventory?: { name?: string }
+    user?: { name?: string }
+  }>
+  storefront_path: string
 }
 
-export interface PromotionDetailResponse {
-  promotion: Promotion;
-  metrics: PromotionMetrics;
+export interface MerchantAnalyticsResponse {
+  summary: {
+    gross_revenue: number
+    orders: number
+    issued_redemptions: number
+    redeemed_redemptions: number
+    redemption_rate: number
+    average_order_value: number
+  }
+  top_items: MerchantInventoryItem[]
+  recent_payments: Array<{
+    id: number
+    amount: string
+    status: string
+    created_at: string
+    description?: string | null
+  }>
+  recent_redemptions: Array<{
+    id: number
+    redemption_code: string
+    redeemed_at: string | null
+    created_at: string
+    inventory?: { name?: string }
+    user?: { name?: string }
+  }>
 }
 
 export interface MerchantRegistrationData {
-  business_name: string;
-  category: string;
-  description?: string;
-  address?: string;
+  business_name: string
+  category: string
+  description?: string
+  address?: string
 }
 
-export interface CreatePromotionData {
-  title: string;
-  description?: string;
-  promo_code?: string;
-  discount_value: string;
-  lat: number;
-  lng: number;
-  radius: number;
-  starts_at: string;
-  expires_at: string;
+export interface CreateInventoryData {
+  name: string
+  description?: string
+  price_usd: number
+  stock_count: number
+  image_url?: string
+  is_available?: boolean
 }
 
-export interface UpdatePromotionData {
-  title?: string;
-  description?: string | null;
-  promo_code?: string | null;
-  discount_value?: string;
-  radius?: number;
-  token_cost?: number;
-  starts_at?: string;
-  expires_at?: string;
-  is_active?: boolean;
+export async function registerMerchant(data: MerchantRegistrationData) {
+  return api.post<{ message: string; profile: MerchantProfile; user: any }>('/merchant-portal/register', data)
 }
 
-/**
- * Register the current user as a merchant
- */
-export async function registerMerchant(token: string, data: MerchantRegistrationData): Promise<MerchantProfile> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/register`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to register merchant' }));
-    throw new Error(error.message || 'Failed to register merchant');
-  }
-
-  const result = await response.json();
-  return result.user?.merchant_profile || result.user?.merchantProfile || result.profile || result.data || result;
+export async function getMerchantProfile() {
+  return api.get<{ profile: MerchantProfile }>('/merchant-portal/profile')
 }
 
-/**
- * Get current merchant profile
- */
-export async function getMerchantProfile(token: string): Promise<MerchantProfile> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/profile`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch merchant profile' }));
-    throw new Error(error.message || 'Failed to fetch merchant profile');
-  }
-
-  const result = await response.json();
-  return result.profile || result.data || result;
+export async function updateMerchantProfile(data: Partial<MerchantRegistrationData>) {
+  return api.put<{ message: string; profile: MerchantProfile }>('/merchant-portal/profile', data)
 }
 
-/**
- * Update merchant profile
- */
-export async function updateMerchantProfile(token: string, data: Partial<MerchantRegistrationData>): Promise<MerchantProfile> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/profile`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update merchant profile' }));
-    throw new Error(error.message || 'Failed to update merchant profile');
-  }
-
-  const result = await response.json();
-  return result.profile || result.data || result;
+export async function getMerchantDashboard() {
+  return api.get<MerchantDashboardResponse>('/merchant-portal/dashboard')
 }
 
-/**
- * Get active promotions
- */
-export async function getPromotions(token: string): Promise<Promotion[]> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch promotions' }));
-    throw new Error(error.message || 'Failed to fetch promotions');
-  }
-
-  const result = await response.json();
-  return result.data || result; // Assuming Laravel Resource returns { data: [...] }
+export async function getMerchantAnalytics(range: '7d' | '30d' | '90d' = '30d') {
+  return api.get<MerchantAnalyticsResponse>('/merchant-portal/analytics', { params: { range } })
 }
 
-/**
- * Create a new promotion
- */
-export async function createPromotion(token: string, data: CreatePromotionData): Promise<Promotion> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to create promotion' }));
-    throw new Error(error.message || 'Failed to create promotion');
-  }
-
-  const result = await response.json();
-  return result.promotion || result.data || result;
+export async function getInventory() {
+  return api.get<{ items: MerchantInventoryItem[] }>('/merchant-portal/inventory')
 }
 
-export async function getPromotionDetail(token: string, promotionId: number | string): Promise<PromotionDetailResponse> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch promotion details' }));
-    throw new Error(error.message || 'Failed to fetch promotion details');
-  }
-
-  const result = await response.json();
-
-  return {
-    promotion: result.promotion || result.data || result,
-    metrics: result.metrics || {
-      views: result.promotion?.views ?? 0,
-      clicks: result.promotion?.clicks ?? 0,
-      redemptions: result.promotion?.redemptions ?? 0,
-      conversion_rate: 0,
-    },
-  };
+export async function createInventoryItem(data: CreateInventoryData) {
+  return api.post<{ message: string; item: MerchantInventoryItem }>('/merchant-portal/inventory', data)
 }
 
-export async function updatePromotion(token: string, promotionId: number | string, data: UpdatePromotionData): Promise<Promotion> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update promotion' }));
-    throw new Error(error.message || 'Failed to update promotion');
-  }
-
-  const result = await response.json();
-  return result.promotion || result.data || result;
+export async function updateInventoryItem(id: number, data: Partial<CreateInventoryData>) {
+  return api.put<{ message: string; item: MerchantInventoryItem }>(`/merchant-portal/inventory/${id}`, data)
 }
 
-export async function deletePromotion(token: string, promotionId: number | string): Promise<Promotion> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-  });
+export async function archiveInventoryItem(id: number) {
+  return api.delete<{ message: string; item: MerchantInventoryItem }>(`/merchant-portal/inventory/${id}`)
+}
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to deactivate promotion' }));
-    throw new Error(error.message || 'Failed to deactivate promotion');
-  }
-
-  const result = await response.json();
-  return result.promotion || result.data || result;
+export async function redeemMerchantCode(code: string) {
+  return api.post<{ success: boolean; item_name: string; user_name: string; redeemed_at: string }>('/merchant-portal/inventory/redeem', { code })
 }

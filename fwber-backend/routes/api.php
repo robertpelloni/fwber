@@ -33,6 +33,8 @@ if (! app()->isProduction()) {
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic']);
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
+Route::get('marketplace/nearby', [\App\Http\Controllers\MerchantInventoryController::class, 'nearby']);
+Route::get('marketplace/{merchantId}', [\App\Http\Controllers\MerchantInventoryController::class, 'showMarketplace']);
 
 Route::middleware('auth:sanctum')->group(function () {
     
@@ -96,6 +98,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('messages/{userId}', [\App\Http\Controllers\MessageController::class, 'index']);
     Route::post('messages/{messageId}/read', [\App\Http\Controllers\MessageController::class, 'markAsRead']);
+
+    // Merchant / Marketplace
+    Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);
+    Route::get('merchant-portal/profile', [\App\Http\Controllers\MerchantController::class, 'profile']);
+    Route::put('merchant-portal/profile', [\App\Http\Controllers\MerchantController::class, 'updateProfile']);
+    Route::get('merchant-portal/dashboard', [\App\Http\Controllers\MerchantController::class, 'dashboard']);
+    Route::get('merchant-portal/analytics', [\App\Http\Controllers\MerchantAnalyticsController::class, 'index']);
+    Route::get('merchant-portal/inventory', [\App\Http\Controllers\MerchantInventoryController::class, 'index']);
+    Route::post('merchant-portal/inventory', [\App\Http\Controllers\MerchantInventoryController::class, 'store']);
+    Route::put('merchant-portal/inventory/{id}', [\App\Http\Controllers\MerchantInventoryController::class, 'update']);
+    Route::delete('merchant-portal/inventory/{id}', [\App\Http\Controllers\MerchantInventoryController::class, 'destroy']);
+    Route::post('merchant-portal/inventory/redeem', [\App\Http\Controllers\MerchantInventoryController::class, 'redeem']);
+    Route::post('marketplace/purchase/{itemId}', [\App\Http\Controllers\MerchantInventoryController::class, 'purchase']);
 
     // Premium / Billing
     Route::get('premium/plans', [\App\Http\Controllers\PremiumController::class, 'plans']);

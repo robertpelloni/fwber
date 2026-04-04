@@ -27,6 +27,7 @@ import {
   Download,
   Globe,
   ArrowLeft,
+  Store,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -325,6 +326,22 @@ export default function SettingsPage() {
                 icon={<CreditCard className="w-5 h-5" />}
                 title="Manage Subscription"
                 description="View your plan, billing history, and upgrade options"
+              />
+            </div>
+          </section>
+
+          {/* Commerce Section */}
+          <section className="mb-8">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+              Commerce
+            </h2>
+            <div className="space-y-3">
+              <SettingsLink
+                href={user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'}
+                icon={<Store className="w-5 h-5" />}
+                title={user?.role === 'merchant' ? 'Merchant Portal' : 'Become a Merchant'}
+                description={user?.role === 'merchant' ? 'Manage inventory, storefront analytics, and redemption codes' : 'Open a local storefront and sell redeemable nearby inventory'}
+                badge={user?.role === 'merchant' ? 'Merchant' : 'New'}
               />
             </div>
           </section>

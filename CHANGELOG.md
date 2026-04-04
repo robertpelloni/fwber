@@ -906,3 +906,14 @@ All notable changes to this project will be documented in this file.
 - Reintroduced the premium API route surface in `fwber-backend/routes/api.php`, including plan/status/history/purchase routes and `POST /api/stripe/webhook`.
 - Reworked `PremiumUpgradeModal` to support Stripe Elements when configured and a mock-gateway fallback when Stripe is unavailable, allowing local validation without live secrets.
 - Repaired `/who-likes-you` so premium-gated 403 responses no longer risk being misinterpreted as auth expiry, and unlocked users now render without a permanent blur overlay.
+
+## [1.4.0] - 2026-04-04
+### Added
+- Restored `MerchantController`, `MerchantInventoryController`, `MerchantAnalyticsController`, merchant models, and the compact merchant schema migration `2026_04_04_040000_restore_merchant_marketplace_tables.php`.
+- Added merchant portal frontend pages for registration, dashboard, inventory, profile, analytics, plus restored storefront browsing at `/marketplace/[merchantId]`.
+- Added `DigitalReceipt` and `MerchantRestoreTest` to support the revived merchant purchase and redemption flow.
+
+### Fixed
+- Reintroduced merchant and marketplace API routes for merchant registration/profile/dashboard/inventory/analytics, public storefront browsing, authenticated purchases, and code redemption.
+- Rebuilt merchant navigation and settings entry points so the UI now points at active merchant routes instead of archived promotion pages.
+- Updated AR inventory browsing to use the restored nearby marketplace API instead of a hard-coded demo storefront.

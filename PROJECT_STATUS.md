@@ -1,57 +1,61 @@
-# PROJECT_STATUS.md - fwber v1.3.9 (Premium & Billing Restoration)
+# PROJECT_STATUS.md - fwber v1.4.0 (Marketplace & Merchant Restoration)
 
 **Date:** 2026-04-04
-**Version:** 1.3.9 "Premium & Billing Restoration"
+**Version:** 1.4.0 "Marketplace & Merchant Restoration"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND PUSHED**
 
 ---
 
 ## 🎯 What This Release Restored
-This release completes the next planned post-simplification phase after AI surface restoration: the **premium / billing route and UI surface**.
+This release completes the next planned restoration slice after AI and premium: the **merchant / marketplace surface**.
 
 Restored in active runtime:
-- premium plan/status/history backend endpoints
-- premium purchase initiation and purchase completion endpoints
-- premium billing schema (`payments`, `subscriptions`)
-- minimal Stripe webhook surface for premium billing lifecycle updates
-- `/premium` upgrade page
-- `/settings/subscription` billing page
-- `/premium/success` confirmation page
-- repaired `/who-likes-you` premium upsell/unlock flow
+- merchant registration, profile, dashboard, inventory, analytics, and redemption backend endpoints
+- marketplace storefront and purchase backend endpoints
+- merchant schema (`merchant_profiles`, `merchant_inventories`, `merchant_payments`, `inventory_redemptions`)
+- merchant models and user relations
+- `/merchant/register`
+- `/merchant/dashboard`
+- `/merchant/inventory`
+- `/merchant/profile`
+- `/merchant/analytics`
+- `/marketplace/[merchantId]`
+- digital receipt UI and repaired AR inventory feed integration
+- settings entry into the merchant portal
 
-## 💳 Backend Restoration
+## 🏪 Backend Restoration
 - **Controllers restored:**
-  - `fwber-backend/app/Http/Controllers/PremiumController.php`
-  - `fwber-backend/app/Http/Controllers/StripeWebhookController.php`
+  - `fwber-backend/app/Http/Controllers/MerchantController.php`
+  - `fwber-backend/app/Http/Controllers/MerchantInventoryController.php`
+  - `fwber-backend/app/Http/Controllers/MerchantAnalyticsController.php`
 - **Models restored:**
-  - `fwber-backend/app/Models/Payment.php`
-  - `fwber-backend/app/Models/Subscription.php`
+  - `MerchantProfile`
+  - `MerchantInventory`
+  - `MerchantPayment`
+  - `InventoryRedemption`
 - **Schema restored:**
-  - `fwber-backend/database/migrations/2026_04_04_030000_restore_payments_table.php`
-  - `fwber-backend/database/migrations/2026_04_04_030100_restore_subscriptions_table.php`
-- **Route surface restored:** `fwber-backend/routes/api.php` now includes premium plan/status/history/purchase routes plus `POST /api/stripe/webhook`.
-- **Staged-restore safety guards:** payment/subscription writes are wrapped in `Schema::hasTable(...)` checks so partially migrated deploy targets fail gracefully instead of hard-crashing.
-- **Mock-mode billing support:** local/dev environments without live Stripe credentials can still exercise the premium purchase UX through the existing mock gateway.
+  - `2026_04_04_040000_restore_merchant_marketplace_tables.php`
+- **Route surface restored:** merchant portal registration/profile/dashboard/inventory/analytics routes plus public marketplace browsing and authenticated purchase endpoints.
+- **Payment integration strategy:** marketplace purchases intentionally use the same compact payment gateway pattern restored in v1.3.9 so mock mode remains usable locally while Stripe-backed purchases remain possible in production.
 
 ## 🌐 Frontend Restoration
-- **New premium page:** `fwber-frontend/app/premium/page.tsx`
-- **New billing settings page:** `fwber-frontend/app/settings/subscription/page.tsx`
-- **New premium success page:** `fwber-frontend/app/premium/success/page.tsx`
-- **Restored upgrade modal behavior:** `fwber-frontend/components/PremiumUpgradeModal.tsx` now cleanly supports Stripe Elements when configured and mock-gateway fallback when not.
-- **Who-likes-you repaired:** `fwber-frontend/app/who-likes-you/page.tsx` now handles premium locking intentionally instead of blindly blurring every result forever.
+- **New merchant pages:** register, dashboard, inventory, profile, analytics
+- **New storefront page:** `app/marketplace/[merchantId]/page.tsx`
+- **Restored commerce component:** `components/marketplace/DigitalReceipt.tsx`
+- **Navigation restored:** merchant entry added back into settings and merchant header navigation rebuilt around active merchant routes instead of dead promotions pages.
+- **AR repair:** `InventoryARView.tsx` now uses the restored nearby marketplace API instead of a hard-coded demo storefront.
 
 ## ✅ Validation
 - **Backend tests passed:**
-  - `php artisan test tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
-  - Result: **26 passed**
+  - `php artisan test tests/Feature/MerchantRestoreTest.php tests/Feature/PremiumRestoreTest.php tests/Feature/AiWingmanRestoreTest.php tests/Feature/CoreDatingFlowTest.php tests/Feature/OptimizeCoreIndexesMigrationTest.php`
+  - Result: **28 passed**
 - **Frontend production build passed:**
   - `npm run build --prefix fwber-frontend`
-  - Result: `/premium`, `/premium/success`, and `/settings/subscription` all appear in the production route map.
+  - Result: merchant and marketplace pages all appear in the production route map.
 
 ## ✅ Release Focus
-- [x] Restore premium billing schema/models/controller surface.
-- [x] Reintroduce premium plans/status/history/purchase APIs.
-- [x] Restore minimal Stripe webhook support for premium lifecycle changes.
-- [x] Restore user-visible premium upgrade/settings pages.
-- [x] Repair the who-likes-you premium UX end-to-end.
+- [x] Restore merchant/marketplace schema/models/controller surface.
+- [x] Reintroduce merchant registration, inventory, redemption, analytics, and storefront routes.
+- [x] Restore user-visible merchant portal pages and storefront UI.
+- [x] Restore digital receipts and repair AR inventory browsing.
 - [x] Re-verify backend tests and frontend production build.

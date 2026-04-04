@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.3.9 "Premium & Billing Restoration"
+> **Current Version:** 1.4.0 "Marketplace & Merchant Restoration"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,8 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.3.9)
+### Phase 5: Production Scale (COMPLETED - v1.4.0)
+- **Marketplace & Merchant Restoration:** Restored compact merchant commerce infrastructure with merchant registration/profile/dashboard/inventory/analytics endpoints, merchant storefront pages, purchase/redemption flow, digital receipts, and `merchant_profiles` / `merchant_inventories` / `merchant_payments` / `inventory_redemptions` schema.
 - **Premium & Billing Restoration:** Restored `PremiumController`, `StripeWebhookController`, `Payment`, `Subscription`, the `payments`/`subscriptions` schema, `/premium`, `/settings/subscription`, `/premium/success`, and the repaired who-likes-you premium flow.
 - **AI Surface Restoration:** Restored `AiWingmanController`, `ViralContent`, the `viral_contents` schema, and the public `/roast` page, reconnecting active UI and API flows for roast/hype generation.
 - **Restoration Foundation:** `AiServiceProvider` and `PaymentServiceProvider` are restored to the active backend, preparing safe reactivation of AI and monetization systems without unresolved container dependencies.
@@ -61,6 +62,6 @@ The platform is now **100% focused on its core identity**:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Phase D Restore — Marketplace/Merchant:** Restore merchant dashboard, inventory, storefront, and merchant payment route surface now that premium/payment primitives are active again.
-2. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling in a real authenticated deployment environment.
+1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology and validate restored AI, premium, and merchant systems in the new environment.
+2. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
 3. **Redeploy After Column Guard Fix:** Re-run deployment and confirm the migration now survives both duplicate-index and missing-column drift scenarios.

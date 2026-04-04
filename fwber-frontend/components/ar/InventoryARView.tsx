@@ -52,13 +52,14 @@ export default function InventoryARView({ onClose }: InventoryARViewProps) {
     // 2. Fetch nearby items
     useEffect(() => {
         if (userLocation) {
-            // In a real app, we'd call the /marketplace/nearby API
-            // For now, we simulate finding the merchant's items
-            marketplaceApi.getInventory(1) // Demo merchant
+            marketplaceApi.getNearby()
                 .then(res => {
                     const enhancedItems = res.items.map(item => ({
                         ...item,
-                        // Mock location slightly north-east of user
+                        // The compact merchant restore does not yet persist exact
+                        // merchant lat/lng. We place nearby overlays relative to the
+                        // viewer so the AR affordance remains demonstrable until the
+                        // richer geo-merchant layer is restored in a later phase.
                         lat: userLocation.latitude + 0.001,
                         lng: userLocation.longitude + 0.001
                     }));
@@ -111,7 +112,7 @@ export default function InventoryARView({ onClose }: InventoryARViewProps) {
                             <p className="text-white font-black text-xs uppercase tracking-tighter">{item.name}</p>
                             <p className="text-amber-500 font-bold text-[10px] flex items-center justify-center gap-1">
                                 <Coins className="w-2.5 h-2.5" />
-                                {item.price_tokens}
+                                ${Number(item.price_usd).toFixed(2)}
                             </p>
                         </div>
                         <div className="text-[8px] text-zinc-400 font-bold uppercase tracking-widest px-2 py-0.5 bg-zinc-800 rounded-full">
