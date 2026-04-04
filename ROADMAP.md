@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.3.0 "Trust & Safety Hardening"
+> **Current Version:** 1.3.1 "Foreground Notification UX"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -34,7 +34,9 @@ The platform is now **100% focused on its core identity**:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.3.0)
+### Phase 5: Production Scale (COMPLETED - v1.3.1)
+- **Foreground Notification UX:** Expo foreground pushes now bridge into the WebView and render in-app match/message toasts during active mobile sessions.
+- **Cold-Start Push Routing:** The native shell checks the last tapped notification on launch so deep linking remains reliable when the app is opened from a push.
 - **Trust & Safety Hardening:** Blocking now severs discovery visibility, established matches, and messaging access instead of behaving like a superficial preference flag.
 - **Safety Contract Repair:** Frontend block requests now match the backend validator contract, and the unblock endpoint is exposed in the active API surface.
 - **Legacy Discovery Cleanup:** The active match feed no longer relies on archived `followedTopics` relations or the removed `date_feedback` table during core ranking.
@@ -52,4 +54,4 @@ The platform is now **100% focused on its core identity**:
 ## 🎯 Next Immediate Milestones
 1. **TestFlight Beta:** Have actual users test the TestFlight IPA compiled by the new GitHub Actions workflow.
 2. **App Store Assets:** Generate fresh screenshots emphasizing the privacy-first, hyper-local nature of the simplified application.
-3. **Foreground Notification UX:** Add in-app active-session toasts so push events feel immediate even when the mobile shell is already open.
+3. **Notification Route Audit:** Ensure notification bell links, toast CTAs, and push payload URLs all resolve users into the same message/match destinations.

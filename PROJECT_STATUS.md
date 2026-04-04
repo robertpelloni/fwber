@@ -1,37 +1,40 @@
-# PROJECT_STATUS.md - fwber v1.3.0 (Trust & Safety Hardening)
+# PROJECT_STATUS.md - fwber v1.3.1 (Foreground Notification UX)
 
 **Date:** 2026-04-04
-**Version:** 1.3.0 "Trust & Safety Hardening"
+**Version:** 1.3.1 "Foreground Notification UX"
 **Status:** ✅ **LOCAL RELEASE VERIFIED AND READY**
 
 ---
 
-## 🎯 What This Release Solved
-This release focused on a core product truth: in a privacy-first proximity dating app, **blocking must be absolute**. It cannot be cosmetic UI state. It must sever discovery, sever messaging, sever match visibility, and remain consistent across backend and frontend contracts.
+## 🔔 Native-to-Web Foreground Push Bridge
+This release focused on the last obvious gap in the mobile notification experience: **what happens when a push arrives while the app is already open**.
 
-## 🛡️ Trust & Safety Hardening
-- **Block relationships are now enforced everywhere that matters:**
-  - discovery feed candidates
-  - established match/conversation lists
-  - direct match actions (`like`, `pass`, `super_like`)
-  - messaging attempts between blocked users
-- **Blocking now actively severs pre-existing connections:** when a user blocks someone, the backend deactivates any existing `user_matches` row and deletes both sides of historical `match_actions` so the blocked user cannot re-enter the queue through stale mutual-like state.
-- **Cache invalidation is now symmetrical:** match-feed and established-match caches are flushed for both users on block and unblock so stale matches do not linger after a safety action.
+Previously:
+- Expo received foreground pushes in `mobile/app/index.js`
+- the app logged them to the native console
+- but the user saw nothing inside the WebView unless they later checked the OS tray
 
-## 🔧 Hidden Bugs Uncovered and Fixed
-- **Frontend/backend payload mismatch:** the web safety client was posting `blocked_id`, but the backend validator required `user_id`. This meant the block flow looked implemented yet could fail at runtime. The client contract is now aligned.
-- **Missing unblock route:** the backend controller supported unblock, but the API route was never registered. `DELETE /api/blocks/{userId}` is now live.
-- **Discovery engine still depended on archived systems:** the matching service was still eager-loading removed `followedTopics` relations and querying the old `date_feedback` table. Those legacy assumptions caused fresh-install and SQLite test crashes. The active matching path now uses simplified core-safe logic and gracefully skips archived-table modifiers.
+Now:
+- the Expo shell converts foreground notifications into a browser `CustomEvent`
+- the WebView dispatches `fwber:native-notification`
+- the Next.js app consumes that event and renders an in-app toast immediately
+- message and match pushes include direct actions that route the user into the correct page
+
+## ✅ UX Improvements Delivered
+- **Foreground push toasts:** open mobile sessions now receive immediate visual feedback for new matches and new messages.
+- **Actionable toasts:** taps on the toast CTA route directly to `/matches` or `/messages` without forcing the user through the notification tray.
+- **Cold-start routing guard:** the native shell now checks `Notifications.getLastNotificationResponseAsync()` on launch so notification opens remain reliable when the app was resumed from a push.
+- **Shared toast system reuse:** the native bridge feeds the existing `ToastProvider`, keeping the UX consistent with the rest of the app instead of inventing a second notification UI.
 
 ## ✅ Validation
-- **Backend regression coverage added:** `tests/Feature/BlockSafetyFlowTest.php`
-- **Verified passing locally:**
-  - `php artisan test tests/Feature/BlockSafetyFlowTest.php tests/Feature/CoreDatingFlowTest.php`
-  - Result: **22 passed**
+- **Frontend production build succeeded:**
+  - `npm run build --prefix fwber-frontend`
+- Notes:
+  - build completed successfully
+  - Sentry emitted existing configuration deprecation warnings, but they did not block compilation
 
 ## ✅ Release Focus
-- [x] Enforce block state across discovery, established matches, and messaging.
-- [x] Fix frontend safety API request payload contract.
-- [x] Expose unblock route in the active API surface.
-- [x] Remove archived social-graph assumptions from the core discovery path.
-- [x] Add regression coverage proving safety actions actually sever access.
+- [x] Bridge native foreground pushes into the web UI.
+- [x] Show actionable match/message toasts during active mobile sessions.
+- [x] Preserve deep-link routing when the app launches from a tapped push.
+- [x] Re-verify the frontend production build after the bridge landed.

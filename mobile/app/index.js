@@ -53,7 +53,47 @@ export default function Home() {
   const [isRequesting, setIsRequesting] = useState(false);
   const [targetUrl, setTargetUrl] = useState(`https://${TARGET_DOMAIN}`);
 
-  // Initial check of existing permissions
+  const dispatchNativeNotificationToWebView = (notification) => {
+    if (!webViewRef.current) {
+      return;
+    }
+
+    const payload = {
+      title: notification?.request?.content?.title ?? 'New activity',
+      body: notification?.request?.content?.body ?? '',
+      data: notification?.request?.content?.data ?? {},
+      receivedAt: new Date().toISOString(),
+    };
+
+    const js = `
+      window.dispatchEvent(new CustomEvent('fwber:native-notification', {
+        detail: ${JSON.stringify(payload)}
+      }));
+      true;
+    `;
+
+    webViewRef.current.injectJavaScript(js);
+  };
+
+  const routeNotificationUrl = (url) => {
+    if (!url) {
+      return;
+    }
+
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+
+    console.log('User tapped notification, routing to:', normalizedUrl);
+
+    if (webViewRef.current) {
+      const js = `window.location.href = "${normalizedUrl}"; true;`;
+      webViewRef.current.injectJavaScript(js);
+      return;
+    }
+
+    setTargetUrl(`https://${TARGET_DOMAIN}${normalizedUrl}`);
+  };
+
+  // Initial check of existing permissions and any notification that launched the app.
   useEffect(() => {
     (async () => {
       const { status } = await Location.getForegroundPermissionsAsync();
@@ -63,28 +103,24 @@ export default function Home() {
       } else {
          setPermissionsGranted(false);
       }
+
+      const lastNotificationResponse = await Notifications.getLastNotificationResponseAsync();
+      const launchUrl = lastNotificationResponse?.notification?.request?.content?.data?.url;
+      if (launchUrl) {
+        routeNotificationUrl(launchUrl);
+      }
     })();
 
     // Handle Push Notifications when the app is foregrounded
     const foregroundSubscription = Notifications.addNotificationReceivedListener(notification => {
         console.log('Received notification in foreground:', notification);
+        dispatchNativeNotificationToWebView(notification);
     });
 
     // Handle Push Notifications when the user taps them (background/killed)
     const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
         const url = response.notification.request.content.data.url;
-        
-        if (url) {
-            console.log('User tapped notification, routing to:', url);
-            // If the WebView is already loaded, we can inject JS to navigate
-            if (webViewRef.current) {
-                const js = `window.location.href = "${url.startsWith('/') ? url : '/' + url}"; true;`;
-                webViewRef.current.injectJavaScript(js);
-            } else {
-                // If WebView hasn't mounted yet, set the initial URL
-                setTargetUrl(`https://${TARGET_DOMAIN}${url.startsWith('/') ? url : '/' + url}`);
-            }
-        }
+        routeNotificationUrl(url);
     });
 
     return () => {

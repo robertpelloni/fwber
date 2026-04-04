@@ -13,6 +13,7 @@ import FeedbackModal from '@/components/FeedbackModal'
 // Legacy: Mercure provider removed, migrated to Reverb WebSocket
 import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
+import NativeForegroundNotificationBridge from '@/components/NativeForegroundNotificationBridge'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import AnalyticsProvider from '@/components/AnalyticsProvider'
 import SafeWalkTracker from '@/components/safety/SafeWalkTracker'
@@ -118,6 +119,7 @@ export default function RootLayout({
                 </Suspense>
                 <ToastProvider>
                   <NotificationListener />
+                  <NativeForegroundNotificationBridge />
                   <SafeWalkTracker />
                   <div className="relative flex min-h-screen flex-col">
                     <div className="flex-1">{children}</div>

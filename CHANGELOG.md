@@ -828,3 +828,12 @@ All notable changes to this project will be documented in this file.
 - Updated match discovery and established-match retrieval to exclude blocked relationships consistently, and prevented new match actions against blocked users.
 - Removed active discovery-path assumptions about archived `followedTopics` relations and guarded legacy `date_feedback` scoring so fresh installs and SQLite tests no longer crash on removed tables.
 - Added `BlockSafetyFlowTest` coverage proving blocking hides established matches, prevents messaging, and removes blocked users from discovery; verified alongside `CoreDatingFlowTest` with 22 passing tests.
+
+## [1.3.1] - 2026-04-04
+### Added
+- Bridged Expo foreground push notifications into the WebView by dispatching a `fwber:native-notification` browser event from `mobile/app/index.js`, allowing the web app to react instantly while the native shell is already open.
+- Added `fwber-frontend/components/NativeForegroundNotificationBridge.tsx`, which translates native notification events into the existing toast system and provides direct CTA routing for new matches and new messages.
+
+### Fixed
+- Hardened notification-launch routing in the mobile shell by checking `Notifications.getLastNotificationResponseAsync()` during startup, preserving deep links when the app is opened from a tapped push after being backgrounded or cold-started.
+- Re-verified the frontend production build after the bridge landed: `npm run build --prefix fwber-frontend` completed successfully, with only pre-existing Sentry configuration warnings.
