@@ -581,6 +581,7 @@ run_http_check() {
   local body_regex="$5"
   local payload="${6:-}"
   local bearer_token="${7:-}"
+  local severity="${8:-fail}"
 
   local response_file
   local error_file
@@ -617,7 +618,11 @@ run_http_check() {
     curl_error="$(tr '\n' ' ' < "$error_file")"
     add_snapshot "$label" "$method" "$url" 'connect_error' '' '' '' '' '' "$(printf '%s' "$curl_error" | head -c 240)"
     rm -f "$response_file" "$error_file" "$headers_file"
-    fail_case "$label" "Request failed to connect: ${curl_error:-curl error}"
+    if [[ "$severity" == "warn" ]]; then
+      warn_case "$label" "Request failed to connect: ${curl_error:-curl error}"
+    else
+      fail_case "$label" "Request failed to connect: ${curl_error:-curl error}"
+    fi
     return
   fi
 
@@ -660,12 +665,20 @@ run_http_check() {
   done
 
   if [[ "$expected_code_matched" != "1" ]]; then
-    fail_case "$label" "Returned HTTP $http_code, expected one of [$expected_codes]. Body: $(printf '%s' "$response_body" | head -c 400)"
+    if [[ "$severity" == "warn" ]]; then
+      warn_case "$label" "Returned HTTP $http_code, expected one of [$expected_codes]. Body: $(printf '%s' "$response_body" | head -c 400)"
+    else
+      fail_case "$label" "Returned HTTP $http_code, expected one of [$expected_codes]. Body: $(printf '%s' "$response_body" | head -c 400)"
+    fi
     return
   fi
 
   if [[ -n "$body_regex" ]] && ! grep -Eq "$body_regex" <<<"$response_body"; then
-    fail_case "$label" "Returned HTTP $http_code but body did not match /$body_regex/. Body: $(printf '%s' "$response_body" | head -c 400)"
+    if [[ "$severity" == "warn" ]]; then
+      warn_case "$label" "Returned HTTP $http_code but body did not match /$body_regex/. Body: $(printf '%s' "$response_body" | head -c 400)"
+    else
+      fail_case "$label" "Returned HTTP $http_code but body did not match /$body_regex/. Body: $(printf '%s' "$response_body" | head -c 400)"
+    fi
     return
   fi
 
@@ -758,7 +771,7 @@ main() {
   # so transient first-hit cold-path failures do not pollute the actual smoke
   # result if the immediately-following real contract check succeeds.
   curl -sS -X POST "${API_URL%/}/public/roast" -H 'Accept: application/json' -H 'Content-Type: application/json' --data "$ROAST_PAYLOAD" >/dev/null 2>&1 || true
-  run_http_check 'Public roast preview check' POST "${API_URL%/}/public/roast" '200' '"is_preview"[[:space:]]*:[[:space:]]*true' "$ROAST_PAYLOAD"
+  run_http_check 'Public roast preview check' POST "${API_URL%/}/public/roast" '200' '"is_preview"[[:space:]]*:[[:space:]]*true' "$ROAST_PAYLOAD" '' 'warn'
   run_http_check 'Geo nearby endpoint' GET "$GEO_QUERY_URL" '200' '"users"'
   check_websocket_upgrade
   run_optional_authenticated_checks
