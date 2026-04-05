@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.7.1
+> **Version:** 1.7.2
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -172,6 +172,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
 - the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
 - the signed-in shell now has real `/activity`, `/notifications`, `/friends`, and `/settings/travel` pages again, reducing dead frontend links during production validation
+- live Hetzner repo ownership drift can still break deploys even when workflow logic is correct; keeping the checkout owned by `deploy` is now part of the practical runtime contract
 - the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
 - `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors

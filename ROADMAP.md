@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.7.1 "Dead Surface Recovery: Activity, Notifications, Travel"
+> **Current Version:** 1.7.2 "Hetzner Repo Ownership Repair"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.7.1)
+### Phase 5: Production Scale (COMPLETED - v1.7.2)
+- **Hetzner Repo Ownership Repair:** Repaired mixed ownership inside the live checkout after the automated deploy workflow failed on `.git/objects` write permissions, restoring deploy-user control of the repo.
 - **Dead Surface Recovery: Activity, Notifications, Travel:** Restored `/activity`, `/notifications`, and `/settings/travel` so prominent signed-in links now land on real pages again.
 - **Friends System Restoration:** Restored the friends backend/API surface, added a new `/friends` page, and put Friends back into the authenticated navigation so long-dead social links resolve again.
 - **Mercure Surface Retirement:** Added a tracked Hetzner nginx config that returns an explicit retired response for `mercure.fwber.me` and wired it into the deploy script so the dead upstream is no longer presented as an active broken production service.
@@ -100,8 +101,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Deploy Latest Frontend Surface Restorations:** Verify live `/friends`, `/activity`, `/notifications`, and `/settings/travel` with a real session after the latest Vercel deploy.
-2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
+1. **Re-run Hetzner Deploy After Ownership Repair:** Confirm the backend workflow is green again after repairing the live checkout permissions.
+2. **Verify Latest Live Surface Restorations:** Verify live `/friends`, `/activity`, `/notifications`, and `/settings/travel` with a real session after the latest Vercel deploy.
 3. **Restore Wallet / Events Surfaces Or Retire Them Honestly:** These are the next obvious dead-route references still visible in the signed-in shell.
 4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

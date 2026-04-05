@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.2] - 2026-04-05 — Hetzner Repo Ownership Repair
+
+### Fixed
+- Repaired ownership drift on the live Hetzner checkout after the backend deploy workflow failed with `insufficient permission for adding an object to repository database .git/objects`.
+- Restored `deploy` ownership of the repo git database/working tree and re-applied the shared log ACLs required for deploy-user + `www-data` coexistence.
+
 ## [1.7.1] - 2026-04-05 — Dead Surface Recovery: Activity, Notifications, Travel
 
 ### Added
