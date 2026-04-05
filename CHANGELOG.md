@@ -2,6 +2,67 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.7] - 2026-04-05 — Frontend CI Node Runtime Alignment
+
+### Fixed
+- Updated `frontend-build.yml` to use Node.js 24 so GitHub Actions runs the same major npm/runtime family as the local lockfile regeneration environment.
+- This addresses the remaining frontend CI mismatch where `npm ci` under GitHub's older Node 20 / npm 10 toolchain still rejected the resynced lockfile.
+
+## [1.6.6] - 2026-04-05 — Hetzner Log ACL Deploy Fix
+
+### Fixed
+- Replaced the brittle deploy-time log chmod workaround with an ACL-based approach for `storage/logs`, so GitHub/SSH deploys and the PHP-FPM runtime can both write rotated log files without Monolog permission churn.
+- Removed the logging channel `permission` override that caused Monolog to attempt file chmod operations against `www-data`-owned daily logs during deploys.
+- Applied the matching ACL repair on the live Hetzner server so future rotated logs inherit shared write access for `deploy` and `www-data`.
+
+## [1.6.6] - 2026-04-05 — Discovery Route Recovery
+
+### Fixed
+- Hardened `NodeInfoController` so `/.well-known/nodeinfo` and `/nodeinfo/2.0` degrade safely on drifted production schemas instead of crashing when optional columns like `users.last_active_at` or `user_profiles.is_federated` are absent.
+- Strengthened the Hetzner nginx source config for `api.fwber.me` with an explicit `location ^~ /.well-known/` block so discovery routes are not accidentally trapped by hidden-file protections.
+- Added discovery-route regression coverage for NodeInfo in `PublicWebRoutesTest`.
+
+### Verified
+- `php artisan test --filter="PublicWebRoutesTest"` passes (4 tests / 26 assertions).
+- `php artisan route:list --path=.well-known` succeeds.
+
+## [1.6.5] - 2026-04-04 — Hetzner Backend Stability Repair
+
+### Fixed
+- Replaced the broken backend root web route that rendered a non-existent `welcome` view with a lightweight JSON status payload, eliminating the live `api.fwber.me/` root-route 500 caused by missing view templates.
+- Added `WebFingerController` so the public discovery routes no longer point at a missing class, restoring `php artisan route:list` and preventing route-cache/tooling breakage in production.
+- Hardened `DashboardController` so dashboard stats and activity degrade gracefully when `user_matches` is missing from a drifted production database instead of throwing production 500s.
+- Fixed a latent PHP 8.4 type bug in dashboard activity where the `limit` query string could remain a string and crash `array_slice()`.
+- Added a corrective migration (`2026_04_05_000000_restore_match_tables_if_missing.php`) that recreates `user_matches` / `match_actions` when migration history claims they exist but live schema drift has removed them.
+- Hardened backend log-file permissions plus the Hetzner deploy script so deploy-user artisan commands are less likely to fail when Monolog rotates files under the web runtime user.
+- Added regression coverage for the new degraded-schema dashboard behavior plus the repaired public web routes.
+
+### Verified
+- `php artisan route:list` now succeeds again.
+- `php artisan test --filter="DashboardEndpointsTest|PublicWebRoutesTest"` passes (6 tests / 29 assertions).
+- `./vendor/bin/pint` passes on all touched backend files.
+
+## [1.6.4] - 2026-04-04 — Frontend Lockfile Resync
+
+### Fixed
+- Regenerated `fwber-frontend/package-lock.json` so GitHub Actions `npm ci` matches the actual frontend dependency graph again.
+- This fixes the remaining frontend workflow failure where Actions reported the lockfile was out of sync and refused to install before the Next.js build step.
+
+## [1.6.3] - 2026-04-04 — Workflow Stabilization Sweep
+
+### Changed
+- Fixed `backend-tests.yml` so GitHub Actions prepares and migrates against SQLite instead of accidentally trying to connect to MySQL during CI setup.
+- Fixed `frontend-build.yml` to cache against `fwber-frontend/package-lock.json`, eliminating the lockfile-not-found setup-node failure.
+- Simplified `ci.yml` into a lightweight repository-hygiene workflow instead of duplicating backend/frontend build jobs already covered by dedicated workflows.
+- Reworked `deploy.yml` into a manual-only container publish workflow so it no longer auto-fails on every push while the real production deployment is handled by Hetzner/Vercel-specific workflows.
+
+## [1.6.2] - 2026-04-04 — GitHub Hetzner Deploy Validation
+
+### Verified
+- Added the required GitHub repository secrets and variable for Hetzner backend deployment.
+- Triggered the Hetzner backend deploy workflow successfully from GitHub Actions after the rustup-path patch landed on the server.
+- Confirmed the workflow completed end-to-end with a green deploy, healthy backend verification, successful geo build, successful websocket smoke probe, and smoke summary of **9 passes / 3 expected auth-token warnings / 0 failures**.
+
 ## [1.6.1] - 2026-04-04 — GitHub Hetzner Deploy Rust Path Fix
 
 ### Fixed
