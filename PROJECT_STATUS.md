@@ -1,17 +1,17 @@
-# PROJECT_STATUS.md - fwber v1.6.7 (Frontend CI Node Runtime Alignment)
+# PROJECT_STATUS.md - fwber v1.6.9 (Frontend Workflow Install Strategy Fix)
 
 **Date:** 2026-04-05
-**Version:** 1.6.7 "Frontend CI Node Runtime Alignment"
-**Status:** ✅ **FRONTEND CI ROOT-CAUSED TO NODE/NPM GENERATION DRIFT; ALIGNMENT PATCH APPLIED**
+**Version:** 1.6.9 "Frontend Workflow Install Strategy Fix"
+**Status:** ✅ **FRONTEND CI ISOLATED TO INSTALL-STRATEGY DRIFT; PRAGMATIC FIX APPLIED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release targets the last visible modern CI failure.
+This release applies a pragmatic CI fix after the frontend workflow remained blocked by platform-sensitive dependency resolution.
 
 Delivered:
-- upgraded the dedicated frontend workflow to Node.js 24
-- aligned GitHub frontend build runtime with the npm/lockfile generation environment that now exists locally
+- switched the frontend GitHub workflow from `npm ci` to `npm install --no-fund --no-audit`
+- kept the build validation step intact
 
 ## ✅ Why This Matters
-After the lockfile resync, the remaining frontend CI failure was still coming from the older GitHub runner npm stack, not the app code itself. Aligning the runtime removes that toolchain mismatch.
+The frontend dependency graph still includes wallet/native-adjacent packages whose optional/platform-sensitive resolution can diverge between local and GitHub Linux environments. This change restores CI signal while deeper dependency cleanup remains pending.
