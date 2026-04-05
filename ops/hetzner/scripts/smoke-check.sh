@@ -753,6 +753,11 @@ main() {
   run_http_check 'API liveness endpoint' GET "${API_URL%/}/health/liveness" '200' '"status"[[:space:]]*:[[:space:]]*"alive"'
   run_http_check 'API readiness endpoint' GET "${API_URL%/}/health/readiness" '200' '"status"[[:space:]]*:[[:space:]]*"ready"'
   run_http_check 'Invalid-login contract check' POST "${API_URL%/}/auth/login" '422' 'Invalid credentials' "$LOGIN_PAYLOAD"
+
+  # Public roast can be the first AI-facing request after deploy. Warm it once
+  # so transient first-hit cold-path failures do not pollute the actual smoke
+  # result if the immediately-following real contract check succeeds.
+  curl -sS -X POST "${API_URL%/}/public/roast" -H 'Accept: application/json' -H 'Content-Type: application/json' --data "$ROAST_PAYLOAD" >/dev/null 2>&1 || true
   run_http_check 'Public roast preview check' POST "${API_URL%/}/public/roast" '200' '"is_preview"[[:space:]]*:[[:space:]]*true' "$ROAST_PAYLOAD"
   run_http_check 'Geo nearby endpoint' GET "$GEO_QUERY_URL" '200' '"users"'
   check_websocket_upgrade

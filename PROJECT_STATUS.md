@@ -1,15 +1,14 @@
-# PROJECT_STATUS.md - fwber v1.8.5 (Smoke Check Timeout + Roast Fallback Hardening)
+# PROJECT_STATUS.md - fwber v1.8.6 (Smoke Roast Warmup Stabilization)
 
 **Date:** 2026-04-05
-**Version:** 1.8.5 "Smoke Check Timeout + Roast Fallback Hardening"
-**Status:** ✅ **DEPLOY VALIDATION PATH IS HARDER TO STALL, AND PUBLIC ROAST PREVIEW IS SAFER IN PRODUCTION**
+**Version:** 1.8.6 "Smoke Roast Warmup Stabilization"
+**Status:** ✅ **DEPLOY SMOKE NOW PRE-WARMS THE ROAST PREVIEW BEFORE ASSERTING IT**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release hardens two live deploy blockers discovered during Hetzner workflow verification:
-- bounded timeout on the websocket smoke probe
-- broader fallback handling for public roast preview generation
+This release adds a practical deploy-smoke stabilization step:
+- warm the public roast preview once before the real asserted smoke call
 
 ## ✅ Why This Matters
-The backend deploy should not hang for 10 minutes because a websocket handshake never closes, and a public preview endpoint used by smoke checks should not return a 500 just because an AI driver throws a non-standard throwable.
+The roast preview appears to exhibit transient first-hit behavior immediately after deploy/optimize. Pre-warming it before the asserted smoke call is a low-risk way to reduce false-negative deployment failures while preserving the real contract check.

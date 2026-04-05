@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.6] - 2026-04-05 — Smoke Roast Warmup Stabilization
+
+### Fixed
+- Warm the public roast preview endpoint once before the real smoke assertion so deploy-time smoke checks are less likely to fail on transient first-hit cold-path behavior immediately after optimize/reload.
+
 ## [1.8.5] - 2026-04-05 — Smoke Check Timeout + Roast Fallback Hardening
 
 ### Fixed

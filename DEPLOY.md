@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.8.5
+> **Version:** 1.8.6
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -175,7 +175,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - live Hetzner repo ownership drift can still break deploys even when workflow logic is correct; keeping the checkout owned by `deploy` is now part of the practical runtime contract
 - the signed-in product shell now also includes restored `/wallet`, `/events`, `/friends`, `/activity`, `/notifications`, and `/settings/travel` routes, plus refreshed referral/vouch flows and video-chat backend endpoints, so post-deploy validation should exercise those features with a real session
 - the Hetzner backend deploy script now prefers a root-owned nginx sync helper on the live server, allowing GitHub deploys to refresh tracked nginx configs without requiring blanket passwordless sudo for raw filesystem writes
-- the websocket smoke probe is now bounded by a timeout, and public roast preview generation has been hardened so deploy verification is less likely to hang or fail on avoidable AI-driver issues
+- the websocket smoke probe is now bounded by a timeout, public roast preview generation has been hardened, and the roast endpoint is warmed once before the asserted smoke call so deploy verification is less likely to hang or fail on transient first-hit behavior
 - the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
 - `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors
