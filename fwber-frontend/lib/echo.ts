@@ -1,6 +1,7 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { getPublicApiOrigin } from '@/lib/api/client';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/browser-storage';
 
 declare global {
     interface Window {
@@ -26,9 +27,9 @@ export const initEcho = (token?: string) => {
         || (isFwberProductionHost ? 'cbb98008592ac1b78cec' : 'app-key');
 
     if (appKey === 'your_app_key') {
-        if (!window.localStorage.getItem('fwber_suppress_app_key_warn')) {
+        if (!safeLocalStorageGet('fwber_suppress_app_key_warn')) {
             console.warn('fwber: Detected placeholder "your_app_key". Falling back to a safe default.');
-            window.localStorage.setItem('fwber_suppress_app_key_warn', 'true');
+            safeLocalStorageSet('fwber_suppress_app_key_warn', 'true');
         }
         appKey = isFwberProductionHost ? 'cbb98008592ac1b78cec' : 'app-key';
     }

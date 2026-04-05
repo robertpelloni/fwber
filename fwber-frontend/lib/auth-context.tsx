@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo, useCallback } from 'react'
 import { logAuth, setUserContext, clearUserContext } from './logger'
 import { getApiBaseUrl, setApiClientAuthToken } from './api/client'
+import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageRemove } from './browser-storage'
 
 // Types
 interface User {
@@ -146,8 +147,8 @@ function clearStoredAuth(): void {
   }
 
   setApiClientAuthToken(null)
-  localStorage.removeItem('fwber_token')
-  localStorage.removeItem('fwber_user')
+  safeLocalStorageRemove('fwber_token')
+  safeLocalStorageRemove('fwber_user')
 
   // --- NATIVE BRIDGE: Clear token in mobile app to prevent ghost background pings ---
   if ((window as any).ReactNativeWebView) {
@@ -163,8 +164,8 @@ function persistStoredAuth(user: User, token: string): void {
   }
 
   setApiClientAuthToken(token)
-  localStorage.setItem('fwber_token', token)
-  localStorage.setItem('fwber_user', JSON.stringify(user))
+  safeLocalStorageSet('fwber_token', token)
+  safeLocalStorageSet('fwber_user', JSON.stringify(user))
 
   // --- NATIVE BRIDGE: Push token to mobile app if running in WebView ---
   if ((window as any).ReactNativeWebView) {
@@ -290,9 +291,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem('fwber_token')
-        const userStr = localStorage.getItem('fwber_user')
-        const devToken = localStorage.getItem('auth_token')
+        const token = safeLocalStorageGet('fwber_token')
+        const userStr = safeLocalStorageGet('fwber_user')
+        const devToken = safeLocalStorageGet('auth_token')
 
         // Development bypass: if we have 'auth_token' = 'dev', treat as authenticated
         if (devToken === 'dev') {
@@ -419,7 +420,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (err) {
         console.error('AuthContext: Critical Init Error', err)
 
-        if (restoreCachedAuth(localStorage.getItem('fwber_user'), localStorage.getItem('fwber_token'), cancelled, dispatch)) {
+        if (restoreCachedAuth(safeLocalStorageGet('fwber_user'), safeLocalStorageGet('fwber_token'), cancelled, dispatch)) {
           return
         }
 
@@ -445,8 +446,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (typeof window !== 'undefined') {
       if (state.isAuthenticated && state.token && state.user) {
-        localStorage.setItem('fwber_token', state.token)
-        localStorage.setItem('fwber_user', JSON.stringify(state.user))
+        safeLocalStorageSet('fwber_token', state.token)
+        safeLocalStorageSet('fwber_user', JSON.stringify(state.user))
       } else {
         clearStoredAuth()
       }

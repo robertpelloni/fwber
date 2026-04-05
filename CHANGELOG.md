@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.9] - 2026-04-05 — Dashboard Storage Guard + E2E Restore Probe Hardening
+
+### Fixed
+- Hardened frontend auth/session persistence to use safe local-storage wrappers so restricted browser contexts no longer throw uncaught dashboard-time storage access errors.
+- Hardened the shared API client and realtime bootstrap to stop directly touching blocked browser storage during auth-header lookup, logout cleanup, or placeholder Reverb-key warnings.
+- Hardened the E2E IndexedDB storage layer to detect blocked or unavailable storage contexts explicitly instead of crashing during `indexedDB.open(...)`.
+- Updated `useE2EEncryption()` to degrade gracefully when storage is unavailable, skip noisy remote restore probing in blocked contexts, and expose `storageUnavailable` state to callers.
+- Verified the live public `https://api.fwber.me/api/security/keys/restore?key_type=ecdh` endpoint responds from Hetzner with **401 Unauthenticated**, proving the route exists publicly and the earlier browser noise was not caused by the route being absent from the active backend.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the storage/E2E hardening sweep.
+- live CLI curl against `api.fwber.me/api/security/keys/restore?key_type=ecdh` returned `401`, not `404`.
+- live Hetzner `php artisan route:list | grep security/keys` confirmed the restore route is registered in the deployed backend.
+
 ## [1.9.8] - 2026-04-05 — Restore Branch Messaging + WebFinger Stabilization
 
 ### Changed

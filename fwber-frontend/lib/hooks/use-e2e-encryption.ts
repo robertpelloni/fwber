@@ -10,6 +10,7 @@ export function useE2EEncryption() {
   const [isReady, setIsReady] = useState(false);
   const [isRestorable, setIsRestorable] = useState(false);
   const [sharedKeys, setSharedKeys] = useState<Record<string, any>>({});
+  const [storageUnavailable, setStorageUnavailable] = useState(false);
 
   // Initialize Keys
   useEffect(() => {
@@ -19,23 +20,26 @@ export function useE2EEncryption() {
       try {
         let keyPair = await Storage.getKeyPair(user.id, 'ecdh');
         let metadata = await Storage.getKeyPairMetadata(user.id, 'ecdh');
-        
+
+        setStorageUnavailable(false);
+
         const KEY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
         const needsRotation = metadata && (Date.now() - metadata.createdAt > KEY_MAX_AGE_MS);
 
         if (!keyPair || needsRotation) {
-          // Check if we have a backup on the server before generating new ones
-          try {
-            const res = await api.get<any>(`/security/keys/restore?key_type=ecdh`, {
+          if (token && !storageUnavailable) {
+            try {
+              const res = await api.get<any>(`/security/keys/restore?key_type=ecdh`, {
                 headers: { Authorization: `Bearer ${token}` }
-            });
-            if (res.encrypted_private_key) {
+              });
+              if (res.encrypted_private_key) {
                 console.debug('E2E: Found remote backup. Marking as restorable.');
                 setIsRestorable(true);
-                return; // Wait for user to restore or rotate manually
+                return;
+              }
+            } catch {
+              // Missing backup or auth drift should not block local generation.
             }
-          } catch (e) {
-            // No backup found, proceed to generation
           }
 
           console.debug(needsRotation ? 'E2E keys expired. Rotating...' : 'Generating initial E2E keys...');
@@ -44,25 +48,34 @@ export function useE2EEncryption() {
 
           const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
           await securityApi.storePublicKey(publicKeyString);
-          
+
           if (needsRotation) {
-            setSharedKeys({}); // Clear cached shared keys on rotation
+            setSharedKeys({});
           }
         }
         setIsReady(true);
       } catch (error) {
+        if (Storage.isStorageUnavailableError(error)) {
+          setStorageUnavailable(true);
+          setIsRestorable(false);
+          setIsReady(true);
+          console.warn('E2E storage is unavailable in this browser context. Skipping local key bootstrap.');
+          return;
+        }
+
         console.error('Failed to initialize E2E encryption:', error);
       }
     };
 
     initKeys();
-  }, [user, isAuthenticated, token]);
+  }, [user, isAuthenticated, token, storageUnavailable]);
 
   // Get Shared Key (Derive or Cache)
   const getSharedKey = useCallback(async (peerId: string | number) => {
     if (sharedKeys[String(peerId)]) return sharedKeys[String(peerId)];
 
     if (!user) throw new Error('User not authenticated');
+    if (storageUnavailable) throw new Error('E2E storage unavailable in this browser context');
 
     // Handle Local Peer (Number)
     const myKeys = await Storage.getKeyPair(user.id, 'ecdh');
@@ -80,7 +93,7 @@ export function useE2EEncryption() {
       console.error(`Failed to establish secure session with user ${peerId}`, error);
       throw error;
     }
-  }, [user, sharedKeys]);
+  }, [user, sharedKeys, storageUnavailable]);
 
   const getSharedKeyRaw = useCallback(async (peerId: string | number) => {
     const keyData = await getSharedKey(peerId);
@@ -104,6 +117,9 @@ export function useE2EEncryption() {
 
   const regenerateKeys = useCallback(async () => {
     if (!user) return;
+    if (storageUnavailable) {
+      throw new Error('E2E storage unavailable in this browser context');
+    }
     try {
 
       const keyPair = await Crypto.generateKeyPair();
@@ -120,10 +136,11 @@ export function useE2EEncryption() {
       console.error('Failed to regenerate keys:', error);
       throw error;
     }
-  }, [user]);
+  }, [user, storageUnavailable]);
 
   const backupKeys = useCallback(async (passphrase: string) => {
     if (!user || !token) throw new Error('Not authenticated');
+    if (storageUnavailable) throw new Error('E2E storage unavailable in this browser context');
 
     const ecdhKeys = await Storage.getKeyPair(user.id, 'ecdh');
     if (!ecdhKeys) throw new Error('Local keys not found for backup');
@@ -142,10 +159,11 @@ export function useE2EEncryption() {
 
     await exportAndBackup(ecdhKeys, 'ecdh');
     setIsRestorable(false);
-  }, [user, token]);
+  }, [user, token, storageUnavailable]);
 
   const restoreKeys = useCallback(async (passphrase: string) => {
     if (!user || !token) throw new Error('Not authenticated');
+    if (storageUnavailable) throw new Error('E2E storage unavailable in this browser context');
 
     const fetchAndImport = async (keyType: 'ecdh') => {
         const res = await api.get<any>(`/security/keys/restore?key_type=${keyType}`, {
@@ -177,7 +195,7 @@ export function useE2EEncryption() {
     setIsReady(true);
     setIsRestorable(false);
     setSharedKeys({});
-  }, [user, token]);
+  }, [user, token, storageUnavailable]);
 
-  return { isReady, isRestorable, encrypt, decrypt, regenerateKeys, backupKeys, restoreKeys, getSharedKeyRaw };
+  return { isReady, isRestorable, storageUnavailable, encrypt, decrypt, regenerateKeys, backupKeys, restoreKeys, getSharedKeyRaw };
 }

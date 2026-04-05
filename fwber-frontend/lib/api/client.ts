@@ -12,6 +12,7 @@ import type {
   ErrorResponse,
   PaginatedResponse,
 } from './types';
+import { safeLocalStorageGet, safeLocalStorageRemove } from '@/lib/browser-storage';
 
 function normalizeApiOrigin(rawUrl?: string | null): string {
   const fallbackOrigin = 'https://api.fwber.me'
@@ -160,7 +161,7 @@ export class NetworkError extends Error {
  * Get authorization headers from localStorage
  */
 function getAuthHeaders(): Record<string, string> {
-  const token = currentAuthToken ?? (typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null);
+  const token = currentAuthToken ?? safeLocalStorageGet('fwber_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -266,8 +267,8 @@ async function request<T>(
           // If auth error in browser, clear storage and redirect
           if (apiError.isAuthError && typeof window !== 'undefined' && hadAuthHeader) {
             setApiClientAuthToken(null);
-            localStorage.removeItem('fwber_token');
-            localStorage.removeItem('fwber_user');
+            safeLocalStorageRemove('fwber_token');
+            safeLocalStorageRemove('fwber_user');
             // Check if we are already on login page to avoid redirect loops
             if (!window.location.pathname.includes('/login')) {
               window.location.href = '/login?reason=session_expired';
