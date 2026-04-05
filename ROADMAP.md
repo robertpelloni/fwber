@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.9 "Frontend Workflow Install Strategy Fix"
+> **Current Version:** 1.8.3 "Hetzner Deploy Privilege Recovery"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,15 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.9)
+### Phase 5: Production Scale (COMPLETED - v1.8.3)
+- **Hetzner Deploy Privilege Recovery:** Hardened the backend deploy script so missing passwordless sudo for nginx config file writes no longer aborts an otherwise successful Hetzner deployment.
+- **Referral, Payout & Video Chat Restoration:** Restored referral validation, signup/premium referral rewards, vouch links keyed by referral code, video call initiate/signal/status/history endpoints, and expanded `/wallet` into a wallet + referrals + payout hub.
+- **Wallet Surface Restoration:** Restored the compact wallet backend/API surface and added a real `/wallet` page so token-linked dead routes now land somewhere useful again.
+- **Events Surface Restoration:** Restored the events backend/API surface, event invitation flow, and frontend pages for listing, viewing, and creating events.
+- **Hetzner Repo Ownership Repair:** Repaired mixed ownership inside the live checkout after the automated deploy workflow failed on `.git/objects` write permissions, restoring deploy-user control of the repo.
+- **Dead Surface Recovery: Activity, Notifications, Travel:** Restored `/activity`, `/notifications`, and `/settings/travel` so prominent signed-in links now land on real pages again.
+- **Friends System Restoration:** Restored the friends backend/API surface, added a new `/friends` page, and put Friends back into the authenticated navigation so long-dead social links resolve again.
+- **Mercure Surface Retirement:** Added a tracked Hetzner nginx config that returns an explicit retired response for `mercure.fwber.me` and wired it into the deploy script so the dead upstream is no longer presented as an active broken production service.
 - **Frontend Workflow Install Strategy Fix:** Switched the dedicated frontend GitHub workflow to `npm install --no-fund --no-audit` so frontend CI can proceed despite platform-sensitive optional dependency resolution in the current dependency graph.
 - **Hetzner Smoke/Deploy Contract Hardening:** Hardened smoke-check URL normalization + Reverb key discovery, re-synced tracked nginx configs during deploy, and re-verified the live Hetzner stack with a clean 9/3/0 smoke result including websocket upgrade success.
 - **NodeInfo 500 Recovery + Frontend CI Runtime Fix:** Hardened `NodeInfoController` against missing federation-era schema and aligned the frontend GitHub build to Node.js 24 so both discovery endpoints and frontend CI stop failing for infrastructure/toolchain reasons.
@@ -97,8 +105,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
-2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
-3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
-4. **Re-run Frontend Build With Updated Install Strategy:** Confirm the dedicated frontend workflow goes green.
+1. **Re-run GitHub Hetzner Deploy + Verify Referral/Video Surface:** Verify live `/wallet`, referral signup, vouch links, and video-chat initiation/history after the privilege fix ships.
+2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, and live video signaling with a real signed-in browser session.
+3. **Resolve Remaining Gift-Specific Dead Flows:** Compact-restore or retire remaining gift/token spend paths that still reference the newly restored wallet surface.
+4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

@@ -2,6 +2,73 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.3] - 2026-04-05 — Hetzner Deploy Privilege Recovery
+
+### Fixed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so nginx config sync attempts are optional when the deploy user lacks passwordless `sudo` for filesystem writes, while required `nginx` and `systemctl` commands still run with non-interactive privileged execution.
+- This specifically fixes the latest GitHub Hetzner deploy failure where deployment had already migrated and optimized successfully but aborted on `sudo cp` / `sudo ln` while refreshing nginx site configs.
+
+## [1.8.2] - 2026-04-05 — Referral, Payout & Video Chat Restoration
+
+### Added
+- Restored the referral backend surface with public referral-code lookup, referral summary API, referral commissions ledger, signup referral rewards, and two-level premium referral commissions.
+- Restored the video chat backend surface with video call logging, signaling relay, call status updates, and call history endpoints.
+- Restored public/authenticated vouch routes keyed by referral code so invite links and social-proof flows land on live APIs again.
+- Added `ReferralRestoreTest` and `VideoChatRestoreTest` coverage.
+
+### Changed
+- Expanded the wallet payload and `/wallet` page into a real wallet/referrals/payout hub.
+- Fixed frontend referral, vouch, and video API callers to use the active Hetzner API contract instead of stale relative or malformed base URLs.
+- Added Wallet navigation back into the app shell and dashboard quick actions.
+
+## [1.8.1] - 2026-04-05 — Wallet Surface Restoration
+
+### Added
+- Restored the wallet backend surface with wallet columns, wallet transactions table, referral-code backfill, wallet payload endpoint, and wallet-address update endpoint.
+- Restored the frontend `/wallet` page so existing token/gift/event upsell links land on a real wallet surface again.
+- Added `WalletRestoreTest` coverage for wallet payload and wallet-address updates.
+
+## [1.8.0] - 2026-04-05 — Events Surface Restoration
+
+### Added
+- Restored the events backend surface with `Event`, `EventAttendee`, and `EventInvitation` models plus migrations and endpoints for listing, creating, viewing, RSVPing, and inviting users.
+- Restored frontend routes for `/events`, `/events/[id]`, and `/events/create` using the existing event hooks/components already lingering in the codebase.
+- Added `EventRestoreTest` coverage for event creation, listing, RSVP, invitations, and acceptance flow.
+
+## [1.7.2] - 2026-04-05 — Hetzner Repo Ownership Repair
+
+### Fixed
+- Repaired ownership drift on the live Hetzner checkout after the backend deploy workflow failed with `insufficient permission for adding an object to repository database .git/objects`.
+- Restored `deploy` ownership of the repo git database/working tree and re-applied the shared log ACLs required for deploy-user + `www-data` coexistence.
+
+## [1.7.1] - 2026-04-05 — Dead Surface Recovery: Activity, Notifications, Travel
+
+### Added
+- Restored the `/activity` page so the dashboard feed “view all” action now lands on a real full-screen activity timeline.
+- Restored the `/notifications` inbox page so the bell drawer “view all” action now opens a proper full notifications surface.
+- Restored the `/settings/travel` page so the Settings travel-mode link now leads to a working control surface instead of a dead route.
+
+## [1.7.0] - 2026-04-05 — Friends System Restoration
+
+### Added
+- Restored the friends backend surface with a `Friend` model, `friends` schema, friend request send/respond/remove endpoints, and lightweight authenticated user search.
+- Added a new authenticated `/friends` page with searchable people discovery, pending request management, accepted-friends list, and removal controls.
+- Restored Friends navigation in the main authenticated shell so the feature is visible again from the app header and existing messaging links no longer point at a dead route.
+- Added `FriendRestoreTest` coverage for list/search/request/accept flows.
+
+## [1.7.0] - 2026-04-05 — Mercure Surface Retirement
+
+### Fixed
+- Added a tracked Hetzner nginx config for `mercure.fwber.me` that returns an explicit `410 Gone` response instead of proxying to the dead `127.0.0.1:3000` upstream and surfacing a misleading `502`.
+- Updated the Hetzner deploy script to re-sync the tracked `mercure.fwber.me` nginx config alongside the `api`, `ws`, and `geo` configs during deploy.
+- This makes the public production contract more honest: Mercure is no longer treated as a broken live service when Reverb is the actual active realtime stack.
+
+### Verified
+- Live server inspection confirmed there is no Mercure service and no listener on `127.0.0.1:3000`.
+- Public DNS for `mercure.fwber.me` resolves to `5.161.250.43`.
+- Public `https://mercure.fwber.me/.well-known/mercure` now returns the explicit retired `410 Gone` response from nginx.
+- The retirement path is therefore the correct operational response until/unless Mercure is intentionally reintroduced.
+
 ## [1.6.9] - 2026-04-05 — Frontend Workflow Install Strategy Fix
 
 ### Fixed
@@ -14,6 +81,7 @@ All notable changes to this project will be documented in this file.
 - Live smoke check now passes against Hetzner with **9 passes / 3 expected warnings / 0 failures**.
 - The websocket upgrade probe now succeeds against `https://ws.fwber.me` using the production Reverb app key.
 - `https://api.fwber.me/`, `/.well-known/nodeinfo`, and `/nodeinfo/2.0` all return healthy responses live after backend/nginx refresh.
+- GitHub Actions are now aligned behind the repaired stack: the `Frontend Build & Deploy (Vercel)` workflow for commit `e0fee531a` succeeded, and the live `www.fwber.me` frontend bundles reference `https://api.fwber.me`, `ws.fwber.me`, and `broadcasting/auth` as expected.
 
 ## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
 

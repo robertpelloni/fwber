@@ -1,23 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.6.9 (Frontend Workflow Install Strategy Fix)
+# PROJECT_STATUS.md - fwber v1.8.3 (Hetzner Deploy Privilege Recovery)
 
 **Date:** 2026-04-05
-**Version:** 1.6.9 "Frontend Workflow Install Strategy Fix"
-**Status:** ✅ **FRONTEND CI ISOLATED TO INSTALL-STRATEGY DRIFT; PRAGMATIC FIX APPLIED**
+**Version:** 1.8.3 "Hetzner Deploy Privilege Recovery"
+**Status:** ✅ **LATEST DEPLOY FAILURE ROOT-CAUSED TO NGINX CONFIG WRITE PRIVILEGES; SCRIPT NOW DEGRADES SAFELY**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release applies a pragmatic CI + operations stabilization pass after the frontend workflow and post-deploy verification layer both showed environment-sensitive drift.
+This release hardens the Hetzner deployment script after observing a real GitHub Actions deployment failure.
 
 Delivered:
-- switched the frontend GitHub workflow from `npm ci` to `npm install --no-fund --no-audit`
-- hardened the Hetzner smoke-check script so it auto-normalizes the API base URL and can discover the Reverb app key from the backend config
-- hardened the Hetzner deploy script so it re-applies tracked nginx configs for api/ws/geo before nginx validation + reload
-- confirmed a clean live smoke result on Hetzner, including websocket upgrade verification
+- optional nginx config sync when deploy lacks passwordless sudo for filesystem writes
+- retained strict privileged execution for required `nginx` validation and `systemctl` restarts
+- non-interactive privileged helper paths to avoid hanging on password prompts in CI
 
 ## ✅ Why This Matters
-The frontend dependency graph still includes wallet/native-adjacent packages whose optional/platform-sensitive resolution can diverge between local and GitHub Linux environments. At the same time, the production verifier itself needed to be more resistant to operator/env drift.
-
-This release improves both:
-- CI signal becomes more resilient
-- deploy-time verification becomes closer to a real source-of-truth contract check
+The previous deploy already completed `git pull`, `composer install`, migrations, optimize, and `php artisan deploy:verify`, then failed only because `sudo cp` / `sudo ln` required a password. This patch keeps deployment moving when live nginx configs are already present and only config refresh lacks privileges.

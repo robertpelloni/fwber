@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.6.9
+> **Version:** 1.8.3
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -171,8 +171,13 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - the dedicated frontend GitHub build now targets Node.js 24 so CI uses the same runtime family as the locally verified lockfile/build flow
 - public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
 - the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
-- the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, and `geo.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
+- the signed-in shell now has real `/activity`, `/notifications`, `/friends`, and `/settings/travel` pages again, reducing dead frontend links during production validation
+- live Hetzner repo ownership drift can still break deploys even when workflow logic is correct; keeping the checkout owned by `deploy` is now part of the practical runtime contract
+- the signed-in product shell now also includes restored `/wallet`, `/events`, `/friends`, `/activity`, `/notifications`, and `/settings/travel` routes, plus refreshed referral/vouch flows and video-chat backend endpoints, so post-deploy validation should exercise those features with a real session
+- the Hetzner backend deploy script now treats nginx config-file sync as optional when the deploy user lacks passwordless sudo for filesystem writes, instead of aborting after an otherwise successful migrate/optimize/verify cycle
+- the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
+- `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors
 - `HETZNER_HOST`
 - `HETZNER_USERNAME`
 - `HETZNER_SSH_KEY`
@@ -188,6 +193,7 @@ That path now performs a more trustworthy verification pass by:
 - using the canonical `https://api.fwber.me/api` base automatically
 - reloading tracked nginx site configs before testing
 - attempting a real websocket upgrade probe using the configured Reverb app key when available
+- keeping retired surfaces like `mercure.fwber.me` out of the healthy production contract instead of silently proxying to dead local ports
 
 A recent live Hetzner run completed with:
 

@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
-> **Generated on:** 2026-04-04
-> **Current Global Version:** 1.5.3
+> **Generated on:** 2026-04-05
+> **Current Global Version:** 1.8.3
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -24,13 +24,13 @@ fwber/
 ## 📦 Active Logical Packages
 
 ### 1. `fwber-backend`
-- **Version:** inherits global `1.4.5`
+- **Version:** inherits global `1.8.3`
 - **Role:** Core API and business logic.
 - **Owns:** auth, onboarding, profiles, photos, proximity matching, messages, block/report safety actions, notification APIs, E2E key backup/restore.
 - **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `1.4.5`
+- **Version:** inherits global `1.8.3`
 - **Role:** Main user-facing product surface.
 - **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
 - **Key stack:** Next.js app router, React, Tailwind CSS.
@@ -58,6 +58,8 @@ fwber/
 - Backend, frontend, mobile shell, and deployment docs now reflect the simplified core dating product.
 - CI/CD workflows are present under `.github/workflows/`.
 - The mobile shell now bridges foreground Expo pushes into the web app toast layer for active-session notification UX.
+- The frontend app shell now exposes restored Gold, Roast, Merchant, and moderator sections directly in authenticated navigation instead of hiding them behind direct URLs.
+- The frontend browser client now targets `api.fwber.me` directly in production and the backend route surface once again includes dashboard stats/activity for the authenticated shell.
 - Notification routes are now standardized across backend payloads, notification drawer links, and toast CTA actions.
 - The frontend Sentry integration now follows current App Router instrumentation conventions and no longer emits Sentry-specific build warnings.
 - Active frontend pages no longer prefetch retired routes like `/roast` or `/rate-my-pussy`, and analytics event ingestion is live again in the simplified backend route set.
@@ -75,6 +77,9 @@ fwber/
 - Smoke-check reports now also capture DNS resolution records for the public frontend/API/geo/websocket hosts, making host-to-responder drift easier to prove.
 - Smoke-check runs can now also be compared across deploys via drift JSON/Markdown artifacts, making it easier to detect what changed between report generations.
 - Smoke-check/diff outputs can now also be condensed into compact notification artifacts and optionally posted to a webhook for chatops-style deploy summaries.
+- The fwber backend runtime is now actually deployed on Hetzner with local MySQL, Redis, Reverb, queue, and geo services active; the remaining migration work is primarily public DNS/TLS cutover.
+- The deploy script now also handles non-root operator execution more safely by auto-using `sudo` for systemd/nginx actions when required.
+- The smoke-check websocket probe now uses a valid RFC-compliant handshake key, eliminating a post-cutover false-negative seen during live Hetzner validation.
 - Merchant discovery is now geo-aware again through persisted storefront coordinates and distance-ranked nearby marketplace responses.
 - Merchant moderation and trust scoring are active again through restored moderation routes, trust-weighted ranking, and moderation dashboard merchant review tooling.
 - Merchant review prioritization is active through queue priority scoring, search, and inline note workflows.

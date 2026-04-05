@@ -14,7 +14,6 @@ COMPARE_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/compare-smoke-reports.py"
 PUBLISH_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/publish-smoke-report.py"
 REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
-SUDO_BIN=""
 
 # GitHub Actions and other non-login SSH executions do not reliably source the deploy user's
 # shell profile, which means Rust installed via rustup can disappear from PATH even though the
@@ -28,9 +27,27 @@ if [ -d "$HOME/.cargo/bin" ]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-if [ "$(id -u)" -ne 0 ]; then
-  SUDO_BIN="sudo"
-fi
+run_privileged() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  else
+    sudo -n "$@"
+  fi
+}
+
+run_optional_privileged() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+    return 0
+  fi
+
+  if sudo -n "$@"; then
+    return 0
+  fi
+
+  echo "Skipping privileged command because passwordless sudo is unavailable: $*"
+  return 0
+}
 
 sync_nginx_site() {
   local source_path="$1"
@@ -40,8 +57,11 @@ sync_nginx_site() {
     return
   fi
 
-  $SUDO_BIN cp "$source_path" "/etc/nginx/sites-available/$site_name"
-  $SUDO_BIN ln -sf "/etc/nginx/sites-available/$site_name" "/etc/nginx/sites-enabled/$site_name"
+  # Some Hetzner deployments grant the deploy user passwordless sudo for nginx and
+  # systemctl operations but not blanket root filesystem writes. In that case we
+  # keep the existing live nginx config instead of failing the entire deployment.
+  run_optional_privileged cp "$source_path" "/etc/nginx/sites-available/$site_name"
+  run_optional_privileged ln -sf "/etc/nginx/sites-available/$site_name" "/etc/nginx/sites-enabled/$site_name"
 }
 
 cd "$REPO_ROOT"
@@ -70,12 +90,13 @@ fi
 sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/api.fwber.me.conf" "api.fwber.me"
 sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/ws.fwber.me.conf" "ws.fwber.me"
 sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/geo.fwber.me.conf" "geo.fwber.me"
-$SUDO_BIN nginx -t
+sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/mercure.fwber.me.conf" "mercure.fwber.me"
+run_privileged nginx -t
 
-$SUDO_BIN systemctl restart fwber-queue
-$SUDO_BIN systemctl restart fwber-reverb
-$SUDO_BIN systemctl restart fwber-geo
-$SUDO_BIN systemctl reload nginx
+run_privileged systemctl restart fwber-queue
+run_privileged systemctl restart fwber-reverb
+run_privileged systemctl restart fwber-geo
+run_privileged systemctl reload nginx
 
 if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
   mkdir -p "$REPORT_DIR_ROOT"

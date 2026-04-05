@@ -1,11 +1,15 @@
 # MEMORY.md
 
-## 2026-04-05 — v1.6.9 Frontend CI + smoke tooling both needed pragmatism over purity
-- After lockfile resync and Node 24 alignment, the frontend GitHub workflow was still failing because of platform-sensitive optional dependency resolution in wallet/native-adjacent packages.
-- Switching the CI install step to `npm install --no-fund --no-audit` is the pragmatic path to restore build verification signal while the dependency graph is further simplified.
-- The Hetzner smoke verifier needed the same philosophy: normalize `FWBER_API_URL` automatically and discover the Reverb app key from Laravel config instead of assuming perfect operator-provided env every time.
-- Re-applying tracked nginx configs during deploy is also worth the extra step because live server drift already happened more than once during this Hetzner cutover.
+## 2026-04-05 — v1.8.3 the latest Hetzner deploy failure was not a code/runtime failure, it was a privilege-shape mismatch
+- GitHub Hetzner deploy reached `composer install`, migration execution, optimize, and `php artisan deploy:verify` successfully.
+- The failure occurred afterward when the script tried `sudo cp` / `sudo ln` to refresh nginx configs under `/etc/nginx`, which the deploy user could not perform non-interactively.
+- The deploy script now treats nginx config sync as optional in that privilege shape while keeping required `nginx -t` and `systemctl` operations strict.
 
-## 2026-04-05 — v1.6.8 Discovery routes still need schema guards even when federation is de-scoped
-- `/nodeinfo/2.0` was still 500ing live because `NodeInfoController` assumed `user_profiles.is_federated` existed.
-- Even when federation is not the active product focus, discovery routes must degrade safely instead of crashing on absent optional schema.
+## 2026-04-05 — v1.8.2 referrals and video were still latent in the frontend, so backend restoration had very high leverage
+- The product still had referral banners, register-time referral handling, vouch links, wallet payout expectations, and a fairly complete WebRTC video UI.
+- The main missing pieces were the backend/API contracts and several frontend callers still using stale URL assumptions.
+- Restoring these flows was therefore more valuable than inventing new UI because large user-visible surfaces were already waiting behind dead or malformed endpoints.
+
+## 2026-04-05 — v1.8.1 Wallet was the next obvious dead-route cluster after Events
+- `/wallet` was still referenced by event payment, notification gift routes, and premium filter upsells, while a wallet hook already existed in the frontend.
+- Restoring a compact wallet backend/API/page is another strong leverage move because it resolves several visible dead links and reuses existing frontend logic without reintroducing the full archived token economy.
