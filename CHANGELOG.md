@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.5] - 2026-04-05 — Restore Branch Smoke Suite + Deploy Hardening Replay
+
+### Changed
+- Replayed deployment health, smoke-check, smoke-report, ACL/logging, nginx sync, and deploy hardening commits onto `restore/pre-simplification-hetzner`.
+- Advanced restore-branch tip through `1601157a3`, `e8a6e4862`, `d56af49ae`, `6cfdd4941`, `e7b3946e9`, `9662a5b7d`, `a542f93b3`, `02a27b1a7`, `4506cff55`, `a524abac9`, `a56f004ad`, and `cb8ac70ca`.
+- Added a direct restore-branch fix `d4d073e4f` to correct Linux-sensitive `Api` controller namespace casing in routes so branch CI can move past a concrete route-resolution failure.
+
 ## [1.9.4] - 2026-04-05 — Restore Branch Workflow Stabilization Replay
 
 ### Changed

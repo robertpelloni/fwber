@@ -1,21 +1,16 @@
 # MEMORY.md
 
+## 2026-04-05 — the restore branch is now deep enough that Linux-specific app breakage is surfacing, not just workflow drift
+- After replaying the health/smoke/deploy stack, backend CI on the restore branch surfaced a real Linux route-resolution issue: routes referenced `App\Http\Controllers\API\...` while the actual namespace/path is `Api\...`.
+- That mismatch is easy to miss on Windows but breaks on Linux CI. A direct restore-branch fix was warranted and applied as `d4d073e4f`.
+- Expect more of these reconciliation issues as the richer old branch meets the modern Linux/Hetzner environment.
+
 ## 2026-04-05 — replaying workflow modernization onto the rewind branch was immediately justified by a real CI failure
 - The first restore-branch frontend workflow run failed because the older branch still carried stale workflow assumptions and no suitable lockfile path resolution.
-- After that failure, replaying `847f43f26` and `18f3539e9` onto the rewind branch was the right next move.
+- After that failure, replaying `847f43f26`, `18f3539e9`, `81781ffb1`, `6f1251b18`, and `e0fee531a` onto the rewind branch was the right next move.
 - This confirms the replay order matters: CI/deploy modernization needs to happen early, not after deeper app-layer merges.
 
 ## 2026-04-05 — the rewind branch can already accept modern Hetzner commits with manageable conflicts
-- `restore/pre-simplification-hetzner` successfully absorbed:
-  - `11250c5ec` (Hetzner deployment docs)
-  - `59f132e38` (Hetzner ops templates + frontend env alignment)
-  - `847f43f26` (GitHub backend deploy switched to Hetzner)
-  - `18f3539e9` (workflow stabilization after cutover)
-- Early replay conflicts were mostly documentation/version files and missing workflow files that needed to be kept from the replayed commits.
-- That is still a very good sign: replay is viable and conflict profile remains manageable.
-
-## 2026-04-05 — v1.9.2 created the actual rewind track, not just the idea
-- The dedicated restore branch is now `restore/pre-simplification-hetzner`.
-- It is rooted at `a636a53c3`, the final pre-simplification snapshot before `2a3f8aa40`.
-- The repo-level diff from `a636a53c3..HEAD` is enormous: 827 files changed, 20,665 insertions, 56,068 deletions.
-- That confirms rewind + replay is the correct strategy for “bring back everything” rather than continuing only archive-by-archive restoration forever.
+- `restore/pre-simplification-hetzner` has now successfully absorbed docs, ops templates, workflow modernization, health endpoints, smoke tooling, report tooling, ACL/logging changes, and nginx/deploy hardening.
+- Early replay conflicts were mostly documentation/version files and deploy script merges, which remain manageable.
+- That is still a strong signal that rewind + replay is viable.
