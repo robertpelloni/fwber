@@ -21,6 +21,7 @@ class Following extends Model
         'actor_uri',
         'username',
         'domain',
+        'actor_type',
         'status',
     ];
 

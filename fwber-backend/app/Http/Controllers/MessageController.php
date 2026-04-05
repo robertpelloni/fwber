@@ -270,12 +270,21 @@ class MessageController extends Controller
                 (string) $resolvedType,
                 json_encode(['message_id' => $message->id])
             );
-            $this->eventStore->append(
-                $event,
-                'Chatroom',
-                $currentVersion + 1,
-                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
-            );
+            try {
+                $this->eventStore->append(
+                    $event,
+                    'Chatroom',
+                    $currentVersion + 1,
+                    ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+                );
+            } catch (\Throwable $eventStoreException) {
+                \Illuminate\Support\Facades\Log::warning('Message event append failed; continuing with message persistence', [
+                    'match_id' => $match->id,
+                    'sender_id' => $senderId,
+                    'receiver_id' => $receiverId,
+                    'error' => $eventStoreException->getMessage(),
+                ]);
+            }
             // ----------------------------------
 
             // Update match last_message_at

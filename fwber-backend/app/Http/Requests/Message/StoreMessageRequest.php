@@ -22,7 +22,11 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'receiver_id' => 'required|string',
+            // The rewind branch still contains older tests and controllers that
+            // send numeric local user IDs, while federation paths can also use a
+            // remote actor URL string. Accept either so restored messaging flows
+            // remain compatible with both local and federated contracts.
+            'receiver_id' => 'required',
             'content' => 'nullable|string|max:5000',
             'message_type' => 'sometimes|string',
             'media' => 'nullable|file',
