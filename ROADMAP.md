@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.9.3 "Restore Branch Hetzner Replay Kickoff"
+> **Current Version:** 1.9.4 "Restore Branch Workflow Stabilization Replay"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.9.3)
+### Phase 5: Production Scale (COMPLETED - v1.9.4)
+- **Restore Branch Workflow Stabilization Replay:** Replayed the GitHub Hetzner backend deploy workflow and the workflow-stabilization sweep onto `restore/pre-simplification-hetzner`, then pushed branch tip `82ff8e6f6`.
 - **Restore Branch Hetzner Replay Kickoff:** Created a dedicated restore worktree, replayed the first two Hetzner commits onto `restore/pre-simplification-hetzner`, and pushed branch tip `96c10825f`.
 - **Pre-Simplification Rewind Branch + Replay Plan:** Created and pushed `restore/pre-simplification-hetzner`, documented the rewind baseline at `a636a53c3`, and produced the initial Hetzner/runtime replay manifest.
 - **Premium Discovery Filter Restoration:** Restored premium discovery schema, profile persistence, full `/matches` advanced filter passthrough, server-side token gating, and expanded filter UX so the active discovery screen matches the product contract again.
@@ -115,8 +116,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Continue Mandatory Hetzner Infra Replay:** Next target commits on `restore/pre-simplification-hetzner` should cover deployment health endpoints, smoke tooling, workflow stabilization, and ACL/log fixes.
-2. **Validate The Restore Branch After The Next Replay Tranche:** Run backend tests, frontend build, deploy verification, and smoke tooling checks on the branch.
-3. **Resolve Conflicts Between Full Feature Set And Modern Runtime Contract:** Pay special attention to websocket envs, frontend API origin handling, migration idempotency, route cache safety, and health endpoints.
+1. **Continue Mandatory Hetzner Infra Replay:** Next target commits on `restore/pre-simplification-hetzner` should cover deployment health endpoints, smoke tooling, ACL/log fixes, rustup path fixes, and route/schema drift hardening.
+2. **Inspect Fresh Restore-Branch Workflow Runs:** Confirm the replayed workflow modernization resolves the earlier restore-branch frontend CI failure.
+3. **Validate The Restore Branch After The Next Replay Tranche:** Run backend tests, frontend build, deploy verification, and smoke tooling checks on the branch.
 4. **Compare Rewind Branch Against Main After Each Tranche:** Identify which post-simplification fixes still matter after infra replay.
 5. **DreamHost Retirement:** Once the rewind-merge restoration is stable on Hetzner, retire the old DreamHost backend path and remove stale provider dependencies.

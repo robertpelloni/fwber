@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.4] - 2026-04-05 — Restore Branch Workflow Stabilization Replay
+
+### Changed
+- Replayed `847f43f26` onto `restore/pre-simplification-hetzner`, bringing the GitHub backend deployment path over from DreamHost-era behavior to Hetzner.
+- Replayed `18f3539e9` onto the restore branch, modernizing the workflow set after the first restore-branch frontend CI failure exposed stale assumptions.
+- Advanced and pushed restore-branch tip to `82ff8e6f6`, triggering fresh CI/deploy runs with the newer workflow stack.
+
 ## [1.9.3] - 2026-04-05 — Restore Branch Hetzner Replay Kickoff
 
 ### Changed

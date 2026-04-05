@@ -1,17 +1,17 @@
-# PROJECT_STATUS.md - fwber v1.9.3 (Restore Branch Hetzner Replay Kickoff)
+# PROJECT_STATUS.md - fwber v1.9.4 (Restore Branch Workflow Stabilization Replay)
 
 **Date:** 2026-04-05
-**Version:** 1.9.3 "Restore Branch Hetzner Replay Kickoff"
-**Status:** ✅ **THE FULL-FEATURE REWIND BRANCH NOW HAS ITS FIRST HETZNER REPLAY COMMITS APPLIED AND PUSHED**
+**Version:** 1.9.4 "Restore Branch Workflow Stabilization Replay"
+**Status:** ✅ **THE REWIND BRANCH NOW INCLUDES HETZNER BACKEND DEPLOY AND STABILIZED CI WORKFLOWS**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release marks the first real merge/replay progress on the dedicated rewind branch:
-- created restore worktree for safe parallel branch work
-- replayed Hetzner deployment docs commit onto the rewind branch
-- replayed Hetzner ops templates + frontend env alignment onto the rewind branch
-- pushed the updated rewind branch to origin
+The restore branch moved past planning and initial ops templates into actual CI/deploy modernization:
+- replayed GitHub backend deploy switch from DreamHost to Hetzner onto the rewind branch
+- replayed workflow stabilization after the first rewind-branch frontend CI failure exposed stale assumptions
+- pushed restore branch tip `82ff8e6f6`
+- triggered fresh restore-branch workflow runs with the newer workflow set
 
 ## ✅ Why This Matters
-The project is no longer only planning the rewind strategy. The replay has started on `restore/pre-simplification-hetzner`, proving the branch can absorb modern Hetzner changes while preserving the richer pre-simplification feature baseline.
+The rewind branch is now carrying not just Hetzner docs and ops files, but also the core GitHub Actions deployment and CI transition required to make a full-feature branch realistically deployable in the current production topology.
