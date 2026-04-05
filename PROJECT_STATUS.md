@@ -1,18 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.8.3 (Hetzner Deploy Privilege Recovery)
+# PROJECT_STATUS.md - fwber v1.8.4 (Hetzner Nginx Sync Helper Integration)
 
 **Date:** 2026-04-05
-**Version:** 1.8.3 "Hetzner Deploy Privilege Recovery"
-**Status:** ✅ **LATEST DEPLOY FAILURE ROOT-CAUSED TO NGINX CONFIG WRITE PRIVILEGES; SCRIPT NOW DEGRADES SAFELY**
+**Version:** 1.8.4 "Hetzner Nginx Sync Helper Integration"
+**Status:** ✅ **HETZNER NOW HAS A ROOT-OWNED NGINX SYNC PATH FOR GITHUB DEPLOYS**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release hardens the Hetzner deployment script after observing a real GitHub Actions deployment failure.
+This release extends the prior Hetzner deploy privilege repair into a reproducible ops path.
 
 Delivered:
-- optional nginx config sync when deploy lacks passwordless sudo for filesystem writes
-- retained strict privileged execution for required `nginx` validation and `systemctl` restarts
-- non-interactive privileged helper paths to avoid hanging on password prompts in CI
+- deploy script now prefers a dedicated root-owned nginx sync helper
+- live Hetzner host provisioned with `/usr/local/bin/fwber-sync-nginx-sites`
+- deploy user granted narrow passwordless sudo for that helper
 
 ## ✅ Why This Matters
-The previous deploy already completed `git pull`, `composer install`, migrations, optimize, and `php artisan deploy:verify`, then failed only because `sudo cp` / `sudo ln` required a password. This patch keeps deployment moving when live nginx configs are already present and only config refresh lacks privileges.
+The deploy workflow no longer has to rely on blanket sudo permissions for raw file-copy commands just to refresh nginx configs. This is a safer and more reproducible model for GitHub-triggered Hetzner deploys.

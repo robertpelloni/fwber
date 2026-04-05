@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.4] - 2026-04-05 — Hetzner Nginx Sync Helper Integration
+
+### Fixed
+- Updated `ops/hetzner/scripts/deploy-backend.sh` to prefer a root-owned nginx sync helper when available, so GitHub deploys can refresh tracked nginx configs and validate them without requiring blanket passwordless sudo for raw `cp` / `ln` commands.
+- Provisioned the live Hetzner host with `/usr/local/bin/fwber-sync-nginx-sites` and a dedicated sudoers allowance for the `deploy` user.
+
 ## [1.8.3] - 2026-04-05 — Hetzner Deploy Privilege Recovery
 
 ### Fixed
