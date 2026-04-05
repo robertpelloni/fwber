@@ -1,29 +1,29 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.5.3
-> **Last Updated:** 2026-04-04
+> **Version:** 1.6.6
+> **Last Updated:** 2026-04-05
 
 ---
 
 ## 🔴 Critical: Deployment & Verification
-- [ ] **Hetzner VPS Provisioning Execution**: Complete server creation, DNS cutover, package install, env setup, and service configuration using the deployment docs plus `ops/hetzner/` templates.
-- [ ] **Redeploy After Restoration Phases**: Re-run deployment now that AI, premium/billing, marketplace/merchant, geo-aware merchant discovery, merchant trust scoring, merchant review prioritization, deployment health verification, smoke-check automation, report artifacts, remediation diagnostics, endpoint fingerprinting, DNS appendix reporting, drift diffing, and notification publishing are restored on top of the migration-hardening work.
-- [ ] **Fix Live Health Route Drift**: The current reachable `api.fwber.me` deployment still returns `404` for `/api/health`, `/api/health/liveness`, and `/api/health/readiness`; current smoke data shows this traffic resolves to and is served from **Apache at `75.119.202.57`**.
-- [ ] **Fix Live Geo Domain Drift**: The current reachable `geo.fwber.me/nearby` contract returns a Vercel deployment-not-found `404`; smoke data now shows `geo.fwber.me` resolves to **`216.198.79.65|64.29.17.1`** and responds via **Vercel at `64.29.17.1`** instead of a geo microservice host.
-- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in an authenticated deployment environment with real secrets.
-- [ ] **Provision Smoke-Test Tokens/Keys**: Create or document production-safe smoke-test accounts/tokens plus the Reverb app key path so `ops/hetzner/scripts/smoke-check.sh` can run its optional authenticated and websocket probes in production.
-- [ ] **Wire Chat/Webhook Notifications**: Provide a real `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` target if you want deploy notifications delivered automatically outside the report directory.
+- [ ] **Re-run Hetzner Backend Deploy After ACL Fix**: Confirm the backend deploy workflow now succeeds after the log ACL fix and backend stability repair are both present in the deployed script/code path.
+- [ ] **Re-check `api.fwber.me/` and Dashboard Endpoints Live**: Verify the backend root route and dashboard endpoints stop 500ing in production after the repaired deploy completes.
+- [ ] **Re-run Frontend GitHub Workflow After Lockfile Resync**: Confirm `frontend-build.yml` goes green once the resynced lockfile is in the workflow run context.
+- [ ] **Verify Live Frontend API Recovery**: Confirm the dashboard and E2E restore calls now hit `api.fwber.me` instead of `www.fwber.me/api/*` after Vercel finishes deploying the updated frontend.
+- [ ] **Repair / Confirm Realtime Contract**: Re-check the live header connection badge and websocket/broadcast-auth behavior after the backend/public-route repair deploy.
+- [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s before broadening restoration further.
 
-## 🟡 High: Product Polish
-- [ ] **Store Asset Production**: Execute the screenshot and copy plan in `mobile/STORE_ASSETS.md`.
-- [ ] **Real-Device Notification QA**: Verify foreground, background, and cold-start notification flows on physical iOS/Android devices now that routes and toasts are standardized.
-- [ ] **Production Login 500 Root Cause Audit**: Inspect live backend logs for the production `/api/auth/login` 500 so the server-side failure itself is fixed, not just the frontend error handling.
+## 🟡 High: Product Restoration
+- [ ] **Map Remaining Removed Features vs Current Live Errors**: Before re-enabling all archived systems wholesale, finish stabilizing the live stack so restoration does not compound unresolved runtime drift.
+- [ ] **Audit Remaining Dead Settings Links**: Continue replacing leftover settings entries that still point at retired/non-core surfaces with live restored or core destinations.
+- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment.
+- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is fully validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
 
 ## ✅ Recently Completed
-- [x] **Smoke Report Notification Publisher**: Added compact notification artifact generation and optional webhook publishing for smoke + drift report summaries.
-- [x] **Smoke Report Drift Diff**: Added comparison tooling that highlights summary, diagnostic, fingerprint, and DNS changes between smoke-check runs.
-- [x] **DNS Resolution Appendix & Host Mapping**: Smoke-check reports now capture resolved addresses for frontend, API, geo, and websocket hosts.
-- [x] **Endpoint Fingerprints & Host Signals**: Smoke-check reports now capture remote IPs, server headers, redirect targets, content types, and body excerpts for each endpoint.
+- [x] **Hetzner Log ACL Deploy Fix**: Removed the broken log permission override, switched to ACL-based shared log access, and repaired the live Hetzner server log directory ACLs.
+- [x] **Hetzner Backend Stability Repair**: Replaced the broken root route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables.
+- [x] **Frontend Lockfile Resync**: Regenerated `fwber-frontend/package-lock.json` and validated with fresh `npm ci` + `npm run build`.
+- [x] **Workflow Stabilization Sweep**: Fixed backend/frontend workflow drift and removed duplicate auto-failing CI/deploy noise from legacy workflows.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

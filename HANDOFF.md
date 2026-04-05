@@ -1,175 +1,113 @@
 # HANDOFF - End of GPT Session
 
-> **Timestamp:** 2026-04-04
-> **Version Reached:** 1.5.3
+> **Timestamp:** 2026-04-05
+> **Version Reached:** 1.6.6
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the autonomous deployment-hardening loop and delivered **v1.5.3 "Smoke Report Notification Publisher"**.
+After deploying the Hetzner backend stability patch, the next failure surfaced immediately in the real GitHub deploy path: daily log ownership drift between `deploy` and `www-data`.
 
-After v1.5.2 added drift comparison, the next practical gap was communication: the deployment evidence system could produce rich artifacts, but operators still lacked a concise publishable summary for chatops or webhook-based notification flows.
-
-This release fixes that by adding:
-- a smoke-report notification publisher
-- compact notification JSON/Markdown artifacts
-- optional webhook publishing support
-- deploy-script integration so notification artifacts are generated after smoke and drift reports
-
-No processes were manually killed.
+This session fixed that in **v1.6.6 "Hetzner Log ACL Deploy Fix"**.
 
 ---
 
-## What Changed
+## What Happened
+### 1. Live backend drift patch exposed a new deploy blocker
+The `v1.6.5` push reached Hetzner and started deploying correctly, but the GitHub deploy failed during the migration/logging phase because Laravel/Monolog attempted to chmod a daily log file owned by `www-data`.
 
-### 1. Added `ops/hetzner/scripts/publish-smoke-report.py`
-This new script consumes:
-- `smoke-check-summary.json`
-- optional `smoke-check-drift.json`
+Observed failure shape:
+- deploy runs as `deploy`
+- PHP-FPM/web runtime writes daily logs as `www-data`
+- Monolog permission handling tried to chmod the current day log from the deploy-side artisan process
+- deploy failed with `chmod(): Operation not permitted`
 
-It generates:
-- `smoke-check-notification.json`
-- `smoke-check-notification.md`
+### 2. Root cause
+The previous attempt to harden logging by setting Monolog `permission => 0664` was the wrong shape for this environment.
 
-It can also optionally POST the resulting payload to a webhook using:
-- `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`
+Why:
+- it assumes the process opening the log file can chmod it
+- that is false when the file was created by a different runtime user (`www-data`) and the deploy process runs as `deploy`
 
-### 2. Notification payload shape
-The publisher emits a concise payload containing:
-- markdown `text`
-- `report_dir`
-- overall status
-- summary counters
-- top diagnostics
-- drift summary when available
+### 3. Correct repair chosen
+The correct fix is shared write access at the directory ACL layer, not repeated per-file chmod from application logging config.
 
-This keeps the message compact enough for chat tools while still pointing back to the full report directory for deep inspection.
+So I:
+- removed the Monolog permission override from `config/logging.php`
+- changed the deploy script to maintain ACLs on `storage/logs`
+- applied the matching ACL repair live on Hetzner
 
-### 3. Updated `ops/hetzner/scripts/deploy-backend.sh`
-When smoke checks run and Python is available, the deploy flow now also generates notification artifacts in the current report directory.
+---
 
-Python selection behavior remains:
-- `FWBER_PYTHON_BIN` if provided
-- otherwise `python3`
-- fallback to `python`
+## What Was Changed
 
-### 4. Validation performed
-Executed:
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
-
-Then validated end to end by generating:
-1. smoke summary
-2. drift diff
-3. notification artifacts
-
-Outputs were inspected and confirmed valid for:
-- notification JSON
-- notification Markdown
-- inclusion of drift summary when drift JSON exists
-- inclusion of top diagnostics from the current smoke report
-
-### 5. Documentation updated
+### Repo changes
 Updated:
-- `CHANGELOG.md`
-- `DEPLOY.md`
-- `PROJECT_STATUS.md`
-- `TODO.md`
-- `ROADMAP.md`
-- `MEMORY.md`
-- `HANDOFF.md`
-- `IDEAS.md`
-- `docs/SUBMODULE_DASHBOARD.md`
-- `docs/ai/deployment/hetzner-vercel-production.md`
-- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
-
-Added:
-- `docs/ai/implementation/smoke-report-notification-publisher.md`
-- `docs/ai/testing/smoke-report-notification-publisher.md`
-
----
-
-## Validation
-
-### Static validation
-Executed:
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
-- `git diff --check`
-
-### End-to-end artifact validation
-Executed:
-- generated smoke-check summary artifacts
-- generated drift artifacts
-- generated notification artifacts from those reports
-
-Validated:
-- `smoke-check-notification.json`
-- `smoke-check-notification.md`
-- drift-aware notification content
-- compact top-diagnostic summarization
-
-### Memory operations
-Executed:
-- searched AI DevKit memory for prior smoke-report publish/webhook knowledge
-- stored the v1.5.3 notification-publisher knowledge after implementation
-
----
-
-## Files Changed This Session
-
-### Operations scripts
-- `ops/hetzner/scripts/publish-smoke-report.py`
+- `fwber-backend/config/logging.php`
 - `ops/hetzner/scripts/deploy-backend.sh`
+- documentation/version files
 
-### AI DevKit docs
-- `docs/ai/implementation/smoke-report-notification-publisher.md`
-- `docs/ai/testing/smoke-report-notification-publisher.md`
+Behavior now:
+- no Monolog chmod attempt against foreign-owned daily logs
+- deploy script uses `setfacl` on `storage/logs` when available so future rotated log files inherit shared access for:
+  - `deploy`
+  - `www-data`
 
-### Deployment / release docs
+### Live server changes
+Executed on Hetzner:
+- added `deploy` to `www-data` group
+- fixed existing log file permissions to group-writable
+- applied ACLs to `/var/www/fwber/repo/fwber-backend/storage/logs`
+- applied default ACLs so future files inherit shared access
+
+Confirmed ACL state now includes shared entries for:
+- `user:deploy:rwx`
+- `group:www-data:rwx`
+- matching default ACLs
+
+---
+
+## Validation State
+### Confirmed before this fix
+- backend CI green
+- repository hygiene green
+- GitHub Hetzner backend deploy green in prior validated runs
+- direct backend drift fixes compile/test locally
+
+### Remaining next verification after this release
+- re-run Hetzner backend deploy on the new ACL-aware script/code
+- verify live root route and dashboard endpoints stop 500ing
+- re-run frontend GitHub build after lockfile resync
+
+---
+
+## Files Changed in This Slice
+- `fwber-backend/config/logging.php`
+- `ops/hetzner/scripts/deploy-backend.sh`
 - `CHANGELOG.md`
-- `DEPLOY.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
-- `ROADMAP.md`
 - `MEMORY.md`
+- `ROADMAP.md`
+- `DEPLOY.md`
 - `HANDOFF.md`
-- `IDEAS.md`
-- `docs/SUBMODULE_DASHBOARD.md`
-- `docs/ai/deployment/hetzner-vercel-production.md`
-- `docs/deployment/HETZNER_VERCEL_DEPLOYMENT.md`
-
-### Version tracking
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
+- version files
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.5.3`
-- **Recommended Commit Message:** `feat: add smoke-report notification publishing (v1.5.3)`
+- **Target Version:** `1.6.6`
+- **Recommended Commit Message:** `fix: replace log chmod strategy with acl-based hetzner deploy access (v1.6.6)`
 
 ---
 
-## Current Best Next Steps
-1. **Redeploy the backend serving `api.fwber.me`**
-   - health routes are still missing there
-2. **Fix `geo.fwber.me` routing/DNS**
-   - geo is still resolving/responding through the wrong hosting topology
-3. **Provide a real deploy notification target**
-   - set `FWBER_SMOKE_NOTIFY_WEBHOOK_URL` if you want chat/webhook delivery beyond local artifacts
-4. **Provision smoke credentials and websocket key access**
-   - user token
-   - merchant token
-   - moderator token
-   - Reverb app key
-5. **Run the full live deploy path**
-   - `FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh`
-   - review smoke summary, drift diff, notification summary, diagnostics, fingerprints, and DNS appendix before sign-off
-6. **Then run live Stripe verification**
-   - premium purchase
-   - marketplace purchase
-   - webhook handling
+## Best Next Steps
+1. Commit and push `v1.6.6`
+2. Re-run Hetzner backend deploy workflow
+3. Re-verify live:
+   - `https://api.fwber.me/`
+   - dashboard routes
+   - route tooling
+4. Re-run frontend GitHub workflow
+5. Continue production 500 sweep before large-scale feature restoration
 
-The deployment evidence pipeline is now stronger because it can not only collect and compare evidence, but also condense that evidence into a publishable operator summary.
+No processes were manually killed.

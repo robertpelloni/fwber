@@ -14,6 +14,23 @@ COMPARE_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/compare-smoke-reports.py"
 PUBLISH_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/publish-smoke-report.py"
 REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
+SUDO_BIN=""
+
+# GitHub Actions and other non-login SSH executions do not reliably source the deploy user's
+# shell profile, which means Rust installed via rustup can disappear from PATH even though the
+# server is correctly provisioned. Prefer the rustup toolchain explicitly when present so geo
+# builds stay consistent across manual SSH sessions and CI-triggered deployments.
+if [ -f "$HOME/.cargo/env" ]; then
+  # shellcheck disable=SC1090
+  . "$HOME/.cargo/env"
+fi
+if [ -d "$HOME/.cargo/bin" ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+if [ "$(id -u)" -ne 0 ]; then
+  SUDO_BIN="sudo"
+fi
 
 cd "$REPO_ROOT"
 git pull origin main
@@ -25,15 +42,23 @@ php artisan optimize:clear
 php artisan optimize
 php artisan deploy:verify
 
+# Daily log files may be created by the web runtime as `www-data`, while deploy automation runs
+# as the `deploy` user. Use ACLs on the logs directory when available so future log files remain
+# writable to both users without requiring brittle chmod/chown hacks on every rotated file.
+if [ -d "$BACKEND_DIR/storage/logs" ] && command -v setfacl >/dev/null 2>&1; then
+  setfacl -m u:deploy:rwx,g:www-data:rwx "$BACKEND_DIR/storage/logs" 2>/dev/null || true
+  setfacl -d -m u:deploy:rwx,g:www-data:rwx "$BACKEND_DIR/storage/logs" 2>/dev/null || true
+fi
+
 if [ -d "$GEO_DIR" ]; then
   cd "$GEO_DIR"
   cargo build --release
 fi
 
-systemctl restart fwber-queue
-systemctl restart fwber-reverb
-systemctl restart fwber-geo
-systemctl reload nginx
+$SUDO_BIN systemctl restart fwber-queue
+$SUDO_BIN systemctl restart fwber-reverb
+$SUDO_BIN systemctl restart fwber-geo
+$SUDO_BIN systemctl reload nginx
 
 if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
   mkdir -p "$REPORT_DIR_ROOT"

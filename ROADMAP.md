@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.5.3 "Smoke Report Notification Publisher"
+> **Current Version:** 1.6.5 "Hetzner Backend Stability Repair"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,19 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.5.3)
+### Phase 5: Production Scale (COMPLETED - v1.6.5)
+- **Hetzner Backend Stability Repair:** Replaced the broken root backend route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables discovered during live Hetzner inspection.
+- **Frontend Lockfile Resync:** Regenerated the frontend lockfile and verified `npm ci && npm run build`, removing the remaining dependency-sync blocker in the modern GitHub workflow set.
+- **Workflow Stabilization Sweep:** Fixed backend/frontend GitHub workflow drift and converted stale duplicate pipelines into lightweight/manual forms so the real automation signal is no longer buried under legacy red runs.
+- **GitHub Hetzner Deploy Validation:** Added the required GitHub Hetzner secrets, re-ran the GitHub backend deploy workflow, and confirmed a green GitHub-triggered Hetzner deployment with successful smoke validation.
+- **GitHub Hetzner Deploy Rust Path Fix:** Patched the Hetzner deploy script so CI-triggered non-login SSH sessions source rustup's Cargo path before building `fwber-geo`, fixing the first GitHub Hetzner deployment failure.
+- **GitHub Backend Deploy Switched to Hetzner:** Replaced the stale GitHub Actions backend deployment job that still targeted DreamHost so CI deployment automation now matches the Hetzner production backend.
+- **Live Dashboard API + Realtime Recovery:** Fixed the browser API origin to hit `api.fwber.me`, restored missing dashboard routes, added schema guards for simplified databases, and hardened Reverb defaults so live frontend requests and realtime stop failing on production contract drift.
+- **Restored Feature Navigation Surface:** Exposed Gold Premium, Roast, Merchant, and moderator surfaces directly in the signed-in app shell via sidebar, mobile nav, dashboard cards, and clearer settings entry points so restored systems are actually reachable by users.
+- **Hetzner Script Executable Bits:** Marked the Hetzner ops scripts executable in git so server pulls retain runnable permissions for deploy, smoke, drift, and notification tooling.
+- **WebSocket Smoke Handshake Fix:** Corrected the smoke-check websocket probe to use a valid RFC-compliant handshake key so public post-cutover smoke runs no longer report false-negative websocket failures.
+- **Deploy Script Privilege Hardening:** Hardened `deploy-backend.sh` so it auto-uses `sudo` for systemd/nginx actions when run by a non-root operator like `deploy`.
+- **Hetzner Backend Execution & Database Migration:** Deployed fwber backend runtime to Hetzner, installed missing dependencies, upgraded Rust, built `fwber-geo`, provisioned local MySQL, imported DreamHost production data, and enabled `fwber-queue`, `fwber-reverb`, and `fwber-geo` under systemd.
 - **Smoke Report Notification Publisher:** Added `publish-smoke-report.py` plus deploy integration so smoke + drift artifacts can be condensed into compact notification JSON/Markdown outputs and optionally POSTed to a webhook.
 - **Smoke Report Drift Diff:** Added `compare-smoke-reports.py` plus deploy integration so smoke reports can be compared across runs for summary, diagnostics, endpoint fingerprints, and DNS changes.
 - **DNS Resolution Appendix & Host Mapping:** Extended smoke-check reports with resolved-address capture for frontend, API, geo, and websocket hosts so DNS drift can be documented alongside HTTP fingerprints and diagnostics.
@@ -81,7 +93,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Hetzner/Vercel Deployment Execution:** Stand up the planned VPS + frontend deployment topology using the `ops/hetzner/` templates, then verify the stack with `php artisan deploy:verify`, `ops/hetzner/scripts/smoke-check.sh`, and the generated report artifacts before deeper UX testing.
-2. **Fix Current Live Routing Drift:** Ensure the reachable `api.fwber.me` backend actually serves `/api/health*` and that `geo.fwber.me` points to a live geo-service deployment rather than a Vercel 404.
-3. **Production Stripe Verification:** Confirm live Stripe checkout + webhook handling for both premium and marketplace purchases in a real authenticated deployment environment.
-4. **Smoke-Test Credential Strategy:** Provision safe premium/merchant/moderator smoke tokens and Reverb key access so the optional smoke-check probes can run at full depth.
+1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
+2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
+3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
+4. **Re-run Hetzner Backend Deploy + Frontend Build:** Confirm the ACL fix clears backend deploy failures and the resynced lockfile clears frontend workflow failures.
+5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

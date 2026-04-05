@@ -1,46 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.5.3 (Smoke Report Notification Publisher)
+# PROJECT_STATUS.md - fwber v1.6.6 (Hetzner Log ACL Deploy Fix)
 
-**Date:** 2026-04-04
-**Version:** 1.5.3 "Smoke Report Notification Publisher"
-**Status:** ✅ **VERIFIED, COMMITTED, AND BETTER PREPARED FOR OPERATOR ALERTING**
+**Date:** 2026-04-05
+**Version:** 1.6.6 "Hetzner Log ACL Deploy Fix"
+**Status:** ✅ **LIVE LOG-ROTATION DEPLOY CONFLICT PATCHED AT SOURCE AND ON SERVER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extended the deployment evidence system with compact publishable summaries.
+This release fixes the last deploy blocker uncovered while applying the backend stability repair.
 
 Delivered:
-- a smoke-report notification publisher
-- local notification JSON/Markdown artifacts
-- optional webhook publishing support
-- deploy-script integration for notification artifact generation after smoke/diff creation
-
-## 🚀 Operations Improvements
-### Added `ops/hetzner/scripts/publish-smoke-report.py`
-This script consumes:
-- `smoke-check-summary.json`
-- optional `smoke-check-drift.json`
-
-It produces:
-- `smoke-check-notification.json`
-- `smoke-check-notification.md`
-
-It can also optionally POST the payload to a webhook via:
-- `FWBER_SMOKE_NOTIFY_WEBHOOK_URL`
-
-### Updated `ops/hetzner/scripts/deploy-backend.sh`
-When smoke checks run and Python is available, the deploy flow now also generates compact notification artifacts in the current report directory.
-
-## ✅ Validation
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `python3 ops/hetzner/scripts/publish-smoke-report.py --help`
-- generated smoke summary + drift diff + notification artifacts end to end
-- validated JSON and Markdown notification outputs
+- removed the Monolog permission override that caused chmod failures on `www-data`-owned daily logs during deploys
+- switched the deploy script to ACL-based shared log access for `deploy` + `www-data`
+- applied the same ACL repair directly on the live Hetzner server
 
 ## ✅ Why This Matters
-The deployment-hardening system now supports:
-1. detailed evidence
-2. drift comparison
-3. concise publishable summaries
-
-That makes it easier to wire deploy results into chatops, incident threads, or release notes without manually summarizing large report bundles.
+The previous backend patch revealed that deploy-user artisan commands and PHP-FPM daily log rotation were fighting over ownership semantics. ACLs are the correct shared-write fix here; per-file chmod from an unprivileged deploy shell was not.

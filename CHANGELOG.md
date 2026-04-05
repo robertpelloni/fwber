@@ -2,6 +2,114 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.6] - 2026-04-05 — Hetzner Log ACL Deploy Fix
+
+### Fixed
+- Replaced the brittle deploy-time log chmod workaround with an ACL-based approach for `storage/logs`, so GitHub/SSH deploys and the PHP-FPM runtime can both write rotated log files without Monolog permission churn.
+- Removed the logging channel `permission` override that caused Monolog to attempt file chmod operations against `www-data`-owned daily logs during deploys.
+- Applied the matching ACL repair on the live Hetzner server so future rotated logs inherit shared write access for `deploy` and `www-data`.
+
+## [1.6.5] - 2026-04-04 — Hetzner Backend Stability Repair
+
+### Fixed
+- Replaced the broken backend root web route that rendered a non-existent `welcome` view with a lightweight JSON status payload, eliminating the live `api.fwber.me/` root-route 500 caused by missing view templates.
+- Added `WebFingerController` so the public discovery routes no longer point at a missing class, restoring `php artisan route:list` and preventing route-cache/tooling breakage in production.
+- Hardened `DashboardController` so dashboard stats and activity degrade gracefully when `user_matches` is missing from a drifted production database instead of throwing production 500s.
+- Fixed a latent PHP 8.4 type bug in dashboard activity where the `limit` query string could remain a string and crash `array_slice()`.
+- Added a corrective migration (`2026_04_05_000000_restore_match_tables_if_missing.php`) that recreates `user_matches` / `match_actions` when migration history claims they exist but live schema drift has removed them.
+- Hardened backend log-file permissions plus the Hetzner deploy script so deploy-user artisan commands are less likely to fail when Monolog rotates files under the web runtime user.
+- Added regression coverage for the new degraded-schema dashboard behavior plus the repaired public web routes.
+
+### Verified
+- `php artisan route:list` now succeeds again.
+- `php artisan test --filter="DashboardEndpointsTest|PublicWebRoutesTest"` passes (6 tests / 29 assertions).
+- `./vendor/bin/pint` passes on all touched backend files.
+
+## [1.6.4] - 2026-04-04 — Frontend Lockfile Resync
+
+### Fixed
+- Regenerated `fwber-frontend/package-lock.json` so GitHub Actions `npm ci` matches the actual frontend dependency graph again.
+- This fixes the remaining frontend workflow failure where Actions reported the lockfile was out of sync and refused to install before the Next.js build step.
+
+## [1.6.3] - 2026-04-04 — Workflow Stabilization Sweep
+
+### Changed
+- Fixed `backend-tests.yml` so GitHub Actions prepares and migrates against SQLite instead of accidentally trying to connect to MySQL during CI setup.
+- Fixed `frontend-build.yml` to cache against `fwber-frontend/package-lock.json`, eliminating the lockfile-not-found setup-node failure.
+- Simplified `ci.yml` into a lightweight repository-hygiene workflow instead of duplicating backend/frontend build jobs already covered by dedicated workflows.
+- Reworked `deploy.yml` into a manual-only container publish workflow so it no longer auto-fails on every push while the real production deployment is handled by Hetzner/Vercel-specific workflows.
+
+## [1.6.2] - 2026-04-04 — GitHub Hetzner Deploy Validation
+
+### Verified
+- Added the required GitHub repository secrets and variable for Hetzner backend deployment.
+- Triggered the Hetzner backend deploy workflow successfully from GitHub Actions after the rustup-path patch landed on the server.
+- Confirmed the workflow completed end-to-end with a green deploy, healthy backend verification, successful geo build, successful websocket smoke probe, and smoke summary of **9 passes / 3 expected auth-token warnings / 0 failures**.
+
+## [1.6.1] - 2026-04-04 — GitHub Hetzner Deploy Rust Path Fix
+
+### Fixed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so non-login SSH sessions (including GitHub Actions) explicitly source the rustup cargo environment from `~/.cargo/env` and prepend `~/.cargo/bin` to `PATH` before building `fwber-geo`.
+- This fixes the GitHub Hetzner deployment failure where the server used the old system Cargo (`1.75.0`) instead of the already-installed rustup toolchain required for the geo service's `edition2024` manifest.
+
+## [1.6.0] - 2026-04-04 — GitHub Backend Deploy Switched to Hetzner
+
+### Changed
+- Replaced the stale GitHub Actions backend deployment workflow that still SSHed into DreamHost with a Hetzner-targeted deployment workflow.
+- `deploy-backend.yml` now deploys to Hetzner using `ops/hetzner/scripts/deploy-backend.sh` and new secrets (`HETZNER_HOST`, `HETZNER_USERNAME`, `HETZNER_SSH_KEY`, optional `HETZNER_PROJECT_PATH`, optional `HETZNER_REVERB_APP_KEY`).
+- Added workflow dispatch support and expanded path triggers so ops changes under `ops/hetzner/` can trigger the backend deploy pipeline.
+
+## [1.5.9] - 2026-04-04 — Live Dashboard API + Realtime Recovery
+
+### Fixed
+- Corrected the browser API base handling so authenticated frontend requests go to `https://api.fwber.me/api/...` instead of incorrectly hitting Vercel-relative `/api/...` paths like `https://www.fwber.me/api/dashboard/stats`.
+- Restored missing backend routes for `/api/dashboard/stats` and `/api/dashboard/activity`, eliminating the live dashboard 404 spam.
+- Hardened `DashboardController` to tolerate simplified/drifted databases where `profile_views` may not exist, returning zero values instead of throwing a production error.
+- Hardened realtime client defaults so the live fwber frontend can fall back to `ws.fwber.me` and the correct API broadcast-auth origin when Vercel env drift leaves Reverb config incomplete.
+- Added backend coverage for the dashboard endpoints via `DashboardEndpointsTest`.
+
+## [1.5.8] - 2026-04-04 — Restored Feature Navigation Surface
+
+### Fixed
+- Surfaced the restored sections directly inside the authenticated app instead of leaving them discoverable only by direct URL or deep settings paths.
+- Added a new "Restored features" area to the main app sidebar/mobile nav for Gold Premium, Roast, Merchant, and moderation surfaces.
+- Added a dedicated restored-sections card grid on the dashboard so signed-in users can actually reach the restored feature set immediately after login.
+- Updated Settings to expose the restored premium, merchant, AI roast, and moderation entry points more clearly.
+
+## [1.5.7] - 2026-04-04 — Hetzner Script Executable Bits
+
+### Changed
+- Marked the Hetzner operations scripts as executable in git so fresh clones/pulls on the server retain runnable permissions for `deploy-backend.sh`, `smoke-check.sh`, `compare-smoke-reports.py`, and `publish-smoke-report.py`.
+- This fixes the live Hetzner issue where smoke execution could be silently skipped after pull because the script existence check required `-x` but the repo tracked the files as non-executable.
+
+## [1.5.6] - 2026-04-04 — WebSocket Smoke Handshake Fix
+
+### Fixed
+- Corrected the websocket smoke probe in `ops/hetzner/scripts/smoke-check.sh` to use a valid RFC-compliant `Sec-WebSocket-Key`, fixing the live Hetzner smoke-check failure where the websocket endpoint was healthy but the probe itself produced `400 Invalid Sec-WebSocket-Key`.
+- This turns the public smoke run from a false-negative websocket failure into a valid handshake test against `ws.fwber.me`.
+
+## [1.5.5] - 2026-04-04 — Deploy Script Privilege Hardening
+
+### Changed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so service restarts and nginx reloads automatically use `sudo` when the script is run as a non-root operator such as `deploy`, while still working normally when run as root.
+- This directly fixes the live Hetzner issue where deploy execution from the `deploy` account reached the systemctl stage successfully but failed on service restart due to insufficient privileges.
+
+## [1.5.4] - 2026-04-04 — Hetzner Backend Execution & Database Migration
+
+### Added
+- Added deployment execution notes in `docs/ai/deployment/hetzner-cutover-execution-status.md` to document the real Hetzner server actions completed during live infrastructure work.
+
+### Changed
+- Deployed the fwber backend stack to Hetzner at `5.161.250.43`, including repo checkout, backend dependency install, local MySQL provisioning, DreamHost database import, local Redis/Reverb/geo integration, and systemd activation for `fwber-queue`, `fwber-reverb`, and `fwber-geo`.
+- Upgraded the Hetzner host Rust toolchain via `rustup` so `fwber-geo` could build successfully with its `edition2024` manifest requirements.
+- Reconfigured the Hetzner backend runtime away from the temporary sqlite fallback and onto local MySQL plus Redis, matching the intended production topology much more closely.
+
+### Verified
+- Confirmed `php artisan deploy:verify --json` returns healthy on Hetzner using local MySQL + Redis.
+- Confirmed the geo service responds locally on `127.0.0.1:8081`.
+- Confirmed Reverb is listening on `127.0.0.1:8080` and a websocket handshake through nginx succeeds with `101 Switching Protocols` using the production-style app key.
+- Confirmed the queue worker, Reverb service, geo service, and Redis are active under systemd.
+
 ## [1.5.3] - 2026-04-04 — Smoke Report Notification Publisher
 
 ### Added
