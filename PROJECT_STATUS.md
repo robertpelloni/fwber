@@ -1,21 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.7.0 (Rewind Navigation Recovery + Missing Activity Surfaces)
+# PROJECT_STATUS.md - fwber v1.7.1 (Rewind CI Repair for Avatar Requests + Recommendation Caching)
 
 **Date:** 2026-04-05
-**Version:** 1.7.0 "Rewind Navigation Recovery + Missing Activity Surfaces"
-**Status:** ✅ **RESTORE BRANCH NOW SURFACES APPROVED FEATURES IN THE MAIN SHELL; ACTIVITY + NOTIFICATIONS DESTINATIONS RECOVERED**
+**Version:** 1.7.1 "Rewind CI Repair for Avatar Requests + Recommendation Caching"
+**Status:** ✅ **RESTORE BRANCH FRONTEND IS GREEN AND THE NEXT BACKEND CI CONTRACT FAILURES ARE NOW PATCHED AT THE SOURCE**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release focused on the user-facing symptom behind the earlier restore complaint: the rewind branch already contained many recovered systems, but the signed-in shell still emphasized excluded areas and still lacked obvious destinations for restored activity/notification flows.
+This release followed the rewind navigation recovery with another compatibility tranche aimed directly at the two concrete backend CI failures still blocking the richer branch from looking like a viable Hetzner-ready promotion candidate.
 
 Delivered:
-- the restore-branch app header and left rail now prioritize approved restored surfaces such as friends, activity, events, wallet, roast, merchant, moderation, notifications, and travel mode
-- removed excluded federation / journal / governance-era emphasis from the primary shell navigation without deleting the underlying compatibility work yet
-- added a real top-level `/activity` page backed by dashboard activity data
-- added a real top-level `/notifications` inbox page with mark-as-read and mark-all-read behavior
-- added shared notification route helpers in `fwber-frontend/lib/notifications.ts`
-- rebuilt the rewind dashboard so restored surfaces are visible and reachable instead of buried in legacy/excluded cards
+- avatar generation in testing now uses deterministic placeholder provider credentials so the rewind suite can actually observe outbound image-generation HTTP fakes instead of silently short-circuiting before requests are recorded
+- `RecommendationController` now uses tagged caching for personalized recommendation responses, matching the restore-branch caching contract expected by the controller-caching suite
+- these repairs stay branch-local and deployment-safe, so the rewind branch keeps moving toward a full restored feature surface without regressing modern Hetzner/runtime assumptions
 
 ## ✅ Why This Matters
-A branch is not meaningfully “restored” if users still cannot reach the restored areas from the main app shell. This release closes that UX gap while still respecting the approved exclusion list.
+To restore everything that was removed while still deploying successfully to Hetzner, the rewind branch has to keep converging on green CI. This release patches the next two explicit backend contract mismatches instead of waiting for another opaque red run to say “something failed somewhere.”

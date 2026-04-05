@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BulletinBoard;
 use App\Models\TelemetryEvent;
 use App\Services\RecommendationService;
+use App\Support\TaggedCache;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,8 +59,25 @@ class RecommendationController extends Controller
 
             $limit = $request->input('limit', 10);
 
-            // Generate recommendations using the service
-            $recommendations = $this->recommendationService->getRecommendations($user->id, $context, $types);
+            // The broader rewind branch expects personalized recommendations to
+            // participate in tagged caching so recommendation-heavy surfaces can
+            // be restored without reintroducing avoidable recomputation on every
+            // request. The tag shape is also asserted directly in CI.
+            $cacheKey = sprintf(
+                'recommendations:user:%s:%s',
+                $user->id,
+                md5(json_encode([
+                    'types' => $types,
+                    'context' => $context,
+                    'limit' => $limit,
+                ]))
+            );
+
+            $recommendations = TaggedCache::remember([
+                "recommendations:user:{$user->id}",
+            ], $cacheKey, function () use ($user, $context, $types) {
+                return $this->recommendationService->getRecommendations($user->id, $context, $types);
+            }, 300);
 
             // Log recommendation generation for analytics
             $this->recordTelemetrySafely($user->id, 'recommendation_generated', [

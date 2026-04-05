@@ -122,13 +122,15 @@ class AvatarGenerationService
 
         if (empty($apiKey)) {
             if (app()->environment('testing')) {
-                return [
-                    'success' => true,
-                    'image_url' => 'https://example.com/fake-avatar.png',
-                    'provider' => 'dalle',
-                ];
+                // The richer rewind suite asserts that outbound image-generation
+                // requests are actually attempted under HTTP fakes. Using a
+                // deterministic placeholder key in tests preserves that contract
+                // instead of short-circuiting before Http::assertSent can see
+                // the request.
+                $apiKey = 'testing-openai-key';
+            } else {
+                throw new \Exception('OpenAI API key not configured');
             }
-            throw new \Exception('OpenAI API key not configured');
         }
 
         $response = Http::withHeaders([
@@ -165,13 +167,10 @@ class AvatarGenerationService
 
         if (empty($apiKey)) {
             if (app()->environment('testing')) {
-                return [
-                    'success' => true,
-                    'image_url' => 'https://example.com/fake-avatar.png',
-                    'provider' => 'gemini',
-                ];
+                $apiKey = 'testing-gemini-key';
+            } else {
+                throw new \Exception('Gemini API key not configured');
             }
-            throw new \Exception('Gemini API key not configured');
         }
 
         // Note: Actual Gemini Imagen endpoint might differ or require Vertex AI
@@ -208,13 +207,10 @@ class AvatarGenerationService
 
         if (empty($apiToken)) {
             if (app()->environment('testing')) {
-                return [
-                    'success' => true,
-                    'image_url' => 'https://example.com/fake-avatar.png',
-                    'provider' => 'replicate',
-                ];
+                $apiToken = 'testing-replicate-token';
+            } else {
+                throw new \Exception('Replicate API token not configured');
             }
-            throw new \Exception('Replicate API token not configured');
         }
 
         // Use provided model version or fallback to config
@@ -260,13 +256,10 @@ class AvatarGenerationService
 
         if (empty($apiToken)) {
             if (app()->environment('testing')) {
-                return [
-                    'success' => true,
-                    'image_url' => 'https://example.com/fake-avatar.png',
-                    'provider' => 'replicate',
-                ];
+                $apiToken = 'testing-replicate-token';
+            } else {
+                throw new \Exception('Replicate API token not configured');
             }
-            throw new \Exception('Replicate API token not configured');
         }
 
         // Read image and convert to data URI

@@ -1,242 +1,186 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.7.0
+> **Version Reached:** 1.7.1
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This session continued the rewind-branch recovery, but shifted from pure CI compatibility work into a more user-visible restoration pass.
+This session continued the rewind-branch recovery in two connected phases:
+1. committed and pushed the previously validated shell/navigation recovery as **v1.7.0**
+2. immediately investigated the next restore-branch backend CI blockers and patched them as **v1.7.1**
 
-The key realization was:
-- the restore branch already contained many recovered systems
-- but the app still *felt* under-restored because the signed-in shell highlighted excluded areas and did not provide obvious destinations for restored activity / notification flows
+The current guiding principle remains unchanged:
+- restore everything the user approved
+- keep excluded systems out of the primary product emphasis
+- keep modern Hetzner/runtime compatibility intact so the branch can actually deploy when it is promoted
 
-Completed in **v1.7.0 "Rewind Navigation Recovery + Missing Activity Surfaces"**:
-- recovered a real top-level `/activity` page
-- recovered a real top-level `/notifications` inbox page
-- added shared notification route helpers
-- rewired the restore-branch `AppHeader` / left rail around the user-approved restored scope
-- rebuilt the dashboard to spotlight approved restored surfaces rather than excluded federation/journal/governance-era branches
-- validated with a successful frontend production build
-- committed and pushed the changes
+No processes were manually killed.
 
 ---
 
-## Why This Work Was Chosen Next
-The user explicitly asked why the repo was still not back to how it felt a few days ago.
+## Phase A — v1.7.0 Was Finalized and Pushed
+The restore worktree had an already-validated but uncommitted navigation/surface recovery tranche.
 
-The answer was not just "more code needs to be merged." It was also:
-- the main shell still pointed attention toward excluded systems
-- top-level activity/notification destinations were still missing
-- important restored areas existed but were not being surfaced like a coherent product
+That work was committed and pushed as:
+- **Commit:** `81f486d93`
+- **Message:** `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
 
-So the next best move was not another invisible backend-only patch. It was a shell/navigation recovery pass that makes the rewind branch actually *feel restored*.
+### What v1.7.0 delivered
+- real `/activity` page
+- real `/notifications` page
+- shared notification route helpers
+- app shell/left rail aligned to approved restored scope
+- dashboard rebuilt to surface restored features more coherently
+- successful restore-branch frontend production build validation
 
----
-
-## What Was Changed
-
-### 1. `fwber-frontend/components/AppHeader.tsx`
-The app shell was substantially reworked.
-
-#### Previous problem
-The rewind branch sidebar/navigation still emphasized several branches the user explicitly excluded from restoration focus, especially:
-- federation
-- journal/social-extra surfaces
-- other older breadth-first menu clutter
-
-That meant the signed-in experience was advertising the wrong parts of the product.
-
-#### New navigation shape
-Primary nav now emphasizes:
-- `/dashboard`
-- `/matches`
-- `/messages`
-- `/friends`
-- `/activity`
-- `/events`
-- `/nearby`
-- `/safety`
-
-Account controls now visibly surface:
-- `/settings`
-- `/notifications`
-- `/settings/travel`
-- `/settings/account`
-
-A dedicated restored-features section now highlights:
-- `/premium`
-- `/wallet`
-- `/roast`
-- `/share-unlock`
-- merchant flow (`/merchant/dashboard` or `/merchant/register`)
-- `/moderation` for moderators
-
-#### Why this matters
-This makes the rewind branch line up better with the approved restoration scope:
-- restored allowed systems are visible
-- excluded systems are no longer the main emphasis
-- core user routes are easier to reach without direct URL spelunking
+This directly addressed the user complaint that the rewind branch did not yet *feel* as restored as it should.
 
 ---
 
-### 2. `fwber-frontend/app/activity/page.tsx`
-Added a real top-level activity page.
+## Phase B — Next Backend CI Failures Were Investigated
+After pushing `v1.7.0`, the next priority was backend CI alignment.
 
-#### What it does
-- loads from `/dashboard/activity?limit=50`
-- renders activity rows for:
-  - matches
-  - messages
-  - profile views
-  - friend actions
-  - gifts
-- routes users to the right destination depending on activity type
+I inspected the prior failed backend run for `d86d0cbd6`:
+- **Run:** `24008637953`
 
-#### Why this matters
-The restore branch had activity data paths and dashboard activity concepts, but not a recovered top-level destination that made the app feel complete.
+### What the failed log showed
+The suite was overwhelmingly green except for two focused failures:
+1. `Tests\Feature\AvatarGenerationTest > service generates prompt with detailed attributes`
+2. `Tests\Feature\Caching\ControllerCachingTest`
 
-Now `/activity` is real again.
+That was an excellent signal because it means the richer rewind branch is not collapsing broadly. It is continuing to fail at narrow, specific compatibility seams.
 
 ---
 
-### 3. `fwber-frontend/app/notifications/page.tsx`
-Added a real top-level notifications inbox.
+## Root Cause Analysis
 
-#### What it does
-- loads from `/notifications`
-- supports mark-one-read
-- supports mark-all-read
-- uses notification type routing to send users to the right destination after click
+### 1. Avatar-generation test failure
+The rewind branch still had testing-mode shortcuts in `AvatarGenerationService`.
 
-#### Why this matters
-The bell UI and notification flows are not enough if the user cannot open a proper inbox page. This restores that missing destination.
+Why that matters:
+- in testing, if a provider credential was absent, the service returned a fake success payload early
+- but the richer rewind suite expects outbound HTTP image-generation requests to still be attempted under `Http::fake()`
+- that means `Http::assertSent()` never saw a request, so the test failed even though the service returned a nominal success shape
 
----
+### 2. Recommendation caching test failure
+The `ControllerCachingTest` expected personalized recommendations to use tagged caching.
 
-### 4. `fwber-frontend/lib/notifications.ts`
-Added shared notification routing helpers.
+But `RecommendationController` was directly calling the recommendation service without wrapping the response in `TaggedCache::remember(...)`.
 
-#### Helpers added
-- `normalizeNotificationType(...)`
-- `getNotificationRoute(...)`
-- `getNotificationActionLabel(...)`
-
-#### Why this matters
-This reduces drift between:
-- payload type strings
-- notification inbox routing
-- toast/bell behavior
-- future restored notification-related surfaces
+That broke the mocked contract:
+- `Cache::tags([...])` was expected once
+- no call happened
+- CI failed
 
 ---
 
-### 5. `fwber-frontend/app/dashboard/page.tsx`
-Rebuilt the dashboard around approved restored surfaces.
+## What Was Changed for v1.7.1
 
-#### Previous problem
-The old rewind dashboard still mixed in excluded or poorly prioritized branches and contained awkward/dead actions like `/profile/edit`.
+### 1. `fwber-backend/app/Services/AvatarGenerationService.php`
+Adjusted provider behavior under tests.
 
-#### New dashboard emphasis
-- keeps main stats visible
-- keeps activity feed visible
-- improves quick actions with:
-  - nearby
-  - messages
-  - friends
-  - wallet
-  - notifications
-  - profile
-- adds a restored sections grid for:
-  - Gold Premium
-  - Wallet & Referrals
-  - Profile Roast
-  - Notifications Inbox
-  - Events
-  - Travel Mode
-  - Merchant portal/register
-  - Moderation when applicable
+#### New behavior
+Instead of returning early in testing when credentials are missing, the service now injects deterministic placeholder credentials:
+- DALL-E → `testing-openai-key`
+- Gemini → `testing-gemini-key`
+- Replicate → `testing-replicate-token`
 
-#### Why this matters
-This directly addresses the user complaint that the app did not feel like the earlier broader state. The features were increasingly present, but not being surfaced like first-class citizens.
+#### Why this is correct
+This preserves the observable request contract under `Http::fake()` and matches the richer rewind suite’s expectations without compromising real production behavior.
+
+The live/runtime behavior is unchanged for non-testing environments:
+- missing credentials still raise real configuration exceptions outside tests
+
+### 2. `fwber-backend/app/Http/Controllers/RecommendationController.php`
+Restored tagged caching around personalized recommendations.
+
+#### New behavior
+- imports `App\Support\TaggedCache`
+- builds a user-scoped recommendation cache key based on:
+  - user id
+  - types
+  - context
+  - limit
+- wraps recommendation generation in:
+  - `TaggedCache::remember(["recommendations:user:{id}"], ...)`
+
+#### Why this is correct
+This aligns the branch with:
+- the older broader cache expectations
+- the CI suite’s mocked `Cache::tags(...)` contract
+- the practical need to avoid recomputing recommendation payloads repeatedly on the richer restored branch
 
 ---
 
 ## Validation Performed
 
-### Frontend build
-Executed from:
-- `C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend`
-
-Command:
-- `npm run build`
+### Restore-branch frontend build
+Executed again to keep the previously staged surface recovery honest:
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
 
 Result:
-- **successful production build**
-- route manifest now includes:
-  - `/activity`
-  - `/notifications`
-- updated app shell/dashboard changes are production-build safe
+- successful production build
 
-### Existing CI runs
-At the time of this slice, the earlier `v1.6.9` GitHub runs were still in progress / pending final verification, while this new feature slice proceeded in parallel to keep restore momentum going.
+### Targeted restore-branch backend tests
+Executed:
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-backend`
+- `php artisan test --filter='AvatarGenerationTest|ControllerCachingTest'`
+
+Local result on this workstation:
+- non-Redis subset passed
+- Redis-gated cases skipped cleanly because the local machine does not have the PHP Redis extension available
+
+This is still useful validation because it confirms:
+- touched files parse and execute correctly
+- non-Redis paths remain stable
+- the remaining CI-facing expectations are now patched at the source for environments where the Redis extension is present
 
 ---
 
 ## Files Changed This Slice
 
-### Frontend UX / navigation
+### v1.7.0 commit finalized this previously staged tranche
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
 - `fwber-frontend/app/activity/page.tsx`
 - `fwber-frontend/app/notifications/page.tsx`
 - `fwber-frontend/lib/notifications.ts`
+- docs/version files for `v1.7.0`
 
-### Versioning / docs
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
+### v1.7.1 tranche
+- `fwber-backend/app/Services/AvatarGenerationService.php`
+- `fwber-backend/app/Http/Controllers/RecommendationController.php`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
 - `MEMORY.md`
 - `ROADMAP.md`
 - `docs/SUBMODULE_DASHBOARD.md`
+- `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 - `HANDOFF.md`
 
 ---
 
 ## Git / Release
-Committed and pushed:
-- **Commit:** `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
+### Already committed and pushed
+- **`81f486d93`** — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
 
-Branch pushed:
-- `restore/pre-simplification-hetzner`
-
----
-
-## Key Analysis
-This was an important correction in strategy.
-
-The rewind branch did not just need more backend compatibility fixes. It also needed:
-- coherent user-facing navigation
-- obvious destinations for restored interactions
-- less emphasis on systems the user explicitly does not want restored as first-class scope
-
-This release is therefore not cosmetic. It is part of making the rewind branch truly usable as the candidate replacement line.
+### Current tranche target
+- **Target Version:** `1.7.1`
+- **Recommended Commit Message:** `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
 
 ---
 
 ## Best Next Steps
-1. Check the latest GitHub Actions runs for both `v1.6.9` and this new `v1.7.0` push.
-2. If backend CI still fails, patch the next concrete restore-branch compatibility seam immediately.
-3. Continue broad rewind reconciliation, especially for user-visible surfaces that still exist in code but are not yet integrated cleanly.
-4. Keep excluded systems out of the main signed-in emphasis:
-   - ActivityPub / Federation
-   - Governance / DAO / Council / On-chain
-   - Journals / Scrapbooks / Icebreakers / extra profile-social layer
-5. Once CI/build stabilize, prepare the rewind branch to supersede piecemeal incremental restoration.
-
-No processes were manually killed.
+1. Commit and push the `v1.7.1` rewind-branch backend CI repair.
+2. Let the fresh restore-branch backend/frontend runs execute.
+3. If backend CI is still red, inspect the next concrete failure and patch it directly rather than broad guessing.
+4. Continue restoring approved removed systems while keeping excluded areas out of the main shell emphasis:
+   - keep excluding ActivityPub/Federation from user-facing restoration scope
+   - keep excluding Governance/DAO/Council/On-chain from user-facing restoration scope
+   - keep excluding Journals/Scrapbooks/Icebreakers/extra profile-social layer from user-facing restoration scope
+5. Preserve Hetzner/runtime compatibility as a non-negotiable baseline while broadening the restored surface.

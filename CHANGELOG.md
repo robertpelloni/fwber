@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.1] - 2026-04-05 — Rewind CI Repair for Avatar Requests + Recommendation Caching
+
+### Fixed
+- Reworked restore-branch avatar generation so testing environments use deterministic placeholder provider credentials instead of short-circuiting before outbound HTTP fakes are recorded.
+- This preserves the broader rewind-suite contract where `AvatarGenerationTest` asserts real image-generation requests are attempted under `Http::fake()`.
+- Restored tagged recommendation caching in `RecommendationController`, matching the rewind branch's cached-surface expectations and the mocked `Cache::tags(...)` contract asserted by controller-caching tests.
+- Kept these fixes branch-local and runtime-safe so the richer rewind branch remains compatible with modern Hetzner deployment constraints instead of regressing into old brittle assumptions.
+
+### Verified
+- `php artisan test --filter='AvatarGenerationTest|ControllerCachingTest'` completed locally with the non-Redis subset passing and Redis-gated cases skipping cleanly on this workstation.
+- restore-branch frontend production build remained green after the prior navigation-surface recovery.
+
 ## [1.7.0] - 2026-04-05 — Rewind Navigation Recovery + Missing Activity Surfaces
 
 ### Fixed

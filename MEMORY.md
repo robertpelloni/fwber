@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-05 — v1.7.1 some rewind-branch test failures are caused by testing shortcuts that are harmless in lean branches but wrong for full-surface suites
+- The avatar-generation code was still using testing-only early returns when provider credentials were absent, which prevented `Http::assertSent()`-style rewind tests from ever observing outbound generation calls.
+- Recommendation responses on the richer branch also needed their older tagged-cache contract restored because the CI suite asserts personalized recommendation caching explicitly.
+- The right pattern on the rewind branch is to preserve observable contracts under `Http::fake()` / `Cache::shouldReceive()` rather than prematurely short-circuiting inside test environments.
+
 ## 2026-04-05 — v1.7.0 A restore branch can still feel broken even when the code is present if the shell highlights the wrong surfaces
 - The rewind branch contained many restored systems, but the main app shell still pointed users toward excluded federation/journal-era branches and still lacked real `/activity` and `/notifications` destinations.
 - Restoring breadth is not enough; the signed-in shell must also spotlight the approved surfaces so the product actually feels restored.
