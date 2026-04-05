@@ -5,6 +5,8 @@
  * Wraps the native IndexedDB API with a cleaner async interface.
  */
 
+import { canUseIndexedDB } from '@/lib/browser-storage';
+
 const DB_NAME = 'fwber_media_vault';
 const DB_VERSION = 1;
 const STORE_MEDIA = 'encrypted_media';
@@ -36,8 +38,19 @@ let dbInstance: IDBDatabase | null = null;
 async function openDatabase(): Promise<IDBDatabase> {
   if (dbInstance) return dbInstance;
 
+  if (!canUseIndexedDB()) {
+    throw new Error('Vault storage unavailable in this browser context');
+  }
+
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    let request: IDBOpenDBRequest;
+
+    try {
+      request = indexedDB.open(DB_NAME, DB_VERSION);
+    } catch (error) {
+      reject(error instanceof Error ? error : new Error('Failed to open vault database'));
+      return;
+    }
 
     request.onerror = () => {
       reject(new Error('Failed to open vault database'));

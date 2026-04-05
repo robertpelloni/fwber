@@ -1,4 +1,5 @@
 import { ChatMessage } from './hooks/use-websocket';
+import { canUseIndexedDB } from '@/lib/browser-storage';
 
 const DB_NAME = 'fwber_messages';
 const DB_VERSION = 1;
@@ -10,8 +11,19 @@ const MESSAGE_RETENTION_DAYS = 30;
  * Initialize IndexedDB for message storage
  */
 function openDatabase(): Promise<IDBDatabase> {
+  if (!canUseIndexedDB()) {
+    return Promise.reject(new Error('Message storage unavailable in this browser context'));
+  }
+
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    let request: IDBOpenDBRequest;
+
+    try {
+      request = indexedDB.open(DB_NAME, DB_VERSION);
+    } catch (error) {
+      reject(error instanceof Error ? error : new Error('Message storage unavailable in this browser context'));
+      return;
+    }
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);

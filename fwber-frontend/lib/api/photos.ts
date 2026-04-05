@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { safeLocalStorageGet } from '@/lib/browser-storage'
 
 // Define local interface to avoid circular dependency with faceBlur types
 interface FileWithFaceBlurMetadata extends File {
@@ -60,7 +61,7 @@ class PhotoAPI {
     }
 
     // Add authorization header if token exists
-    const token = localStorage.getItem('fwber_token')
+    const token = safeLocalStorageGet('fwber_token')
     if (token) {
       defaultHeaders['Authorization'] = `Bearer ${token}`
     }
@@ -123,7 +124,7 @@ class PhotoAPI {
       }
       
       const url = `${this.baseUrl}/photos`
-      const token = localStorage.getItem('fwber_token')
+      const token = safeLocalStorageGet('fwber_token')
       
       try {
         // Simulate progress for better UX
@@ -308,7 +309,7 @@ class PhotoAPI {
   // Get original photo blob
   async getOriginalPhoto(photoId: string): Promise<Blob> {
     const url = `${this.baseUrl}/photos/${photoId}/original`
-    const token = localStorage.getItem('fwber_token')
+    const token = safeLocalStorageGet('fwber_token')
     
     const response = await fetch(url, {
       headers: {
@@ -335,7 +336,7 @@ export function usePhotos() {
   const [error, setError] = useState<string | null>(null)
 
   const fetchPhotos = async () => {
-    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null
+    const storedToken = safeLocalStorageGet('fwber_token')
     if (!token && !storedToken) {
       setPhotos([])
       return
@@ -462,7 +463,7 @@ export function usePhotos() {
   }
 
   useEffect(() => {
-    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null
+    const storedToken = safeLocalStorageGet('fwber_token')
 
     if (authLoading) {
       return

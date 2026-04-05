@@ -13,6 +13,18 @@ export function canUseWebStorage(): boolean {
   }
 }
 
+export function safeLocalStorageKeys(): string[] {
+  if (typeof window === 'undefined') {
+    return []
+  }
+
+  try {
+    return Object.keys(window.localStorage)
+  } catch {
+    return []
+  }
+}
+
 export function safeLocalStorageGet(key: string): string | null {
   if (typeof window === 'undefined') {
     return null
@@ -85,5 +97,17 @@ export function safeSessionStorageRemove(key: string): void {
     window.sessionStorage.removeItem(key)
   } catch {
     // Ignore blocked session storage contexts.
+  }
+}
+
+export function canUseIndexedDB(): boolean {
+  if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+    return false
+  }
+
+  try {
+    return typeof indexedDB.open === 'function'
+  } catch {
+    return false
   }
 }

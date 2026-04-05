@@ -1,5 +1,7 @@
 'use client';
 
+import { canUseIndexedDB, safeLocalStorageGet, safeLocalStorageSet } from '@/lib/browser-storage';
+
 const DB_NAME = 'fwber_offline_v1';
 const STORE_NAME = 'pending_messages';
 
@@ -21,8 +23,20 @@ export interface OfflineMessage {
 }
 
 export async function openDB(): Promise<IDBDatabase> {
+    if (!canUseIndexedDB()) {
+        throw new Error('Offline message storage unavailable in this browser context');
+    }
+
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, 1);
+        let request: IDBOpenDBRequest;
+
+        try {
+            request = indexedDB.open(DB_NAME, 1);
+        } catch (error) {
+            reject(error instanceof Error ? error : new Error('Offline message storage unavailable in this browser context'));
+            return;
+        }
+
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
         request.onupgradeneeded = (event) => {
@@ -86,14 +100,9 @@ export async function incrementRetryCount(id: number): Promise<void> {
 }
 
 export function getLastSyncAt(): string | null {
-    if (typeof window !== 'undefined') {
-        return localStorage.getItem('fwber_last_chat_sync');
-    }
-    return null;
+    return safeLocalStorageGet('fwber_last_chat_sync');
 }
 
 export function setLastSyncAt(isoString: string): void {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('fwber_last_chat_sync', isoString);
-    }
+    safeLocalStorageSet('fwber_last_chat_sync', isoString);
 }

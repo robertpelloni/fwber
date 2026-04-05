@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.9.9 "Dashboard Storage Guard + E2E Restore Probe Hardening"
+> **Current Version:** 1.9.10 "Extended Browser Storage Guard Sweep"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.9.9)
+### Phase 5: Production Scale (COMPLETED - v1.9.10)
+- **Extended Browser Storage Guard Sweep:** Extended blocked-storage hardening into auxiliary frontend modules including offline sync metadata, preview telemetry, photo/verification token lookups, recommendation/content-generation caches, message storage, and vault storage so stricter browser contexts no longer explode outside the initial dashboard/E2E paths.
 - **Dashboard Storage Guard + E2E Restore Probe Hardening:** Hardened auth persistence, API auth-header lookup, realtime bootstrap, and E2E IndexedDB bootstrap against blocked browser storage contexts; also verified live that `api/security/keys/restore` is publicly present on Hetzner and responds with `401` when unauthenticated.
 - **Restore Branch Messaging + WebFinger Stabilization:** Added direct restore-branch fixes for local/federated message receiver validation, non-blocking message event append, and federated-only WebFinger actor URI behavior, then validated the targeted backend tests locally.
 - **Restore Branch Profile + Frontend Build Stabilization:** Added direct restore-branch fixes for profile persistence, match-action event-bus drift, missing frontend UI primitives, and broken council/merchant/WASM sources, then validated key tests plus local frontend build.

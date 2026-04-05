@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-05 — once storage is blocked, many secondary frontend modules also become latent crash sources unless swept systematically
+- After the first dashboard-focused storage fix, additional raw storage callers still existed in photos, verification, offline sync, preview telemetry, recommendation caches, AI content caches, and auxiliary IndexedDB stores.
+- The right stabilization pattern is now clear: centralize safe browser-storage helpers and make every non-core cache/offline helper tolerate blocked storage without blowing up the active UI.
+- This broader sweep is important for Hetzner/Vercel production too because user browsers and mobile WebViews vary more than local dev environments.
+
 ## 2026-04-05 — live dashboard errors can come from blocked browser storage even when backend routes are healthy
 - The reported `Access to storage is not allowed from this context` dashboard errors were caused by frontend assumptions that `localStorage` and `IndexedDB` are always available.
 - Live verification showed `https://api.fwber.me/api/security/keys/restore?key_type=ecdh` returns `401 Unauthenticated`, and Hetzner route list confirmed the route is registered, so the restore-endpoint noise was not a missing-route problem.

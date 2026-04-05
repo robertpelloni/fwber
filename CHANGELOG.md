@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.10] - 2026-04-05 — Extended Browser Storage Guard Sweep
+
+### Fixed
+- Extended browser-storage hardening to additional frontend modules that still touched restricted storage APIs directly, including offline sync metadata, preview telemetry auth lookup, photo uploads/original fetches, verification uploads, recommendation caching, and content-generation caching.
+- Hardened auxiliary IndexedDB callers (`offline-store`, `messageStorage`, `vault/storage`) so blocked browser contexts now fail gracefully instead of throwing low-level `indexedDB.open(...)` runtime errors.
+- Added safe local-storage key enumeration/removal helpers so cache-clearing utilities no longer crash when storage access is blocked.
+- Kept the live dashboard-compatible mainline frontend deployable after the broader storage-guard sweep.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the extended storage sweep.
+- Remaining direct storage access inside `fwber-frontend/lib/**` is now limited to the guarded helper layer and intentionally wrapped IndexedDB open calls.
+
 ## [1.9.9] - 2026-04-05 — Dashboard Storage Guard + E2E Restore Probe Hardening
 
 ### Fixed

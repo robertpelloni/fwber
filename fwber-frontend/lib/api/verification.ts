@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { safeLocalStorageGet } from '@/lib/browser-storage';
 
 export interface VerificationStatus {
   is_verified: boolean;
@@ -22,7 +23,7 @@ export const verificationApi = {
     const formData = new FormData();
     formData.append('photo', photo);
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null;
+    const token = safeLocalStorageGet('fwber_token');
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
