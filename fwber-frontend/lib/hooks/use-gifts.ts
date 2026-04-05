@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getGifts, sendGift, getReceivedGifts, Gift } from '@/lib/api/gifts';
+import { getGifts, sendGift, getReceivedGifts } from '@/lib/api/gifts';
 
 export function useGifts() {
   return useQuery({

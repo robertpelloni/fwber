@@ -183,6 +183,16 @@ class User extends Authenticatable
         return $this->hasMany(VideoCall::class, 'receiver_id');
     }
 
+    public function sentGifts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserGift::class, 'sender_id');
+    }
+
+    public function receivedGifts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserGift::class, 'receiver_id');
+    }
+
     public function sentFriendRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Friend::class, 'user_id');

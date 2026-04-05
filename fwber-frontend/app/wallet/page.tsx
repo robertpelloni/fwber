@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { useWallet } from '@/lib/hooks/useWallet'
+import { useReceivedGifts } from '@/lib/hooks/use-gifts'
 import { Coins, Wallet as WalletIcon, RefreshCw, Copy, Ticket, Gift, BadgeDollarSign, ShieldCheck, Link as LinkIcon } from 'lucide-react'
 
 async function copyText(value?: string | null) {
@@ -12,9 +13,25 @@ async function copyText(value?: string | null) {
 }
 
 export default function WalletPage() {
+  const [activeTab, setActiveTab] = useState<'overview' | 'gifts'>('overview')
   const { data, loading, error, updateAddress, refresh } = useWallet()
+  const { data: receivedGifts = [], isLoading: giftsLoading } = useReceivedGifts()
   const [walletAddress, setWalletAddress] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+
+  const selectedTabClasses = useMemo(() => ({
+    active: 'bg-gray-900 text-white dark:bg-white dark:text-gray-900',
+    inactive: 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
+  }), [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const nextTab = new URLSearchParams(window.location.search).get('tab') === 'gifts' ? 'gifts' : 'overview'
+    setActiveTab(nextTab)
+  }, [])
 
   const handleSave = async () => {
     if (!walletAddress.trim()) return
@@ -45,6 +62,10 @@ export default function WalletPage() {
             <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-sm text-red-600 shadow-sm dark:border-red-900/40 dark:bg-red-950/20">{error}</div>
           ) : (
             <div className="space-y-6">
+              <div className="flex flex-wrap gap-3">
+                <a href="/wallet" className={`rounded-xl px-4 py-2 text-sm font-semibold ${activeTab === 'overview' ? selectedTabClasses.active : selectedTabClasses.inactive}`}>Overview</a>
+                <a href="/wallet?tab=gifts" className={`rounded-xl px-4 py-2 text-sm font-semibold ${activeTab === 'gifts' ? selectedTabClasses.active : selectedTabClasses.inactive}`}>Received Gifts</a>
+              </div>
               <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Token Balance</p>
@@ -82,6 +103,34 @@ export default function WalletPage() {
                 </div>
               </div>
 
+              {activeTab === 'gifts' ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                  <div className="mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
+                    <Gift className="h-5 w-5 text-pink-500" />
+                    <h2 className="text-lg font-semibold">Received Gifts</h2>
+                  </div>
+                  {giftsLoading ? (
+                    <p className="text-sm text-gray-500">Loading gifts…</p>
+                  ) : receivedGifts.length ? (
+                    <div className="space-y-3">
+                      {receivedGifts.map((giftEntry) => (
+                        <div key={giftEntry.id} className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-white">{giftEntry.gift.name} from {giftEntry.sender?.name || 'Someone'}</div>
+                              <div className="mt-1 text-sm text-gray-500">{giftEntry.message || 'No note attached.'}</div>
+                              <div className="mt-1 text-xs text-gray-400">{new Date(giftEntry.created_at).toLocaleString()}</div>
+                            </div>
+                            <div className="text-right text-sm font-semibold text-gray-900 dark:text-white">+{giftEntry.cost_at_time} tokens</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No gifts received yet.</p>
+                  )}
+                </div>
+              ) : (
               <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
                 <section className="space-y-6">
                   <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
@@ -209,6 +258,7 @@ export default function WalletPage() {
                   </div>
                 </section>
               </div>
+              )}
             </div>
           )}
         </main>

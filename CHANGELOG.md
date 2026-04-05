@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.8] - 2026-04-05 — Gift Economy Surface Restoration
+
+### Added
+- Restored the compact gifts backend with gift catalog, gift sending, received-gifts ledger, wallet transaction side effects, and gift notifications.
+- Restored `gifts` / `user_gifts` schema in a deployment-safe migration with seeded default gift catalog.
+- Added `GiftRestoreTest` coverage for listing, sending, and receiving gifts.
+
+### Changed
+- Expanded `/wallet` to support a real `?tab=gifts` received-gifts view so existing gift notifications and wallet redirects land on useful UI.
+- Fixed frontend gifts API typing to consume the restored paginated received-gifts response.
+
 ## [1.8.7] - 2026-04-05 — Non-Critical Roast Smoke Classification
 
 ### Fixed

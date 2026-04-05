@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.7 "Non-Critical Roast Smoke Classification"
+> **Current Version:** 1.8.8 "Gift Economy Surface Restoration"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.7)
+### Phase 5: Production Scale (COMPLETED - v1.8.8)
+- **Gift Economy Surface Restoration:** Restored gift catalog/send/received endpoints, gift notifications, and a real `/wallet?tab=gifts` destination so token-era gift UI has a working backend contract again.
 - **Non-Critical Roast Smoke Classification:** Reclassified the public roast preview smoke assertion as warning-level so deploys stop failing solely on the known transient AI preview issue while still preserving diagnostics.
 - **Smoke Roast Warmup Stabilization:** Warm the public roast preview endpoint once before the asserted smoke call so transient first-hit deploy behavior does not produce a false-negative smoke failure.
 - **Smoke Check Timeout + Roast Fallback Hardening:** Added a bounded websocket smoke timeout and hardened public roast preview generation against broader AI-driver failures so deploy validation stops hanging or returning avoidable live 500s.
@@ -109,8 +110,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Confirm Green GitHub Hetzner Deploy + Verify Referral/Video/Roast Surface:** Verify live `/wallet`, referral signup, vouch links, roast preview, and video-chat initiation/history after the smoke classification change ships.
-2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, and live video signaling with a real signed-in browser session.
-3. **Resolve Remaining Gift-Specific Dead Flows:** Compact-restore or retire remaining gift/token spend paths that still reference the newly restored wallet surface.
+1. **Verify Gift + Wallet + Referral + Video Surfaces Live:** Verify live `/wallet`, `/wallet?tab=gifts`, referral signup, vouch links, gifts, roast preview, and video-chat initiation/history now that the Hetzner deploy path is green.
+2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, live video signaling, and any gift-notification realtime behavior with a real signed-in browser session.
+3. **Restore / Retire Remaining Token Spend Surfaces:** Boosts, token-gated unlocks, and adjacent wallet-linked purchase surfaces still need compact restoration or honest retirement.
 4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

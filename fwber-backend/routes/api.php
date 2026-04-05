@@ -125,11 +125,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('events/{id}/rsvp', [\App\Http\Controllers\EventController::class, 'rsvp']);
     Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
 
-    // Wallet / Referrals / Vouches
+    // Wallet / Referrals / Vouches / Gifts
     Route::get('wallet', [\App\Http\Controllers\WalletController::class, 'show']);
     Route::post('wallet/address', [\App\Http\Controllers\WalletController::class, 'updateAddress']);
     Route::get('referrals/summary', [\App\Http\Controllers\ReferralController::class, 'summary']);
     Route::get('vouch/link', [\App\Http\Controllers\VouchController::class, 'generateLink']);
+    Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);
+    Route::post('gifts/send', [\App\Http\Controllers\GiftController::class, 'send']);
+    Route::get('gifts/received', [\App\Http\Controllers\GiftController::class, 'received']);
 
     // Merchant / Marketplace
     Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);

@@ -37,6 +37,6 @@ export async function sendGift(receiverId: number, giftId: number, message?: str
 }
 
 export async function getReceivedGifts(): Promise<UserGift[]> {
-  const response = await apiClient.get<UserGift[]>('/gifts/received');
-  return response.data;
+  const response = await apiClient.get<{ data: UserGift[] }>('/gifts/received');
+  return response.data.data;
 }

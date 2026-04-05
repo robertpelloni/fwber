@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.8.7
+> **Version:** 1.8.8
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -176,6 +176,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - the signed-in product shell now also includes restored `/wallet`, `/events`, `/friends`, `/activity`, `/notifications`, and `/settings/travel` routes, plus refreshed referral/vouch flows and video-chat backend endpoints, so post-deploy validation should exercise those features with a real session
 - the Hetzner backend deploy script now prefers a root-owned nginx sync helper on the live server, allowing GitHub deploys to refresh tracked nginx configs without requiring blanket passwordless sudo for raw filesystem writes
 - the websocket smoke probe is now bounded by a timeout, public roast preview generation has been hardened, the roast endpoint is warmed once before the asserted smoke call, and the roast smoke assertion is warning-level rather than deploy-blocking while this transient preview issue is still under investigation
+- post-deploy manual verification should now also exercise the restored gifts contract (`/api/gifts`, `/api/gifts/send`, `/api/gifts/received`, `/wallet?tab=gifts`) because gift UI and notification routes are live again
 - the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
 - `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors
