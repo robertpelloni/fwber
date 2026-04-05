@@ -13,6 +13,7 @@ Delivered:
 - restored friends backend model + schema + API endpoints
 - restored searchable `/friends` frontend page
 - restored Friends navigation in the authenticated shell
+- carried the Mercure retirement through to live Hetzner verification, where the hostname now returns the explicit retired response instead of `502`
 
 ## ✅ Why This Matters
 The signed-in experience still contained dead `/friends` links from messages, notifications, and activity flows. This release turns that dead route back into a functioning feature and makes the app feel materially less hollow while broader restoration continues.

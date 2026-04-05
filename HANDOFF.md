@@ -12,7 +12,7 @@ Why Friends first:
 - that meant users were still encountering dead social links even after major deployment/runtime stabilization work
 - restoring Friends converts multiple dead routes back into a coherent live feature without reopening the heaviest archived systems first
 
-This session also carried forward the tracked Mercure retirement config/deploy-sync updates that were already reflected in docs but not yet committed in the working tree.
+This session also carried forward the tracked Mercure retirement config/deploy-sync updates and verified them live: public `mercure.fwber.me` now returns the explicit retired response instead of `502`.
 
 ---
 

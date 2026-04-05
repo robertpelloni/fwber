@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
 
 ### Verified
 - Live server inspection confirmed there is no Mercure service and no listener on `127.0.0.1:3000`.
+- Public DNS for `mercure.fwber.me` resolves to `5.161.250.43`.
+- Public `https://mercure.fwber.me/.well-known/mercure` now returns the explicit retired `410 Gone` response from nginx.
 - The retirement path is therefore the correct operational response until/unless Mercure is intentionally reintroduced.
 
 ## [1.6.9] - 2026-04-05 — Frontend Workflow Install Strategy Fix

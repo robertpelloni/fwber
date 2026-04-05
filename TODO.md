@@ -21,7 +21,7 @@
 
 ## ✅ Recently Completed
 - [x] **Friends System Restoration**: Restored the friends backend/API surface, added a new `/friends` page, and put Friends back into authenticated navigation.
-- [x] **Mercure Surface Retirement**: Added a tracked Hetzner nginx config that returns an explicit `410 Gone` for `mercure.fwber.me` and wired it into the deploy script so the dead upstream is no longer presented as a broken live service.
+- [x] **Mercure Surface Retirement**: Added a tracked Hetzner nginx config that returns an explicit `410 Gone` for `mercure.fwber.me`, wired it into the deploy script, and verified the retired response live from the public internet.
 - [x] **Frontend Workflow Install Strategy Fix**: Switched the dedicated frontend GitHub workflow to `npm install --no-fund --no-audit` to get past platform-sensitive optional dependency drift.
 - [x] **Frontend/Backend Contract Verification Sweep**: Confirmed the frontend GitHub workflow is green again and verified that the live `www.fwber.me` bundles point at `https://api.fwber.me`, `ws.fwber.me`, and `broadcasting/auth`.
 
