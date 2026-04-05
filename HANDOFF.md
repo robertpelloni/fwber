@@ -125,15 +125,17 @@ This means the next realtime concern is no longer “can a websocket handshake h
 - nothing meaningful is listening behind the configured upstream
 - this is now a clear product/ops decision: provision it properly or retire/remove it from the active surface
 
-### 2. Frontend live UX still needs browser-level verification
+### 2. Frontend live UX still needs authenticated browser-level verification
 Even with backend + websocket probes healthy, the live frontend should still be checked for:
-- correct API origin usage
 - header connection badge behavior
-- broadcast auth flow
+- private broadcast auth flow
 - dashboard rendering against the recovered backend
+- authenticated E2E restore/user flows
 
-### 3. GitHub frontend workflow still needs re-run confirmation
-The workflow has now been changed again (`npm install --no-fund --no-audit`), but that still needs confirmation from an actual GitHub Actions run.
+### 3. Browser automation harness is flaky locally
+- `agent-browser` CLI is installed, but the daemon restart timed out repeatedly during this session
+- I therefore used frontend bundle inspection as the reliable fallback verification path
+- this harness issue is now its own tooling task if richer autonomous browser verification is needed
 
 ---
 

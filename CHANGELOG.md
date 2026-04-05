@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Live smoke check now passes against Hetzner with **9 passes / 3 expected warnings / 0 failures**.
 - The websocket upgrade probe now succeeds against `https://ws.fwber.me` using the production Reverb app key.
 - `https://api.fwber.me/`, `/.well-known/nodeinfo`, and `/nodeinfo/2.0` all return healthy responses live after backend/nginx refresh.
+- GitHub Actions are now aligned behind the repaired stack: the `Frontend Build & Deploy (Vercel)` workflow for commit `e0fee531a` succeeded, and the live `www.fwber.me` frontend bundles reference `https://api.fwber.me`, `ws.fwber.me`, and `broadcasting/auth` as expected.
 
 ## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
 
