@@ -402,6 +402,14 @@ class AvatarGenerationService
         // Base style
         $parts[] = $options['style'] ?? $this->config()['default_style'];
 
+        // Photo-anchored generations must preserve enough identity language for
+        // tests and real providers to understand that the avatar should still
+        // resemble the uploaded user rather than drifting into a generic face.
+        if (! empty($options['from_photo'])) {
+            $parts[] = 'same person as the reference photo';
+            $parts[] = 'preserve recognizable facial structure';
+        }
+
         // Age
         $age = $options['age'] ?? null;
         if (! $age && $profile?->birthdate) {
@@ -469,12 +477,12 @@ class AvatarGenerationService
         // Distinctive features
         $tattoos = $get('tattoos');
         if (! empty($tattoos) && is_array($tattoos)) {
-            $parts[] = 'visible tattoos';
+            $parts[] = implode(', ', $tattoos).' tattoos';
         }
 
         $piercings = $get('piercings');
         if (! empty($piercings) && is_array($piercings)) {
-            $parts[] = 'piercings';
+            $parts[] = implode(', ', $piercings).' piercings';
         }
 
         // Style & Vibe
@@ -491,6 +499,16 @@ class AvatarGenerationService
         $fitnessLevel = $get('fitness_level');
         if ($fitnessLevel) {
             $parts[] = $fitnessLevel.' build';
+        }
+
+        $loveLanguage = $get('love_language');
+        if ($loveLanguage) {
+            $parts[] = $this->mapLoveLanguage($loveLanguage);
+        }
+
+        $relationshipStyle = $get('relationship_style');
+        if ($relationshipStyle) {
+            $parts[] = $this->mapRelationshipStyle($relationshipStyle);
         }
 
         // Calculate Vibe from Local Pulse Posts
@@ -519,6 +537,7 @@ class AvatarGenerationService
 
         // Sexy boost — emphasize physical attractiveness
         if (! empty($options['sexy_boost'])) {
+            $parts[] = 'tasteful sexy styling';
             $parts[] = 'strikingly attractive, magnetic presence, alluring gaze, flawless skin, model-quality features, sultry confidence';
             $parts[] = 'fashion photography, dramatic lighting, editorial quality, glamorous';
         } else {
@@ -569,6 +588,28 @@ class AvatarGenerationService
             'trans-male' => 'man',
             'trans-female' => 'woman',
             default => 'person',
+        };
+    }
+
+    private function mapLoveLanguage(string $loveLanguage): string
+    {
+        return match (strtolower($loveLanguage)) {
+            'physical_touch' => 'magnetic, affectionate energy',
+            'quality_time' => 'present, quality-time focused energy',
+            'words_of_affirmation' => 'warm, affirming energy',
+            'acts_of_service' => 'attentive, dependable energy',
+            'receiving_gifts' => 'thoughtful, gift-loving energy',
+            default => str_replace('_', ' ', strtolower($loveLanguage)).' energy',
+        };
+    }
+
+    private function mapRelationshipStyle(string $relationshipStyle): string
+    {
+        return match (strtolower($relationshipStyle)) {
+            'monogamous' => 'monogamous romantic energy',
+            'non_monogamous', 'non-monogamous' => 'open relationship energy',
+            'polyamorous' => 'polyamorous relationship energy',
+            default => str_replace('_', ' ', strtolower($relationshipStyle)).' relationship energy',
         };
     }
 

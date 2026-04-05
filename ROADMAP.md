@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.8 "NodeInfo 500 Recovery + Frontend CI Runtime Fix"
+> **Current Version:** 1.6.9 "Restore Branch CI Compatibility Sweep"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.8)
+### Phase 5: Production Scale (COMPLETED - v1.6.9)
+- **Restore Branch CI Compatibility Sweep:** Repaired restore-branch avatar-generation config/prompt drift, tagged-cache mock compatibility, stale frontend Sentry App Router wiring, missing WASM artifact assumptions, and deprecated Sentry Next.js build options so the broader rewind branch is much closer to the earlier full-surface state while remaining buildable/testable under modern tooling.
 - **NodeInfo 500 Recovery + Frontend CI Runtime Fix:** Hardened `NodeInfoController` against missing federation-era schema and aligned the frontend GitHub build to Node.js 24 so both discovery endpoints and frontend CI stop failing for infrastructure/toolchain reasons.
 - **Hetzner Log ACL Deploy Fix:** Replaced the broken daily-log permission approach with shared ACLs for `deploy` and `www-data`, fixing deploy-time failures caused by rotated log ownership drift on Hetzner.
 - **Hetzner Backend Stability Repair:** Replaced the broken root backend route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables discovered during live Hetzner inspection.

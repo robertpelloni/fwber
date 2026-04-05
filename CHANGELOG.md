@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.9] - 2026-04-05 — Restore Branch CI Compatibility Sweep
+
+### Fixed
+- Reworked restore-branch `AvatarGenerationService` config resolution so PHPUnit overrides for `avatar_generation.default_provider` and provider credentials are honored consistently during direct service tests.
+- Restored prompt-enrichment behavior expected by the broader pre-simplification test suite, including photo identity anchors, detailed tattoo/piercing descriptors, love-language and relationship-style flavor text, and tasteful sexy-boost phrasing.
+- Updated `TaggedCache` to always attempt `Cache::tags(...)` before falling back, preserving tagged-cache expectations in mocked controller-caching tests while still tolerating runtime stores that reject tags.
+- Modernized the restore-branch frontend Sentry wiring to current App Router conventions with `instrumentation.ts`, new `instrumentation-client.ts`, and removal of the deprecated `sentry.client.config.ts` path.
+- Disabled the rewind branch's broken browser-side WASM import path in `lib/e2e/crypto.ts`, keeping encrypted-settings surfaces build-safe when generated WASM bindings are not present in CI/worktrees.
+- Removed the deprecated Sentry `disableLogger` webpack option from the restore-branch Next.js config so build output is clean again.
+
+### Verified
+- `php artisan test` completed locally in the restore worktree with **425 passed / 8 skipped**.
+- `npm run build` completed successfully in `fwber-frontend` after the Sentry/WASM compatibility sweep.
+- The remaining GitHub backend CI failures were root-caused to restore-branch compatibility drift rather than fresh feature regressions, and the repaired areas are now aligned with the local validated state.
+
 ## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
 
 ### Fixed

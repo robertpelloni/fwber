@@ -9,17 +9,7 @@
 let wasmModule: any = null;
 
 async function loadWasm() {
-  if (wasmModule) return wasmModule;
-  try {
-    // @ts-ignore
-    wasmModule = await import('@/lib/wasm/fwber_wasm');
-    await wasmModule.default();
-    console.log('E2E: WASM encryption acceleration active');
-    return wasmModule;
-  } catch (e) {
-    console.debug('E2E: WASM acceleration not available, using WebCrypto fallback');
-    return null;
-  }
+  return null;
 }
 
 // Configuration for ECDH
