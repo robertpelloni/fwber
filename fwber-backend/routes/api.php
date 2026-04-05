@@ -316,10 +316,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'show']);
     Route::post('proximity/artifacts/{id}/claim', [\App\Http\Controllers\ProximityArtifactController::class, 'claim']);
     Route::post('proximity/artifacts/{id}/flag', [\App\Http\Controllers\ProximityArtifactController::class, 'flag']);
-    Route::get('proximity/artifacts/{artifact}/comments', [\App\Http\Controllers\API\ProximityArtifactCommentController::class, 'index']);
-    Route::post('proximity/artifacts/{artifact}/comments', [\App\Http\Controllers\API\ProximityArtifactCommentController::class, 'store']);
-    Route::delete('proximity/artifacts/comments/{comment}', [\App\Http\Controllers\API\ProximityArtifactCommentController::class, 'destroy']);
-    Route::post('proximity/artifacts/{artifact}/vote', [\App\Http\Controllers\API\ProximityArtifactVoteController::class, 'vote']);
+    Route::get('proximity/artifacts/{artifact}/comments', [\App\Http\Controllers\Api\ProximityArtifactCommentController::class, 'index']);
+    Route::post('proximity/artifacts/{artifact}/comments', [\App\Http\Controllers\Api\ProximityArtifactCommentController::class, 'store']);
+    Route::delete('proximity/artifacts/comments/{comment}', [\App\Http\Controllers\Api\ProximityArtifactCommentController::class, 'destroy']);
+    Route::post('proximity/artifacts/{artifact}/vote', [\App\Http\Controllers\Api\ProximityArtifactVoteController::class, 'vote']);
     Route::delete('proximity/artifacts/{id}', [\App\Http\Controllers\ProximityArtifactController::class, 'destroy']);
     Route::get('proximity/local-pulse', [\App\Http\Controllers\ProximityArtifactController::class, 'localPulse']);
 
@@ -583,13 +583,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('promotions/{id}/track', [\App\Http\Controllers\MerchantController::class, 'trackPromotion']);
 
     // Matchmaker Bounty
-    Route::get('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'index']);
-    Route::post('bounties', [\App\Http\Controllers\API\MatchBountyController::class, 'store']);
-    Route::get('bounties/{slug}', [\App\Http\Controllers\API\MatchBountyController::class, 'show']);
+    Route::get('bounties', [\App\Http\Controllers\Api\MatchBountyController::class, 'index']);
+    Route::post('bounties', [\App\Http\Controllers\Api\MatchBountyController::class, 'store']);
+    Route::get('bounties/{slug}', [\App\Http\Controllers\Api\MatchBountyController::class, 'show']);
     Route::get('bounties/{slug}/suggest', function ($slug) {
         return response()->json(['message' => 'Use POST to suggest']);
     });
-    Route::post('bounties/{slug}/suggest', [\App\Http\Controllers\API\MatchBountyController::class, 'suggest']);
+    Route::post('bounties/{slug}/suggest', [\App\Http\Controllers\Api\MatchBountyController::class, 'suggest']);
 
     // Friend routes
     Route::prefix('friends')->group(function () {
