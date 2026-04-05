@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.1] - 2026-04-05 — Dead Surface Recovery: Activity, Notifications, Travel
+
+### Added
+- Restored the `/activity` page so the dashboard feed “view all” action now lands on a real full-screen activity timeline.
+- Restored the `/notifications` inbox page so the bell drawer “view all” action now opens a proper full notifications surface.
+- Restored the `/settings/travel` page so the Settings travel-mode link now leads to a working control surface instead of a dead route.
+
 ## [1.7.0] - 2026-04-05 — Friends System Restoration
 
 ### Added

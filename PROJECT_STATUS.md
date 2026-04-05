@@ -1,19 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.7.0 (Friends System Restoration)
+# PROJECT_STATUS.md - fwber v1.7.1 (Dead Surface Recovery: Activity, Notifications, Travel)
 
 **Date:** 2026-04-05
-**Version:** 1.7.0 "Friends System Restoration"
-**Status:** ✅ **FRIENDS FEATURE IS BACK IN THE LIVE PRODUCT SURFACE**
+**Version:** 1.7.1 "Dead Surface Recovery: Activity, Notifications, Travel"
+**Status:** ✅ **SEVERAL PROMINENT DEAD SIGNED-IN ROUTES ARE NOW REAL AGAIN**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release restores one of the obvious missing user-facing systems that still had dead links and Cypress coverage but no live surface.
+This release restores three high-visibility frontend surfaces that were still linked from the live app shell but missing as actual pages.
 
 Delivered:
-- restored friends backend model + schema + API endpoints
-- restored searchable `/friends` frontend page
-- restored Friends navigation in the authenticated shell
-- carried the Mercure retirement through to live Hetzner verification, where the hostname now returns the explicit retired response instead of `502`
+- restored `/activity`
+- restored `/notifications`
+- restored `/settings/travel`
 
 ## ✅ Why This Matters
-The signed-in experience still contained dead `/friends` links from messages, notifications, and activity flows. This release turns that dead route back into a functioning feature and makes the app feel materially less hollow while broader restoration continues.
+These routes were already referenced from dashboard/activity, notification bell flows, and Settings. Restoring them reduces the “hollow app” feeling immediately and makes the signed-in product shell feel substantially more complete.
