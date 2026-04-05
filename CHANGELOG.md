@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.6] - 2026-04-05 — Restore Branch Route Drift Recovery Replay
+
+### Changed
+- Replayed `8357d83f3` and `9b090bf9b` onto `restore/pre-simplification-hetzner`, bringing over the root-route recovery, match-table drift migration, dashboard endpoint coverage, and nodeinfo/frontend-CI alignment work.
+- Advanced restore-branch tip to `81ee89400` and triggered fresh restore-branch backend/frontend runs against the newer runtime-hardening set.
+
 ## [1.9.5] - 2026-04-05 — Restore Branch Smoke Suite + Deploy Hardening Replay
 
 ### Changed

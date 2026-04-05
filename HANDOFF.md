@@ -1,62 +1,57 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.9.5
+> **Version Reached:** 1.9.6
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the rewind-merge strategy aggressively and made meaningful branch-level progress.
+This session continued the rewind merge without stopping and moved the restore branch much closer to the real Hetzner runtime contract.
 
-### Main branch releases recorded during this extended rewind session
+### Main branch releases recorded across this rewind session
 - `v1.9.1` — premium discovery filter restoration
 - `v1.9.2` — pre-simplification rewind branch + replay plan
-- `v1.9.3` — first restore-branch Hetzner replay kickoff
+- `v1.9.3` — restore-branch Hetzner replay kickoff
 - `v1.9.4` — restore-branch workflow modernization replay
-- `v1.9.5` — restore-branch health/smoke/deploy hardening replay + Linux route-case fix documentation
+- `v1.9.5` — restore-branch smoke/deploy hardening replay
+- `v1.9.6` — restore-branch route drift recovery replay
 
-### Restore branch now exists and has progressed substantially
+### Current restore branch state
 Branch:
 - `restore/pre-simplification-hetzner`
 
 Current remote tip:
-- **`d4d073e4f`**
-
-This branch now contains replayed commits for:
-- Hetzner deployment docs
-- Hetzner ops templates
-- frontend production env alignment
-- GitHub backend deploy switch to Hetzner
-- workflow stabilization
-- rustup cargo PATH loading
-- frontend workflow alignment to Node 24
-- frontend workflow switch from `npm ci` to `npm install --no-fund --no-audit`
-- deployment health endpoints and `deploy:verify`
-- smoke-check system and smoke report tooling
-- ACL/logging hardening
-- nginx/deploy hardening
-- direct Linux route namespace casing fix
+- **`81ee89400`** after replaying route drift recovery commits
+- plus direct Linux route namespace casing fix `d4d073e4f`
 
 No processes were manually killed.
 
 ---
 
-## Main Branch Work Previously Completed In This Session
+## Recap: Strategic Rewind Basis
+### User-requested strategy
+The user explicitly asked to restore removed systems by effectively rewinding to the fuller pre-simplification codebase and merging that with the validated Hetzner changes.
+
+### Boundary used
+- pre-simplification baseline: `a636a53c3`
+- simplification begins: `2a3f8aa40`
+
+### Scale finding that justified the branch strategy
+Diff from `a636a53c3..HEAD` showed:
+- **827 files changed**
+- **20,665 insertions**
+- **56,068 deletions**
+
+This is why the rewind branch is the right main vehicle for “put everything back.”
+
+---
+
+## Main Branch Work Completed Earlier In This Session
 ### v1.9.1 — Premium Discovery Filter Restoration
-#### Problem discovered
-The active simplified branch still exposed premium discovery fields and filters for:
-- dietary preferences
-- religion
-- political views
-- cannabis / kids / pets / zodiac
-- token-gated premium filter UX
-
-But the backend schema/controller path had drifted.
-
-#### Added
+Added:
 - `fwber-backend/database/migrations/2026_04_05_080000_restore_discovery_filter_profile_columns.php`
 - `fwber-backend/tests/Feature/PremiumDiscoveryFiltersTest.php`
 
-#### Updated
+Updated:
 - `fwber-backend/config/economy.php`
 - `fwber-backend/app/Models/UserProfile.php`
 - `fwber-backend/app/Http/Controllers/ProfileController.php`
@@ -65,8 +60,7 @@ But the backend schema/controller path had drifted.
 - `fwber-frontend/components/MatchFilter.tsx`
 - `fwber-frontend/app/matches/page.tsx`
 
-#### Validation
-Executed:
+Validation:
 - `php artisan test --filter='PremiumDiscoveryFiltersTest|ContentUnlockRestoreTest|BoostRestoreTest|GiftRestoreTest|ReferralRestoreTest|VideoChatRestoreTest|WalletRestoreTest'`
 - `npm run build --prefix fwber-frontend`
 
@@ -74,255 +68,165 @@ Result:
 - **20 tests passed / 104 assertions**
 - frontend build succeeded
 
-#### Git
-- commit: `2e0789400`
-- message: `feat: restore premium discovery filters and profile persistence (v1.9.1)`
+Git:
+- `2e0789400` — `feat: restore premium discovery filters and profile persistence (v1.9.1)`
 
----
-
-## Strategy Shift Confirmed
-The user explicitly clarified the true goal:
-> restore removed features by rewinding to the fuller codebase and merging that with the Hetzner changes
-
-This moved the work from:
-- one-off archive restorations
-
-to:
-- **pre-simplification rewind branch + selective Hetzner/runtime replay**
-
-### Historical boundary used
-- baseline: `a636a53c3`
-- simplification starts: `2a3f8aa40`
-
-### Scale finding that justified the branch strategy
-Diff from `a636a53c3..HEAD`:
-- **827 files changed**
-- **20,665 insertions**
-- **56,068 deletions**
-
-That is why rewind + replay is the correct large-scale recovery strategy.
-
----
-
-## v1.9.2 — Pre-Simplification Rewind Branch + Replay Plan
-### Added
+### v1.9.2 — Rewind plan + helper tooling
+Added:
 - `docs/ai/planning/pre-simplification-hetzner-rewind-plan.md`
 - `ops/git/create-pre-simplification-restore-branch.sh`
 - `ops/git/hetzner-replay-commits.txt`
 
-### Branch creation completed
-Executed:
-- `bash ops/git/create-pre-simplification-restore-branch.sh`
-
-Result:
-- local + remote branch created: `restore/pre-simplification-hetzner`
-- initial remote baseline: `a636a53c3`
-
-### Git
-- main commit: `aa20a81bc`
-- message: `chore: create pre-simplification restore branch and hetzner replay plan (v1.9.2)`
+Git:
+- `aa20a81bc` — `chore: create pre-simplification restore branch and hetzner replay plan (v1.9.2)`
 
 ---
 
-## Restore Branch Replay Progress
-### Safe execution setup
-Created dedicated worktree:
+## Restore Branch Infrastructure Replay Progress
+A dedicated worktree was created at:
 - `C:/Users/hyper/workspace/fwber_restore_worktree`
 
 This keeps `main` clean while replaying onto the rewind branch.
 
----
+### Replays already applied before the newest tranche
+1. `79e22d99a` ← `11250c5ec` — Hetzner deployment docs
+2. `96c10825f` ← `59f132e38` — Hetzner ops templates + frontend env alignment
+3. `b2fa74cd1` ← `847f43f26` — backend deploy switched to Hetzner
+4. `82ff8e6f6` ← `18f3539e9` — workflow stabilization
+5. `f1c7e3e53` ← `81781ffb1` — rustup cargo PATH loading
+6. `1b9aea596` ← `6f1251b18` — frontend CI aligned to Node 24
+7. `adb6f4f15` ← `e0fee531a` — frontend workflow uses `npm install --no-fund --no-audit`
+8. `1601157a3` ← `ad963d99b` — deployment health endpoints + `deploy:verify`
+9. `e8a6e4862` ← `f95017246` — post-deploy smoke checks
+10. `d56af49ae` ← `b55304b43` — smoke report artifacts + drift detection
+11. `6cfdd4941` ← `d343ec817` — smoke diagnostics + remediation hints
+12. `e7b3946e9` ← `973cb6eb9` — endpoint fingerprints
+13. `9662a5b7d` ← `be414a3b3` — DNS appendix
+14. `a542f93b3` ← `4a5630bca` — smoke drift diffing
+15. `02a27b1a7` ← `efccf1e49` — smoke notification publishing
+16. `4506cff55` ← `6e9e1e835` — ACL/logging hardening
+17. `a524abac9` ← `604f9c759` — smoke/config sync hardening
+18. `a56f004ad` ← `c037acb4f` — deploy recovery when nginx config sync lacks passwordless sudo
+19. `cb8ac70ca` ← `fab438e0a` — Hetzner nginx sync helper integration
 
-## Restore Branch Replays Already Applied Before This Final Tranche
-### Replay 1
-- source: `11250c5ec`
-- restore branch commit: `79e22d99a`
-- subject: Hetzner deployment docs alignment
+### Direct restore-branch compatibility fix
+- `d4d073e4f` — `fix: correct restore-branch api controller namespace casing`
 
-### Replay 2
-- source: `59f132e38`
-- restore branch commit: `96c10825f`
-- subject: Hetzner ops templates + frontend env alignment
+This corrected Linux-sensitive route references from `API` to `Api` in `fwber-backend/routes/api.php` for:
+- `ProximityArtifactCommentController`
+- `ProximityArtifactVoteController`
+- `MatchBountyController`
 
-### Replay 3
-- source: `847f43f26`
-- restore branch commit: `b2fa74cd1`
-- subject: GitHub backend deploy switched from DreamHost to Hetzner
-
-### Replay 4
-- source: `18f3539e9`
-- restore branch commit: `82ff8e6f6`
-- subject: workflow stabilization after cutover
-
-### Replay 5
-- source: `81781ffb1`
-- restore branch commit: `f1c7e3e53`
-- subject: rustup cargo path loading for non-login deploy shells
-
-### Replay 6
-- source: `6f1251b18`
-- restore branch commit: `1b9aea596`
-- subject: frontend workflow alignment to Node 24
-
-### Replay 7
-- source: `e0fee531a`
-- restore branch commit: `adb6f4f15`
-- subject: frontend workflow uses `npm install --no-fund --no-audit`
-
-### Replay 8
-- source: `ad963d99b`
-- restore branch commit: `1601157a3`
-- subject: deployment health endpoints + `deploy:verify`
-
-### Replay 9
-- source: `f95017246`
-- restore branch commit: `e8a6e4862`
-- subject: post-deploy smoke checks
-
-### Replay 10
-- source: `b55304b43`
-- restore branch commit: `d56af49ae`
-- subject: smoke-check report artifacts + live drift detection
-
-### Replay 11
-- source: `d343ec817`
-- restore branch commit: `6cfdd4941`
-- subject: smoke diagnostics + remediation hints
-
-### Replay 12
-- source: `973cb6eb9`
-- restore branch commit: `e7b3946e9`
-- subject: endpoint fingerprints in smoke reports
-
-### Replay 13
-- source: `be414a3b3`
-- restore branch commit: `9662a5b7d`
-- subject: DNS resolution appendix for smoke reports
-
-### Replay 14
-- source: `4a5630bca`
-- restore branch commit: `a542f93b3`
-- subject: smoke-report drift diffing
-
-### Replay 15
-- source: `efccf1e49`
-- restore branch commit: `02a27b1a7`
-- subject: smoke-report notification publishing
-
-### Replay 16
-- source: `6e9e1e835`
-- restore branch commit: `4506cff55`
-- subject: ACL-based Hetzner deploy access / logging hardening
-
-### Replay 17
-- source: `604f9c759`
-- restore branch commit: `a524abac9`
-- subject: smoke-check + config sync hardening
-
-### Replay 18
-- source: `c037acb4f`
-- restore branch commit: `a56f004ad`
-- subject: deploy recovery when nginx config sync lacks passwordless sudo
-
-### Replay 19
-- source: `fab438e0a`
-- restore branch commit: `cb8ac70ca`
-- subject: Hetzner nginx sync helper integration for GitHub deploys
+That fix was necessary because Linux CI exposed class-resolution failures that Windows can mask.
 
 ---
 
-## Restore Branch Validation / Findings During This Session
-### Script-level validation performed in restore worktree
+## New Replay Tranche Completed In This Session
+### Replay 20
+- source: `8357d83f3`
+- restore branch commit: `10da0fc7f`
+- subject: `fix: repair live hetzner backend route and schema drift failures (v1.6.5)`
+
+What this brought into the restore branch:
+- root route recovery away from missing `welcome` view assumptions
+- web route/runtime hardening
+- match-table drift recovery migration
+- dashboard endpoint coverage additions
+- additional deploy/runtime hardening from the real Hetzner experience
+
+Notable merge decision:
+- `DashboardController.php` conflict was resolved by preserving the richer restore-branch implementation (`ours`) while still bringing in the broader route/web/runtime hardening files from the replay.
+- `WebFingerController.php` and `PublicWebRoutesTest.php` were taken from the replayed side where useful to align modern route/runtime expectations.
+
+### Replay 21
+- source: `9b090bf9b`
+- restore branch commit: `81ee89400`
+- subject: `fix: recover nodeinfo endpoint and align frontend ci to node 24 (v1.6.8)`
+
+What this brought into the restore branch:
+- nodeinfo endpoint hardening
+- additional frontend CI/runtime alignment
+- another layer of modern production compatibility for the fuller old branch
+
+### Branch push completed
+Executed:
+- `git push origin restore/pre-simplification-hetzner`
+
+Result:
+- restore branch advanced from `d4d073e4f` to **`81ee89400`**
+
+Fresh runs were triggered for this tip:
+- `Backend CI (Tests & Linting)` — in progress at time of status check
+- `Frontend Build & Deploy (Vercel)` — in progress at time of status check
+
+---
+
+## Validation Performed In This Session
+### Restore worktree script validation
 Executed successfully:
 - `bash -n ops/hetzner/scripts/deploy-backend.sh`
 - `bash -n ops/hetzner/scripts/smoke-check.sh`
 - `python -m py_compile ops/hetzner/scripts/compare-smoke-reports.py ops/hetzner/scripts/publish-smoke-report.py`
 
-### Workflow validation observation
-Reading the replayed restore-branch frontend workflow confirmed it now uses:
+### Workflow validation by inspection
+Confirmed in restore-branch workflow:
 - `node-version: '24.x'`
 - `npm install --no-fund --no-audit`
 
-This is important because it directly addressed the earlier restore-branch frontend workflow failure mode.
+### CI log inspection findings
+After the direct `Api` namespace route fix, restore-branch backend CI moved on to deeper failures instead of class-resolution failures.
+
+That is an important sign of progress.
 
 ---
 
-## Key Failure Analysis Discovered On Restore Branch
-### Backend CI failures were no longer only workflow issues
-After enough infra replay, the restore branch backend CI exposed a real Linux app/runtime issue:
-- routes referenced `App\Http\Controllers\API\...`
-- actual controller namespace/path is `App\Http\Controllers\Api\...`
+## Latest Failure Analysis From Restore-Branch CI
+### What got better
+The branch is no longer mainly failing on missing `Api` controller class resolution.
 
-This is easy to miss on Windows, but breaks on Linux CI and deploy environments.
+### What the latest CI now shows instead
+The newest restore-branch backend CI log points to deeper contract mismatches, including:
+- profile update persistence differences
+- onboarding/profile payload expectation mismatches
+- travel-mode persistence differences
+- root route still expecting a missing `welcome` view in some path/configurations before the newer replay run is fully evaluated
+- webfinger/header contract mismatch (`application/json` vs `application/jrd+json`)
 
-### Concrete example surfaced in CI logs
-- `Target class [App\Http\Controllers\API\ProximityArtifactVoteController] does not exist.`
+Representative failing areas from CI logs:
+- `OnboardingEdgeCasesTest`
+- `OnboardingProfileUpdateTest`
+- `ProfileUpdateTest`
+- `PublicWebRoutesTest`
 
-This showed the rewind branch had moved beyond “old workflow mismatch” into genuine Linux production compatibility problems.
+### Why this is actually useful
+This means the restore branch has moved beyond:
+- stale workflow problems
+- Linux case-sensitivity problems
 
----
+and is now exposing the real behavioral reconciliation work needed between:
+- the richer pre-simplification feature branch
+- the modern Hetzner/runtime contract
 
-## Direct Restore-Branch Fix Added
-### Commit added directly on restore branch
-- commit: `d4d073e4f`
-- message: `fix: correct restore-branch api controller namespace casing`
-
-### What it changed
-Updated route references in:
-- `fwber-backend/routes/api.php`
-
-Changed:
-- `App\Http\Controllers\API\ProximityArtifactCommentController` → `App\Http\Controllers\Api\ProximityArtifactCommentController`
-- `App\Http\Controllers\API\ProximityArtifactVoteController` → `App\Http\Controllers\Api\ProximityArtifactVoteController`
-- `App\Http\Controllers\API\MatchBountyController` → `App\Http\Controllers\Api\MatchBountyController`
-
-### Why this fix matters
-This is exactly the kind of reconciliation needed when restoring the older full-feature branch into the modern Linux/Hetzner reality.
-It also provides a concrete signal that future rewind fixes may need to be:
-- direct branch fixes
-- not only cherry-picks from `main`
+That is exactly where this branch needed to get.
 
 ---
 
-## Additional Important Findings
-### 1. Replay conflicts remain manageable
-Most cherry-pick conflicts were still concentrated in:
-- docs files
-- version files
-- deploy script merges
-- workflow files absent from the older baseline
+## Important Operational Finding
+Local PHP tests in the restore worktree still cannot run directly yet because that checkout does not have installed dependencies.
 
-This remains a strong sign that rewind + replay is viable.
-
-### 2. Local restore-branch PHP test execution is not yet available in the worktree
-Attempting local tests in the restore worktree backend failed because that checkout does not yet have installed dependencies:
+Observed failure:
 - missing `vendor/autoload.php`
 
-This is not a logic failure in the code itself, but it means local restore-branch validation will require dependency installation in that worktree before direct local test runs are possible.
-
-### 3. The restore branch is now carrying a substantial fraction of the Hetzner contract
-It now includes:
-- deploy workflow
-- frontend workflow modernizations
-- deploy verification
-- smoke/report stack
-- ACL/logging fixes
-- nginx sync hardening
-
-So it is no longer just a raw old snapshot with a couple docs commits.
+Implication:
+- local branch validation there will require dependency installation in `fwber_restore_worktree/fwber-backend` before direct local `php artisan test` runs are possible.
 
 ---
 
 ## Commands Executed In This Session
-### Branch/run inspection
-- `gh run list --branch restore/pre-simplification-hetzner ...`
-- `gh run view ... --log-failed`
-- restore worktree status inspection
-- replay manifest reading
-
-### Restore branch replay operations
+### Replay / branch work
 - `git cherry-pick 81781ffb1 6f1251b18 e0fee531a`
 - conflict resolution + continue
+- `git push origin restore/pre-simplification-hetzner`
 - `git cherry-pick ad963d99b f95017246 b55304b43`
 - conflict resolution + continue
 - `git cherry-pick d343ec817 973cb6eb9 be414a3b3 4a5630bca efccf1e49`
@@ -330,53 +234,57 @@ So it is no longer just a raw old snapshot with a couple docs commits.
 - `git cherry-pick 6e9e1e835 604f9c759 c037acb4f fab438e0a`
 - conflict resolution + continue
 - `git push origin restore/pre-simplification-hetzner`
+- direct route namespace fix + commit/push of `d4d073e4f`
+- `git cherry-pick 8357d83f3 9b090bf9b`
+- conflict resolution + continue
+- `git push origin restore/pre-simplification-hetzner`
 
-### Restore branch validation
-- `bash -n ops/hetzner/scripts/deploy-backend.sh`
-- `bash -n ops/hetzner/scripts/smoke-check.sh`
-- `python -m py_compile ...`
-- workflow grep for Node/npm install settings
+### Run / failure inspection
+- `gh run list --branch restore/pre-simplification-hetzner ...`
+- `gh run view ... --log-failed`
 
-### Direct restore-branch fix
-- route namespace correction in `fwber-backend/routes/api.php`
-- commit + push of `d4d073e4f`
+### Validation
+- script syntax checks on deploy/smoke Python helpers
+- attempted local restore-worktree PHP test run (blocked by missing vendor dependencies)
 
-### Main branch documentation/version sync
-- version bumps and docs sync through `v1.9.5`
+### Main branch docs/version sync
+- version bumps and sync through `v1.9.6`
 
 ---
 
 ## Current Branch State
 ### `main`
-- latest recorded version in this handoff: **1.9.5**
-- now fully documents the rewind plan and replay progress
-- remains the production-oriented working branch with incremental restorations plus strategic documentation
+- latest recorded version in this handoff: **1.9.6**
+- continues to document the rewind strategy and branch progress in detail
+- remains the production-oriented branch with incremental restores and operational tracking
 
 ### `restore/pre-simplification-hetzner`
-- original baseline: `a636a53c3`
-- current remote tip: **`d4d073e4f`**
-- now includes 19 replayed Hetzner/runtime commits plus 1 direct Linux route-case fix
+- baseline root: `a636a53c3`
+- current remote tip: **`81ee89400`**
+- now contains 21 replayed Hetzner/runtime commits plus the direct Linux route-case fix `d4d073e4f`
 
 ---
 
 ## Recommended Next Steps
-1. Inspect the newest restore-branch backend CI run for `d4d073e4f` and confirm whether namespace-case failures are resolved.
-2. Continue replaying remaining mandatory infra items such as:
+1. Inspect the fresh restore-branch runs for `81ee89400`.
+2. Continue the remaining mandatory infra replays, especially:
    - executable bit tracking (`9f73a29b9`)
    - roast-preview smoke hardening (`5b4c8673e`, `88b705dcf`, `e692027f0`)
-3. After that, begin replaying or directly porting:
-   - route/schema drift hardening
-   - migration idempotency fixes
-   - dashboard/realtime contract recovery
-4. Install dependencies inside the restore worktree when ready so local branch tests can run there directly.
+3. After that, start addressing the now-visible deeper behavioral issues on the restore branch:
+   - profile update persistence
+   - onboarding payload compatibility
+   - travel-mode persistence
+   - root route / webfinger / nodeinfo response contracts
+4. Install dependencies in the restore worktree when ready so local backend tests can run there directly.
 
 ---
 
-## Main Branch Commits Recorded In This Session
+## Main Branch Commits Recorded Across This Extended Session
 - `2e0789400` — `feat: restore premium discovery filters and profile persistence (v1.9.1)`
 - `aa20a81bc` — `chore: create pre-simplification restore branch and hetzner replay plan (v1.9.2)`
 - `8e05eac4e` — `docs: record restore branch hetzner replay kickoff (v1.9.3)`
 - `28fb5e373` — `docs: record restore branch workflow stabilization replay (v1.9.4)`
-- **pending current docs/version sync commit for `v1.9.5` at the moment this handoff text was written**
+- `8ec8e1b35` — `docs: record restore branch smoke and deploy hardening replay (v1.9.5)`
+- **pending current docs/version sync commit for `v1.9.6` at the moment this handoff text was written**
 
 No processes were manually killed.
