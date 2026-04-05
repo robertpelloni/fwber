@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.3] - 2026-04-05 — Hetzner Deploy Privilege Recovery
+
+### Fixed
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so nginx config sync attempts are optional when the deploy user lacks passwordless `sudo` for filesystem writes, while required `nginx` and `systemctl` commands still run with non-interactive privileged execution.
+- This specifically fixes the latest GitHub Hetzner deploy failure where deployment had already migrated and optimized successfully but aborted on `sudo cp` / `sudo ln` while refreshing nginx site configs.
+
 ## [1.8.2] - 2026-04-05 — Referral, Payout & Video Chat Restoration
 
 ### Added

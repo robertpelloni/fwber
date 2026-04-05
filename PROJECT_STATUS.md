@@ -1,22 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.8.2 (Referral, Payout & Video Chat Restoration)
+# PROJECT_STATUS.md - fwber v1.8.3 (Hetzner Deploy Privilege Recovery)
 
 **Date:** 2026-04-05
-**Version:** 1.8.2 "Referral, Payout & Video Chat Restoration"
-**Status:** ✅ **REFERRALS, PAYOUT LEDGER, VOUCH ROUTES, AND VIDEO CHAT BACKEND ARE RESTORED**
+**Version:** 1.8.3 "Hetzner Deploy Privilege Recovery"
+**Status:** ✅ **LATEST DEPLOY FAILURE ROOT-CAUSED TO NGINX CONFIG WRITE PRIVILEGES; SCRIPT NOW DEGRADES SAFELY**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release restores the next major missing product cluster users were still expecting after Wallet:
+This release hardens the Hetzner deployment script after observing a real GitHub Actions deployment failure.
 
 Delivered:
-- referral-code validation API
-- referral signup rewards
-- premium referral commissions + pending payout ledger
-- vouch routes keyed by referral code
-- video chat backend routes for call initiate / signal / status / history
-- expanded wallet UI into a wallet + referrals + payouts hub
-- frontend API contract fixes for referral, vouch, and video surfaces
+- optional nginx config sync when deploy lacks passwordless sudo for filesystem writes
+- retained strict privileged execution for required `nginx` validation and `systemctl` restarts
+- non-interactive privileged helper paths to avoid hanging on password prompts in CI
 
 ## ✅ Why This Matters
-The frontend still contained referral onboarding flows, vouch links, wallet/payout expectations, and a substantial video chat UI. Restoring the backend/API contract behind those surfaces eliminates another large class of "feature exists in the UI but not in production reality" problems.
+The previous deploy already completed `git pull`, `composer install`, migrations, optimize, and `php artisan deploy:verify`, then failed only because `sudo cp` / `sudo ln` required a password. This patch keeps deployment moving when live nginx configs are already present and only config refresh lacks privileges.
