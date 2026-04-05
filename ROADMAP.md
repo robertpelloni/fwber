@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.7.2 "Hetzner Repo Ownership Repair"
+> **Current Version:** 1.8.0 "Events Surface Restoration"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.7.2)
+### Phase 5: Production Scale (COMPLETED - v1.8.0)
+- **Events Surface Restoration:** Restored the events backend/API surface, event invitation flow, and frontend pages for listing, viewing, and creating events.
 - **Hetzner Repo Ownership Repair:** Repaired mixed ownership inside the live checkout after the automated deploy workflow failed on `.git/objects` write permissions, restoring deploy-user control of the repo.
 - **Dead Surface Recovery: Activity, Notifications, Travel:** Restored `/activity`, `/notifications`, and `/settings/travel` so prominent signed-in links now land on real pages again.
 - **Friends System Restoration:** Restored the friends backend/API surface, added a new `/friends` page, and put Friends back into the authenticated navigation so long-dead social links resolve again.
@@ -101,8 +102,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Re-run Hetzner Deploy After Ownership Repair:** Confirm the backend workflow is green again after repairing the live checkout permissions.
-2. **Verify Latest Live Surface Restorations:** Verify live `/friends`, `/activity`, `/notifications`, and `/settings/travel` with a real session after the latest Vercel deploy.
-3. **Restore Wallet / Events Surfaces Or Retire Them Honestly:** These are the next obvious dead-route references still visible in the signed-in shell.
+1. **Deploy Events + Verify Latest Live Restorations:** Verify live `/friends`, `/activity`, `/notifications`, `/settings/travel`, and `/events` with a real session after the latest deploys.
+2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge and websocket/broadcast-auth behavior with a real signed-in browser session.
+3. **Restore Wallet / Gift Surfaces Or Retire Them Honestly:** `/wallet` is now the next obvious dead-route reference still visible in the signed-in shell.
 4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

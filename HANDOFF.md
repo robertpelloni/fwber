@@ -1,84 +1,122 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.7.2
+> **Version Reached:** 1.8.0
 > **Current Model:** GPT
 
 ## Executive Summary
-This session restored another cluster of dead user-facing surfaces and then repaired a live Hetzner checkout ownership issue that had started breaking otherwise-valid automated deploys.
+This session continued the phased feature restoration by bringing back the **Events** system in compact but real form.
 
-Two main outcomes:
-1. **Feature restoration:** `/activity`, `/notifications`, and `/settings/travel` are now real pages again.
-2. **Infra repair:** repaired mixed ownership inside `/var/www/fwber/repo` so the Hetzner backend deploy workflow can keep pulling/pushing objects cleanly.
+Completed in **v1.8.0 "Events Surface Restoration"**:
+- backend events schema/models/controllers restored
+- frontend `/events`, `/events/[id]`, and `/events/create` pages restored
+- event RSVP and invitation flows restored
 
----
-
-## Feature Work Completed
-### Dead Surface Recovery
-Added frontend routes:
-- `fwber-frontend/app/activity/page.tsx`
-- `fwber-frontend/app/notifications/page.tsx`
-- `fwber-frontend/app/settings/travel/page.tsx`
-
-Why these mattered:
-- `/activity` was still referenced by the dashboard activity feed
-- `/notifications` was still referenced by NotificationBell
-- `/settings/travel` was still advertised in Settings
-
-This made several obvious dead signed-in links real again.
-
-### Prior restoration carried forward
-The earlier **Friends** restoration was already completed and is part of the current restored shell set:
-- `/friends`
-- `/activity`
-- `/notifications`
-- `/settings/travel`
+This was the next logical restoration after Friends + other dead signed-in pages because:
+- `/events` was still referenced by notification route logic and Cypress tests
+- frontend hooks/components for events were already present
+- restoring it reactivates a lot of latent code with relatively compact backend work
 
 ---
 
-## Validation Completed
+## What Was Restored
+
+### Backend
+Added:
+- `fwber-backend/app/Models/Event.php`
+- `fwber-backend/app/Models/EventAttendee.php`
+- `fwber-backend/app/Models/EventInvitation.php`
+- `fwber-backend/app/Http/Controllers/EventController.php`
+- `fwber-backend/app/Http/Controllers/EventInvitationController.php`
+- `fwber-backend/database/migrations/2026_04_05_020000_restore_events_tables.php`
+- `fwber-backend/tests/Feature/EventRestoreTest.php`
+
+Updated:
+- `fwber-backend/routes/api.php`
+
+Restored API surface:
+- `GET /api/events`
+- `GET /api/events/my-events`
+- `POST /api/events`
+- `GET /api/events/{id}`
+- `POST /api/events/{id}/rsvp`
+- `GET /api/events/invitations`
+- `POST /api/events/{id}/invite`
+- `POST /api/events/invitations/{id}/respond`
+
+### Frontend
+Added:
+- `fwber-frontend/app/events/page.tsx`
+- `fwber-frontend/app/events/[id]/page.tsx`
+- `fwber-frontend/app/events/create/page.tsx`
+
+These leverage already-existing frontend code:
+- `components/EventCard.tsx`
+- `components/events/EventInvitationsList.tsx`
+- `components/events/EventPaymentModal.tsx`
+- `lib/hooks/use-events.ts`
+- `lib/api/events.ts`
+
+---
+
+## Validation Performed
+### Backend
+Executed:
+- `php artisan test --filter=EventRestoreTest`
+
+Result:
+- **2 tests passed / 10 assertions**
+
+Coverage includes:
+- event creation
+- event listing
+- RSVP
+- invitation send
+- invitation accept
+
 ### Frontend
 Executed:
 - `npm run build --prefix fwber-frontend`
 
-Confirmed route list now includes:
+Result:
+- build succeeded
+- route list now includes:
+  - `/events`
+  - `/events/[id]`
+  - `/events/create`
+
+---
+
+## Current Restored Surface Set
+Visible/live-facing restored routes now include:
 - `/friends`
 - `/activity`
 - `/notifications`
 - `/settings/travel`
-
-### GitHub workflows
-Confirmed green during this cycle:
-- `Frontend Build & Deploy (Vercel)` ✅
-- `Backend CI (Tests & Linting)` ✅
-- `Repository Hygiene` ✅
+- `/events`
+- `/events/[id]`
+- `/events/create`
+- plus earlier restored premium / merchant / roast surfaces
 
 ---
 
-## Hetzner Infrastructure Repair
-### Root cause found
-A push-triggered Hetzner deploy failed with:
-- `insufficient permission for adding an object to repository database .git/objects`
+## Files Changed
+### Backend
+- `fwber-backend/app/Models/Event.php`
+- `fwber-backend/app/Models/EventAttendee.php`
+- `fwber-backend/app/Models/EventInvitation.php`
+- `fwber-backend/app/Http/Controllers/EventController.php`
+- `fwber-backend/app/Http/Controllers/EventInvitationController.php`
+- `fwber-backend/database/migrations/2026_04_05_020000_restore_events_tables.php`
+- `fwber-backend/tests/Feature/EventRestoreTest.php`
+- `fwber-backend/routes/api.php`
 
-This was **not** an application bug.
-It was live checkout ownership drift on the server.
-
-### Repair applied live
-Executed on Hetzner:
-- restored `deploy` ownership over the repo/git database and relevant working-tree paths
-- re-applied shared ACLs on backend logs so deploy-user + `www-data` coexistence remains intact
-
-This repaired the server-side deployment substrate.
-
----
-
-## Files Changed in This Slice
 ### Frontend
-- `fwber-frontend/app/activity/page.tsx`
-- `fwber-frontend/app/notifications/page.tsx`
-- `fwber-frontend/app/settings/travel/page.tsx`
+- `fwber-frontend/app/events/page.tsx`
+- `fwber-frontend/app/events/[id]/page.tsx`
+- `fwber-frontend/app/events/create/page.tsx`
 
-### Docs / Release / Ops tracking
+### Docs / Release
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -88,26 +126,22 @@ This repaired the server-side deployment substrate.
 - `HANDOFF.md`
 - version files
 
-No repo code changes were needed for the ownership repair itself beyond documenting it.
-
 ---
 
 ## Git / Release
-- **Target Version:** `1.7.2`
-- **Recommended Commit Message:** `chore: repair hetzner repo ownership drift after surface restoration (v1.7.2)`
+- **Target Version:** `1.8.0`
+- **Recommended Commit Message:** `feat: restore events surface and invitation flow (v1.8.0)`
 
 ---
 
 ## Best Next Steps
-1. Re-run the Hetzner backend deploy workflow after the ownership repair and confirm it is green again
-2. Verify the newly restored live routes with a real authenticated session:
-   - `/friends`
-   - `/activity`
-   - `/notifications`
-   - `/settings/travel`
-3. Continue the next user-facing cleanup/restoration wave on remaining dead links:
-   - `/wallet`
+1. Push and let the green workflows deploy Events
+2. Verify live signed-in routes:
    - `/events`
-4. Keep the production 500 sweep running before broader archived-system restoration
+   - `/events/[id]`
+   - `/events/create`
+3. Continue the next obvious dead-surface restoration or retirement decision:
+   - `/wallet`
+4. Keep production 500 sweeps running before broader archived-system restoration
 
 No processes were manually killed.

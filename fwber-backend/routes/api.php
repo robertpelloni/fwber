@@ -113,6 +113,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('friends/requests/{userId}', [\App\Http\Controllers\FriendController::class, 'respond']);
     Route::delete('friends/{friendId}', [\App\Http\Controllers\FriendController::class, 'destroy']);
 
+    // Events
+    Route::get('events', [\App\Http\Controllers\EventController::class, 'index']);
+    Route::get('events/my-events', [\App\Http\Controllers\EventController::class, 'myEvents']);
+    Route::post('events', [\App\Http\Controllers\EventController::class, 'store']);
+    Route::get('events/invitations', [\App\Http\Controllers\EventInvitationController::class, 'index']);
+    Route::post('events/invitations/{id}/respond', [\App\Http\Controllers\EventInvitationController::class, 'respond']);
+    Route::get('events/{id}', [\App\Http\Controllers\EventController::class, 'show']);
+    Route::post('events/{id}/rsvp', [\App\Http\Controllers\EventController::class, 'rsvp']);
+    Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
+
     // Merchant / Marketplace
     Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);
     Route::get('merchant-portal/profile', [\App\Http\Controllers\MerchantController::class, 'profile']);

@@ -1,18 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.7.2 (Hetzner Repo Ownership Repair)
+# PROJECT_STATUS.md - fwber v1.8.0 (Events Surface Restoration)
 
 **Date:** 2026-04-05
-**Version:** 1.7.2 "Hetzner Repo Ownership Repair"
-**Status:** ✅ **LIVE SERVER CHECKOUT PERMISSION DRIFT REPAIRED**
+**Version:** 1.8.0 "Events Surface Restoration"
+**Status:** ✅ **EVENTS ARE BACK AS A REAL PRODUCT SURFACE**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release records an infrastructure-state repair discovered during the latest automated deploy cycle.
+This release restores the events system in compact but usable form.
 
 Delivered:
-- repaired ownership drift inside `/var/www/fwber/repo/.git`
-- restored deploy-user control of the live checkout
-- re-applied shared ACLs for backend logs so deploy-user and PHP-FPM can keep coexisting cleanly
+- backend events schema + models + controllers
+- events list/detail/create frontend routes
+- event RSVP and invitation flows
 
 ## ✅ Why This Matters
-The latest push-triggered Hetzner backend deploy failed not because of application code, but because the server checkout itself had drifted to mixed ownership. That is now repaired.
+Notifications and prior tests still referenced `/events`, but the route was gone. Restoring a lean events stack repairs another major chunk of visible missing functionality without reopening the heaviest archived product areas yet.

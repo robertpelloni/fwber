@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - 2026-04-05 — Events Surface Restoration
+
+### Added
+- Restored the events backend surface with `Event`, `EventAttendee`, and `EventInvitation` models plus migrations and endpoints for listing, creating, viewing, RSVPing, and inviting users.
+- Restored frontend routes for `/events`, `/events/[id]`, and `/events/create` using the existing event hooks/components already lingering in the codebase.
+- Added `EventRestoreTest` coverage for event creation, listing, RSVP, invitations, and acceptance flow.
+
 ## [1.7.2] - 2026-04-05 — Hetzner Repo Ownership Repair
 
 ### Fixed
