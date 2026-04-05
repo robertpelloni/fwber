@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -14,6 +15,11 @@ class AuthController extends Controller
     private function hydrateAuthUser(User $user): User
     {
         return $user->load('profile')->loadCount(['vouches']);
+    }
+
+    private function generateReferralCode(string $name): string
+    {
+        return strtoupper(substr(Str::slug($name, ''), 0, 6) ?: 'FWB') . random_int(1000, 9999);
     }
 
     public function register(RegisterRequest $request)
@@ -24,6 +30,7 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'referral_code' => $this->generateReferralCode($validated['name']),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

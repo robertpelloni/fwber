@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.1] - 2026-04-05 — Wallet Surface Restoration
+
+### Added
+- Restored the wallet backend surface with wallet columns, wallet transactions table, referral-code backfill, wallet payload endpoint, and wallet-address update endpoint.
+- Restored the frontend `/wallet` page so existing token/gift/event upsell links land on a real wallet surface again.
+- Added `WalletRestoreTest` coverage for wallet payload and wallet-address updates.
+
 ## [1.8.0] - 2026-04-05 — Events Surface Restoration
 
 ### Added

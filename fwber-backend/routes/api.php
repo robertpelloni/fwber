@@ -123,6 +123,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('events/{id}/rsvp', [\App\Http\Controllers\EventController::class, 'rsvp']);
     Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
 
+    // Wallet
+    Route::get('wallet', [\App\Http\Controllers\WalletController::class, 'show']);
+    Route::post('wallet/address', [\App\Http\Controllers\WalletController::class, 'updateAddress']);
+
     // Merchant / Marketplace
     Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);
     Route::get('merchant-portal/profile', [\App\Http\Controllers\MerchantController::class, 'profile']);

@@ -41,6 +41,9 @@ class User extends Authenticatable
         'unlimited_swipes',
         'golden_tickets_remaining',
         'avatar_url',
+        'wallet_address',
+        'token_balance',
+        'referral_code',
         'onboarding_completed_at',
         'decoy_password',
         'decoy_user_id',
@@ -60,6 +63,7 @@ class User extends Authenticatable
         'password' => 'hashed',
         'tier_expires_at' => 'datetime',
         'unlimited_swipes' => 'boolean',
+        'token_balance' => 'decimal:2',
         'two_factor_confirmed_at' => 'datetime',
         'last_active_at' => 'datetime',
         'onboarding_completed_at' => 'datetime',
@@ -146,6 +150,11 @@ class User extends Authenticatable
     public function merchantPurchases(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(MerchantPayment::class, 'payer_id');
+    }
+
+    public function walletTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WalletTransaction::class);
     }
 
     public function sentFriendRequests(): \Illuminate\Database\Eloquent\Relations\HasMany

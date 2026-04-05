@@ -1,21 +1,24 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.8.0
+> **Version Reached:** 1.8.1
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the phased feature restoration by bringing back the **Events** system in compact but real form.
+This session continued the next restoration wave after Events and brought back the compact **Wallet** surface.
 
-Completed in **v1.8.0 "Events Surface Restoration"**:
-- backend events schema/models/controllers restored
-- frontend `/events`, `/events/[id]`, and `/events/create` pages restored
-- event RSVP and invitation flows restored
+Completed in **v1.8.1 "Wallet Surface Restoration"**:
+- wallet backend schema support restored
+- wallet payload + address update endpoints restored
+- frontend `/wallet` page restored
 
-This was the next logical restoration after Friends + other dead signed-in pages because:
-- `/events` was still referenced by notification route logic and Cypress tests
-- frontend hooks/components for events were already present
-- restoring it reactivates a lot of latent code with relatively compact backend work
+This was the next recommended move because `/wallet` was still referenced by:
+- event payment modal
+- notification gift routing
+- token/premium upsell surfaces
+- existing frontend wallet hook
+
+So restoring it removed another prominent dead-route cluster from the signed-in app.
 
 ---
 
@@ -23,56 +26,48 @@ This was the next logical restoration after Friends + other dead signed-in pages
 
 ### Backend
 Added:
-- `fwber-backend/app/Models/Event.php`
-- `fwber-backend/app/Models/EventAttendee.php`
-- `fwber-backend/app/Models/EventInvitation.php`
-- `fwber-backend/app/Http/Controllers/EventController.php`
-- `fwber-backend/app/Http/Controllers/EventInvitationController.php`
-- `fwber-backend/database/migrations/2026_04_05_020000_restore_events_tables.php`
-- `fwber-backend/tests/Feature/EventRestoreTest.php`
+- `fwber-backend/app/Models/WalletTransaction.php`
+- `fwber-backend/app/Http/Controllers/WalletController.php`
+- `fwber-backend/database/migrations/2026_04_05_030000_restore_wallet_columns_and_transactions.php`
+- `fwber-backend/tests/Feature/WalletRestoreTest.php`
 
 Updated:
+- `fwber-backend/app/Models/User.php`
+- `fwber-backend/app/Http/Controllers/AuthController.php`
 - `fwber-backend/routes/api.php`
 
-Restored API surface:
-- `GET /api/events`
-- `GET /api/events/my-events`
-- `POST /api/events`
-- `GET /api/events/{id}`
-- `POST /api/events/{id}/rsvp`
-- `GET /api/events/invitations`
-- `POST /api/events/{id}/invite`
-- `POST /api/events/invitations/{id}/respond`
+Restored backend capabilities:
+- wallet payload endpoint
+- wallet address update endpoint
+- referral-code backfill / generation
+- token balance support
+- wallet transaction storage
+
+Restored routes:
+- `GET /api/wallet`
+- `POST /api/wallet/address`
 
 ### Frontend
 Added:
-- `fwber-frontend/app/events/page.tsx`
-- `fwber-frontend/app/events/[id]/page.tsx`
-- `fwber-frontend/app/events/create/page.tsx`
+- `fwber-frontend/app/wallet/page.tsx`
 
-These leverage already-existing frontend code:
-- `components/EventCard.tsx`
-- `components/events/EventInvitationsList.tsx`
-- `components/events/EventPaymentModal.tsx`
-- `lib/hooks/use-events.ts`
-- `lib/api/events.ts`
+Behavior:
+- shows token balance
+- shows referral code
+- shows wallet address
+- allows wallet address update
+- lists recent wallet transactions
+- shows golden tickets remaining
 
 ---
 
 ## Validation Performed
 ### Backend
 Executed:
-- `php artisan test --filter=EventRestoreTest`
+- `php artisan test --filter=WalletRestoreTest`
 
 Result:
-- **2 tests passed / 10 assertions**
-
-Coverage includes:
-- event creation
-- event listing
-- RSVP
-- invitation send
-- invitation accept
+- **2 tests passed / 9 assertions**
 
 ### Frontend
 Executed:
@@ -80,15 +75,12 @@ Executed:
 
 Result:
 - build succeeded
-- route list now includes:
-  - `/events`
-  - `/events/[id]`
-  - `/events/create`
+- route list now includes `/wallet`
 
 ---
 
 ## Current Restored Surface Set
-Visible/live-facing restored routes now include:
+The most visible restored signed-in routes now include:
 - `/friends`
 - `/activity`
 - `/notifications`
@@ -96,25 +88,23 @@ Visible/live-facing restored routes now include:
 - `/events`
 - `/events/[id]`
 - `/events/create`
-- plus earlier restored premium / merchant / roast surfaces
+- `/wallet`
+- plus previously restored premium / merchant / roast surfaces
 
 ---
 
 ## Files Changed
 ### Backend
-- `fwber-backend/app/Models/Event.php`
-- `fwber-backend/app/Models/EventAttendee.php`
-- `fwber-backend/app/Models/EventInvitation.php`
-- `fwber-backend/app/Http/Controllers/EventController.php`
-- `fwber-backend/app/Http/Controllers/EventInvitationController.php`
-- `fwber-backend/database/migrations/2026_04_05_020000_restore_events_tables.php`
-- `fwber-backend/tests/Feature/EventRestoreTest.php`
+- `fwber-backend/app/Models/WalletTransaction.php`
+- `fwber-backend/app/Http/Controllers/WalletController.php`
+- `fwber-backend/database/migrations/2026_04_05_030000_restore_wallet_columns_and_transactions.php`
+- `fwber-backend/tests/Feature/WalletRestoreTest.php`
+- `fwber-backend/app/Models/User.php`
+- `fwber-backend/app/Http/Controllers/AuthController.php`
 - `fwber-backend/routes/api.php`
 
 ### Frontend
-- `fwber-frontend/app/events/page.tsx`
-- `fwber-frontend/app/events/[id]/page.tsx`
-- `fwber-frontend/app/events/create/page.tsx`
+- `fwber-frontend/app/wallet/page.tsx`
 
 ### Docs / Release
 - `CHANGELOG.md`
@@ -129,19 +119,21 @@ Visible/live-facing restored routes now include:
 ---
 
 ## Git / Release
-- **Target Version:** `1.8.0`
-- **Recommended Commit Message:** `feat: restore events surface and invitation flow (v1.8.0)`
+- **Target Version:** `1.8.1`
+- **Recommended Commit Message:** `feat: restore compact wallet surface and endpoints (v1.8.1)`
 
 ---
 
 ## Best Next Steps
-1. Push and let the green workflows deploy Events
-2. Verify live signed-in routes:
-   - `/events`
-   - `/events/[id]`
-   - `/events/create`
-3. Continue the next obvious dead-surface restoration or retirement decision:
+1. Push and let the green workflows deploy Wallet
+2. Verify live signed-in routes together:
    - `/wallet`
-4. Keep production 500 sweeps running before broader archived-system restoration
+   - `/friends`
+   - `/activity`
+   - `/notifications`
+   - `/settings/travel`
+   - `/events`
+3. Continue the next restoration/cleanup decision on remaining token/gift surfaces
+4. Keep production 500 sweeps running in parallel before larger archived-system reactivation
 
 No processes were manually killed.
