@@ -1,18 +1,15 @@
-# PROJECT_STATUS.md - fwber v1.8.4 (Hetzner Nginx Sync Helper Integration)
+# PROJECT_STATUS.md - fwber v1.8.5 (Smoke Check Timeout + Roast Fallback Hardening)
 
 **Date:** 2026-04-05
-**Version:** 1.8.4 "Hetzner Nginx Sync Helper Integration"
-**Status:** ✅ **HETZNER NOW HAS A ROOT-OWNED NGINX SYNC PATH FOR GITHUB DEPLOYS**
+**Version:** 1.8.5 "Smoke Check Timeout + Roast Fallback Hardening"
+**Status:** ✅ **DEPLOY VALIDATION PATH IS HARDER TO STALL, AND PUBLIC ROAST PREVIEW IS SAFER IN PRODUCTION**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extends the prior Hetzner deploy privilege repair into a reproducible ops path.
-
-Delivered:
-- deploy script now prefers a dedicated root-owned nginx sync helper
-- live Hetzner host provisioned with `/usr/local/bin/fwber-sync-nginx-sites`
-- deploy user granted narrow passwordless sudo for that helper
+This release hardens two live deploy blockers discovered during Hetzner workflow verification:
+- bounded timeout on the websocket smoke probe
+- broader fallback handling for public roast preview generation
 
 ## ✅ Why This Matters
-The deploy workflow no longer has to rely on blanket sudo permissions for raw file-copy commands just to refresh nginx configs. This is a safer and more reproducible model for GitHub-triggered Hetzner deploys.
+The backend deploy should not hang for 10 minutes because a websocket handshake never closes, and a public preview endpoint used by smoke checks should not return a 500 just because an AI driver throws a non-standard throwable.

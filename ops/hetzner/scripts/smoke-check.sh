@@ -702,7 +702,7 @@ check_websocket_upgrade() {
     printf 'Upgrade: websocket\r\n'
     printf 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n'
     printf 'Sec-WebSocket-Version: 13\r\n\r\n'
-  } | openssl s_client -quiet -connect "${ws_host}:443" -servername "$ws_host" 2>/dev/null | head -n 1)"
+  } | timeout 12s openssl s_client -quiet -connect "${ws_host}:443" -servername "$ws_host" 2>/dev/null | head -n 1 || true)"
 
   if grep -Eq '101[[:space:]]+Switching Protocols' <<<"$handshake_response"; then
     pass_case "$label" "Received a successful websocket upgrade from $WS_URL."

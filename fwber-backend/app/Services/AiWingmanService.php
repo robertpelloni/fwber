@@ -467,7 +467,10 @@ EOT;
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                // The public roast preview is used in smoke checks and landing pages,
+                // so backend deploys should never fail hard just because an LLM driver
+                // is misconfigured or unavailable. We degrade to a playful fallback.
                 Log::error("AiWingmanService: Failed to generate generic {$mode}: ".$e->getMessage());
 
                 return "You broke the roast machine! That's how un-roastable you are. (Try again later)";
@@ -517,7 +520,7 @@ EOT;
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 Log::error("AiWingmanService: Failed to generate {$mode}: ".$e->getMessage());
 
                 return $mode === 'hype'

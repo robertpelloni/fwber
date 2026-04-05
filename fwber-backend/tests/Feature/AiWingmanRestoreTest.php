@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Services\Ai\Llm\LlmManager;
+use App\Services\Ai\Llm\LlmProviderInterface;
 use App\Services\AiWingmanService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -56,5 +58,27 @@ class AiWingmanRestoreTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('roast', 'You are pure main-character energy.');
+    }
+
+    public function test_public_roast_endpoint_falls_back_cleanly_when_driver_throws_non_exception_throwables(): void
+    {
+        $provider = Mockery::mock(LlmProviderInterface::class);
+        $provider->shouldReceive('chat')->once()->andThrow(new \Error('driver exploded'));
+
+        $manager = Mockery::mock(LlmManager::class);
+        $manager->shouldReceive('driver')->once()->andReturn($provider);
+
+        $this->app->instance(AiWingmanService::class, new AiWingmanService($manager));
+
+        $response = $this->postJson('/api/public/roast', [
+            'name' => 'Mia',
+            'job' => 'Night-shift nurse',
+            'trait' => 'Always early',
+            'mode' => 'roast',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('is_preview', true);
+        $response->assertJsonPath('roast', "You broke the roast machine! That's how un-roastable you are. (Try again later)");
     }
 }

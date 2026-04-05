@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.5] - 2026-04-05 — Smoke Check Timeout + Roast Fallback Hardening
+
+### Fixed
+- Added a bounded timeout to the websocket smoke-check probe so a hanging TLS/WebSocket negotiation cannot stall the GitHub Hetzner deploy job until action timeout.
+- Hardened `AiWingmanService` roast generation to catch broader `Throwable` failures, ensuring the public roast preview degrades to a playful fallback instead of returning a live 500 when AI driver wiring is unhealthy.
+- Added coverage proving public roast still returns a preview payload when the underlying LLM driver throws a non-Exception throwable.
+
 ## [1.8.4] - 2026-04-05 — Hetzner Nginx Sync Helper Integration
 
 ### Fixed
