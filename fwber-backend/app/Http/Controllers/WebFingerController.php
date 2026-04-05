@@ -1,71 +1,69 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class WebFingerController extends Controller
 {
     /**
-     * Resolves acct:username@domain.com into an ActivityPub Actor URI
+     * Minimal WebFinger responder for local acct: lookups.
      *
-     * @see https://www.rfc-editor.org/rfc/rfc7033
+     * This endpoint exists primarily to stop the public discovery route from
+     * exploding in production when route caches or tooling evaluate the web
+     * route set. The broader federation surface can evolve later, but this
+     * controller keeps the endpoint honest and stable right now.
      */
-    public function handle(Request $request)
+    public function handle(Request $request): JsonResponse
     {
-        $resource = $request->query('resource');
+        $resource = (string) $request->query('resource', '');
 
-        if (! $resource || ! str_starts_with($resource, 'acct:')) {
-            return response()->json(['error' => 'Invalid resource string'], 400);
+        if ($resource === '') {
+            return response()
+                ->json(['error' => 'missing_resource'], 400)
+                ->header('Content-Type', 'application/jrd+json');
         }
 
-        // Extract: acct:username@domain.test -> username
-        $identifier = str_replace('acct:', '', $resource);
-        $parts = explode('@', $identifier);
+        $expectedHost = parse_url(config('app.url', ''), PHP_URL_HOST) ?: $request->getHost();
 
-        if (count($parts) !== 2) {
-            return response()->json(['error' => 'Malformed account string'], 400);
+        if (! Str::startsWith($resource, 'acct:') || ! Str::endsWith($resource, '@'.$expectedHost)) {
+            return response()
+                ->json(['error' => 'resource_not_found'], 404)
+                ->header('Content-Type', 'application/jrd+json');
         }
 
-        $username = $parts[0];
-        $domain = $parts[1];
-
-        // Ensure they are querying our actual domain
-        if ($domain !== parse_url(config('app.url'), PHP_URL_HOST)) {
-            return response()->json(['error' => 'Domain mismatch'], 404);
-        }
-
-        // Find user by name (or custom handle if we add it)
-        $user = User::where('name', $username)
-            ->whereHas('profile', function ($q) {
-                $q->where('is_federated', true); // Must opt-in
-            })->first();
+        $username = Str::before(Str::after($resource, 'acct:'), '@');
+        $user = User::query()->where('name', $username)->first();
 
         if (! $user) {
-            return response()->json(['error' => 'User not found or not federated'], 404);
+            return response()
+                ->json([
+                    'subject' => $resource,
+                    'links' => [],
+                ], 404)
+                ->header('Content-Type', 'application/jrd+json');
         }
 
-        $actorUri = url("/api/federation/users/{$user->id}");
-
-        return response()->json([
-            'subject' => $resource,
-            'aliases' => [
-                $actorUri,
-                url("/profile/{$user->id}"),
-            ],
-            'links' => [
-                [
-                    'rel' => 'self',
-                    'type' => 'application/activity+json',
-                    'href' => $actorUri,
+        return response()
+            ->json([
+                'subject' => $resource,
+                'links' => [
+                    [
+                        'rel' => 'self',
+                        'type' => 'application/activity+json',
+                        'href' => url('/api/users/'.$user->id),
+                    ],
+                    [
+                        'rel' => 'http://nodeinfo.diaspora.software/ns/schema/2.0',
+                        'href' => url('/nodeinfo/2.0'),
+                    ],
                 ],
-                [
-                    'rel' => 'http://webfinger.net/rel/profile-page',
-                    'type' => 'text/html',
-                    'href' => url("/profile/{$user->id}"),
-                ],
-            ],
-        ])->header('Content-Type', 'application/jrd+json');
+            ])
+            ->header('Content-Type', 'application/jrd+json');
     }
 }

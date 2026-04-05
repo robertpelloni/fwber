@@ -12,9 +12,9 @@ GEO_DIR="$REPO_ROOT/fwber-geo"
 SMOKE_CHECK_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/smoke-check.sh"
 COMPARE_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/compare-smoke-reports.py"
 PUBLISH_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/publish-smoke-report.py"
-NGINX_SYNC_HELPER="${FWBER_NGINX_SYNC_HELPER:-/usr/local/bin/fwber-sync-nginx-sites}"
 REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
+SUDO_BIN=""
 
 # GitHub Actions and other non-login SSH executions do not reliably source the deploy user's
 # shell profile, which means Rust installed via rustup can disappear from PATH even though the
@@ -28,42 +28,9 @@ if [ -d "$HOME/.cargo/bin" ]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-run_privileged() {
-  if [ "$(id -u)" -eq 0 ]; then
-    "$@"
-  else
-    sudo -n "$@"
-  fi
-}
-
-run_optional_privileged() {
-  if [ "$(id -u)" -eq 0 ]; then
-    "$@"
-    return 0
-  fi
-
-  if sudo -n "$@"; then
-    return 0
-  fi
-
-  echo "Skipping privileged command because passwordless sudo is unavailable: $*"
-  return 0
-}
-
-sync_nginx_site() {
-  local source_path="$1"
-  local site_name="$2"
-
-  if [ ! -f "$source_path" ]; then
-    return
-  fi
-
-  # Some Hetzner deployments grant the deploy user passwordless sudo for nginx and
-  # systemctl operations but not blanket root filesystem writes. In that case we
-  # keep the existing live nginx config instead of failing the entire deployment.
-  run_optional_privileged cp "$source_path" "/etc/nginx/sites-available/$site_name"
-  run_optional_privileged ln -sf "/etc/nginx/sites-available/$site_name" "/etc/nginx/sites-enabled/$site_name"
-}
+if [ "$(id -u)" -ne 0 ]; then
+  SUDO_BIN="sudo"
+fi
 
 cd "$REPO_ROOT"
 git pull origin main
@@ -75,12 +42,11 @@ php artisan optimize:clear
 php artisan optimize
 php artisan deploy:verify
 
-# Daily log files may be created by the web runtime as `www-data`, while deploy automation runs
-# as the `deploy` user. Use ACLs on the logs directory when available so future log files remain
-# writable to both users without requiring brittle chmod/chown hacks on every rotated file.
-if [ -d "$BACKEND_DIR/storage/logs" ] && command -v setfacl >/dev/null 2>&1; then
-  setfacl -m u:deploy:rwx,g:www-data:rwx "$BACKEND_DIR/storage/logs" 2>/dev/null || true
-  setfacl -d -m u:deploy:rwx,g:www-data:rwx "$BACKEND_DIR/storage/logs" 2>/dev/null || true
+# Daily log files can be created by the web runtime between deploys. Make a best-effort
+# attempt to keep existing log files group-writable so deploy-user artisan commands do not
+# fail the next day when Monolog rotates into a file owned by the PHP-FPM user.
+if [ -d "$BACKEND_DIR/storage/logs" ]; then
+  find "$BACKEND_DIR/storage/logs" -maxdepth 1 -type f -name '*.log' -exec chmod ug+rw {} + 2>/dev/null || true
 fi
 
 if [ -d "$GEO_DIR" ]; then
@@ -88,23 +54,10 @@ if [ -d "$GEO_DIR" ]; then
   cargo build --release
 fi
 
-if [ -x "$NGINX_SYNC_HELPER" ]; then
-  # Prefer the root-owned helper when present. It keeps GitHub-triggered deploys
-  # reproducible even when the deploy user only has narrowly-scoped passwordless
-  # sudo rather than blanket root filesystem write access.
-  run_privileged "$NGINX_SYNC_HELPER"
-else
-  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/api.fwber.me.conf" "api.fwber.me"
-  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/ws.fwber.me.conf" "ws.fwber.me"
-  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/geo.fwber.me.conf" "geo.fwber.me"
-  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/mercure.fwber.me.conf" "mercure.fwber.me"
-  run_privileged nginx -t
-fi
-
-run_privileged systemctl restart fwber-queue
-run_privileged systemctl restart fwber-reverb
-run_privileged systemctl restart fwber-geo
-run_privileged systemctl reload nginx
+$SUDO_BIN systemctl restart fwber-queue
+$SUDO_BIN systemctl restart fwber-reverb
+$SUDO_BIN systemctl restart fwber-geo
+$SUDO_BIN systemctl reload nginx
 
 if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
   mkdir -p "$REPORT_DIR_ROOT"
@@ -115,10 +68,6 @@ if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
 
   FWBER_BACKEND_DIR="$BACKEND_DIR" \
   FWBER_REPORT_DIR="$REPORT_DIR" \
-  FWBER_API_URL="https://api.fwber.me/api" \
-  FWBER_FRONTEND_URL="https://www.fwber.me" \
-  FWBER_WS_URL="https://ws.fwber.me" \
-  FWBER_GEO_URL="https://geo.fwber.me" \
   "$SMOKE_CHECK_SCRIPT"
 
   CURRENT_REPORT_JSON="$REPORT_DIR/smoke-check-summary.json"

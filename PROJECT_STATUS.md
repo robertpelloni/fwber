@@ -1,18 +1,27 @@
-# PROJECT_STATUS.md - fwber v1.8.4 (Hetzner Nginx Sync Helper Integration)
+# PROJECT_STATUS.md - fwber v1.6.5 (Hetzner Backend Stability Repair)
 
-**Date:** 2026-04-05
-**Version:** 1.8.4 "Hetzner Nginx Sync Helper Integration"
-**Status:** ✅ **HETZNER NOW HAS A ROOT-OWNED NGINX SYNC PATH FOR GITHUB DEPLOYS**
+**Date:** 2026-04-04
+**Version:** 1.6.5 "Hetzner Backend Stability Repair"
+**Status:** ✅ **LOCAL BACKEND REPAIR PATCH VALIDATED; HETZNER DEPLOY + LIVE RE-VERIFICATION NEXT**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release extends the prior Hetzner deploy privilege repair into a reproducible ops path.
+This release focuses on repairing concrete live Hetzner backend breakage discovered during direct production inspection.
 
 Delivered:
-- deploy script now prefers a dedicated root-owned nginx sync helper
-- live Hetzner host provisioned with `/usr/local/bin/fwber-sync-nginx-sites`
-- deploy user granted narrow passwordless sudo for that helper
+- replaced the broken backend root route that referenced a non-existent `welcome` view
+- added the missing `WebFingerController` so public discovery routes no longer break route tooling / route cache evaluation
+- hardened dashboard stats and activity so they return safe zero/empty values when `user_matches` is absent in a drifted production database
+- fixed the PHP 8.4 `limit` type bug in dashboard activity
+- added a corrective migration to restore `user_matches` / `match_actions` if migration history and live schema drift diverge
+- hardened backend log-file permissions and the Hetzner deploy script against next-day Monolog rotation ownership drift
+- added regression tests covering degraded-schema dashboard behavior and repaired public web routes
 
 ## ✅ Why This Matters
-The deploy workflow no longer has to rely on blanket sudo permissions for raw file-copy commands just to refresh nginx configs. This is a safer and more reproducible model for GitHub-triggered Hetzner deploys.
+Direct Hetzner inspection showed the backend infrastructure itself was alive, but application consistency had drifted:
+- `api.fwber.me/` returned `500` because the route rendered a non-existent `welcome` view
+- dashboard activity calls were throwing because `user_matches` was missing from the live MySQL schema even though migrations claimed it had already run
+- `php artisan route:list` was broken by a route pointing at a missing `WebFingerController`
+
+This release converts those findings into tracked, tested source changes instead of leaving them as one-off server mysteries.

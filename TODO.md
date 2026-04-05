@@ -1,29 +1,30 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.4
-> **Last Updated:** 2026-04-05
+> **Version:** 1.6.5
+> **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Deployment & Verification
-- [ ] **Confirm Latest GitHub Hetzner Backend Deploy Goes Green**: Verify the push containing the nginx sync helper integration finishes successfully end-to-end.
-- [ ] **Verify Latest Live Surface Restorations Together**: Check `/friends`, `/activity`, `/notifications`, `/settings/travel`, `/events`, `/wallet`, referral signup, vouch links, and video-call initiation in one signed-in production pass.
-- [ ] **Verify Live Frontend API Recovery**: Confirm wallet, referral, vouch, dashboard, and E2E restore calls all hit `api.fwber.me` correctly after the latest frontend deploys.
-- [ ] **Repair / Confirm Realtime Contract**: Re-check the live header connection badge, websocket/broadcast-auth behavior, and live video signaling after the recent backend/public-route repairs.
-- [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s before broadening restoration further.
-- [ ] **Map Remaining Removed Features for Full Restoration**: Continue the next restoration wave now that referral/video dead zones are back online.
+- [ ] **Deploy v1.6.5 Hetzner Backend Stability Repair**: Pull the new backend patch onto Hetzner, run the corrective match-table migration, refresh route/config caches, and verify `api.fwber.me/` plus dashboard endpoints stop throwing live 500s.
+- [ ] **Repair Live Reverb Handshake Contract**: Re-test `ws.fwber.me` using the real production app key after the backend patch deploy and determine whether the remaining websocket issue is config/auth related or a true runtime failure.
+- [ ] **Repair / Replace Mercure Surface**: `mercure.fwber.me` still returns `502` because nothing is listening on `127.0.0.1:3000`; either provision the intended service or remove the dead public route from the active production contract.
+- [ ] **Re-run Frontend GitHub Workflow After Lockfile Resync**: Confirm `frontend-build.yml` now goes green after the updated `package-lock.json` lands.
+- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment.
+- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is fully validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
 
 ## 🟡 High: Product Restoration
-- [ ] **Resolve Remaining Gift-Specific Dead Flows**: Gift UI still points at wallet-linked token spending paths that may need either compact restoration or honest retirement.
-- [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment, now including referral commissions.
-- [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is fully validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
-- [ ] **Real-Device Notification + Video QA**: Verify foreground/background notifications plus actual device/browser WebRTC call flows on physical devices.
+- [ ] **Map Remaining Removed Features vs Current Live Errors**: Before re-enabling all archived systems wholesale, finish stabilizing the live stack so restoration does not compound unresolved runtime drift.
+- [ ] **Audit Remaining Dead Settings Links**: Continue replacing leftover settings entries that still point at retired/non-core surfaces with live restored or core destinations.
+- [ ] **Store Asset Production**: Execute the screenshot and copy plan in `mobile/STORE_ASSETS.md`.
+- [ ] **Real-Device Notification QA**: Verify foreground, background, and cold-start notification flows on physical iOS/Android devices now that routes and toasts are standardized.
 
 ## ✅ Recently Completed
-- [x] **Hetzner Nginx Sync Helper Integration**: Added a root-owned helper path on the live server and updated the deploy script to use it for tracked nginx config refresh during GitHub deploys.
-- [x] **Hetzner Deploy Privilege Recovery**: Hardened the deploy script so nginx config sync no longer aborts the whole deploy when the deploy user lacks passwordless sudo for filesystem writes.
-- [x] **Referral, Payout & Video Chat Restoration**: Restored referral validation, referral rewards/commissions, referral/vouch links, video-call backend endpoints, and expanded `/wallet` into a wallet + referrals + payout hub.
-- [x] **Wallet Surface Restoration**: Restored the wallet backend/API surface and added a real `/wallet` page so token-linked dead routes now land somewhere useful.
+- [x] **Hetzner Backend Stability Repair**: Replaced the broken root route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables.
+- [x] **Frontend Lockfile Resync**: Regenerated `fwber-frontend/package-lock.json` and validated with fresh `npm ci` + `npm run build`.
+- [x] **Workflow Stabilization Sweep**: Fixed backend/frontend workflow drift and removed duplicate auto-failing CI/deploy noise from legacy workflows.
+- [x] **GitHub Hetzner Deploy Validation**: Added Hetzner GitHub secrets, triggered the workflow, and confirmed a green GitHub-driven deploy with 9 smoke-check passes and 0 failures.
+- [x] **GitHub Hetzner Deploy Rust Path Fix**: Patched the deploy script so CI-triggered non-login SSH sessions use the rustup Cargo toolchain required by `fwber-geo`.
 
 ---
 *This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*

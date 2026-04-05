@@ -1,16 +1,16 @@
 # MEMORY.md
 
-## 2026-04-05 — v1.8.4 the safest Hetzner fix was a narrow root-owned helper instead of broader sudo
-- The deploy user only had passwordless sudo for specific `systemctl` reload/restart commands, not raw `cp` / `ln` or `nginx -t`.
-- Rather than widening broad filesystem sudo, the live host now exposes `/usr/local/bin/fwber-sync-nginx-sites` as a narrow root-owned helper and grants `deploy` passwordless sudo only for that script.
-- The repo deploy script now prefers this helper when present, which is a cleaner long-term shape for GitHub-triggered deploys.
+## 2026-04-04 — v1.6.5 Hetzner backend drift was app/schema inconsistency, not dead infrastructure
+- Direct Hetzner inspection showed the fwber backend stack itself was alive: nginx, php-fpm, queue worker, Reverb, geo service, Redis, and MySQL were all up.
+- The live failures were caused by application drift instead: the root route rendered a missing `welcome` view, `php artisan route:list` broke on a missing `WebFingerController`, and dashboard activity crashed because the `user_matches` table was missing even though migrations claimed it had already run.
+- `DashboardController` also hid a real PHP 8.4 type bug where the `limit` query string remained a string and later crashed `array_slice()`.
+- A corrective migration plus controller hardening is the right repair shape when the live DB can be recreated and schema drift has already escaped normal migration guarantees.
+- Monolog file ownership drift is also a real Hetzner operational footgun: log rotation can hand files back to the web runtime user and later break deploy-user artisan commands unless permissions are normalized.
 
-## 2026-04-05 — v1.8.3 the latest Hetzner deploy failure was not a code/runtime failure, it was a privilege-shape mismatch
-- GitHub Hetzner deploy reached `composer install`, migration execution, optimize, and `php artisan deploy:verify` successfully.
-- The failure occurred afterward when the script tried `sudo cp` / `sudo ln` to refresh nginx configs under `/etc/nginx`, which the deploy user could not perform non-interactively.
-- The deploy script now treats nginx config sync as optional in that privilege shape while keeping required `nginx -t` and `systemctl` operations strict.
+## 2026-04-04 — v1.6.4 Frontend workflow failure was real lockfile drift
+- After workflow cleanup, the remaining frontend GitHub failure was not a workflow-definition problem but a real `package-lock.json` sync issue.
+- Running `npm install` in `fwber-frontend/` regenerated the lockfile, and a clean `npm ci && npm run build` then succeeded locally.
 
-## 2026-04-05 — v1.8.2 referrals and video were still latent in the frontend, so backend restoration had very high leverage
-- The product still had referral banners, register-time referral handling, vouch links, wallet payout expectations, and a fairly complete WebRTC video UI.
-- The main missing pieces were the backend/API contracts and several frontend callers still using stale URL assumptions.
-- Restoring these flows was therefore more valuable than inventing new UI because large user-visible surfaces were already waiting behind dead or malformed endpoints.
+## 2026-04-04 — v1.6.3 Remaining GitHub failures were mostly workflow drift, not product regressions
+- After the Hetzner deploy pipeline went green, the remaining red GitHub runs were mostly caused by duplicate or stale workflows.
+- `backend-tests.yml` needed SQLite env during migration setup, `frontend-build.yml` needed the correct lockfile path for npm caching, and the older monolithic `ci.yml` / `deploy.yml` needed to stop duplicating modern dedicated workflows.
