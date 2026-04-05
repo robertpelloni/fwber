@@ -96,5 +96,5 @@ Explicitly still excluded from restoration:
 1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
 2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
 3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
-4. **Re-run Frontend GitHub Build:** Confirm the resynced lockfile makes `frontend-build.yml` green.
+4. **Re-run Hetzner Backend Deploy + Frontend Build:** Confirm the ACL fix clears backend deploy failures and the resynced lockfile clears frontend workflow failures.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

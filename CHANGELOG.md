@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.6] - 2026-04-05 — Hetzner Log ACL Deploy Fix
+
+### Fixed
+- Replaced the brittle deploy-time log chmod workaround with an ACL-based approach for `storage/logs`, so GitHub/SSH deploys and the PHP-FPM runtime can both write rotated log files without Monolog permission churn.
+- Removed the logging channel `permission` override that caused Monolog to attempt file chmod operations against `www-data`-owned daily logs during deploys.
+- Applied the matching ACL repair on the live Hetzner server so future rotated logs inherit shared write access for `deploy` and `www-data`.
+
 ## [1.6.5] - 2026-04-04 — Hetzner Backend Stability Repair
 
 ### Fixed

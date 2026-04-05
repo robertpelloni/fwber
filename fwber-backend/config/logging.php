@@ -66,7 +66,6 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
-            'permission' => 0664,
             'formatter' => env('LOG_FORMATTER', null), // Allow overriding formatter
         ],
 
@@ -75,7 +74,6 @@ return [
             'path' => storage_path('logs/laravel-json.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
-            'permission' => 0664,
             'formatter' => \Monolog\Formatter\JsonFormatter::class,
         ],
 
@@ -144,7 +142,6 @@ return [
             'path' => storage_path('logs/database/queries.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 7,
-            'permission' => 0664,
         ],
 
         'security' => [
@@ -152,7 +149,6 @@ return [
             'path' => storage_path('logs/security.log'),
             'level' => 'info',
             'days' => 90,
-            'permission' => 0664,
         ],
 
         'audit' => [
@@ -160,7 +156,6 @@ return [
             'path' => storage_path('logs/audit.log'),
             'level' => 'info',
             'days' => 365,
-            'permission' => 0664,
         ],
     ],
 

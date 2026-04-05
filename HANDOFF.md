@@ -1,118 +1,87 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.6.5
+> **Version Reached:** 1.6.6
 > **Current Model:** GPT
 
 ## Executive Summary
-The work shifted from workflow stabilization into direct live backend error repair after inspecting the Hetzner production app itself.
+After deploying the Hetzner backend stability patch, the next failure surfaced immediately in the real GitHub deploy path: daily log ownership drift between `deploy` and `www-data`.
 
-This session completed **v1.6.5 "Hetzner Backend Stability Repair"**.
-
-The key finding is important:
-- the Hetzner infrastructure was alive
-- but several production 500s were caused by **application drift**, not dead services
+This session fixed that in **v1.6.6 "Hetzner Log ACL Deploy Fix"**.
 
 ---
 
-## What Was Root-Caused
-Direct live inspection found multiple real backend issues:
+## What Happened
+### 1. Live backend drift patch exposed a new deploy blocker
+The `v1.6.5` push reached Hetzner and started deploying correctly, but the GitHub deploy failed during the migration/logging phase because Laravel/Monolog attempted to chmod a daily log file owned by `www-data`.
 
-### 1. `https://api.fwber.me/` returned 500
-Cause:
-- backend web root still tried to render a non-existent `welcome` view in production
+Observed failure shape:
+- deploy runs as `deploy`
+- PHP-FPM/web runtime writes daily logs as `www-data`
+- Monolog permission handling tried to chmod the current day log from the deploy-side artisan process
+- deploy failed with `chmod(): Operation not permitted`
 
-### 2. `php artisan route:list` failed on Hetzner
-Cause:
-- `routes/web.php` referenced `App\Http\Controllers\WebFingerController`
-- that controller file did not exist in the active backend
+### 2. Root cause
+The previous attempt to harden logging by setting Monolog `permission => 0664` was the wrong shape for this environment.
 
-### 3. Dashboard activity/stats could 500 on live schema drift
-Cause:
-- live drift showed `user_matches` may be missing even when migration history implies the matching schema already ran
-- dashboard code assumed the table existed
-- there was also a PHP 8.4 bug where `limit` could remain a string and later break `array_slice()`
+Why:
+- it assumes the process opening the log file can chmod it
+- that is false when the file was created by a different runtime user (`www-data`) and the deploy process runs as `deploy`
 
-### 4. Deploy-time artisan commands could fail on daily log rotation
-Cause:
-- log files created by the web runtime could be owned by `www-data` with insufficient permissions for later deploy-user artisan commands to append
-- this surfaced as permission-denied failures while trying to log exceptions during artisan execution
+### 3. Correct repair chosen
+The correct fix is shared write access at the directory ACL layer, not repeated per-file chmod from application logging config.
+
+So I:
+- removed the Monolog permission override from `config/logging.php`
+- changed the deploy script to maintain ACLs on `storage/logs`
+- applied the matching ACL repair live on Hetzner
 
 ---
 
 ## What Was Changed
 
-### Backend route repair
-Updated:
-- `fwber-backend/routes/web.php`
-
-Changes:
-- replaced the broken root route with a lightweight JSON backend status payload
-- kept public discovery routes but made them point at a real controller implementation
-
-### Missing controller restored
-Added:
-- `fwber-backend/app/Http/Controllers/WebFingerController.php`
-
-This stops the discovery route surface from breaking route loading and public web discovery.
-
-### Dashboard hardening
-Updated:
-- `fwber-backend/app/Http/Controllers/DashboardController.php`
-- `fwber-backend/tests/Feature/DashboardEndpointsTest.php`
-
-Changes:
-- degrade to zero stats/activity when `user_matches` is missing
-- fix PHP 8.4-safe limit handling
-- expanded regression coverage for drifted schema behavior
-
-### Corrective schema repair migration
-Added:
-- `fwber-backend/database/migrations/2026_04_05_000000_restore_match_tables_if_missing.php`
-
-Purpose:
-- repair live environments where migration history drifted from actual tables and matching tables are absent
-
-### Public web route tests
-Added:
-- `fwber-backend/tests/Feature/PublicWebRoutesTest.php`
-
-Coverage:
-- backend root route returns JSON status payload
-- WebFinger endpoint requires the expected resource query parameter
-
-### Logging permission hardening
+### Repo changes
 Updated:
 - `fwber-backend/config/logging.php`
 - `ops/hetzner/scripts/deploy-backend.sh`
+- documentation/version files
 
-Changes:
-- daily log channels now create files with group-writable permissions
-- deploy script makes a best-effort pass over existing log files to restore writeability before later artisan commands are blocked by rotation ownership drift
+Behavior now:
+- no Monolog chmod attempt against foreign-owned daily logs
+- deploy script uses `setfacl` on `storage/logs` when available so future rotated log files inherit shared access for:
+  - `deploy`
+  - `www-data`
+
+### Live server changes
+Executed on Hetzner:
+- added `deploy` to `www-data` group
+- fixed existing log file permissions to group-writable
+- applied ACLs to `/var/www/fwber/repo/fwber-backend/storage/logs`
+- applied default ACLs so future files inherit shared access
+
+Confirmed ACL state now includes shared entries for:
+- `user:deploy:rwx`
+- `group:www-data:rwx`
+- matching default ACLs
 
 ---
 
-## Validation Performed
-Executed locally:
-- `php artisan test --filter="DashboardEndpointsTest|PublicWebRoutesTest"`
-- `php artisan route:list --path=.well-known`
+## Validation State
+### Confirmed before this fix
+- backend CI green
+- repository hygiene green
+- GitHub Hetzner backend deploy green in prior validated runs
+- direct backend drift fixes compile/test locally
 
-Results:
-- **6 tests passed / 29 assertions**
-- route list for public discovery routes succeeded
-
-Live inspection also confirmed the pre-fix production symptoms were real.
+### Remaining next verification after this release
+- re-run Hetzner backend deploy on the new ACL-aware script/code
+- verify live root route and dashboard endpoints stop 500ing
+- re-run frontend GitHub build after lockfile resync
 
 ---
 
-## Files Changed
-- `fwber-backend/app/Http/Controllers/DashboardController.php`
-- `fwber-backend/app/Http/Controllers/WebFingerController.php`
+## Files Changed in This Slice
 - `fwber-backend/config/logging.php`
-- `fwber-backend/routes/web.php`
-- `fwber-backend/database/migrations/2026_04_05_000000_restore_match_tables_if_missing.php`
-- `fwber-backend/tests/Feature/DashboardEndpointsTest.php`
-- `fwber-backend/tests/Feature/PublicWebRoutesTest.php`
 - `ops/hetzner/scripts/deploy-backend.sh`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
@@ -126,18 +95,19 @@ Live inspection also confirmed the pre-fix production symptoms were real.
 ---
 
 ## Git / Release
-- **Target Version:** `1.6.5`
-- **Recommended Commit Message:** `fix: repair live hetzner backend route and schema drift failures (v1.6.5)`
+- **Target Version:** `1.6.6`
+- **Recommended Commit Message:** `fix: replace log chmod strategy with acl-based hetzner deploy access (v1.6.6)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push `v1.6.5`
-2. Deploy the backend patch to Hetzner
+1. Commit and push `v1.6.6`
+2. Re-run Hetzner backend deploy workflow
 3. Re-verify live:
    - `https://api.fwber.me/`
-   - dashboard stats/activity endpoints
-   - route cache / artisan route:list behavior
-4. Continue frontend live verification and broader restoration planning only after 500s are under control
+   - dashboard routes
+   - route tooling
+4. Re-run frontend GitHub workflow
+5. Continue production 500 sweep before large-scale feature restoration
 
 No processes were manually killed.

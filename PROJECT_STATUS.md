@@ -1,27 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.6.5 (Hetzner Backend Stability Repair)
+# PROJECT_STATUS.md - fwber v1.6.6 (Hetzner Log ACL Deploy Fix)
 
-**Date:** 2026-04-04
-**Version:** 1.6.5 "Hetzner Backend Stability Repair"
-**Status:** ✅ **LOCAL BACKEND REPAIR PATCH VALIDATED; HETZNER DEPLOY + LIVE RE-VERIFICATION NEXT**
+**Date:** 2026-04-05
+**Version:** 1.6.6 "Hetzner Log ACL Deploy Fix"
+**Status:** ✅ **LIVE LOG-ROTATION DEPLOY CONFLICT PATCHED AT SOURCE AND ON SERVER**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release focuses on repairing concrete live Hetzner backend breakage discovered during direct production inspection.
+This release fixes the last deploy blocker uncovered while applying the backend stability repair.
 
 Delivered:
-- replaced the broken backend root route that referenced a non-existent `welcome` view
-- added the missing `WebFingerController` so public discovery routes no longer break route tooling / route cache evaluation
-- hardened dashboard stats and activity so they return safe zero/empty values when `user_matches` is absent in a drifted production database
-- fixed the PHP 8.4 `limit` type bug in dashboard activity
-- added a corrective migration to restore `user_matches` / `match_actions` if migration history and live schema drift diverge
-- hardened backend log-file permissions and the Hetzner deploy script against next-day Monolog rotation ownership drift
-- added regression tests covering degraded-schema dashboard behavior and repaired public web routes
+- removed the Monolog permission override that caused chmod failures on `www-data`-owned daily logs during deploys
+- switched the deploy script to ACL-based shared log access for `deploy` + `www-data`
+- applied the same ACL repair directly on the live Hetzner server
 
 ## ✅ Why This Matters
-Direct Hetzner inspection showed the backend infrastructure itself was alive, but application consistency had drifted:
-- `api.fwber.me/` returned `500` because the route rendered a non-existent `welcome` view
-- dashboard activity calls were throwing because `user_matches` was missing from the live MySQL schema even though migrations claimed it had already run
-- `php artisan route:list` was broken by a route pointing at a missing `WebFingerController`
-
-This release converts those findings into tracked, tested source changes instead of leaving them as one-off server mysteries.
+The previous backend patch revealed that deploy-user artisan commands and PHP-FPM daily log rotation were fighting over ownership semantics. ACLs are the correct shared-write fix here; per-file chmod from an unprivileged deploy shell was not.
