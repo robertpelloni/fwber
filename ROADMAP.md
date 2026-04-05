@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.1 "Wallet Surface Restoration"
+> **Current Version:** 1.8.2 "Referral, Payout & Video Chat Restoration"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.1)
+### Phase 5: Production Scale (COMPLETED - v1.8.2)
+- **Referral, Payout & Video Chat Restoration:** Restored referral validation, signup/premium referral rewards, vouch links keyed by referral code, video call initiate/signal/status/history endpoints, and expanded `/wallet` into a wallet + referrals + payout hub.
 - **Wallet Surface Restoration:** Restored the compact wallet backend/API surface and added a real `/wallet` page so token-linked dead routes now land somewhere useful again.
 - **Events Surface Restoration:** Restored the events backend/API surface, event invitation flow, and frontend pages for listing, viewing, and creating events.
 - **Hetzner Repo Ownership Repair:** Repaired mixed ownership inside the live checkout after the automated deploy workflow failed on `.git/objects` write permissions, restoring deploy-user control of the repo.
@@ -103,8 +104,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Deploy Wallet + Verify Latest Live Restorations:** Verify live `/friends`, `/activity`, `/notifications`, `/settings/travel`, `/events`, and `/wallet` with a real session after the latest deploys.
-2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge and websocket/broadcast-auth behavior with a real signed-in browser session.
+1. **Deploy Referral + Video + Wallet Upgrades:** Verify live `/wallet`, referral signup, vouch links, and video-chat initiation/history with a real session after the latest deploys.
+2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, and live video signaling with a real signed-in browser session.
 3. **Resolve Remaining Gift-Specific Dead Flows:** Compact-restore or retire remaining gift/token spend paths that still reference the newly restored wallet surface.
 4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

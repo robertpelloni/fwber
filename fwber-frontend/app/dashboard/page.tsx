@@ -3,7 +3,7 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
-import { Heart, Users, MessageSquare, TrendingUp, Clock, Target, Crown, Flame, Store, Gavel } from 'lucide-react';
+import { Heart, Users, MessageSquare, TrendingUp, Clock, Target, Crown, Flame, Store, Gavel, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
 import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
@@ -106,9 +106,10 @@ export default function DashboardPage() {
                     <Target className="w-5 h-5 text-purple-500" />
                     Quick Actions
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
                     <ActionButton href="/nearby" label="Discover Nearby" icon="📍" color="purple" />
                     <ActionButton href="/messages" label="View Messages" icon="💬" color="blue" />
+                    <ActionButton href="/wallet" label="Open Wallet" icon="💸" color="orange" />
                     <ActionButton href="/profile/edit" label="Edit Profile" icon="✏️" color="green" />
                     <ActionButton href="/settings" label="Settings" icon="⚙️" color="gray" />
                   </div>
@@ -126,6 +127,13 @@ export default function DashboardPage() {
                       description="Upgrade, check billing status, and jump into who-likes-you without hunting for hidden links."
                       icon={<Crown className="h-5 w-5" />}
                       accent="yellow"
+                    />
+                    <FeatureSurfaceCard
+                      href="/wallet"
+                      title="Wallet & Referrals"
+                      description="Open your token balance, referral links, pending payout ledger, and wallet address controls from one place."
+                      icon={<Wallet className="h-5 w-5" />}
+                      accent="green"
                     />
                     <FeatureSurfaceCard
                       href="/roast"

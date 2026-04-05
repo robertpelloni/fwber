@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { Sparkles, X } from 'lucide-react'
 import axios from 'axios'
 import Link from 'next/link'
+import { getApiBaseUrl } from '@/lib/api/client'
 
 export default function ReferralBanner() {
   const searchParams = useSearchParams()
@@ -20,7 +21,7 @@ export default function ReferralBanner() {
 
       const checkCode = async () => {
         try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/referral/${refCode}`)
+          const res = await axios.get(`${getApiBaseUrl()}/auth/referral/${refCode}`)
           if (res.data.valid) {
              setReferrer({
                name: res.data.referrer_name,

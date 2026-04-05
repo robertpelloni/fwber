@@ -44,6 +44,7 @@ class User extends Authenticatable
         'wallet_address',
         'token_balance',
         'referral_code',
+        'referrer_id',
         'onboarding_completed_at',
         'decoy_password',
         'decoy_user_id',
@@ -155,6 +156,31 @@ class User extends Authenticatable
     public function walletTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(WalletTransaction::class);
+    }
+
+    public function referrer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referrer_id');
+    }
+
+    public function referrals(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'referrer_id');
+    }
+
+    public function referralCommissions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReferralCommission::class, 'beneficiary_user_id');
+    }
+
+    public function outgoingVideoCalls(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(VideoCall::class, 'caller_id');
+    }
+
+    public function incomingVideoCalls(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(VideoCall::class, 'receiver_id');
     }
 
     public function sentFriendRequests(): \Illuminate\Database\Eloquent\Relations\HasMany

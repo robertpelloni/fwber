@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.2] - 2026-04-05 — Referral, Payout & Video Chat Restoration
+
+### Added
+- Restored the referral backend surface with public referral-code lookup, referral summary API, referral commissions ledger, signup referral rewards, and two-level premium referral commissions.
+- Restored the video chat backend surface with video call logging, signaling relay, call status updates, and call history endpoints.
+- Restored public/authenticated vouch routes keyed by referral code so invite links and social-proof flows land on live APIs again.
+- Added `ReferralRestoreTest` and `VideoChatRestoreTest` coverage.
+
+### Changed
+- Expanded the wallet payload and `/wallet` page into a real wallet/referrals/payout hub.
+- Fixed frontend referral, vouch, and video API callers to use the active Hetzner API contract instead of stale relative or malformed base URLs.
+- Added Wallet navigation back into the app shell and dashboard quick actions.
+
 ## [1.8.1] - 2026-04-05 — Wallet Surface Restoration
 
 ### Added

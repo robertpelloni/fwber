@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\ReferralCommissionService;
 use App\Support\PremiumPlanCatalog;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -20,6 +21,7 @@ class PremiumController extends Controller
     public function __construct(
         protected PaymentGatewayInterface $paymentGateway,
         protected PremiumPlanCatalog $premiumPlanCatalog,
+        protected ReferralCommissionService $referralCommissionService,
     ) {}
 
     public function plans(): JsonResponse
@@ -166,7 +168,10 @@ class PremiumController extends Controller
             ], 400);
         }
 
-        $expiresAt = DB::transaction(function () use ($user, $plan, $result, $paymentDriver) {
+        $paymentRecord = null;
+        $subscriptionRecord = null;
+
+        $expiresAt = DB::transaction(function () use ($user, $plan, $result, $paymentDriver, &$paymentRecord, &$subscriptionRecord) {
             $expiresAt = Carbon::now()->addDays($plan['duration_days']);
 
             $user->forceFill([
@@ -176,7 +181,7 @@ class PremiumController extends Controller
             ])->save();
 
             if (Schema::hasTable('payments')) {
-                Payment::create([
+                $paymentRecord = Payment::create([
                     'user_id' => $user->id,
                     'amount' => $plan['price_usd'],
                     'currency' => $plan['currency'],
@@ -192,7 +197,7 @@ class PremiumController extends Controller
             }
 
             if (Schema::hasTable('subscriptions')) {
-                Subscription::updateOrCreate(
+                $subscriptionRecord = Subscription::updateOrCreate(
                     ['user_id' => $user->id, 'name' => $plan['name']],
                     [
                         'stripe_id' => $result->transactionId ?: 'premium_'.Str::uuid(),
@@ -206,6 +211,13 @@ class PremiumController extends Controller
 
             return $expiresAt;
         });
+
+        $this->referralCommissionService->awardPremiumCommissions(
+            $user->fresh(),
+            $subscriptionRecord,
+            $paymentRecord,
+            $paymentDriver,
+        );
 
         return response()->json([
             'message' => 'Premium purchased successfully',

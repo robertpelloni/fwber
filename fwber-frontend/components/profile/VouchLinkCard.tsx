@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Copy, Share2, Award, ExternalLink, Loader2 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
+import { api } from '@/lib/api/client'
 
 export function VouchLinkCard() {
   const { user, token } = useAuth()
@@ -17,7 +18,7 @@ export function VouchLinkCard() {
     if (typeof window !== 'undefined') {
       return `${window.location.protocol}//${window.location.host}`
     }
-    return ''
+    return 'https://fwber.me'
   }
 
   // Generate or fetch link
@@ -30,25 +31,8 @@ export function VouchLinkCard() {
       // Let's call the API to be safe and consistent with backend logic
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/vouch/generate-link`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        })
-        
-        if (response.ok) {
-            const data = await response.json()
-            // The backend returns the full URL usually, but let's handle both cases
-            // VouchController: return response()->json(['url' => $url]);
-            setLink(data.url)
-        } else {
-            // Fallback if API fails but we have referral code
-            const baseUrl = getBaseUrl()
-            setLink(`${baseUrl}/vouch/${user.referral_code}`)
-        }
+        const data = await api.get<{ url: string }>('/vouch/link')
+        setLink(data.url)
       } catch (err) {
         console.error('Failed to fetch vouch link:', err)
         // Fallback

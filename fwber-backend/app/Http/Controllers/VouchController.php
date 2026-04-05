@@ -5,43 +5,46 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Social\StoreVouchRequest;
 use App\Models\User;
 use App\Models\Vouch;
+use App\Services\ReferralCommissionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class VouchController extends Controller
 {
+    public function __construct(private readonly ReferralCommissionService $referralCommissionService)
+    {
+    }
+
     /**
-     * Generate a unique vouch link for the user.
+     * Generate a stable referral-code-based vouch link for the signed-in user.
      */
     public function generateLink(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $url = rtrim((string) config('app.url', 'https://fwber.me'), '/').'/vouch/'.$user->id;
+        $user = $this->referralCommissionService->ensureReferralCode($request->user());
+        $url = rtrim((string) config('referrals.frontend_url', config('app.frontend_url', 'https://fwber.me')), '/').'/vouch/'.$user->referral_code;
 
         return response()->json([
             'url' => $url,
-            'user_id' => $user->id,
+            'referral_code' => $user->referral_code,
         ]);
     }
 
     /**
-     * Submit a public vouch for a user.
+     * Submit a public vouch using the owner's referral code.
+     *
+     * The frontend and shared links already use referral-code URLs, so the
+     * controller accepts that shape directly instead of forcing callers to know
+     * internal numeric user ids.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreVouchRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'type' => 'required|string|in:safe,fun,hot',
-            'relationship_type' => 'nullable|string',
-            'comment' => 'nullable|string|max:500',
-            'voucher_name' => 'nullable|string|max:100',
-        ]);
-
-        $user = User::findOrFail($validated['user_id']);
+        $validated = $request->validated();
+        $user = User::query()->where('referral_code', $validated['referral_code'])->firstOrFail();
         $ip = $request->ip();
 
-        // Prevent duplicate vouch of same type from same IP
-        $exists = Vouch::where('to_user_id', $user->id)
+        $exists = Vouch::query()
+            ->where('to_user_id', $user->id)
             ->where('ip_address', $ip)
             ->where('type', $validated['type'])
             ->exists();
@@ -50,20 +53,23 @@ class VouchController extends Controller
             return response()->json(['message' => 'Vouch recorded successfully.']);
         }
 
-        Vouch::create([
+        $payload = [
             'to_user_id' => $user->id,
             'type' => $validated['type'],
-            'relationship_type' => $validated['relationship_type'] ?? 'friend',
-            'comment' => $validated['comment'] ?? '',
-            'voucher_name' => $validated['voucher_name'] ?? 'Someone',
             'ip_address' => $ip,
-        ]);
+        ];
 
-        // Simple notification (non-push for now)
-        try {
-            $voucher = $validated['voucher_name'] ?? 'Someone';
-            // Logic for notification could be added here
-        } catch (\Exception $e) {}
+        if (Schema::hasColumn('vouches', 'relationship_type')) {
+            $payload['relationship_type'] = $validated['relationship_type'] ?? 'friend';
+        }
+        if (Schema::hasColumn('vouches', 'comment')) {
+            $payload['comment'] = $validated['comment'] ?? '';
+        }
+        if (Schema::hasColumn('vouches', 'voucher_name')) {
+            $payload['voucher_name'] = $validated['voucher_name'] ?? 'Someone';
+        }
+
+        Vouch::query()->create($payload);
 
         return response()->json(['message' => 'Vouch recorded successfully.']);
     }

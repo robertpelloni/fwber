@@ -5,40 +5,65 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Services\ReferralCommissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    private function hydrateAuthUser(User $user): User
+    public function __construct(private readonly ReferralCommissionService $referralCommissionService)
     {
-        return $user->load('profile')->loadCount(['vouches']);
     }
 
-    private function generateReferralCode(string $name): string
+    private function hydrateAuthUser(User $user): User
     {
-        return strtoupper(substr(Str::slug($name, ''), 0, 6) ?: 'FWB') . random_int(1000, 9999);
+        // The frontend still expects social-proof and referral counters on the
+        // auth payload. We hydrate them here so login/register/me all share the
+        // same richer response shape.
+        $query = $user->load('profile');
+
+        $counts = [];
+        if (Schema::hasTable('vouches')) {
+            $counts[] = 'vouches';
+        }
+        if (Schema::hasColumn('users', 'referrer_id')) {
+            $counts[] = 'referrals';
+        }
+
+        return empty($counts) ? $query : $query->loadCount($counts);
     }
 
     public function register(RegisterRequest $request)
     {
         $validated = $request->validated();
+        $referrer = $this->referralCommissionService->lookupReferrer($validated['referral_code'] ?? null);
 
-        $user = User::create([
+        $payload = [
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'referral_code' => $this->generateReferralCode($validated['name']),
-        ]);
+        ];
+
+        if (Schema::hasColumn('users', 'referrer_id')) {
+            $payload['referrer_id'] = $referrer?->id;
+        }
+
+        $user = User::create($payload);
+
+        $user = $this->referralCommissionService->ensureReferralCode($user);
+
+        if (Schema::hasColumn('users', 'referrer_id') && $referrer && $referrer->id !== $user->id) {
+            $this->referralCommissionService->awardSignupRewards($user, $referrer);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $this->hydrateAuthUser($user),
+            'user' => $this->hydrateAuthUser($user->fresh()),
         ]);
     }
 

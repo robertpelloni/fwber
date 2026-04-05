@@ -27,7 +27,8 @@ import {
     Flame,
     Store,
     Gavel,
-    UserPlus
+    UserPlus,
+    Wallet
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -71,6 +72,7 @@ const accountLinks: NavItem[] = [
 function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null): NavItem[] {
     const links: NavItem[] = [
         { href: '/premium', label: 'Gold', icon: Crown },
+        { href: '/wallet', label: 'Wallet', icon: Wallet },
         { href: '/roast', label: 'Roast', icon: Flame },
         {
             href: user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register',

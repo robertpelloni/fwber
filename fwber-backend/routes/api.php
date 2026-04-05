@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 // Auth
 Route::post('auth/register', [\App\Http\Controllers\AuthController::class, 'register'])->middleware('throttle:auth');
 Route::post('auth/login', [\App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:auth');
+Route::get('auth/referral/{code}', [\App\Http\Controllers\ReferralController::class, 'lookup']);
 Route::get('auth/login', function () {
     return response()->json(['message' => 'Unauthenticated. Please login.'], 401);
 })->name('login');
@@ -36,6 +37,7 @@ Route::get('health/readiness', [\App\Http\Controllers\HealthController::class, '
 Route::get('health/metrics', [\App\Http\Controllers\HealthController::class, 'metrics']);
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 Route::post('public/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastPublic']);
+Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store']);
 Route::post('stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook']);
 Route::get('marketplace/nearby', [\App\Http\Controllers\MerchantInventoryController::class, 'nearby']);
 Route::get('marketplace/{merchantId}', [\App\Http\Controllers\MerchantInventoryController::class, 'showMarketplace']);
@@ -123,9 +125,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('events/{id}/rsvp', [\App\Http\Controllers\EventController::class, 'rsvp']);
     Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
 
-    // Wallet
+    // Wallet / Referrals / Vouches
     Route::get('wallet', [\App\Http\Controllers\WalletController::class, 'show']);
     Route::post('wallet/address', [\App\Http\Controllers\WalletController::class, 'updateAddress']);
+    Route::get('referrals/summary', [\App\Http\Controllers\ReferralController::class, 'summary']);
+    Route::get('vouch/link', [\App\Http\Controllers\VouchController::class, 'generateLink']);
 
     // Merchant / Marketplace
     Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);
@@ -147,6 +151,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('premium/initiate', [\App\Http\Controllers\PremiumController::class, 'initiatePurchase']);
     Route::post('premium/purchase', [\App\Http\Controllers\PremiumController::class, 'purchasePremium']);
     Route::get('premium/who-likes-you', [\App\Http\Controllers\PremiumController::class, 'getWhoLikesYou']);
+
+    // Video Chat
+    Route::post('video/initiate', [\App\Http\Controllers\VideoChatController::class, 'initiate']);
+    Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);
+    Route::put('video/{id}/status', [\App\Http\Controllers\VideoChatController::class, 'updateStatus']);
+    Route::get('video/history', [\App\Http\Controllers\VideoChatController::class, 'history']);
 
     // AI Wingman
     Route::get('wingman/ice-breakers/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getIceBreakers']);
