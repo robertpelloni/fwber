@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.6.8
+> **Version:** 1.6.9
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -170,6 +170,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - shared log write access on Hetzner is now handled via ACLs on `storage/logs` rather than Monolog chmod attempts, preventing deploy-time artisan failures against rotated `www-data` log files
 - the dedicated frontend GitHub build now targets Node.js 24 so CI uses the same runtime family as the locally verified lockfile/build flow
 - public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
+- the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
 - `HETZNER_HOST`
 - `HETZNER_USERNAME`
 - `HETZNER_SSH_KEY`

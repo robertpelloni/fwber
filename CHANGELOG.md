@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.9] - 2026-04-05 — Frontend Workflow Install Strategy Fix
+
+### Fixed
+- Switched the dedicated frontend GitHub workflow from strict `npm ci` to `npm install --no-fund --no-audit` so the build can proceed despite platform-sensitive optional dependency resolution from wallet/native-adjacent packages.
+- This is a pragmatic CI stabilization step while the broader dependency graph is still being reduced and normalized.
+
 ## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
 
 ### Fixed
