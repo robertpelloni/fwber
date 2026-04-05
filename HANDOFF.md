@@ -1,11 +1,11 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.8.3
+> **Version Reached:** 1.8.4
 > **Current Model:** GPT
 
 ## Executive Summary
-This session delivered two sequential releases:
+This session delivered three sequential outcomes:
 
 ### v1.8.2 — Referral, Payout & Video Chat Restoration
 Restored:
@@ -19,23 +19,30 @@ Restored:
 - restored Wallet navigation in the app shell/dashboard
 
 ### v1.8.3 — Hetzner Deploy Privilege Recovery
-After pushing v1.8.2, the GitHub `Deploy Backend (Hetzner)` workflow failed. Investigation showed the deploy had already successfully completed:
+After pushing v1.8.2, the GitHub `Deploy Backend (Hetzner)` workflow failed even though deploy steps had already succeeded through:
 - `git pull`
 - `composer install`
 - migration execution
 - `php artisan optimize`
 - `php artisan deploy:verify`
 
-The failure happened *after* those steps, when the script attempted:
+Failure source:
 - `sudo cp ... /etc/nginx/sites-available/...`
 - `sudo ln -sf ... /etc/nginx/sites-enabled/...`
 
-The deploy user did not have passwordless sudo for those filesystem-write commands, so CI aborted despite the actual app/runtime deploy already being healthy.
+The deploy user lacked passwordless sudo for those filesystem writes, so CI aborted after a practically successful application deploy.
 
-I patched `ops/hetzner/scripts/deploy-backend.sh` so:
-- privileged service commands remain strict/non-interactive (`nginx -t`, `systemctl restart`, `systemctl reload nginx`)
-- nginx config-file sync is now **optional** when passwordless sudo is unavailable for root filesystem writes
-- the deploy no longer dies after an otherwise successful migrate/optimize/verify cycle just because config refresh lacks permission
+### v1.8.4 — Hetzner Nginx Sync Helper Integration
+The v1.8.3 patch reduced the blast radius, but the next GitHub deploy still failed on `sudo nginx -t` because the deploy user also lacked passwordless sudo for that command.
+
+To solve this cleanly:
+1. I patched `ops/hetzner/scripts/deploy-backend.sh` again so it prefers a dedicated root-owned nginx sync helper when available.
+2. I used live root SSH access on Hetzner to provision:
+   - `/usr/local/bin/fwber-sync-nginx-sites`
+   - `/etc/sudoers.d/fwber-deploy-nginx`
+3. That grants the `deploy` user narrow passwordless sudo for the helper, instead of broad passwordless root filesystem access.
+
+This is a safer and more reproducible production shape than widening blanket sudo privileges.
 
 ---
 
@@ -100,11 +107,26 @@ Capabilities restored/fixed:
 Updated:
 - `ops/hetzner/scripts/deploy-backend.sh`
 
-Changes:
-- introduced `run_privileged()` for required non-interactive privileged commands
-- introduced `run_optional_privileged()` for optional privileged nginx config sync steps
-- `sync_nginx_site()` now warns/skips rather than aborting when deploy lacks passwordless sudo for `/etc/nginx` writes
-- `nginx -t` and service restarts remain hard requirements and still fail if they cannot run
+Progression:
+- v1.8.3 introduced `run_privileged()` and `run_optional_privileged()`
+- v1.8.4 added helper-aware nginx sync logic:
+  - prefers `/usr/local/bin/fwber-sync-nginx-sites` when present
+  - still supports fallback repo-managed sync path
+
+### Live Hetzner Infrastructure Changes
+Executed over root SSH on `root@5.161.250.43`:
+- created `/usr/local/bin/fwber-sync-nginx-sites`
+- made it root-owned and executable
+- created `/etc/sudoers.d/fwber-deploy-nginx`
+- verified sudoers syntax with `visudo -cf`
+- verified `deploy` can run `sudo -n /usr/local/bin/fwber-sync-nginx-sites`
+
+This live helper now provides a narrow privileged bridge for GitHub deploys to:
+- copy tracked nginx config files
+- refresh enabled symlinks
+- validate nginx config
+
+without giving the deploy user blanket passwordless sudo for raw filesystem writes.
 
 ---
 
@@ -125,15 +147,25 @@ Result:
 - route list confirmed `/wallet` and `/vouch/[code]`
 
 ### Deployment Failure Analysis
-Inspected failing GitHub run:
-- `Deploy Backend (Hetzner)` run `23992005050`
+Inspected failed GitHub runs:
+- `23992005050` (v1.8.2 push)
+- `23992050640` (v1.8.3 push)
 
 Observed facts:
 - migration `2026_04_05_040000_restore_referrals_and_video_calls` ran successfully on Hetzner
-- `php artisan deploy:verify` passed with Database/Redis/Cache/Storage/Queue/Broadcast all OK
-- failure occurred afterward on password-prompting `sudo` filesystem-write commands for nginx site sync
+- `php artisan deploy:verify` passed on Hetzner with Database/Redis/Cache/Storage/Queue/Broadcast all OK
+- failures were privilege-shape issues, not app/runtime failures:
+  - first on `sudo cp` / `sudo ln`
+  - then on `sudo nginx -t`
 
-This was therefore an **ops privilege-shape issue**, not an application/runtime failure.
+### Live Privilege Verification
+Executed on the server:
+- `sudo -l -U deploy`
+- helper creation + sudoers install
+- `su - deploy -c "sudo -n /usr/local/bin/fwber-sync-nginx-sites ..."`
+
+Result:
+- helper path verified working for the deploy user
 
 ---
 
@@ -143,8 +175,12 @@ This was therefore an **ops privilege-shape issue**, not an application/runtime 
 - **Message:** `feat: restore referral payouts, vouch flows, and video chat backend (v1.8.2)`
 
 ### v1.8.3
+- **Commit:** `c037acb4f`
+- **Message:** `fix: recover hetzner deploys when nginx config sync lacks passwordless sudo (v1.8.3)`
+
+### v1.8.4
 - not yet committed at the moment this handoff file was written
-- **Recommended Commit Message:** `fix: recover hetzner deploys when nginx config sync lacks passwordless sudo (v1.8.3)`
+- **Recommended Commit Message:** `fix: integrate hetzner nginx sync helper for github deploys (v1.8.4)`
 
 ---
 
@@ -165,10 +201,10 @@ This was therefore an **ops privilege-shape issue**, not an application/runtime 
 ---
 
 ## Best Next Steps
-1. Commit + push v1.8.3
-2. Re-run / observe `Deploy Backend (Hetzner)` on the new commit
-3. Confirm the workflow goes green after the nginx privilege-recovery patch
-4. Run live production verification for:
+1. Commit + push v1.8.4
+2. Watch the new `Deploy Backend (Hetzner)` run
+3. Confirm end-to-end green workflow status
+4. Verify live production surfaces:
    - `/wallet`
    - referral signup flow
    - `/vouch/{code}`

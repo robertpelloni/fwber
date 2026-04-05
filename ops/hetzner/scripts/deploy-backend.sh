@@ -12,6 +12,7 @@ GEO_DIR="$REPO_ROOT/fwber-geo"
 SMOKE_CHECK_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/smoke-check.sh"
 COMPARE_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/compare-smoke-reports.py"
 PUBLISH_SMOKE_SCRIPT="$REPO_ROOT/ops/hetzner/scripts/publish-smoke-report.py"
+NGINX_SYNC_HELPER="${FWBER_NGINX_SYNC_HELPER:-/usr/local/bin/fwber-sync-nginx-sites}"
 REPORT_DIR_ROOT="${FWBER_DEPLOY_REPORT_DIR:-$REPO_ROOT/logs/deploy-reports}"
 PYTHON_BIN="${FWBER_PYTHON_BIN:-python3}"
 
@@ -87,11 +88,18 @@ if [ -d "$GEO_DIR" ]; then
   cargo build --release
 fi
 
-sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/api.fwber.me.conf" "api.fwber.me"
-sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/ws.fwber.me.conf" "ws.fwber.me"
-sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/geo.fwber.me.conf" "geo.fwber.me"
-sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/mercure.fwber.me.conf" "mercure.fwber.me"
-run_privileged nginx -t
+if [ -x "$NGINX_SYNC_HELPER" ]; then
+  # Prefer the root-owned helper when present. It keeps GitHub-triggered deploys
+  # reproducible even when the deploy user only has narrowly-scoped passwordless
+  # sudo rather than blanket root filesystem write access.
+  run_privileged "$NGINX_SYNC_HELPER"
+else
+  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/api.fwber.me.conf" "api.fwber.me"
+  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/ws.fwber.me.conf" "ws.fwber.me"
+  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/geo.fwber.me.conf" "geo.fwber.me"
+  sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/mercure.fwber.me.conf" "mercure.fwber.me"
+  run_privileged nginx -t
+fi
 
 run_privileged systemctl restart fwber-queue
 run_privileged systemctl restart fwber-reverb

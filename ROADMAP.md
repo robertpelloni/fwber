@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.3 "Hetzner Deploy Privilege Recovery"
+> **Current Version:** 1.8.4 "Hetzner Nginx Sync Helper Integration"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.3)
+### Phase 5: Production Scale (COMPLETED - v1.8.4)
+- **Hetzner Nginx Sync Helper Integration:** Added a root-owned helper path on the live server and updated the deploy script to use it, so GitHub Hetzner deploys can refresh tracked nginx configs without requiring blanket passwordless sudo for raw filesystem writes.
 - **Hetzner Deploy Privilege Recovery:** Hardened the backend deploy script so missing passwordless sudo for nginx config file writes no longer aborts an otherwise successful Hetzner deployment.
 - **Referral, Payout & Video Chat Restoration:** Restored referral validation, signup/premium referral rewards, vouch links keyed by referral code, video call initiate/signal/status/history endpoints, and expanded `/wallet` into a wallet + referrals + payout hub.
 - **Wallet Surface Restoration:** Restored the compact wallet backend/API surface and added a real `/wallet` page so token-linked dead routes now land somewhere useful again.
@@ -105,7 +106,7 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Re-run GitHub Hetzner Deploy + Verify Referral/Video Surface:** Verify live `/wallet`, referral signup, vouch links, and video-chat initiation/history after the privilege fix ships.
+1. **Confirm Green GitHub Hetzner Deploy + Verify Referral/Video Surface:** Verify live `/wallet`, referral signup, vouch links, and video-chat initiation/history after the nginx helper integration ships.
 2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, and live video signaling with a real signed-in browser session.
 3. **Resolve Remaining Gift-Specific Dead Flows:** Compact-restore or retire remaining gift/token spend paths that still reference the newly restored wallet surface.
 4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
