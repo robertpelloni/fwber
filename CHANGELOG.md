@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.8] - 2026-04-05 — Restore Branch Messaging + WebFinger Stabilization
+
+### Changed
+- Added direct restore-branch fixes so message sending no longer fails closed when legacy event-bus publishing drifts from the modern runtime contract.
+- Restored WebFinger behavior on the rewind branch to honor federated-only users and the expected `/api/federation/users/{id}` actor URI contract.
+- Relaxed restored message request validation so local numeric receiver IDs and federated string actor IDs both work on the richer branch.
+- Verified locally that `DirectMessageTest`, `ActivityPubTest`, and `ActivityPubOutboundTest` now pass on the restore branch after these fixes.
+
 ## [1.9.7] - 2026-04-05 — Restore Branch Profile + Frontend Build Stabilization
 
 ### Changed

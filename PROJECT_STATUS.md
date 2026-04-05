@@ -1,18 +1,17 @@
-# PROJECT_STATUS.md - fwber v1.9.7 (Restore Branch Profile + Frontend Build Stabilization)
+# PROJECT_STATUS.md - fwber v1.9.8 (Restore Branch Messaging + WebFinger Stabilization)
 
 **Date:** 2026-04-05
-**Version:** 1.9.7 "Restore Branch Profile + Frontend Build Stabilization"
-**Status:** ✅ **THE REWIND BRANCH NOW HAS DIRECT FIXES FOR PROFILE PERSISTENCE, MATCH ACTION EVENT-BUS DRIFT, AND SEVERAL FRONTEND BUILD BREAKERS**
+**Version:** 1.9.8 "Restore Branch Messaging + WebFinger Stabilization"
+**Status:** ✅ **THE REWIND BRANCH NOW HAS DIRECT FIXES FOR MESSAGING AND FEDERATED WEBFINGER CONTRACTS, WITH THOSE TARGETED BACKEND TESTS PASSING LOCALLY**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release moved the restore branch from broad infra replay into concrete branch-specific compatibility repair:
-- profile update flow no longer fails closed when event-store append drifts
-- match action flow no longer fails closed when legacy Redis event-bus publishing drifts
-- missing UI primitives were restored for the richer frontend branch
-- broken council / merchant vibe / WASM benchmark frontend sources were cleaned up
-- targeted restore-branch backend tests and a local frontend production build both succeeded
+This release extended the direct compatibility-fix phase on the restore branch:
+- direct messaging no longer fails closed when restored event-bus publishing drifts
+- WebFinger again honors federated-only users and federation actor URI expectations
+- message request validation now supports both local numeric receivers and federated string receivers
+- targeted restore-branch messaging + federation tests now pass locally
 
 ## ✅ Why This Matters
-The rewind branch is now proving it can absorb not only replayed Hetzner/runtime commits but also direct compatibility fixes specific to the older full-feature codebase. That is the expected shape of the remaining work: replay what can be replayed, then patch the branch where old assumptions collide with the modern environment.
+The rewind branch is steadily moving from surface compatibility into real feature-contract recovery. Messaging and WebFinger are core cross-cutting systems that many richer pre-simplification surfaces depend on, so stabilizing them is a meaningful step toward a usable full-feature branch on modern Hetzner infrastructure.
