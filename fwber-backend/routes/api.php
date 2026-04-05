@@ -98,6 +98,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Match Engine
     Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
+    Route::get('matches/{targetUserId}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
+    Route::post('matches/{targetUserId}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
     Route::post('matches/nfc-exchange', [\App\Http\Controllers\MatchController::class, 'nfcExchange']);
 
@@ -125,7 +127,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('events/{id}/rsvp', [\App\Http\Controllers\EventController::class, 'rsvp']);
     Route::post('events/{id}/invite', [\App\Http\Controllers\EventInvitationController::class, 'store']);
 
-    // Wallet / Referrals / Vouches / Gifts
+    // Wallet / Referrals / Vouches / Gifts / Unlocks
     Route::get('wallet', [\App\Http\Controllers\WalletController::class, 'show']);
     Route::post('wallet/address', [\App\Http\Controllers\WalletController::class, 'updateAddress']);
     Route::get('referrals/summary', [\App\Http\Controllers\ReferralController::class, 'summary']);
@@ -133,6 +135,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('gifts', [\App\Http\Controllers\GiftController::class, 'index']);
     Route::post('gifts/send', [\App\Http\Controllers\GiftController::class, 'send']);
     Route::get('gifts/received', [\App\Http\Controllers\GiftController::class, 'received']);
+    Route::post('content-unlocks', [\App\Http\Controllers\ContentUnlockController::class, 'store']);
 
     // Merchant / Marketplace
     Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);

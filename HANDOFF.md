@@ -1,29 +1,30 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.8.9
+> **Version Reached:** 1.9.0
 > **Current Model:** GPT
 
 ## Executive Summary
-This continuation session built directly on the now-stable Hetzner deployment path and restored the next token-spend feature cluster after gifts.
+This continuation session kept advancing the restoration map from the now-green Hetzner deployment baseline.
 
-## v1.8.9 — Profile Boost Restoration
+## v1.9.0 — Token-Gated Unlock Surface Restoration
 Restored:
-- boost purchase backend
-- active boost status backend
-- boost history backend
-- `/matches` boost CTA + active boost panel
-- token-backed wallet spending for boosts
-- mock card-backed boost purchase path
+- generic content unlock ledger
+- match insights lock/unlock flow
+- private photo unlock flow
+- `photos.unlock_price` persistence
+- deployment-safe `content_unlocks` + `photo_unlocks` schema
+- locked/unlocked frontend match insights UX
+- private-photo gated reveal UI on public profiles
 
-This was the next recommended move because the repo still contained:
-- `BoostPurchaseModal`
-- boost hooks / API clients
-- `Boost` model
-- `PurchaseBoostRequest`
-- Cypress expectations for boost purchase flow
+This was the next recommended move after boosts because the repo still clearly contained:
+- `ContentUnlockGate`
+- `PhotoUnlock` model
+- `unlock_price` typing on photo payloads
+- locked match-insights Cypress expectations
+- `MatchInsights` frontend component and hook
 
-So boosts were another classic case of an already-present frontend surface waiting on a restored backend contract.
+So again, large chunks of user-visible product were already waiting behind missing controllers/routes/schema and stale response-shape assumptions.
 
 ---
 
@@ -31,48 +32,73 @@ So boosts were another classic case of an already-present frontend surface waiti
 
 ### Backend
 Added:
-- `fwber-backend/app/Http/Controllers/BoostController.php`
-- `fwber-backend/database/migrations/2026_04_05_060000_restore_boosts_table.php`
-- `fwber-backend/tests/Feature/BoostRestoreTest.php`
+- `fwber-backend/app/Models/ContentUnlock.php`
+- `fwber-backend/app/Services/ContentUnlockService.php`
+- `fwber-backend/app/Http/Controllers/ContentUnlockController.php`
+- `fwber-backend/app/Http/Controllers/MatchInsightsController.php`
+- `fwber-backend/database/migrations/2026_04_05_070000_restore_content_unlocks_and_photo_unlocks.php`
+- `fwber-backend/tests/Feature/ContentUnlockRestoreTest.php`
 
 Updated:
+- `fwber-backend/app/Models/Photo.php`
+- `fwber-backend/app/Http/Controllers/PhotoController.php`
+- `fwber-backend/app/Http/Controllers/ProfileController.php`
 - `fwber-backend/routes/api.php`
 
-Restored routes:
-- `POST /api/boosts/purchase`
-- `GET /api/boosts/active`
-- `GET /api/boosts/history`
+### Restored backend routes
+- `POST /api/content-unlocks`
+- `GET /api/matches/{targetUserId}/insights`
+- `POST /api/matches/{targetUserId}/insights/unlock`
 
-Boost backend behavior:
-- prevents buying a new boost while one is already active
-- supports token-funded purchases
-- supports card/mock-gateway purchases
-- debits token balance for token purchases
-- records wallet transactions for token-backed boost spend
-- stores boost activation window in `boosts`
-- exposes active boost state and boost history cleanly to frontend hooks
+### Backend behavior restored
+#### Generic content unlocks
+- durable `content_unlocks` ledger
+- token spend recorded in wallet transactions
+- 402 returned on insufficient balance
+
+#### Match insights unlocks
+- locked response returns:
+  - `total_score`
+  - `is_locked`
+  - `cost`
+  - `preview_message`
+- unlock endpoint spends tokens and unlocks insights
+- unlocked response returns full compatibility breakdown from `AIMatchingService`
+
+#### Private photo unlocks
+- `unlock_price` is now persisted on photos
+- private photo unlock debits tokens
+- `photo_unlocks` row created
+- locked photo URLs are withheld from public profile payloads
+- unlocked photos become revealable without leaking locked media URLs
 
 ### Frontend
 Updated:
-- `fwber-frontend/lib/api/boosts.ts`
-- `fwber-frontend/lib/hooks/use-boosts.ts`
-- `fwber-frontend/app/matches/page.tsx`
+- `fwber-frontend/lib/hooks/use-match-insights.ts`
+- `fwber-frontend/components/matches/MatchInsights.tsx`
+- `fwber-frontend/app/profile/[id]/page.tsx`
 
-Frontend improvements:
-- boost hooks now correctly match the backend response shape
-- `/matches` now exposes a real boost panel again
-- active boost status is shown with remaining minutes
-- boost modal is reachable from the active matches UI instead of existing as stranded component code
+### Frontend behavior restored
+#### Match insights UX
+- locked state now renders properly
+- unlock CTA now works
+- unlocked insights now show compatibility breakdown/details
+- wallet invalidates after unlock spend
+
+#### Public profile private photo gating
+- public profiles now show locked private-photo gates
+- unlock action uses restored `ContentUnlockGate`
+- profile refreshes after unlock to reveal newly unlocked photos
 
 ---
 
 ## Validation Performed
 ### Backend Tests
 Executed:
-- `php artisan test --filter='BoostRestoreTest|GiftRestoreTest|ReferralRestoreTest|VideoChatRestoreTest|WalletRestoreTest'`
+- `php artisan test --filter='ContentUnlockRestoreTest|BoostRestoreTest|GiftRestoreTest|ReferralRestoreTest|VideoChatRestoreTest|WalletRestoreTest'`
 
 Result:
-- **14 tests passed / 76 assertions**
+- **17 tests passed / 94 assertions**
 
 ### Frontend Build
 Executed:
@@ -80,52 +106,39 @@ Executed:
 
 Result:
 - build succeeded
-- `/matches` and `/wallet` still build after boost + gifts integration
-
-### CI / Deploy Status
-Checked latest GitHub workflows after prior v1.8.8 push:
-- `Deploy Backend (Hetzner)` ✅ success
-- `Backend CI (Tests & Linting)` ✅ success
-- `Repository Hygiene` ✅ success
-- `Frontend Build & Deploy (Vercel)` was in progress when this continuation began
-
-This means the repo entered this boost-restoration wave from a much healthier deployment baseline than earlier in the day.
+- `/profile/[id]`, `/matches`, and `/wallet` all still build after unlock + boosts + gifts work
 
 ---
 
 ## Key Findings
-### 1. Boosts fit the same restoration pattern as gifts/referrals/video
-The frontend already had:
-- modal UI
-- hooks
-- API client
-- test expectations
+### 1. Token-gated unlocks followed the same restoration pattern as boosts/gifts/referrals/video
+The repo already had the UI assumptions and partial model/schema hints.
+The actual missing pieces were:
+- routes
+- controllers
+- schema persistence
+- response-shape handling in the frontend
 
-The backend already retained:
-- `Boost` model
-- purchase request object
+### 2. Public profile payloads needed explicit lock-state shaping
+Returning raw photo URLs for private photos would have undermined the whole unlock flow because storage URLs could leak locked media. The fix was to shape the response so:
+- locked private photos still appear as locked entries
+- but their actual URLs are withheld until unlocked
 
-That makes boosts another high-leverage restoration where relatively small backend work revives a lot of existing UX.
+### 3. A compact shared unlock service is a good long-term pattern
+`ContentUnlockService` now provides a reusable backend pattern for the remaining token-spend surfaces:
+- balance assertion
+- wallet transaction recording
+- unlock ledger creation
 
-### 2. `/matches` was the right place to reconnect boosts
-The current active product shell already keeps discovery and swiping centered in `/matches`, so bringing the boost CTA back there is more coherent than inventing another separate route.
-
-### 3. Wallet is increasingly the canonical token-era recovery hub
-By now the restored token-spend picture looks more coherent:
-- referrals/payouts
-- gifts
-- wallet balance
-- now boosts spending against the same balance
-
-That keeps the product simpler than the old overgrown token economy while still making the surviving token-linked surfaces real again.
+That should make the next remaining wallet/paywall restorations easier and less duplicated.
 
 ---
 
 ## Git / Release
-- **Target Version:** `1.8.9`
-- **Recommended Commit Message:** `feat: restore boosts backend and matches boost surface (v1.8.9)`
+- **Target Version:** `1.9.0`
+- **Recommended Commit Message:** `feat: restore token-gated unlocks for match insights and private photos (v1.9.0)`
 
-At the moment this handoff was written, the boost-restoration work itself had not yet been committed in this session snapshot.
+At the moment this handoff was written, the unlock-restoration work itself had not yet been committed in this snapshot.
 
 ---
 
@@ -146,17 +159,17 @@ At the moment this handoff was written, the boost-restoration work itself had no
 ---
 
 ## Recommended Next Steps
-1. Commit + push v1.8.9
-2. Let GitHub/Hetzner deploy the restored boosts contract
+1. Commit + push v1.9.0
+2. Let GitHub/Hetzner deploy the restored unlock surfaces
 3. Verify live:
-   - `/matches`
-   - active boost status
-   - token-backed boost purchase
-   - card/mock-backed boost purchase behavior where appropriate
-4. Continue the next remaining token-era dead-surface cluster:
-   - content unlocks
+   - locked match insights
+   - unlock insights flow
+   - locked private photos on public profiles
+   - photo unlock flow
+   - wallet/token debit reflection after unlock
+4. Continue the next remaining token-era cluster:
    - token-gated filters
-   - other wallet-linked unlock/paywall flows
-5. Continue monitoring the roast warning separately, but do not let it block core deploy health
+   - adjacent wallet-linked paywall surfaces
+5. Continue root-causing the roast first-hit flake in parallel, but do not let it block core deploy health
 
 No processes were manually killed.

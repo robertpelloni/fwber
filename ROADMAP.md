@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.9 "Profile Boost Restoration"
+> **Current Version:** 1.9.0 "Token-Gated Unlock Surface Restoration"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.9)
+### Phase 5: Production Scale (COMPLETED - v1.9.0)
+- **Token-Gated Unlock Surface Restoration:** Restored match insights unlocks, private photo unlocks, generic content unlock ledger routes, and locked/unlocked frontend UX for another major token-spend surface cluster.
 - **Profile Boost Restoration:** Restored boost purchase/status/history endpoints and reconnected the live `/matches` UI to the boost purchase flow so another token-spend surface works again.
 - **Gift Economy Surface Restoration:** Restored gift catalog/send/received endpoints, gift notifications, and a real `/wallet?tab=gifts` destination so token-era gift UI has a working backend contract again.
 - **Non-Critical Roast Smoke Classification:** Reclassified the public roast preview smoke assertion as warning-level so deploys stop failing solely on the known transient AI preview issue while still preserving diagnostics.
@@ -111,8 +112,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Verify Boost + Gift + Wallet + Referral + Video Surfaces Live:** Verify live `/matches` boost CTA, `/wallet`, `/wallet?tab=gifts`, referral signup, vouch links, gifts, roast preview, and video-chat initiation/history now that the Hetzner deploy path is green.
+1. **Verify Unlock + Boost + Gift + Wallet + Referral + Video Surfaces Live:** Verify live match insights unlock, private photo unlock, `/matches` boost CTA, `/wallet`, `/wallet?tab=gifts`, referral signup, vouch links, gifts, roast preview, and video-chat initiation/history now that the Hetzner deploy path is green.
 2. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, live video signaling, and any gift-notification realtime behavior with a real signed-in browser session.
-3. **Restore / Retire Remaining Token-Gated Unlock Surfaces:** Content unlocks, token-gated filters, and adjacent wallet-linked purchase surfaces still need compact restoration or honest retirement.
+3. **Restore / Retire Remaining Token-Gated Filters + Adjacent Spend Paths:** Token-gated filters and adjacent wallet-linked purchase surfaces still need compact restoration or honest retirement.
 4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

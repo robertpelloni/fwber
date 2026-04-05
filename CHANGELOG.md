@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0] - 2026-04-05 — Token-Gated Unlock Surface Restoration
+
+### Added
+- Restored the compact content-unlock backend with generic unlock ledger, photo unlocks, match insights unlocks, and deployment-safe schema for `content_unlocks`, `photo_unlocks`, and `photos.unlock_price`.
+- Restored match insights backend endpoints for locked/unlocked compatibility analysis plus explicit token unlock action.
+- Added `ContentUnlockRestoreTest` coverage for photo unlocks and match insights unlocks.
+
+### Changed
+- Repaired frontend match insights hooks/components to handle locked and unlocked states, including unlock CTA flow.
+- Restored a token-gated private-photo surface on public profiles using `ContentUnlockGate` and refresh-on-unlock behavior.
+- Backend public profile payloads now expose private-photo lock state without leaking locked photo URLs.
+
 ## [1.8.9] - 2026-04-05 — Profile Boost Restoration
 
 ### Added

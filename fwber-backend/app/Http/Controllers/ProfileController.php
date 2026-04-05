@@ -7,12 +7,14 @@ use App\Events\Profile\UserProfileCreated;
 use App\Events\Profile\UserProfileUpdated;
 use App\Http\Requests\Profile\UpdatePasswordRequest;
 use App\Http\Requests\Profile\UpdateProfileRequest;
+use App\Models\PhotoUnlock;
 use App\Models\User;
 use App\Models\UserProfile;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class ProfileController extends Controller
 {
@@ -40,10 +42,53 @@ class ProfileController extends Controller
     /**
      * Get public profile of a user.
      */
-    public function showPublic(int $id): JsonResponse
+    public function showPublic(Request $request, int $id): JsonResponse
     {
+        $viewer = $request->user();
         $user = User::with(['profile', 'photos', 'vouches'])->findOrFail($id);
-        return response()->json(['data' => $user]);
+
+        $unlockedPhotoIds = collect();
+        if (Schema::hasTable('photo_unlocks') && $viewer) {
+            $unlockedPhotoIds = PhotoUnlock::query()
+                ->where('user_id', $viewer->id)
+                ->whereIn('photo_id', $user->photos->pluck('id'))
+                ->pluck('photo_id');
+        }
+
+        $payload = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'profile' => [
+                'display_name' => $user->profile?->display_name,
+                'bio' => $user->profile?->bio,
+                'age' => $user->profile?->birthdate ? $user->profile->birthdate->diffInYears(now()) : null,
+                'location_name' => $user->profile?->location_name,
+                'photos' => $user->photos->sortBy('order')->map(function ($photo) use ($viewer, $unlockedPhotoIds) {
+                    $isOwnPhoto = $viewer && $viewer->id === $photo->user_id;
+                    $isUnlocked = $isOwnPhoto || ! $photo->is_private || $unlockedPhotoIds->contains($photo->id);
+
+                    return [
+                        'id' => $photo->id,
+                        'url' => $isUnlocked ? $photo->url : null,
+                        'is_private' => (bool) $photo->is_private,
+                        'is_primary' => (bool) $photo->is_primary,
+                        'is_unlocked' => $isUnlocked,
+                        'unlock_price' => $photo->unlock_price,
+                    ];
+                })->values()->all(),
+                'vouches' => $user->vouches->map(function ($vouch) {
+                    return [
+                        'type' => $vouch->type,
+                        'relationship_type' => $vouch->relationship_type,
+                        'comment' => $vouch->comment,
+                        'voucher_name' => $vouch->voucher_name,
+                        'created_at' => $vouch->created_at?->toISOString(),
+                    ];
+                })->values()->all(),
+            ],
+        ];
+
+        return response()->json(['data' => $payload]);
     }
 
     /**

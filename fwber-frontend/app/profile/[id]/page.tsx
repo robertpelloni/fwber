@@ -10,6 +10,8 @@ import { performMatchAction } from '@/lib/api/matches';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { useToast } from '@/components/ToastProvider';
+import ContentUnlockGate from '@/components/ContentUnlockGate';
+import { Lock } from 'lucide-react';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -69,8 +71,10 @@ export default function PublicProfilePage() {
   if (!profile || !profile.profile) return <div className="p-8">Profile not found</div>;
 
   const p = profile.profile;
-  const primaryPhoto = p.photos?.find(photo => photo.is_primary) || p.photos?.[0];
-  const galleryPhotos = p.photos?.filter(photo => !photo.is_private) || [];
+  const visiblePhotos = p.photos?.filter(photo => !photo.is_private || photo.is_unlocked) || [];
+  const lockedPrivatePhotos = p.photos?.filter(photo => photo.is_private && !photo.is_unlocked) || [];
+  const primaryPhoto = visiblePhotos.find(photo => photo.is_primary) || visiblePhotos[0];
+  const galleryPhotos = visiblePhotos;
 
   return (
     <ProtectedRoute>
@@ -118,21 +122,49 @@ export default function PublicProfilePage() {
             </div>
 
             {/* Photo Gallery */}
-            {galleryPhotos.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-4">Photos</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {galleryPhotos.map((photo) => (
-                    <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-800">
-                      <Image
-                        src={photo.url || '/placeholder.jpg'}
-                        alt="Profile Photo"
-                        fill
-                        className="object-cover"
-                      />
+            {(galleryPhotos.length > 0 || lockedPrivatePhotos.length > 0) && (
+              <div className="mb-8 space-y-6">
+                {galleryPhotos.length > 0 && (
+                  <div>
+                    <h3 className="mb-4 text-lg font-semibold">Photos</h3>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                      {galleryPhotos.map((photo) => (
+                        <div key={photo.id} className="relative aspect-square overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-800">
+                          <Image
+                            src={photo.url || '/placeholder.jpg'}
+                            alt="Profile Photo"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
+
+                {lockedPrivatePhotos.length > 0 && (
+                  <div>
+                    <h3 className="mb-4 text-lg font-semibold">Private Photos</h3>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      {lockedPrivatePhotos.map((photo) => (
+                        <ContentUnlockGate
+                          key={photo.id}
+                          contentId={photo.id}
+                          contentType="photo"
+                          cost={photo.unlock_price || 50}
+                          title="Private Photo"
+                          description="Unlock this private photo to reveal it in the gallery."
+                          onUnlock={() => void loadProfile()}
+                          preview={<div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-700" />}
+                        >
+                          <div className="aspect-square rounded-lg bg-gray-100 p-6 text-center text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+                            Photo unlocked. Refreshing gallery…
+                          </div>
+                        </ContentUnlockGate>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

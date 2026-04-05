@@ -51,6 +51,7 @@ class PhotoController extends Controller
         $validator = Validator::make($request->all(), [
             'photo' => 'required|file|mimes:jpeg,png,gif,webp|max:5120',
             'is_private' => 'sometimes|boolean',
+            'unlock_price' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -87,6 +88,7 @@ class PhotoController extends Controller
             'url' => Storage::disk('public')->url($filePath),
             'is_primary' => $user->photos()->count() === 0,
             'is_private' => $request->boolean('is_private'),
+            'unlock_price' => $request->boolean('is_private') ? $request->input('unlock_price') : null,
             'order' => $user->photos()->count(),
         ]);
 

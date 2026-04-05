@@ -28,6 +28,7 @@ class Photo extends Model
         'url',
         'is_primary',
         'is_private',
+        'unlock_price',
         'blur_level',
         'is_encrypted',
         'order',
@@ -36,6 +37,7 @@ class Photo extends Model
     protected $casts = [
         'is_primary' => 'boolean',
         'is_private' => 'boolean',
+        'unlock_price' => 'decimal:2',
         'is_encrypted' => 'boolean',
         'blur_level' => 'integer',
         'order' => 'integer',
