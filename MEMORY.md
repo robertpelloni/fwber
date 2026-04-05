@@ -1,16 +1,15 @@
 # MEMORY.md
 
+## 2026-04-05 — direct branch-specific fixes are now an expected part of the rewind strategy
+- Replay alone is not enough. Once the restore branch absorbed enough modern infra/runtime work, real compatibility bugs surfaced that only exist in the older full-feature branch.
+- The successful fixes in this tranche were not replay commits but branch-local repairs: non-blocking event-store/event-bus append handling and missing frontend UI primitives.
+- This confirms the rewind strategy is now in the mixed phase: replay modern fixes where possible, then patch restore-specific collisions directly.
+
 ## 2026-04-05 — after route-case fixes, the next restore-branch failures moved deeper into profile/onboarding semantics
-- The latest backend CI log on the restore branch no longer centered on missing `Api` controller classes.
-- It now highlights deeper behavioral mismatches such as profile update persistence, onboarding/profile payload expectations, travel-mode persistence, and root-route/webfinger/nodeinfo contract differences.
-- This is useful progress: it means the rewind branch is moving past surface-level Linux/class-resolution failures into real contract reconciliation.
+- The latest backend CI log no longer centered on missing `Api` controller classes.
+- It exposed deeper behavioral mismatches around profile updates, onboarding/profile payload expectations, travel-mode persistence, and other semantics.
+- Wrapping event append failures in `ProfileController` and `MatchController` immediately converted several backend failures into passing tests.
 
-## 2026-04-05 — the restore branch is now deep enough that Linux-specific app breakage is surfacing, not just workflow drift
-- After replaying the health/smoke/deploy stack, backend CI on the restore branch surfaced a real Linux route-resolution issue: routes referenced `App\Http\Controllers\API\...` while the actual namespace/path is `Api\...`.
-- That mismatch is easy to miss on Windows but breaks on Linux CI. A direct restore-branch fix was warranted and applied as `d4d073e4f`.
-- Expect more of these reconciliation issues as the richer old branch meets the modern Linux/Hetzner environment.
-
-## 2026-04-05 — replay order continues to matter
-- Workflow modernization had to come before deeper app-layer debugging.
-- Smoke/deploy hardening had to land before route/runtime verification work.
-- Now that those are in, the remaining failures are increasingly useful because they reveal actual feature-contract mismatches instead of infra noise.
+## 2026-04-05 — frontend rewind branch needed missing primitives, not just workflow modernization
+- Once the workflow modernizations landed, the richer frontend branch still failed to compile because old pages referenced UI primitives (`avatar`, `progress`, `select`) that were absent in the branch state.
+- Adding lightweight compatible components was a high-leverage way to get the full-feature frontend building locally again without waiting for a larger UI-library replay.

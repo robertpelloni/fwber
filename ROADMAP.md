@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.9.6 "Restore Branch Route Drift Recovery Replay"
+> **Current Version:** 1.9.7 "Restore Branch Profile + Frontend Build Stabilization"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.9.6)
+### Phase 5: Production Scale (COMPLETED - v1.9.7)
+- **Restore Branch Profile + Frontend Build Stabilization:** Added direct restore-branch fixes for profile persistence, match-action event-bus drift, missing frontend UI primitives, and broken council/merchant/WASM sources, then validated key tests plus local frontend build.
 - **Restore Branch Route Drift Recovery Replay:** Replayed root-route recovery, match-table drift recovery, dashboard endpoint coverage, and nodeinfo/frontend-CI alignment onto `restore/pre-simplification-hetzner`, advancing the rewind branch to `81ee89400`.
 - **Restore Branch Smoke Suite + Deploy Hardening Replay:** Replayed deployment health, smoke automation/reporting, ACL/logging hardening, and nginx/deploy hardening onto `restore/pre-simplification-hetzner`, then added direct Linux route-namespace casing fixes.
 - **Restore Branch Workflow Stabilization Replay:** Replayed the GitHub Hetzner backend deploy workflow and the workflow-stabilization sweep onto `restore/pre-simplification-hetzner`, then pushed branch tip `82ff8e6f6`.
@@ -118,8 +119,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Inspect Latest Restore-Branch CI On `81ee89400`:** Confirm which route/root/nodeinfo failures were eliminated and isolate the next backend/frontend blockers.
+1. **Inspect Latest Restore-Branch CI On `47b835225`:** Confirm whether the direct profile/frontend stabilization fixes remove the currently known backend/frontend failures.
 2. **Continue Mandatory Hetzner Replay:** Next targets should include executable-bit tracking and roast-preview smoke hardening, then continue remaining runtime fixes that still matter on the full-feature branch.
-3. **Address Remaining Profile/Onboarding Drift:** Recent CI now points at profile persistence, onboarding payload, and travel-mode behavior mismatches.
+3. **Systematically Repair Remaining Behavioral Drift:** Governance, federation, and deeper full-feature frontend contracts are likely next once the newly-fixed profile/bounty/frontend blockers are out of the way.
 4. **Compare Rewind Branch Against Main After Each Tranche:** Identify which post-simplification fixes still matter after infra replay.
 5. **DreamHost Retirement:** Once the rewind-merge restoration is stable on Hetzner, retire the old DreamHost backend path and remove stale provider dependencies.

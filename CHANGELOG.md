@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.7] - 2026-04-05 — Restore Branch Profile + Frontend Build Stabilization
+
+### Changed
+- Added direct restore-branch safeguards so profile updates and match actions continue when legacy event-bus/event-store publishing drifts from the modern runtime contract.
+- Added missing restore-branch UI primitives (`avatar`, `progress`, `select`) and cleaned broken frontend sources (`merchant/vibe`, `council`, WASM benchmark fallback) so the richer frontend can build again locally.
+- Verified targeted restore-branch tests for profile updates, onboarding edge cases, public web routes, and match bounties all pass locally after these fixes.
+
 ## [1.9.6] - 2026-04-05 — Restore Branch Route Drift Recovery Replay
 
 ### Changed

@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.9.6
+> **Version:** 1.9.7
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -185,6 +185,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - the restore branch now also carries replayed GitHub deployment/workflow modernization so CI and deploy behavior can converge toward the current Hetzner production contract earlier in the rewind process
 - the restore branch additionally now carries deployment health endpoints, smoke-check/report tooling, ACL/logging changes, and nginx/deploy hardening, making it much closer to the current Hetzner runtime contract than the raw pre-simplification baseline
 - the restore branch now also carries root-route, nodeinfo, and match-table drift recovery work, which is important because those were real Hetzner/runtime stability fixes on `main` that the full-feature branch also needs
+- the restore branch has now entered a direct-compatibility-fix phase as well, with local fixes for event-store/event-bus drift and missing frontend primitives layered on top of the replayed Hetzner contract
 - the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
 - `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors
