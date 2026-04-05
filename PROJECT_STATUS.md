@@ -1,18 +1,17 @@
-# PROJECT_STATUS.md - fwber v1.6.6 (Hetzner Log ACL Deploy Fix)
+# PROJECT_STATUS.md - fwber v1.6.7 (Frontend CI Node Runtime Alignment)
 
 **Date:** 2026-04-05
-**Version:** 1.6.6 "Hetzner Log ACL Deploy Fix"
-**Status:** ✅ **LIVE LOG-ROTATION DEPLOY CONFLICT PATCHED AT SOURCE AND ON SERVER**
+**Version:** 1.6.7 "Frontend CI Node Runtime Alignment"
+**Status:** ✅ **FRONTEND CI ROOT-CAUSED TO NODE/NPM GENERATION DRIFT; ALIGNMENT PATCH APPLIED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release fixes the last deploy blocker uncovered while applying the backend stability repair.
+This release targets the last visible modern CI failure.
 
 Delivered:
-- removed the Monolog permission override that caused chmod failures on `www-data`-owned daily logs during deploys
-- switched the deploy script to ACL-based shared log access for `deploy` + `www-data`
-- applied the same ACL repair directly on the live Hetzner server
+- upgraded the dedicated frontend workflow to Node.js 24
+- aligned GitHub frontend build runtime with the npm/lockfile generation environment that now exists locally
 
 ## ✅ Why This Matters
-The previous backend patch revealed that deploy-user artisan commands and PHP-FPM daily log rotation were fighting over ownership semantics. ACLs are the correct shared-write fix here; per-file chmod from an unprivileged deploy shell was not.
+After the lockfile resync, the remaining frontend CI failure was still coming from the older GitHub runner npm stack, not the app code itself. Aligning the runtime removes that toolchain mismatch.
