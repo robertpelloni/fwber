@@ -1,154 +1,153 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.6.9
+> **Version Reached:** 1.7.0
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the Hetzner stabilization loop and focused on making the **verification/deploy layer trustworthy again** after the backend itself had already become healthier.
+This session continued the post-stability restoration sweep and brought back the **Friends** system as the next high-value user-facing feature group.
 
-The main success is concrete and live, not theoretical:
-- `api.fwber.me` root works
-- NodeInfo discovery works
-- the Hetzner smoke check now passes with **9 passes / 3 expected warnings / 0 failures**
-- websocket upgrade verification now succeeds against `ws.fwber.me`
+Why Friends first:
+- `/friends` was still referenced from existing signed-in surfaces like Messages, Activity, Notifications, and Cypress tests
+- that meant users were still encountering dead social links even after major deployment/runtime stabilization work
+- restoring Friends converts multiple dead routes back into a coherent live feature without reopening the heaviest archived systems first
 
-This session finalized the current working batch as **v1.6.9 "Frontend Workflow Install Strategy Fix"**, while also folding in substantial Hetzner smoke/deploy contract hardening.
-
----
-
-## What Was Root-Caused This Session
-### 1. The backend had become healthier than the verifier
-After earlier backend recovery steps, the live stack was clearly improving, but the verification layer still had drift/ergonomics problems:
-- manual smoke invocations could accidentally omit `/api`
-- websocket verification could silently skip if the Reverb key was not provided perfectly
-- nginx site configs on the server had already drifted away from repo-tracked source-of-truth configs at least once
-
-### 2. Realtime was healthier than plain GET probes suggested
-A proper websocket upgrade probe matters more than a naive `GET /` against `ws.fwber.me`.
-After hardening the verifier and using the real app-key path, the websocket probe succeeded.
-
-### 3. Server config drift is a real Hetzner operational risk
-The repo-tracked nginx configs were better than what was actually live on the box.
-That means deploy behavior should not assume the server is already aligned; it should re-apply tracked config where appropriate.
+This session also carried forward the tracked Mercure retirement config/deploy-sync updates that were already reflected in docs but not yet committed in the working tree.
 
 ---
 
-## What Was Changed
-### Frontend CI stabilization already present in current batch
-Tracked in `1.6.9`:
-- `.github/workflows/frontend-build.yml`
-- frontend workflow install step switched from `npm ci` to `npm install --no-fund --no-audit`
+## What Was Restored
 
-### Smoke-check hardening
+### 1. Backend friends surface
+Added:
+- `fwber-backend/app/Models/Friend.php`
+- `fwber-backend/app/Http/Controllers/FriendController.php`
+- `fwber-backend/database/migrations/2026_04_05_010000_restore_friends_table.php`
+- `fwber-backend/tests/Feature/FriendRestoreTest.php`
+
 Updated:
-- `ops/hetzner/scripts/smoke-check.sh`
+- `fwber-backend/app/Models/User.php`
+- `fwber-backend/app/Http/Controllers/ProfileController.php`
+- `fwber-backend/routes/api.php`
 
-Changes:
-- normalizes `FWBER_API_URL` to the canonical `/api` contract automatically
-- derives `GEO_QUERY_URL` after normalization
-- auto-discovers `REVERB_APP_KEY` from Laravel config when not supplied explicitly
+Restored API capabilities:
+- `GET /api/friends`
+- `GET /api/friends/requests`
+- `POST /api/friends/requests`
+- `POST /api/friends/requests/{userId}`
+- `DELETE /api/friends/{friendId}`
+- `GET /api/users/search?q=...`
 
-Why this matters:
-- fewer false negatives from operator-supplied base URLs
-- fewer skipped websocket checks due to env drift
+Behavior:
+- list accepted friends
+- list pending inbound requests
+- search users by name/email
+- send request
+- accept / decline request
+- remove friend connection both directions
 
-### Deploy script hardening
+### 2. Frontend friends page
+Added:
+- `fwber-frontend/app/friends/page.tsx`
+
 Updated:
+- `fwber-frontend/lib/api/friends.ts`
+- `fwber-frontend/components/AppHeader.tsx`
+
+Restored UI capabilities:
+- searchable people lookup
+- "Send Request" flow
+- accepted friends list
+- pending request list with Accept / Decline
+- removal controls
+- Friends visible again in top-level authenticated navigation
+
+### 3. Existing dead links now have a real destination
+This restoration directly helps dead-route recovery because `/friends` was already referenced by:
+- Messages page
+- notification route logic
+- activity route logic
+- Cypress friends coverage
+
+---
+
+## Validation Performed
+### Backend tests
+Executed:
+- `php artisan test --filter=FriendRestoreTest`
+
+Result:
+- **2 tests passed / 10 assertions**
+
+Coverage includes:
+- listing accepted friends
+- listing pending requests
+- searching users
+- sending request
+- accepting request
+
+### Frontend build
+Executed:
+- `npm run build`
+
+Result:
+- build succeeded
+- `/friends` now appears in the generated route list
+
+---
+
+## Additional Ops/Infra Work Included
+Working tree also contained valid tracked Hetzner config drift cleanup that was included in the final commit:
+- `ops/hetzner/nginx/mercure.fwber.me.conf`
+- `ops/hetzner/scripts/deploy-backend.sh` sync for `mercure.fwber.me`
+- matching deploy/docs references
+
+This keeps the repo state aligned with the already-documented Mercure retirement contract.
+
+---
+
+## Files Changed
+### Backend
+- `fwber-backend/app/Models/Friend.php`
+- `fwber-backend/app/Models/User.php`
+- `fwber-backend/app/Http/Controllers/FriendController.php`
+- `fwber-backend/app/Http/Controllers/ProfileController.php`
+- `fwber-backend/routes/api.php`
+- `fwber-backend/database/migrations/2026_04_05_010000_restore_friends_table.php`
+- `fwber-backend/tests/Feature/FriendRestoreTest.php`
+
+### Frontend
+- `fwber-frontend/app/friends/page.tsx`
+- `fwber-frontend/lib/api/friends.ts`
+- `fwber-frontend/components/AppHeader.tsx`
+
+### Ops / Docs / Release
+- `ops/hetzner/nginx/mercure.fwber.me.conf`
 - `ops/hetzner/scripts/deploy-backend.sh`
-
-Changes:
-- added helper to re-sync tracked nginx site configs from repo to server
-- re-applies tracked configs for:
-  - `api.fwber.me`
-  - `ws.fwber.me`
-  - `geo.fwber.me`
-- runs `nginx -t` before reload
-- supplies canonical live URLs into the smoke-check invocation
-
-Why this matters:
-- reduces config drift between repo truth and server truth
-- keeps post-deploy smoke runs consistent
-
-### Documentation / release sync
-Updated:
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
-- `ROADMAP.md`
 - `MEMORY.md`
+- `ROADMAP.md`
 - `DEPLOY.md`
+- `HANDOFF.md`
 - version files
 
 ---
 
-## Live Validation Performed
-### Hetzner backend activation / verification
-Confirmed on the live server:
-- `user_matches=yes`
-- `match_actions=yes`
-- `php artisan deploy:verify --json` => healthy
-- `https://api.fwber.me/` => `200 OK`
-
-### Discovery route recovery
-Confirmed live after nginx/backend refresh plus graceful PHP-FPM reload:
-- `https://api.fwber.me/.well-known/nodeinfo` => `200 OK`
-- `https://api.fwber.me/nodeinfo/2.0` => `200 OK`
-- `https://api.fwber.me/.well-known/webfinger?resource=acct:test@api.fwber.me` => app-level `404` JRD response (acceptable for a nonexistent acct)
-
-### Smoke-check result
-Ran the hardened smoke-check against the live stack and got:
-- **passes=9**
-- **warnings=3**
-- **failures=0**
-
-This included:
-- frontend reachability pass
-- API health/liveness/readiness passes
-- invalid-login contract pass
-- public roast preview pass
-- geo nearby pass
-- websocket upgrade pass
-
-### Realtime result
-The websocket upgrade probe now succeeds against:
-- `https://ws.fwber.me`
-
-This means the next realtime concern is no longer “can a websocket handshake happen at all?” but rather:
-- does the actual frontend UX/authenticated broadcast flow behave correctly in-browser?
+## Git / Release
+- **Target Version:** `1.7.0`
+- **Recommended Commit Message:** `feat: restore friends system and reconnect dead social routes (v1.7.0)`
 
 ---
 
-## Remaining Known Issues
-### 1. Mercure remains unresolved
-- `mercure.fwber.me` is still not part of a healthy public contract
-- nothing meaningful is listening behind the configured upstream
-- this is now a clear product/ops decision: provision it properly or retire/remove it from the active surface
-
-### 2. Frontend live UX still needs authenticated browser-level verification
-Even with backend + websocket probes healthy, the live frontend should still be checked for:
-- header connection badge behavior
-- private broadcast auth flow
-- dashboard rendering against the recovered backend
-- authenticated E2E restore/user flows
-
-### 3. Browser automation harness is flaky locally
-- `agent-browser` CLI is installed, but the daemon restart timed out repeatedly during this session
-- I therefore used frontend bundle inspection as the reliable fallback verification path
-- this harness issue is now its own tooling task if richer autonomous browser verification is needed
-
----
-
-## Recommended Immediate Next Steps
-1. Commit and push the current `1.6.9` working tree
-2. Re-run the GitHub frontend workflow and confirm green status
-3. Verify the live frontend in-browser against the recovered backend/realtime stack
-4. Decide whether `mercure.fwber.me` is being provisioned or removed from the public contract
-5. Continue the broader production 500 sweep only after frontend runtime behavior is confirmed
-
----
-
-## Recommended Commit Message
-- `fix(ops): harden hetzner smoke checks and config sync (v1.6.9)`
+## Best Next Steps
+1. Push and let the green Hetzner/Vercel workflows deploy the restored Friends feature
+2. Verify live `/friends` with a real session
+3. Restore the next dead signed-in surfaces:
+   - `/activity`
+   - `/notifications`
+   - `/settings/travel`
+4. Continue eliminating any remaining live 500s before moving into broader archived-system restoration
 
 No processes were manually killed.

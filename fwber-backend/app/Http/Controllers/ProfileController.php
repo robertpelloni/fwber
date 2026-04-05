@@ -47,6 +47,31 @@ class ProfileController extends Controller
     }
 
     /**
+     * Lightweight user search for social/friend surfaces.
+     */
+    public function search(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $query = trim((string) $request->query('q', ''));
+
+        if ($query === '') {
+            return response()->json([]);
+        }
+
+        $results = User::query()
+            ->with('profile')
+            ->where('id', '!=', $user->id)
+            ->where(function ($builder) use ($query): void {
+                $builder->where('name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->limit(12)
+            ->get();
+
+        return response()->json($results);
+    }
+
+    /**
      * Update user profile.
      */
     public function update(UpdateProfileRequest $request): JsonResponse

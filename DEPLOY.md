@@ -171,8 +171,9 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - the dedicated frontend GitHub build now targets Node.js 24 so CI uses the same runtime family as the locally verified lockfile/build flow
 - public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
 - the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
-- the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, and `geo.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
+- the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
+- `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors
 - `HETZNER_HOST`
 - `HETZNER_USERNAME`
 - `HETZNER_SSH_KEY`
@@ -188,6 +189,7 @@ That path now performs a more trustworthy verification pass by:
 - using the canonical `https://api.fwber.me/api` base automatically
 - reloading tracked nginx site configs before testing
 - attempting a real websocket upgrade probe using the configured Reverb app key when available
+- keeping retired surfaces like `mercure.fwber.me` out of the healthy production contract instead of silently proxying to dead local ports
 
 A recent live Hetzner run completed with:
 

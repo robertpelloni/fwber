@@ -70,6 +70,7 @@ fi
 sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/api.fwber.me.conf" "api.fwber.me"
 sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/ws.fwber.me.conf" "ws.fwber.me"
 sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/geo.fwber.me.conf" "geo.fwber.me"
+sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/mercure.fwber.me.conf" "mercure.fwber.me"
 $SUDO_BIN nginx -t
 
 $SUDO_BIN systemctl restart fwber-queue

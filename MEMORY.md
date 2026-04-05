@@ -1,12 +1,9 @@
 # MEMORY.md
 
-## 2026-04-05 — v1.6.9 Frontend CI + smoke tooling both needed pragmatism over purity
-- After lockfile resync and Node 24 alignment, the frontend GitHub workflow was still failing because of platform-sensitive optional dependency resolution in wallet/native-adjacent packages.
-- Switching the CI install step to `npm install --no-fund --no-audit` is the pragmatic path to restore build verification signal while the dependency graph is further simplified.
-- The Hetzner smoke verifier needed the same philosophy: normalize `FWBER_API_URL` automatically and discover the Reverb app key from Laravel config instead of assuming perfect operator-provided env every time.
-- Re-applying tracked nginx configs during deploy is also worth the extra step because live server drift already happened more than once during this Hetzner cutover.
-- Public frontend bundle inspection is a surprisingly useful fallback when full browser automation is flaky: the live `www.fwber.me` bundles clearly exposed `https://api.fwber.me`, `ws.fwber.me`, and `broadcasting/auth`, which gave strong evidence that the deployed frontend contract now matches the recovered backend.
+## 2026-04-05 — v1.7.0 Friends restoration was a high-value next step because dead routes were already in the product shell
+- `/friends` was still referenced by messages, notifications, activity, and Cypress coverage even though the route and backend surface were gone.
+- Restoring Friends yields disproportionate value because it converts several dead navigation paths back into a coherent social feature without reopening the heaviest archived systems first.
 
-## 2026-04-05 — v1.6.8 Discovery routes still need schema guards even when federation is de-scoped
-- `/nodeinfo/2.0` was still 500ing live because `NodeInfoController` assumed `user_profiles.is_federated` existed.
-- Even when federation is not the active product focus, discovery routes must degrade safely instead of crashing on absent optional schema.
+## 2026-04-05 — v1.6.10 A dead public surface is worse than an explicitly retired one
+- `mercure.fwber.me` was still proxying to a nonexistent local upstream and returning `502`, which falsely suggested an active but broken service.
+- Since Reverb is the actual live realtime stack, the honest operational move is to retire the Mercure hostname explicitly with a tracked nginx response until/unless Mercure is intentionally brought back.

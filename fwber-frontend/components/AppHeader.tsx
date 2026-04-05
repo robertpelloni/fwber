@@ -26,7 +26,8 @@ import {
     Crown,
     Flame,
     Store,
-    Gavel
+    Gavel,
+    UserPlus
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -57,6 +58,7 @@ const navLinks: NavItem[] = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/matches', label: 'Matches', icon: Heart },
     { href: '/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/friends', label: 'Friends', icon: UserPlus },
     { href: '/nearby', label: 'Nearby', icon: MapPin },
     { href: '/safety', label: 'Safety', icon: Shield },
 ]

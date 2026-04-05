@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2026-04-05 — Friends System Restoration
+
+### Added
+- Restored the friends backend surface with a `Friend` model, `friends` schema, friend request send/respond/remove endpoints, and lightweight authenticated user search.
+- Added a new authenticated `/friends` page with searchable people discovery, pending request management, accepted-friends list, and removal controls.
+- Restored Friends navigation in the main authenticated shell so the feature is visible again from the app header and existing messaging links no longer point at a dead route.
+- Added `FriendRestoreTest` coverage for list/search/request/accept flows.
+
+## [1.7.0] - 2026-04-05 — Mercure Surface Retirement
+
+### Fixed
+- Added a tracked Hetzner nginx config for `mercure.fwber.me` that returns an explicit `410 Gone` response instead of proxying to the dead `127.0.0.1:3000` upstream and surfacing a misleading `502`.
+- Updated the Hetzner deploy script to re-sync the tracked `mercure.fwber.me` nginx config alongside the `api`, `ws`, and `geo` configs during deploy.
+- This makes the public production contract more honest: Mercure is no longer treated as a broken live service when Reverb is the actual active realtime stack.
+
+### Verified
+- Live server inspection confirmed there is no Mercure service and no listener on `127.0.0.1:3000`.
+- The retirement path is therefore the correct operational response until/unless Mercure is intentionally reintroduced.
+
 ## [1.6.9] - 2026-04-05 — Frontend Workflow Install Strategy Fix
 
 ### Fixed

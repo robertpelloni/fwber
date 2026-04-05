@@ -148,6 +148,16 @@ class User extends Authenticatable
         return $this->hasMany(MerchantPayment::class, 'payer_id');
     }
 
+    public function sentFriendRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Friend::class, 'user_id');
+    }
+
+    public function receivedFriendRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Friend::class, 'friend_id');
+    }
+
     public function getIsModeratorAttribute(): bool
     {
         return in_array($this->role, ['admin', 'moderator'], true);

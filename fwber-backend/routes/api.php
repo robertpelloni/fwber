@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/completeness', [\App\Http\Controllers\DashboardController::class, 'getProfileCompleteness']);
     Route::put('profile', [\App\Http\Controllers\ProfileController::class, 'update']);
     Route::delete('profile', [\App\Http\Controllers\ProfileController::class, 'destroy']);
+    Route::get('users/search', [\App\Http\Controllers\ProfileController::class, 'search']);
     Route::get('users/{id}', [\App\Http\Controllers\ProfileController::class, 'showPublic']);
 
     Route::get('onboarding/status', [\App\Http\Controllers\OnboardingController::class, 'getStatus']);
@@ -104,6 +105,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:messaging');
     Route::get('messages/{userId}', [\App\Http\Controllers\MessageController::class, 'index']);
     Route::post('messages/{messageId}/read', [\App\Http\Controllers\MessageController::class, 'markAsRead']);
+
+    // Friends
+    Route::get('friends', [\App\Http\Controllers\FriendController::class, 'index']);
+    Route::get('friends/requests', [\App\Http\Controllers\FriendController::class, 'requests']);
+    Route::post('friends/requests', [\App\Http\Controllers\FriendController::class, 'store']);
+    Route::post('friends/requests/{userId}', [\App\Http\Controllers\FriendController::class, 'respond']);
+    Route::delete('friends/{friendId}', [\App\Http\Controllers\FriendController::class, 'destroy']);
 
     // Merchant / Marketplace
     Route::post('merchant-portal/register', [\App\Http\Controllers\MerchantController::class, 'register']);

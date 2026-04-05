@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.9 "Frontend Workflow Install Strategy Fix"
+> **Current Version:** 1.7.0 "Friends System Restoration"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,9 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.9)
+### Phase 5: Production Scale (COMPLETED - v1.7.0)
+- **Friends System Restoration:** Restored the friends backend/API surface, added a new `/friends` page, and put Friends back into the authenticated navigation so long-dead social links resolve again.
+- **Mercure Surface Retirement:** Added a tracked Hetzner nginx config that returns an explicit retired response for `mercure.fwber.me` and wired it into the deploy script so the dead upstream is no longer presented as an active broken production service.
 - **Frontend Workflow Install Strategy Fix:** Switched the dedicated frontend GitHub workflow to `npm install --no-fund --no-audit` so frontend CI can proceed despite platform-sensitive optional dependency resolution in the current dependency graph.
 - **Hetzner Smoke/Deploy Contract Hardening:** Hardened smoke-check URL normalization + Reverb key discovery, re-synced tracked nginx configs during deploy, and re-verified the live Hetzner stack with a clean 9/3/0 smoke result including websocket upgrade success.
 - **NodeInfo 500 Recovery + Frontend CI Runtime Fix:** Hardened `NodeInfoController` against missing federation-era schema and aligned the frontend GitHub build to Node.js 24 so both discovery endpoints and frontend CI stop failing for infrastructure/toolchain reasons.
@@ -97,8 +99,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
+1. **Deploy Friends Restoration to Hetzner:** Verify the live `/friends` route works with a real session after the green backend deploy path picks up the new friends schema/API surface.
 2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
-3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
+3. **Resolve Remaining Dead Frontend Surfaces:** Restore `/activity`, `/notifications`, and `/settings/travel` so dead signed-in links disappear.
 4. **Re-run Frontend Build With Updated Install Strategy:** Confirm the dedicated frontend workflow goes green.
 5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.
