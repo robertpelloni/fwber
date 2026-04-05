@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.9.0
+> **Version:** 1.9.1
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -179,6 +179,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - post-deploy manual verification should now also exercise the restored gifts contract (`/api/gifts`, `/api/gifts/send`, `/api/gifts/received`, `/wallet?tab=gifts`) because gift UI and notification routes are live again
 - post-deploy manual verification should now also exercise the restored boosts contract (`/api/boosts/purchase`, `/api/boosts/active`, `/api/boosts/history`, `/matches` boost CTA) because the live matches UI now exposes boost purchases again
 - post-deploy manual verification should now also exercise the restored unlock contract (`/api/content-unlocks`, `/api/matches/{id}/insights`, `/api/matches/{id}/insights/unlock`, locked private photo reveals on public profiles) because token-gated unlock surfaces are live again
+- post-deploy manual verification should now also exercise premium discovery filtering (`/api/matches` with advanced + premium params, profile persistence for diet/politics/religion, 402 gating when balance is below threshold) because the active discovery UI depends on these contracts again
 - the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
 - the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
 - `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors

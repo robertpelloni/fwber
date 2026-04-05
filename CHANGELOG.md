@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.1] - 2026-04-05 — Premium Discovery Filter Restoration
+
+### Added
+- Restored drifted `user_profiles` discovery columns for `dietary_preferences`, `religion`, and `political_views` via deployment-safe migration.
+- Added `PremiumDiscoveryFiltersTest` coverage for profile persistence, premium filter enforcement, and successful premium discovery filtering.
+
+### Changed
+- Reconnected `/matches` to the full advanced and premium discovery filter set, including server-side token gating for premium filters.
+- Restored profile persistence for premium discovery attributes so the active profile editor and onboarding fields can actually save what the discovery engine filters on.
+- Upgraded the match filter UI with age, distance, bio/verified toggles, premium religion/wants-children controls, reset, and clearer active-filter state.
+
 ## [1.9.0] - 2026-04-05 — Token-Gated Unlock Surface Restoration
 
 ### Added

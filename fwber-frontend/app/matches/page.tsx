@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Heart, X, Star, MessageCircle, MapPin, Info, Mic2, Play, Pause, Compass, Rocket, TimerReset } from 'lucide-react';
-import { api } from '@/lib/api/client';
+import { ApiError, api } from '@/lib/api/client';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -55,7 +55,12 @@ export default function MatchesPage() {
       setIsPlaying(false);
     } catch (err) {
       console.error('Error fetching matches:', err);
-      error('Failed to load matches');
+
+      if (err instanceof ApiError && err.status === 402) {
+        error(err.message || 'Premium discovery filters require 100+ tokens.');
+      } else {
+        error('Failed to load matches');
+      }
     } finally {
       setLoading(false);
     }

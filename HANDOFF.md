@@ -1,148 +1,127 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.9.0
+> **Version Reached:** 1.9.1
 > **Current Model:** GPT
 
 ## Executive Summary
-This continuation session kept advancing the restoration map from the now-green Hetzner deployment baseline.
-
-## v1.9.0 — Token-Gated Unlock Surface Restoration
-Restored:
-- generic content unlock ledger
-- match insights lock/unlock flow
-- private photo unlock flow
-- `photos.unlock_price` persistence
-- deployment-safe `content_unlocks` + `photo_unlocks` schema
-- locked/unlocked frontend match insights UX
-- private-photo gated reveal UI on public profiles
-
-This was the next recommended move after boosts because the repo still clearly contained:
-- `ContentUnlockGate`
-- `PhotoUnlock` model
-- `unlock_price` typing on photo payloads
-- locked match-insights Cypress expectations
-- `MatchInsights` frontend component and hook
-
-So again, large chunks of user-visible product were already waiting behind missing controllers/routes/schema and stale response-shape assumptions.
+This session completed two major steps:
+1. shipped `v1.9.1` to restore premium discovery filters end-to-end
+2. reoriented the broader restoration strategy around the user's newest direction: use the last pre-Great-Simplification snapshot as the feature baseline, then merge/replay the validated Hetzner deployment and production-hardening work on top of it
 
 ---
 
-## What Was Implemented
+## v1.9.1 — Premium Discovery Filter Restoration
+### Problem discovered
+The active frontend still exposed a rich discovery filter UI and profile fields for:
+- dietary preferences
+- religion
+- political views
+- kids / pets / cannabis / zodiac
+- token-gated premium filtering
 
-### Backend
+But the active simplified backend had drifted in several ways:
+- `user_profiles` no longer reliably contained all fields the active UI edited
+- `AIMatchingService` still tried to query some premium profile columns anyway
+- `/api/matches` only passed a subset of filters through to the matching engine
+- premium token gating existed only in the frontend overlay, not in the backend contract
+
+That meant the product could present filter controls the backend did not fully persist or honor.
+
+### What was added / changed
+#### Backend
 Added:
-- `fwber-backend/app/Models/ContentUnlock.php`
-- `fwber-backend/app/Services/ContentUnlockService.php`
-- `fwber-backend/app/Http/Controllers/ContentUnlockController.php`
-- `fwber-backend/app/Http/Controllers/MatchInsightsController.php`
-- `fwber-backend/database/migrations/2026_04_05_070000_restore_content_unlocks_and_photo_unlocks.php`
-- `fwber-backend/tests/Feature/ContentUnlockRestoreTest.php`
+- `fwber-backend/database/migrations/2026_04_05_080000_restore_discovery_filter_profile_columns.php`
+- `fwber-backend/tests/Feature/PremiumDiscoveryFiltersTest.php`
 
 Updated:
-- `fwber-backend/app/Models/Photo.php`
-- `fwber-backend/app/Http/Controllers/PhotoController.php`
+- `fwber-backend/config/economy.php`
+- `fwber-backend/app/Models/UserProfile.php`
 - `fwber-backend/app/Http/Controllers/ProfileController.php`
-- `fwber-backend/routes/api.php`
+- `fwber-backend/app/Http/Controllers/MatchController.php`
+- `fwber-backend/app/Http/Requests/MatchFilterRequest.php`
 
-### Restored backend routes
-- `POST /api/content-unlocks`
-- `GET /api/matches/{targetUserId}/insights`
-- `POST /api/matches/{targetUserId}/insights/unlock`
+#### What the backend now does
+- restores `dietary_preferences`, `religion`, and `political_views` columns defensively
+- persists those profile values correctly from the active profile editor
+- passes the full advanced + premium filter set from `/api/matches` into discovery
+- enforces premium discovery filters server-side using the token threshold
+- returns `402` with upgrade metadata when a non-qualified account attempts premium filters
+- exposes applied filter metadata in the matches response
 
-### Backend behavior restored
-#### Generic content unlocks
-- durable `content_unlocks` ledger
-- token spend recorded in wallet transactions
-- 402 returned on insufficient balance
-
-#### Match insights unlocks
-- locked response returns:
-  - `total_score`
-  - `is_locked`
-  - `cost`
-  - `preview_message`
-- unlock endpoint spends tokens and unlocks insights
-- unlocked response returns full compatibility breakdown from `AIMatchingService`
-
-#### Private photo unlocks
-- `unlock_price` is now persisted on photos
-- private photo unlock debits tokens
-- `photo_unlocks` row created
-- locked photo URLs are withheld from public profile payloads
-- unlocked photos become revealable without leaking locked media URLs
-
-### Frontend
+#### Frontend
 Updated:
-- `fwber-frontend/lib/hooks/use-match-insights.ts`
-- `fwber-frontend/components/matches/MatchInsights.tsx`
-- `fwber-frontend/app/profile/[id]/page.tsx`
+- `fwber-frontend/components/MatchFilter.tsx`
+- `fwber-frontend/app/matches/page.tsx`
 
-### Frontend behavior restored
-#### Match insights UX
-- locked state now renders properly
-- unlock CTA now works
-- unlocked insights now show compatibility breakdown/details
-- wallet invalidates after unlock spend
+#### What the frontend now does
+- restores age min/max and distance controls
+- restores bio-required and verified-only toggles
+- restores premium religion and wants-children controls in the active filter UI
+- adds reset action and active-filter count
+- surfaces premium-filter gating errors more cleanly when backend returns `402`
 
-#### Public profile private photo gating
-- public profiles now show locked private-photo gates
-- unlock action uses restored `ContentUnlockGate`
-- profile refreshes after unlock to reveal newly unlocked photos
-
----
-
-## Validation Performed
-### Backend Tests
+### Validation performed
+#### Backend tests
 Executed:
-- `php artisan test --filter='ContentUnlockRestoreTest|BoostRestoreTest|GiftRestoreTest|ReferralRestoreTest|VideoChatRestoreTest|WalletRestoreTest'`
+- `php artisan test --filter='PremiumDiscoveryFiltersTest|ContentUnlockRestoreTest|BoostRestoreTest|GiftRestoreTest|ReferralRestoreTest|VideoChatRestoreTest|WalletRestoreTest'`
 
 Result:
-- **17 tests passed / 94 assertions**
+- **20 tests passed / 104 assertions**
 
-### Frontend Build
+#### Frontend build
 Executed:
 - `npm run build --prefix fwber-frontend`
 
 Result:
 - build succeeded
-- `/profile/[id]`, `/matches`, and `/wallet` all still build after unlock + boosts + gifts work
 
 ---
 
-## Key Findings
-### 1. Token-gated unlocks followed the same restoration pattern as boosts/gifts/referrals/video
-The repo already had the UI assumptions and partial model/schema hints.
-The actual missing pieces were:
-- routes
-- controllers
-- schema persistence
-- response-shape handling in the frontend
+## Strategic Shift Requested By User
+The user then explicitly changed direction again and asked for the removed features to come back by effectively rewinding to the earlier fuller codebase state and merging that with the current Hetzner changes.
 
-### 2. Public profile payloads needed explicit lock-state shaping
-Returning raw photo URLs for private photos would have undermined the whole unlock flow because storage URLs could leak locked media. The fix was to shape the response so:
-- locked private photos still appear as locked entries
-- but their actual URLs are withheld until unlocked
+### Key interpretation
+The safest reading is:
+- do **not** throw away current Hetzner deployment / CI / smoke / ACL / DNS / runtime work
+- do **not** blindly hard-reset `main`
+- instead use the last pre-Great-Simplification snapshot as the feature-rich baseline and merge or replay the modern production infrastructure deltas on top of it
 
-### 3. A compact shared unlock service is a good long-term pattern
-`ContentUnlockService` now provides a reusable backend pattern for the remaining token-spend surfaces:
-- balance assertion
-- wallet transaction recording
-- unlock ledger creation
+### Most important historical anchor identified
+From `git log`, the critical boundary is:
+- `a636a53c3` / `5379985fd` = final pre-simplification snapshot window (`v1.1.7` era)
+- `2a3f8aa40` = `refactor: execute 'The Great Simplification' removing all non-core features (v1.2.0)`
 
-That should make the next remaining wallet/paywall restorations easier and less duplicated.
+That means the natural rewind baseline is the commit immediately before `2a3f8aa40`.
 
----
+### Why this matters
+A raw merge of old code into current `main` would likely reintroduce:
+- stale DreamHost deployment assumptions
+- old websocket / Mercure contracts
+- non-idempotent migrations
+- route/controller conflicts already fixed during Hetzner cutover
+- missing ACL / service / nginx / CI fixes
 
-## Git / Release
-- **Target Version:** `1.9.0`
-- **Recommended Commit Message:** `feat: restore token-gated unlocks for match insights and private photos (v1.9.0)`
-
-At the moment this handoff was written, the unlock-restoration work itself had not yet been committed in this snapshot.
+So the correct maneuver is a controlled restoration branch and replay plan, not a blind reset.
 
 ---
 
-## Docs Updated
+## Recommended Next Steps
+1. Commit and push `v1.9.1` first
+2. Create a dedicated restoration branch from the last pre-simplification commit
+3. Diff that baseline against current `main`
+4. Replay / merge the Hetzner-era runtime-hardening set onto the rewind branch:
+   - Hetzner deploy workflow
+   - nginx/systemd/scripts
+   - smoke checks / verification
+   - deploy ACL/log fixes
+   - frontend API/reverb contract fixes
+   - route/schema drift protections
+5. Use that branch as the new broad restoration track for bringing the removed systems back in larger coherent chunks
+
+---
+
+## Files changed in v1.9.1
 - `VERSION`
 - `VERSION.md`
 - `fwber-backend/VERSION`
@@ -155,21 +134,14 @@ At the moment this handoff was written, the unlock-restoration work itself had n
 - `DEPLOY.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
-
----
-
-## Recommended Next Steps
-1. Commit + push v1.9.0
-2. Let GitHub/Hetzner deploy the restored unlock surfaces
-3. Verify live:
-   - locked match insights
-   - unlock insights flow
-   - locked private photos on public profiles
-   - photo unlock flow
-   - wallet/token debit reflection after unlock
-4. Continue the next remaining token-era cluster:
-   - token-gated filters
-   - adjacent wallet-linked paywall surfaces
-5. Continue root-causing the roast first-hit flake in parallel, but do not let it block core deploy health
+- `fwber-backend/config/economy.php`
+- `fwber-backend/app/Models/UserProfile.php`
+- `fwber-backend/app/Http/Controllers/ProfileController.php`
+- `fwber-backend/app/Http/Controllers/MatchController.php`
+- `fwber-backend/app/Http/Requests/MatchFilterRequest.php`
+- `fwber-backend/database/migrations/2026_04_05_080000_restore_discovery_filter_profile_columns.php`
+- `fwber-backend/tests/Feature/PremiumDiscoveryFiltersTest.php`
+- `fwber-frontend/components/MatchFilter.tsx`
+- `fwber-frontend/app/matches/page.tsx`
 
 No processes were manually killed.

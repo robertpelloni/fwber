@@ -15,6 +15,7 @@ use App\Services\EmailNotificationService;
 use App\Services\PushNotificationService;
 use App\Support\TaggedCache;
 use Carbon\Carbon;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,22 +51,12 @@ class MatchController extends Controller
             ], 400);
         }
 
-        $cacheKey = "feed:user_{$user->id}:".md5($request->getQueryString() ?? '');
+        $filters = $this->buildFilters($request);
+        $this->assertPremiumFilterAccess($user, $filters);
 
-        $matches = TaggedCache::remember(["matches_feed:user_{$user->id}"], $cacheKey, function () use ($user, $profile, $request) {
-            $filters = [
-                'age_min' => $request->get('age_min'),
-                'age_max' => $request->get('age_max'),
-                'max_distance' => $request->get('max_distance'),
-                'interests' => $request->input('interests', []),
-                'smoking' => $request->get('smoking'),
-                'drinking' => $request->get('drinking'),
-                'body_type' => $request->get('body_type'),
-                'height_min' => $request->get('height_min'),
-                'has_bio' => $request->get('has_bio'),
-                'verified_only' => $request->get('verified_only'),
-            ];
+        $cacheKey = "feed:user_{$user->id}:".md5(json_encode($filters));
 
+        $matches = TaggedCache::remember(["matches_feed:user_{$user->id}"], $cacheKey, function () use ($user, $profile, $filters) {
             $candidates = $this->matchingService->findAdvancedMatches($user, $filters);
 
             return collect($candidates)->map(function ($candidate) use ($profile) {
@@ -86,7 +77,75 @@ class MatchController extends Controller
         return response()->json([
             'matches' => MatchResource::collection($matches)->toArray(request()),
             'total' => $matches->count(),
+            'filters' => [
+                'premium_unlocked' => $this->hasPremiumFilterAccess($user),
+                'premium_threshold' => (int) config('economy.premium_filter_threshold', 100),
+                'applied' => $filters,
+            ],
         ]);
+    }
+
+    /**
+     * Normalize supported discovery filters in one place so the controller,
+     * cache key, and response metadata all stay in sync when the frontend adds
+     * or removes controls.
+     */
+    private function buildFilters(MatchFilterRequest $request): array
+    {
+        return [
+            'age_min' => $request->integer('age_min') ?: null,
+            'age_max' => $request->integer('age_max') ?: null,
+            'max_distance' => $request->integer('max_distance') ?: null,
+            'interests' => array_values(array_filter($request->input('interests', []))),
+            'smoking' => $request->string('smoking')->toString() ?: null,
+            'drinking' => $request->string('drinking')->toString() ?: null,
+            'body_type' => $request->string('body_type')->toString() ?: null,
+            'height_min' => $request->integer('height_min') ?: null,
+            'has_bio' => $request->boolean('has_bio'),
+            'verified_only' => $request->boolean('verified_only'),
+            'cannabis' => $request->string('cannabis')->toString() ?: null,
+            'diet' => $request->string('diet')->toString() ?: null,
+            'has_pets' => $request->string('has_pets')->toString() ?: null,
+            'has_children' => $request->string('has_children')->toString() ?: null,
+            'wants_children' => $request->string('wants_children')->toString() ?: null,
+            'politics' => $request->string('politics')->toString() ?: null,
+            'religion' => $request->string('religion')->toString() ?: null,
+            'zodiac' => $request->string('zodiac')->toString() ?: null,
+        ];
+    }
+
+    /**
+     * Premium discovery filters are token-gated in the UI. We also enforce the
+     * contract server-side so handcrafted requests cannot bypass the gating.
+     */
+    private function assertPremiumFilterAccess(User $user, array $filters): void
+    {
+        if (! $this->hasRequestedPremiumFilters($filters) || $this->hasPremiumFilterAccess($user)) {
+            return;
+        }
+
+        throw new HttpResponseException(response()->json([
+            'message' => 'Premium discovery filters require at least 100 tokens.',
+            'required_tokens' => (int) config('economy.premium_filter_threshold', 100),
+            'current_balance' => (float) $user->token_balance,
+            'upgrade_url' => '/wallet',
+        ], 402));
+    }
+
+    private function hasPremiumFilterAccess(User $user): bool
+    {
+        return (float) $user->token_balance >= (float) config('economy.premium_filter_threshold', 100);
+    }
+
+    private function hasRequestedPremiumFilters(array $filters): bool
+    {
+        foreach (['cannabis', 'diet', 'has_pets', 'has_children', 'wants_children', 'politics', 'religion', 'zodiac'] as $key) {
+            if (! empty($filters[$key])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

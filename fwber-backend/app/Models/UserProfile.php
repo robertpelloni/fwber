@@ -34,7 +34,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $smoking_status
  * @property string|null $drinking_status
  * @property string|null $cannabis_status
+ * @property string|null $dietary_preferences
  * @property string|null $zodiac_sign
+ * @property string|null $religion
+ * @property string|null $political_views
  * @property bool $has_children
  * @property bool $wants_children
  * @property bool $has_pets
@@ -86,7 +89,10 @@ class UserProfile extends Model
         'smoking_status',
         'drinking_status',
         'cannabis_status',
+        'dietary_preferences',
         'zodiac_sign',
+        'religion',
+        'political_views',
         'has_children',
         'wants_children',
         'has_pets',
