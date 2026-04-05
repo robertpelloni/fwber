@@ -1,5 +1,12 @@
 # MEMORY.md
 
+## 2026-04-05 — the rewind branch can already accept modern Hetzner commits with manageable conflicts
+- `restore/pre-simplification-hetzner` successfully absorbed:
+  - `11250c5ec` (Hetzner deployment docs)
+  - `59f132e38` (Hetzner ops templates + frontend env alignment)
+- The first replay conflicts were mostly documentation/version and one workflow file that existed in the replayed commit but not in the pre-simplification baseline.
+- That is a very good sign: replay is viable, and the early conflict profile is manageable.
+
 ## 2026-04-05 — v1.9.2 created the actual rewind track, not just the idea
 - The dedicated restore branch is now `restore/pre-simplification-hetzner`.
 - It is rooted at `a636a53c3`, the final pre-simplification snapshot before `2a3f8aa40`.
@@ -10,8 +17,3 @@
 - The newest instruction is no longer just incremental restoration. The user wants a rewind-style recovery: bring back the removed systems as they existed before the Great Simplification, while preserving the current Hetzner deployment reality.
 - The safest baseline candidate appears to be the final pre-simplification snapshot right before `refactor: execute 'The Great Simplification' removing all non-core features (v1.2.0)`.
 - This should likely be handled as a restoration branch plus selective replay/merge of post-simplification Hetzner, deployment, smoke, CI, and production-stability commits.
-
-## 2026-04-05 — v1.9.1 premium discovery restoration fixed a real schema/controller drift problem, not just UI polish
-- Active frontend profile editing and discovery filtering still referenced diet, politics, religion, pets, and kids signals.
-- The simplified active schema had dropped some of those columns, while `AIMatchingService` still referenced them.
-- Restoring the columns and controller persistence was necessary to make the current live UI truthful again and to prevent real schema-drift breakage.

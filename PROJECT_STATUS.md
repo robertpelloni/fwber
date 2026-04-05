@@ -1,18 +1,17 @@
-# PROJECT_STATUS.md - fwber v1.9.2 (Pre-Simplification Rewind Branch + Replay Plan)
+# PROJECT_STATUS.md - fwber v1.9.3 (Restore Branch Hetzner Replay Kickoff)
 
 **Date:** 2026-04-05
-**Version:** 1.9.2 "Pre-Simplification Rewind Branch + Replay Plan"
-**Status:** ✅ **DEDICATED FULL-FEATURE RESTORATION TRACK CREATED FROM THE LAST PRE-SIMPLIFICATION SNAPSHOT**
+**Version:** 1.9.3 "Restore Branch Hetzner Replay Kickoff"
+**Status:** ✅ **THE FULL-FEATURE REWIND BRANCH NOW HAS ITS FIRST HETZNER REPLAY COMMITS APPLIED AND PUSHED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release shifts restoration from one-off archive recovery into a structured repo-level recovery strategy:
-- identified the exact pre-simplification baseline
-- documented the rewind + Hetzner merge plan
-- created and pushed the dedicated restoration branch
-- produced the initial replay manifest for mandatory Hetzner/runtime commits
-- added a reusable branch-creation helper script
+This release marks the first real merge/replay progress on the dedicated rewind branch:
+- created restore worktree for safe parallel branch work
+- replayed Hetzner deployment docs commit onto the rewind branch
+- replayed Hetzner ops templates + frontend env alignment onto the rewind branch
+- pushed the updated rewind branch to origin
 
 ## ✅ Why This Matters
-The repo diff from the last pre-simplification snapshot to current `main` is massive. Reconstructing every removed system only by archive fragment is possible but inefficient and error-prone. A dedicated rewind branch lets us recover the broader feature-rich product surface while preserving the Hetzner deployment reality that current production depends on.
+The project is no longer only planning the rewind strategy. The replay has started on `restore/pre-simplification-hetzner`, proving the branch can absorb modern Hetzner changes while preserving the richer pre-simplification feature baseline.

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.3] - 2026-04-05 — Restore Branch Hetzner Replay Kickoff
+
+### Changed
+- Created a safe worktree for `restore/pre-simplification-hetzner` and began replaying modern Hetzner changes onto the full-feature baseline.
+- Successfully replayed `11250c5ec` (Hetzner deployment docs) and `59f132e38` (Hetzner ops templates + frontend env alignment) onto the rewind branch.
+- Pushed rewind branch tip `96c10825f` to origin, proving the branch can accept modern Hetzner commits with manageable conflicts.
+
 ## [1.9.2] - 2026-04-05 — Pre-Simplification Rewind Branch + Replay Plan
 
 ### Added
