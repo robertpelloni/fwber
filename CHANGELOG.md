@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.4] - 2026-04-04 — Frontend Lockfile Resync
+
+### Fixed
+- Regenerated `fwber-frontend/package-lock.json` so GitHub Actions `npm ci` matches the actual frontend dependency graph again.
+- This fixes the remaining frontend workflow failure where Actions reported the lockfile was out of sync and refused to install before the Next.js build step.
+
 ## [1.6.3] - 2026-04-04 — Workflow Stabilization Sweep
 
 ### Changed

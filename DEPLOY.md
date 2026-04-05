@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-04
-> **Version:** 1.6.3
+> **Version:** 1.6.4
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -166,6 +166,7 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - note: the deploy script now explicitly sources rustup Cargo from `~/.cargo/env` / `~/.cargo/bin` so `fwber-geo` builds correctly in non-login CI SSH sessions as well as manual shells
 - validated: the GitHub `Deploy Backend (Hetzner)` workflow has now completed successfully end-to-end after secrets setup and the rustup-path fix
 - supporting CI workflows were also trimmed/aligned so backend/frontend verification no longer competes with stale duplicate pipelines
+- frontend CI lockfile drift was resolved by resyncing `fwber-frontend/package-lock.json`, which should allow the dedicated frontend workflow to install/build cleanly again
 - `HETZNER_HOST`
 - `HETZNER_USERNAME`
 - `HETZNER_SSH_KEY`

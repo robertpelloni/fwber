@@ -1,95 +1,60 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-04
-> **Version Reached:** 1.6.3
+> **Version Reached:** 1.6.4
 > **Current Model:** GPT
 
 ## Executive Summary
-After validating the GitHub Hetzner backend deploy, I continued into the next obvious problem: the repository still had several failing GitHub workflows, but most of those failures were workflow drift rather than product/runtime regressions.
+After stabilizing the duplicate GitHub workflows, I continued into the remaining red workflow: the dedicated frontend build.
 
-This session completed **v1.6.3 "Workflow Stabilization Sweep"**.
+That failure turned out to be a **real frontend lockfile drift issue**, not just workflow config noise.
+
+This session completed **v1.6.4 "Frontend Lockfile Resync"**.
 
 ---
 
 ## What Was Fixed
 
-### 1. `backend-tests.yml`
-Problem:
-- the dedicated backend workflow tried to migrate during setup without forcing SQLite env values
-- GitHub Actions therefore attempted a MySQL connection and failed with `SQLSTATE[HY000] [2002] Connection refused`
+### 1. Root-caused remaining frontend workflow failure
+Observed from GitHub logs:
+- `frontend-build.yml` now correctly found the lockfile after the workflow patch
+- but `npm ci` still failed with:
+  - missing `react@19.2.4`
+  - missing `react-native@0.84.1`
+  - missing `@types/react@19.2.14`
+- meaning the workflow itself was now valid, but `package-lock.json` was out of sync with the current dependency graph
 
-Fix:
-- set `DB_CONNECTION=sqlite`
-- set `DB_DATABASE=database/database.sqlite`
-- create the sqlite file before migrate
-- run `php artisan migrate:fresh` under those env vars
+### 2. Resynced frontend lockfile
+Executed locally in:
+- `fwber-frontend/`
 
-Updated:
-- `.github/workflows/backend-tests.yml`
+Command:
+- `npm install`
 
-### 2. `frontend-build.yml`
-Problem:
-- setup-node caching was configured with `cache: npm` but without `cache-dependency-path`
-- GitHub looked for a root lockfile instead of `fwber-frontend/package-lock.json`
-- this produced the lockfile-not-found failure in the modern dedicated frontend workflow
+This regenerated `fwber-frontend/package-lock.json`.
 
-Fix:
-- added:
-  - `cache-dependency-path: fwber-frontend/package-lock.json`
+### 3. Validated clean install + build
+Executed successfully:
+- `npm ci`
+- `npm run build`
 
-Updated:
-- `.github/workflows/frontend-build.yml`
-
-### 3. `ci.yml`
-Problem:
-- the old monolithic CI workflow duplicated backend/frontend jobs that are already handled by dedicated workflows
-- those duplicates were creating extra red noise and obscuring the real deployment signal
-
-Fix:
-- rewrote `ci.yml` into a lightweight **Repository Hygiene** workflow only
-- retained:
-  - version consistency checks
-  - license checks
-  - env/secret hygiene checks
-  - stale-handoff-file hygiene checks
-- removed duplicated backend/frontend build jobs
-
-Updated:
-- `.github/workflows/ci.yml`
-
-### 4. `deploy.yml`
-Problem:
-- the old deployment pipeline was stale and auto-ran on pushes even though the real production deploy path is now:
-  - Hetzner backend workflow
-  - Vercel frontend workflow
-- it also contained outdated assumptions and created additional red noise
-
-Fix:
-- rewrote it into a **manual-only container publish** workflow
-- added clear summary output explaining it is not the primary production deployment path
-- retained optional Docker image publishing jobs behind manual inputs only
-
-Updated:
-- `.github/workflows/deploy.yml`
+That confirms the lockfile now matches the actual frontend dependency graph and the dedicated frontend workflow should be able to pass after the updated lockfile is pushed.
 
 ---
 
-## Why This Matters
-At this point the real backend deployment path is healthy and verified:
-- GitHub → Hetzner backend deploy is green
-- smoke validation is green
+## Other Validation State
+### Already green
+- `Deploy Backend (Hetzner)` ✅
+- `Backend CI (Tests & Linting)` ✅
+- `Repository Hygiene` ✅
 
-The remaining red GitHub badges were therefore mostly **automation drift**, not evidence that the product itself was broken.
-
-This release reduces that false-negative CI noise and aligns repository automation with the actual stack.
+### Remaining next verification
+- `Frontend Build & Deploy (Vercel)` needs to be re-run after the new lockfile commit lands
 
 ---
 
 ## Files Changed
-- `.github/workflows/backend-tests.yml`
-- `.github/workflows/frontend-build.yml`
-- `.github/workflows/ci.yml`
-- `.github/workflows/deploy.yml`
+- `fwber-frontend/package-lock.json`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -102,19 +67,18 @@ This release reduces that false-negative CI noise and aligns repository automati
 ---
 
 ## Git / Release
-- **Target Version:** `1.6.3`
-- **Recommended Commit Message:** `chore: stabilize github workflows after hetzner cutover (v1.6.3)`
+- **Target Version:** `1.6.4`
+- **Recommended Commit Message:** `fix: resync frontend lockfile for github npm ci builds (v1.6.4)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push `v1.6.3`
-2. Re-run:
-   - `Backend CI (Tests & Linting)`
-   - `Frontend Build & Deploy (Vercel)`
-   - `Repository Hygiene`
-3. Confirm those modern workflows go green
-4. Continue live frontend verification for dashboard API + realtime recovery
-5. Continue production Stripe verification
+1. Commit and push `v1.6.4`
+2. Re-run `Frontend Build & Deploy (Vercel)`
+3. If green, return to live frontend runtime verification:
+   - dashboard API behavior
+   - E2E restore endpoint behavior
+   - realtime connected badge
+4. Then continue broader restoration planning only after live 500s are under control
 
 No processes were manually killed.
