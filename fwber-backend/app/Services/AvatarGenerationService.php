@@ -21,7 +21,7 @@ class AvatarGenerationService
 
     private function config(): array
     {
-        return config('avatar_generation', [
+        return array_replace_recursive([
             'enabled' => true,
             'default_provider' => 'dalle', // or 'gemini', 'replicate'
             'providers' => [
@@ -41,7 +41,7 @@ class AvatarGenerationService
                 ],
             ],
             'default_style' => 'realistic portrait, professional headshot',
-        ]);
+        ], config('avatar_generation', []));
     }
 
     public function getProviders(): array
@@ -51,7 +51,7 @@ class AvatarGenerationService
 
     public function generateAvatar(User $user, array $options = []): array
     {
-        $provider = $options['provider'] ?? $this->config()['default_provider'];
+        $provider = $options['provider'] ?? config('avatar_generation.default_provider', $this->config()['default_provider']);
         $prompt = $this->buildPrompt($user, $options);
         $negativePrompt = $this->buildNegativePrompt($options);
 
@@ -116,7 +116,9 @@ class AvatarGenerationService
     private function generateWithDalle(string $prompt, array $options): array
     {
         $config = $this->config();
-        $apiKey = $config['providers']['dalle']['api_key'];
+        $apiKey = config('avatar_generation.providers.dalle.api_key')
+            ?: config('services.openai.api_key')
+            ?: ($config['providers']['dalle']['api_key'] ?? null);
 
         if (empty($apiKey)) {
             if (app()->environment('testing')) {
@@ -157,7 +159,9 @@ class AvatarGenerationService
     private function generateWithGemini(string $prompt, string $negativePrompt, array $options): array
     {
         $config = $this->config();
-        $apiKey = $config['providers']['gemini']['api_key'];
+        $apiKey = config('avatar_generation.providers.gemini.api_key')
+            ?: config('services.gemini.api_key')
+            ?: ($config['providers']['gemini']['api_key'] ?? null);
 
         if (empty($apiKey)) {
             if (app()->environment('testing')) {
@@ -198,7 +202,9 @@ class AvatarGenerationService
     private function generateWithReplicate(string $prompt, string $negativePrompt, array $options): array
     {
         $config = $this->config();
-        $apiToken = $config['providers']['replicate']['api_token'];
+        $apiToken = config('avatar_generation.providers.replicate.api_token')
+            ?: config('services.replicate.api_token')
+            ?: ($config['providers']['replicate']['api_token'] ?? null);
 
         if (empty($apiToken)) {
             if (app()->environment('testing')) {
@@ -248,7 +254,9 @@ class AvatarGenerationService
     private function generateWithReplicateImg2Img(string $imagePath, string $prompt, string $negativePrompt, array $options): array
     {
         $config = $this->config();
-        $apiToken = $config['providers']['replicate']['api_token'];
+        $apiToken = config('avatar_generation.providers.replicate.api_token')
+            ?: config('services.replicate.api_token')
+            ?: ($config['providers']['replicate']['api_token'] ?? null);
 
         if (empty($apiToken)) {
             if (app()->environment('testing')) {
