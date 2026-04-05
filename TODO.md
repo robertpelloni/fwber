@@ -1,15 +1,15 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.6.4
+> **Version:** 1.6.5
 > **Last Updated:** 2026-04-04
 
 ---
 
 ## 🔴 Critical: Deployment & Verification
+- [ ] **Deploy v1.6.5 Hetzner Backend Stability Repair**: Pull the new backend patch onto Hetzner, run the corrective match-table migration, refresh route/config caches, and verify `api.fwber.me/` plus dashboard endpoints stop throwing live 500s.
+- [ ] **Repair Live Reverb Handshake Contract**: Re-test `ws.fwber.me` using the real production app key after the backend patch deploy and determine whether the remaining websocket issue is config/auth related or a true runtime failure.
+- [ ] **Repair / Replace Mercure Surface**: `mercure.fwber.me` still returns `502` because nothing is listening on `127.0.0.1:3000`; either provision the intended service or remove the dead public route from the active production contract.
 - [ ] **Re-run Frontend GitHub Workflow After Lockfile Resync**: Confirm `frontend-build.yml` now goes green after the updated `package-lock.json` lands.
-- [ ] **Verify Live Frontend API Recovery**: Confirm the dashboard and E2E restore calls now hit `api.fwber.me` instead of `www.fwber.me/api/*` after Vercel finishes deploying the updated frontend.
-- [ ] **Verify Live Realtime Recovery**: Confirm the header connection badge reaches Connected on the live site and that private channel auth now goes to `api.fwber.me/broadcasting/auth`.
-- [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s before broadening restoration further.
 - [ ] **Production Stripe Verification**: Confirm live premium and marketplace purchase + webhook flows in the Hetzner-hosted backend environment.
 - [ ] **DreamHost Backend Retirement**: Once Hetzner API cutover is fully validated, decommission the old DreamHost fwber backend path and remove stale provider dependencies.
 
@@ -20,6 +20,7 @@
 - [ ] **Real-Device Notification QA**: Verify foreground, background, and cold-start notification flows on physical iOS/Android devices now that routes and toasts are standardized.
 
 ## ✅ Recently Completed
+- [x] **Hetzner Backend Stability Repair**: Replaced the broken root route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables.
 - [x] **Frontend Lockfile Resync**: Regenerated `fwber-frontend/package-lock.json` and validated with fresh `npm ci` + `npm run build`.
 - [x] **Workflow Stabilization Sweep**: Fixed backend/frontend workflow drift and removed duplicate auto-failing CI/deploy noise from legacy workflows.
 - [x] **GitHub Hetzner Deploy Validation**: Added Hetzner GitHub secrets, triggered the workflow, and confirmed a green GitHub-driven deploy with 9 smoke-check passes and 0 failures.

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.4 "Frontend Lockfile Resync"
+> **Current Version:** 1.6.5 "Hetzner Backend Stability Repair"
 > **Last Updated:** 2026-04-04
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.4)
+### Phase 5: Production Scale (COMPLETED - v1.6.5)
+- **Hetzner Backend Stability Repair:** Replaced the broken root backend route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables discovered during live Hetzner inspection.
 - **Frontend Lockfile Resync:** Regenerated the frontend lockfile and verified `npm ci && npm run build`, removing the remaining dependency-sync blocker in the modern GitHub workflow set.
 - **Workflow Stabilization Sweep:** Fixed backend/frontend GitHub workflow drift and converted stale duplicate pipelines into lightweight/manual forms so the real automation signal is no longer buried under legacy red runs.
 - **GitHub Hetzner Deploy Validation:** Added the required GitHub Hetzner secrets, re-ran the GitHub backend deploy workflow, and confirmed a green GitHub-triggered Hetzner deployment with successful smoke validation.
@@ -92,7 +93,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Re-run Frontend GitHub Build:** Confirm the resynced lockfile makes `frontend-build.yml` green.
-2. **Verify Live v1.5.9 Frontend Recovery:** Confirm dashboard requests, E2E key restore checks, and realtime auth all use the correct `api.fwber.me` / `ws.fwber.me` production surfaces after deployment.
-3. **Production 500 Error Sweep + Stripe Verification:** Eliminate live 500s and validate live Stripe flows before broad restoration expansion.
-4. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.
+1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
+2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
+3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
+4. **Re-run Frontend GitHub Build:** Confirm the resynced lockfile makes `frontend-build.yml` green.
+5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

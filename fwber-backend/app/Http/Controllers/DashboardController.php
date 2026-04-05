@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
@@ -17,18 +19,28 @@ class DashboardController extends Controller
         $user = $request->user();
         $userId = $user->id;
 
-        // Get match statistics from squashed table
-        $matchStats = DB::table('user_matches')
-            ->where(function ($query) use ($userId) {
-                $query->where('user1_id', $userId)
-                    ->orWhere('user2_id', $userId);
-            })
-            ->selectRaw('
-                COUNT(*) as total_matches,
-                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_matches,
-                AVG(match_score) as match_score_avg
-            ')
-            ->first();
+        // Match tables have drifted in live Hetzner environments before. When
+        // `user_matches` is absent we intentionally degrade to zero instead of
+        // throwing a production 500 for the whole dashboard.
+        $matchStats = (object) [
+            'total_matches' => 0,
+            'active_matches' => 0,
+            'match_score_avg' => 0,
+        ];
+
+        if (Schema::hasTable('user_matches')) {
+            $matchStats = DB::table('user_matches')
+                ->where(function ($query) use ($userId) {
+                    $query->where('user1_id', $userId)
+                        ->orWhere('user2_id', $userId);
+                })
+                ->selectRaw('
+                    COUNT(*) as total_matches,
+                    SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_matches,
+                    AVG(match_score) as match_score_avg
+                ')
+                ->first() ?? $matchStats;
+        }
 
         // Get conversation count (unique pairs)
         $conversationCount = DB::table('messages')
@@ -89,35 +101,38 @@ class DashboardController extends Controller
     {
         $user = $request->user();
         $userId = $user->id;
-        $limit = $request->input('limit', 10);
+        $limit = max(1, (int) $request->integer('limit', 10));
 
         $activities = [];
 
-        // Recent matches
-        $matches = DB::table('user_matches')
-            ->where(function ($query) use ($userId) {
-                $query->where('user1_id', $userId)
-                    ->orWhere('user2_id', $userId);
-            })
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
+        // Recent matches. Live databases can temporarily drift during recovery
+        // work, so missing match tables should not take down the activity feed.
+        if (Schema::hasTable('user_matches')) {
+            $matches = DB::table('user_matches')
+                ->where(function ($query) use ($userId) {
+                    $query->where('user1_id', $userId)
+                        ->orWhere('user2_id', $userId);
+                })
+                ->orderBy('created_at', 'desc')
+                ->limit($limit)
+                ->get();
 
-        foreach ($matches as $match) {
-            $otherUserId = $match->user1_id == $userId ? $match->user2_id : $match->user1_id;
-            $otherUser = DB::table('users')->find($otherUserId);
+            foreach ($matches as $match) {
+                $otherUserId = $match->user1_id == $userId ? $match->user2_id : $match->user1_id;
+                $otherUser = DB::table('users')->find($otherUserId);
 
-            if ($otherUser) {
-                $activities[] = [
-                    'type' => 'match',
-                    'user' => [
-                        'id' => $otherUser->id,
-                        'name' => $otherUser->name,
-                        'avatar_url' => $otherUser->avatar_url ?? null,
-                    ],
-                    'timestamp' => $match->created_at,
-                    'match_score' => (int) ($match->match_score ?? 0),
-                ];
+                if ($otherUser) {
+                    $activities[] = [
+                        'type' => 'match',
+                        'user' => [
+                            'id' => $otherUser->id,
+                            'name' => $otherUser->name,
+                            'avatar_url' => $otherUser->avatar_url ?? null,
+                        ],
+                        'timestamp' => $match->created_at,
+                        'match_score' => (int) ($match->match_score ?? 0),
+                    ];
+                }
             }
         }
 
@@ -158,17 +173,19 @@ class DashboardController extends Controller
         $user = $request->user();
         $profile = $user->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['percentage' => 0, 'required_complete' => false]);
         }
 
         $fields = [
-            'display_name', 'bio', 'birthdate', 'gender', 'interests', 'latitude', 'longitude'
+            'display_name', 'bio', 'birthdate', 'gender', 'interests', 'latitude', 'longitude',
         ];
 
         $filled = 0;
         foreach ($fields as $field) {
-            if (!empty($profile->$field)) $filled++;
+            if (! empty($profile->$field)) {
+                $filled++;
+            }
         }
 
         $percentage = round(($filled / count($fields)) * 100);

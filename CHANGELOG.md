@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.5] - 2026-04-04 — Hetzner Backend Stability Repair
+
+### Fixed
+- Replaced the broken backend root web route that rendered a non-existent `welcome` view with a lightweight JSON status payload, eliminating the live `api.fwber.me/` root-route 500 caused by missing view templates.
+- Added `WebFingerController` so the public discovery routes no longer point at a missing class, restoring `php artisan route:list` and preventing route-cache/tooling breakage in production.
+- Hardened `DashboardController` so dashboard stats and activity degrade gracefully when `user_matches` is missing from a drifted production database instead of throwing production 500s.
+- Fixed a latent PHP 8.4 type bug in dashboard activity where the `limit` query string could remain a string and crash `array_slice()`.
+- Added a corrective migration (`2026_04_05_000000_restore_match_tables_if_missing.php`) that recreates `user_matches` / `match_actions` when migration history claims they exist but live schema drift has removed them.
+- Hardened backend log-file permissions plus the Hetzner deploy script so deploy-user artisan commands are less likely to fail when Monolog rotates files under the web runtime user.
+- Added regression coverage for the new degraded-schema dashboard behavior plus the repaired public web routes.
+
+### Verified
+- `php artisan route:list` now succeeds again.
+- `php artisan test --filter="DashboardEndpointsTest|PublicWebRoutesTest"` passes (6 tests / 29 assertions).
+- `./vendor/bin/pint` passes on all touched backend files.
+
 ## [1.6.4] - 2026-04-04 — Frontend Lockfile Resync
 
 ### Fixed

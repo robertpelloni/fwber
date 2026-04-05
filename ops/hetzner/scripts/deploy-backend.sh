@@ -42,6 +42,13 @@ php artisan optimize:clear
 php artisan optimize
 php artisan deploy:verify
 
+# Daily log files can be created by the web runtime between deploys. Make a best-effort
+# attempt to keep existing log files group-writable so deploy-user artisan commands do not
+# fail the next day when Monolog rotates into a file owned by the PHP-FPM user.
+if [ -d "$BACKEND_DIR/storage/logs" ]; then
+  find "$BACKEND_DIR/storage/logs" -maxdepth 1 -type f -name '*.log' -exec chmod ug+rw {} + 2>/dev/null || true
+fi
+
 if [ -d "$GEO_DIR" ]; then
   cd "$GEO_DIR"
   cargo build --release
