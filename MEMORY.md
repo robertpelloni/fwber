@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-05 — v1.7.0 A restore branch can still feel broken even when the code is present if the shell highlights the wrong surfaces
+- The rewind branch contained many restored systems, but the main app shell still pointed users toward excluded federation/journal-era branches and still lacked real `/activity` and `/notifications` destinations.
+- Restoring breadth is not enough; the signed-in shell must also spotlight the approved surfaces so the product actually feels restored.
+- The next rewind passes should keep checking for this pattern: code may exist, but if navigation and dashboard entry points are wrong, the branch will still appear half-restored.
+
 ## 2026-04-05 — v1.6.9 Restore-branch failures were mostly compatibility drift, not fresh feature bugs
 - The rewind branch was closer to working breadth than it initially looked; the red CI signal was concentrated around a few old-assumption seams:
   - avatar generation prompt/config behavior no longer matched its tests

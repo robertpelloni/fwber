@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.6.9
+> **Version:** 1.7.0
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Navigation Recovery + Missing Activity Surfaces**: Reworked the restore-branch shell to spotlight approved restored areas, added real `/activity` and `/notifications` pages, added shared notification route helpers, and rebuilt the dashboard around visible restored surfaces; validated with a successful frontend production build.
 - [x] **Restore Branch CI Compatibility Sweep**: Repaired avatar-generation config/prompt compatibility, tagged-cache mock behavior, frontend Sentry App Router instrumentation, broken WASM import assumptions, and stale Sentry webpack options in the rewind branch; validated with `php artisan test` (**425 passed / 8 skipped**) and successful frontend build.
 - [x] **NodeInfo 500 Recovery + Frontend CI Runtime Fix**: Hardened discovery routes against missing federation columns and aligned the frontend GitHub workflow to Node.js 24.
 - [x] **Hetzner Log ACL Deploy Fix**: Removed the broken log permission override, switched to ACL-based shared log access, and repaired the live Hetzner server log directory ACLs.

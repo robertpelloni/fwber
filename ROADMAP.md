@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.9 "Restore Branch CI Compatibility Sweep"
+> **Current Version:** 1.7.0 "Rewind Navigation Recovery + Missing Activity Surfaces"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.9)
+### Phase 5: Production Scale (COMPLETED - v1.7.0)
+- **Rewind Navigation Recovery + Missing Activity Surfaces:** Reworked the restore-branch app shell so approved restored surfaces are visible again, added real top-level `/activity` and `/notifications` pages, and rebuilt the dashboard around the rewind branch’s approved scope instead of excluded federation/journal-era emphasis.
 - **Restore Branch CI Compatibility Sweep:** Repaired restore-branch avatar-generation config/prompt drift, tagged-cache mock compatibility, stale frontend Sentry App Router wiring, missing WASM artifact assumptions, and deprecated Sentry Next.js build options so the broader rewind branch is much closer to the earlier full-surface state while remaining buildable/testable under modern tooling.
 - **NodeInfo 500 Recovery + Frontend CI Runtime Fix:** Hardened `NodeInfoController` against missing federation-era schema and aligned the frontend GitHub build to Node.js 24 so both discovery endpoints and frontend CI stop failing for infrastructure/toolchain reasons.
 - **Hetzner Log ACL Deploy Fix:** Replaced the broken daily-log permission approach with shared ACLs for `deploy` and `www-data`, fixing deploy-time failures caused by rotated log ownership drift on Hetzner.

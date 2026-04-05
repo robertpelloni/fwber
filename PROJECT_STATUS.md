@@ -1,23 +1,21 @@
-# PROJECT_STATUS.md - fwber v1.6.9 (Restore Branch CI Compatibility Sweep)
+# PROJECT_STATUS.md - fwber v1.7.0 (Rewind Navigation Recovery + Missing Activity Surfaces)
 
 **Date:** 2026-04-05
-**Version:** 1.6.9 "Restore Branch CI Compatibility Sweep"
-**Status:** ✅ **RESTORE BRANCH LOCAL SUITE GREEN; CI ROOT CAUSES PATCHED; BROAD REWIND STILL IN RECONCILIATION**
+**Version:** 1.7.0 "Rewind Navigation Recovery + Missing Activity Surfaces"
+**Status:** ✅ **RESTORE BRANCH NOW SURFACES APPROVED FEATURES IN THE MAIN SHELL; ACTIVITY + NOTIFICATIONS DESTINATIONS RECOVERED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release stopped treating the restore branch as a vague "it still fails somewhere" problem and instead repaired the concrete compatibility faults that were keeping the broader pre-simplification surface from behaving like the earlier snapshot.
+This release focused on the user-facing symptom behind the earlier restore complaint: the rewind branch already contained many recovered systems, but the signed-in shell still emphasized excluded areas and still lacked obvious destinations for restored activity/notification flows.
 
 Delivered:
-- `AvatarGenerationService` now honors restore-branch test config overrides and emits the richer prompt language expected by the old AI-avatar surface.
-- `TaggedCache` now calls `Cache::tags(...)` first so mocked tagged-cache controller tests keep working while fallback invalidation still protects non-taggable runtime stores.
-- restore-branch frontend Sentry integration now uses modern App Router instrumentation instead of the stale placeholder/deprecated client config shape.
-- restore-branch frontend E2E crypto no longer hard-imports a missing generated WASM module, so the broader restored UI can build in CI/worktrees without artifact-specific failures.
-- restore-branch Next.js build no longer emits the stale `disableLogger` deprecation warning.
+- the restore-branch app header and left rail now prioritize approved restored surfaces such as friends, activity, events, wallet, roast, merchant, moderation, notifications, and travel mode
+- removed excluded federation / journal / governance-era emphasis from the primary shell navigation without deleting the underlying compatibility work yet
+- added a real top-level `/activity` page backed by dashboard activity data
+- added a real top-level `/notifications` inbox page with mark-as-read and mark-all-read behavior
+- added shared notification route helpers in `fwber-frontend/lib/notifications.ts`
+- rebuilt the rewind dashboard so restored surfaces are visible and reachable instead of buried in legacy/excluded cards
 
 ## ✅ Why This Matters
-The repo is still in a compatibility phase because the broader rewind branch contains old feature breadth plus new deployment/runtime assumptions. This release directly narrows that gap:
-- local backend validation succeeded with **425 passing tests**
-- local frontend production build succeeded
-- the specific GitHub CI failures previously observed were mapped to real restore-branch drift and patched at the source
+A branch is not meaningfully “restored” if users still cannot reach the restored areas from the main app shell. This release closes that UX gap while still respecting the approved exclusion list.

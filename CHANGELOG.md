@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2026-04-05 — Rewind Navigation Recovery + Missing Activity Surfaces
+
+### Fixed
+- Reworked the restore-branch app shell navigation so the signed-in experience now prioritizes the user-approved restored surfaces instead of highlighting excluded federation, governance, and journal-era branches.
+- Added a real top-level `/activity` page backed by `/dashboard/activity`, restoring the missing “view all activity” surface on the rewind branch.
+- Added a real top-level `/notifications` inbox page with mark-as-read and mark-all-read flows, so notification bell routes no longer depend on dead or missing destinations.
+- Added shared notification route normalization helpers in `fwber-frontend/lib/notifications.ts` for consistent navigation from notification payloads.
+- Rebuilt the restore-branch dashboard around the restored product surface: friends, events, notifications, travel mode, wallet/referrals, roast, merchant, and moderation entry points are now explicitly visible.
+- Removed excluded-scope items from the primary left-rail emphasis so the restore branch better reflects the user’s approved restoration scope even before deeper code removal happens.
+
+### Verified
+- `npm run build` completed successfully in the restore worktree after the navigation/dashboard recovery.
+- New routes `/activity` and `/notifications` were included in the successful production route manifest.
+
 ## [1.6.9] - 2026-04-05 — Restore Branch CI Compatibility Sweep
 
 ### Fixed

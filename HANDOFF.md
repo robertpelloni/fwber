@@ -1,163 +1,171 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.6.9
+> **Version Reached:** 1.7.0
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This session stopped pretending the restore branch was simply "not restored yet" in the abstract and instead attacked the concrete compatibility seams that were keeping the broader pre-simplification branch from behaving like the larger snapshot the user wanted back.
+This session continued the rewind-branch recovery, but shifted from pure CI compatibility work into a more user-visible restoration pass.
 
-Completed in **v1.6.9 "Restore Branch CI Compatibility Sweep"**:
-- investigated the failing GitHub backend CI run for commit `b5a057045`
-- confirmed the red run was concentrated in three areas rather than broad systemic collapse:
-  - `AvatarGenerationTest` prompt/config expectations
-  - `ControllerCachingTest` tagged-cache mock expectations
-  - restore-branch frontend Sentry/WASM build drift
-- repaired the restore branch source to match those expectations again
-- validated the full local backend suite and the restore-branch frontend production build
-- committed and pushed the compatibility sweep so the next CI run can prove whether the GitHub failures are fully cleared
+The key realization was:
+- the restore branch already contained many recovered systems
+- but the app still *felt* under-restored because the signed-in shell highlighted excluded areas and did not provide obvious destinations for restored activity / notification flows
+
+Completed in **v1.7.0 "Rewind Navigation Recovery + Missing Activity Surfaces"**:
+- recovered a real top-level `/activity` page
+- recovered a real top-level `/notifications` inbox page
+- added shared notification route helpers
+- rewired the restore-branch `AppHeader` / left rail around the user-approved restored scope
+- rebuilt the dashboard to spotlight approved restored surfaces rather than excluded federation/journal/governance-era branches
+- validated with a successful frontend production build
+- committed and pushed the changes
 
 ---
 
-## What Was Investigated
+## Why This Work Was Chosen Next
+The user explicitly asked why the repo was still not back to how it felt a few days ago.
 
-### 1. GitHub backend CI failure was inspected directly
-Used GitHub Actions logs for run **24005690057** on branch `restore/pre-simplification-hetzner`.
+The answer was not just "more code needs to be merged." It was also:
+- the main shell still pointed attention toward excluded systems
+- top-level activity/notification destinations were still missing
+- important restored areas existed but were not being surfaced like a coherent product
 
-The failure was not a random late-suite crash. The failed run ended with three focused breakpoints:
-1. `Tests\Feature\AvatarGenerationTest > service generates prompt with detailed attributes`
-2. `Tests\Feature\AvatarGenerationTest > service adds identity anchor for photo based generation`
-3. `Tests\Feature\Caching\ControllerCachingTest`
-
-Everything around those areas was largely already passing.
-
-### 2. Root cause for avatar-generation failures
-The restore-branch `AvatarGenerationService` had drifted away from the broader old-suite expectations in two ways:
-- config resolution was too brittle for direct PHPUnit overrides
-- prompt generation no longer emitted several older semantic phrases the tests still expected
-
-Specifically missing or weakened expectations included:
-- photo identity anchor language
-- detailed tattoo/piercing wording
-- love-language flavor text
-- relationship-style flavor text
-- tasteful sexy-boost wording
-
-### 3. Root cause for tagged-cache failure
-The restore-branch `TaggedCache` helper had been made too defensive.
-
-That sounds nice operationally, but it broke the test suite contract because mocked tests expected:
-- `Cache::tags([...])` to be invoked
-- then `remember(...)` to be called on that tagged cache path
-
-The helper was bypassing `tags()` entirely when the store did not advertise tag support strongly enough, which meant the mock expectation never fired.
-
-### 4. Root cause for frontend restore-branch build drift
-The rewind branch frontend still contained stale App Router Sentry wiring and a hard dependency on a missing generated browser WASM import.
-
-That produced build warnings/noise and made the broader restored frontend less portable than the validated mainline frontend.
+So the next best move was not another invisible backend-only patch. It was a shell/navigation recovery pass that makes the rewind branch actually *feel restored*.
 
 ---
 
 ## What Was Changed
 
-### Backend: `fwber-backend/app/Services/AvatarGenerationService.php`
-Repaired both config resolution and prompt composition.
+### 1. `fwber-frontend/components/AppHeader.tsx`
+The app shell was substantially reworked.
 
-#### Config handling fixes
-- changed config merging to `array_replace_recursive(...)` so test-time overrides like:
-  - `avatar_generation.default_provider`
-  - `avatar_generation.providers.dalle.api_key`
-  are preserved instead of being masked by fallback defaults
-- hardened provider key/token lookups for:
-  - OpenAI / DALL-E
-  - Gemini
-  - Replicate
+#### Previous problem
+The rewind branch sidebar/navigation still emphasized several branches the user explicitly excluded from restoration focus, especially:
+- federation
+- journal/social-extra surfaces
+- other older breadth-first menu clutter
 
-#### Prompt behavior fixes
-Restored prompt language the old broader test suite still expects:
-- `same person as the reference photo`
-- `preserve recognizable facial structure`
-- detailed joined tattoo descriptors like `arm sleeve tattoos`
-- detailed joined piercing descriptors like `nose ring piercings`
-- `magnetic, affectionate energy` for `physical_touch`
-- `monogamous romantic energy` for `monogamous`
-- `tasteful sexy styling` for sexy-boost generations
+That meant the signed-in experience was advertising the wrong parts of the product.
 
-Also added dedicated helper methods:
-- `mapLoveLanguage(...)`
-- `mapRelationshipStyle(...)`
+#### New navigation shape
+Primary nav now emphasizes:
+- `/dashboard`
+- `/matches`
+- `/messages`
+- `/friends`
+- `/activity`
+- `/events`
+- `/nearby`
+- `/safety`
 
-These are useful beyond test repair because they make the broader old avatar feature feel intentionally expressive again instead of generic.
+Account controls now visibly surface:
+- `/settings`
+- `/notifications`
+- `/settings/travel`
+- `/settings/account`
 
-### Backend: `fwber-backend/app/Support/TaggedCache.php`
-Reworked tagged cache behavior so it now:
-- always tries `Cache::tags($tags)->remember(...)` first
-- falls back only when tag operations actually fail at runtime
+A dedicated restored-features section now highlights:
+- `/premium`
+- `/wallet`
+- `/roast`
+- `/share-unlock`
+- merchant flow (`/merchant/dashboard` or `/merchant/register`)
+- `/moderation` for moderators
 
-This preserves mocked test expectations while still keeping non-taggable/shared-host/runtime fallback behavior.
+#### Why this matters
+This makes the rewind branch line up better with the approved restoration scope:
+- restored allowed systems are visible
+- excluded systems are no longer the main emphasis
+- core user routes are easier to reach without direct URL spelunking
 
-### Frontend: `fwber-frontend/instrumentation.ts`
-Replaced the dead placeholder Sentry instrumentation with modern App Router bootstrap logic:
-- imports `@sentry/nextjs`
-- exports `register()`
-- exports `onRequestError = Sentry.captureRequestError`
+---
 
-### Frontend: `fwber-frontend/instrumentation-client.ts`
-Added modern client-side App Router Sentry bootstrap:
-- `onRouterTransitionStart = Sentry.captureRouterTransitionStart`
-- `Sentry.init(...)` with replay integration
+### 2. `fwber-frontend/app/activity/page.tsx`
+Added a real top-level activity page.
 
-### Frontend: `fwber-frontend/sentry.client.config.ts`
-Removed from active use by deleting the deprecated file.
+#### What it does
+- loads from `/dashboard/activity?limit=50`
+- renders activity rows for:
+  - matches
+  - messages
+  - profile views
+  - friend actions
+  - gifts
+- routes users to the right destination depending on activity type
 
-### Frontend: `fwber-frontend/lib/e2e/crypto.ts`
-Disabled the broken hard import of `@/lib/wasm/fwber_wasm` in the restore branch and returned `null` from `loadWasm()`.
+#### Why this matters
+The restore branch had activity data paths and dashboard activity concepts, but not a recovered top-level destination that made the app feel complete.
 
-Why this is correct for now:
-- the restore worktree does not guarantee generated WASM bindings exist
-- the frontend already supports WebCrypto fallback
-- buildability is more important right now than pretending every checkout has generated WASM artifacts present
+Now `/activity` is real again.
 
-### Frontend: `fwber-frontend/next.config.js`
-Removed deprecated Sentry option:
-- `disableLogger`
+---
 
-This aligns the restore branch with the already-modernized frontend build strategy.
+### 3. `fwber-frontend/app/notifications/page.tsx`
+Added a real top-level notifications inbox.
+
+#### What it does
+- loads from `/notifications`
+- supports mark-one-read
+- supports mark-all-read
+- uses notification type routing to send users to the right destination after click
+
+#### Why this matters
+The bell UI and notification flows are not enough if the user cannot open a proper inbox page. This restores that missing destination.
+
+---
+
+### 4. `fwber-frontend/lib/notifications.ts`
+Added shared notification routing helpers.
+
+#### Helpers added
+- `normalizeNotificationType(...)`
+- `getNotificationRoute(...)`
+- `getNotificationActionLabel(...)`
+
+#### Why this matters
+This reduces drift between:
+- payload type strings
+- notification inbox routing
+- toast/bell behavior
+- future restored notification-related surfaces
+
+---
+
+### 5. `fwber-frontend/app/dashboard/page.tsx`
+Rebuilt the dashboard around approved restored surfaces.
+
+#### Previous problem
+The old rewind dashboard still mixed in excluded or poorly prioritized branches and contained awkward/dead actions like `/profile/edit`.
+
+#### New dashboard emphasis
+- keeps main stats visible
+- keeps activity feed visible
+- improves quick actions with:
+  - nearby
+  - messages
+  - friends
+  - wallet
+  - notifications
+  - profile
+- adds a restored sections grid for:
+  - Gold Premium
+  - Wallet & Referrals
+  - Profile Roast
+  - Notifications Inbox
+  - Events
+  - Travel Mode
+  - Merchant portal/register
+  - Moderation when applicable
+
+#### Why this matters
+This directly addresses the user complaint that the app did not feel like the earlier broader state. The features were increasingly present, but not being surfaced like first-class citizens.
 
 ---
 
 ## Validation Performed
 
-### 1. Full local backend validation
-Executed from:
-- `C:/Users/hyper/workspace/fwber_restore_worktree/fwber-backend`
-
-Command flow:
-- `composer install ...`
-- `cp .env.example .env`
-- `touch database/database.sqlite`
-- `php artisan key:generate`
-- `php artisan migrate:fresh`
-- `php artisan test`
-
-Result:
-- **425 passed**
-- **8 skipped**
-
-This is the strongest signal so far that the restore branch is much closer to the desired broad restored state than the GitHub red badge implied.
-
-### 2. Targeted backend investigation
-Also ran targeted test slices around the previously failing areas.
-
-Local nuance:
-- this workstation lacks the PHP Redis extension
-- therefore some restore-branch tests intentionally skip here while still running in GitHub environments where Redis support is present
-
-Even with that nuance, the source-level mismatch was clearly identified and patched.
-
-### 3. Frontend production build
+### Frontend build
 Executed from:
 - `C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend`
 
@@ -166,39 +174,30 @@ Command:
 
 Result:
 - **successful production build**
-- stale Sentry App Router warnings eliminated
-- stale missing-WASM import failure eliminated
-- stale `disableLogger` warning eliminated
+- route manifest now includes:
+  - `/activity`
+  - `/notifications`
+- updated app shell/dashboard changes are production-build safe
 
----
-
-## Git / Release
-Committed and pushed:
-- **Commit:** `fix: repair restore branch ci compatibility drift (v1.6.9)`
-
-Branch pushed:
-- `restore/pre-simplification-hetzner`
+### Existing CI runs
+At the time of this slice, the earlier `v1.6.9` GitHub runs were still in progress / pending final verification, while this new feature slice proceeded in parallel to keep restore momentum going.
 
 ---
 
 ## Files Changed This Slice
 
-### Backend
-- `fwber-backend/app/Services/AvatarGenerationService.php`
-- `fwber-backend/app/Support/TaggedCache.php`
-- `fwber-backend/VERSION`
+### Frontend UX / navigation
+- `fwber-frontend/components/AppHeader.tsx`
+- `fwber-frontend/app/dashboard/page.tsx`
+- `fwber-frontend/app/activity/page.tsx`
+- `fwber-frontend/app/notifications/page.tsx`
+- `fwber-frontend/lib/notifications.ts`
 
-### Frontend
-- `fwber-frontend/instrumentation.ts`
-- `fwber-frontend/instrumentation-client.ts`
-- `fwber-frontend/lib/e2e/crypto.ts`
-- `fwber-frontend/next.config.js`
-- `fwber-frontend/sentry.client.config.ts` (deleted)
-- `fwber-frontend/VERSION`
-
-### Documentation / release tracking
+### Versioning / docs
 - `VERSION`
 - `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -209,28 +208,35 @@ Branch pushed:
 
 ---
 
-## Key Analysis / Why This Matters
-The user asked why the repo was not already back to the broader 2–3-day-ago state.
+## Git / Release
+Committed and pushed:
+- **Commit:** `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
 
-This session confirmed the answer more precisely:
-- the restore branch is **not** blocked by an impossibly huge number of failures
-- it is blocked by a manageable set of **compatibility drifts** between the older broad feature surface and the newer runtime/tooling expectations
+Branch pushed:
+- `restore/pre-simplification-hetzner`
 
-That means the correct strategy now is:
-1. continue using `restore/pre-simplification-hetzner` as the primary restoration target
-2. keep aggressively reconciling compatibility drift
-3. stop spending too much time on hyper-granular selective restores when the broad rewind is already mostly alive
+---
+
+## Key Analysis
+This was an important correction in strategy.
+
+The rewind branch did not just need more backend compatibility fixes. It also needed:
+- coherent user-facing navigation
+- obvious destinations for restored interactions
+- less emphasis on systems the user explicitly does not want restored as first-class scope
+
+This release is therefore not cosmetic. It is part of making the rewind branch truly usable as the candidate replacement line.
 
 ---
 
 ## Best Next Steps
-1. Check the newly triggered GitHub Actions runs for this `v1.6.9` commit.
-2. If backend CI is green, continue broad rewind reconciliation instead of tiny feature-by-feature restores.
-3. If backend CI still fails, inspect the next concrete seam and patch it directly.
-4. Keep excluded systems out of the promoted final surface:
+1. Check the latest GitHub Actions runs for both `v1.6.9` and this new `v1.7.0` push.
+2. If backend CI still fails, patch the next concrete restore-branch compatibility seam immediately.
+3. Continue broad rewind reconciliation, especially for user-visible surfaces that still exist in code but are not yet integrated cleanly.
+4. Keep excluded systems out of the main signed-in emphasis:
    - ActivityPub / Federation
    - Governance / DAO / Council / On-chain
    - Journals / Scrapbooks / Icebreakers / extra profile-social layer
-5. Once restore-branch CI/build are stable, prepare it to supersede the piecemeal restoration line.
+5. Once CI/build stabilize, prepare the rewind branch to supersede piecemeal incremental restoration.
 
 No processes were manually killed.
