@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.9.1 "Premium Discovery Filter Restoration"
+> **Current Version:** 1.9.2 "Pre-Simplification Rewind Branch + Replay Plan"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.9.1)
+### Phase 5: Production Scale (COMPLETED - v1.9.2)
+- **Pre-Simplification Rewind Branch + Replay Plan:** Created and pushed `restore/pre-simplification-hetzner`, documented the rewind baseline at `a636a53c3`, and produced the initial Hetzner/runtime replay manifest.
 - **Premium Discovery Filter Restoration:** Restored premium discovery schema, profile persistence, full `/matches` advanced filter passthrough, server-side token gating, and expanded filter UX so the active discovery screen matches the product contract again.
 - **Token-Gated Unlock Surface Restoration:** Restored match insights unlocks, private photo unlocks, generic content unlock ledger routes, and locked/unlocked frontend UX for another major token-spend surface cluster.
 - **Profile Boost Restoration:** Restored boost purchase/status/history endpoints and reconnected the live `/matches` UI to the boost purchase flow so another token-spend surface works again.
@@ -113,8 +114,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Pre-Simplification Rewind Merge:** Rebuild from the last pre-Great-Simplification snapshot and merge current Hetzner deployment/runtime hardening onto it instead of only restoring archived slices one by one.
-2. **Verify Discovery + Unlock + Spend Surfaces Live:** Confirm the latest premium discovery filters, unlocks, boosts, gifts, wallet, referrals, and video flows behave correctly against Hetzner.
-3. **Repair / Confirm Live Reverb Contract:** Re-check the header connection badge, websocket/broadcast-auth behavior, live video signaling, and gift-notification realtime behavior with a real signed-in browser session.
-4. **Production 500 Sweep + Stripe Verification:** Continue hardening live runtime behavior before broader restoration.
+1. **Replay Mandatory Hetzner Infra Onto Restore Branch:** Apply the commit manifest in `ops/git/hetzner-replay-commits.txt` onto `restore/pre-simplification-hetzner`.
+2. **Validate The Restore Branch After Replay:** Run backend tests, frontend build, deploy verification, and smoke tooling checks on the branch.
+3. **Resolve Conflicts Between Full Feature Set And Modern Runtime Contract:** Pay special attention to websocket envs, frontend API origin handling, migration idempotency, route cache safety, and health endpoints.
+4. **Compare Rewind Branch Against Main:** Identify which post-simplification fixes still matter after infra replay.
 5. **DreamHost Retirement:** Once the rewind-merge restoration is stable on Hetzner, retire the old DreamHost backend path and remove stale provider dependencies.

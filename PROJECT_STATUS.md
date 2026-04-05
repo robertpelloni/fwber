@@ -1,18 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.9.1 (Premium Discovery Filter Restoration)
+# PROJECT_STATUS.md - fwber v1.9.2 (Pre-Simplification Rewind Branch + Replay Plan)
 
 **Date:** 2026-04-05
-**Version:** 1.9.1 "Premium Discovery Filter Restoration"
-**Status:** ✅ **ADVANCED MATCH FILTERING NOW MATCHES THE ACTIVE UI AGAIN, WITH SERVER-SIDE TOKEN GATING**
+**Version:** 1.9.2 "Pre-Simplification Rewind Branch + Replay Plan"
+**Status:** ✅ **DEDICATED FULL-FEATURE RESTORATION TRACK CREATED FROM THE LAST PRE-SIMPLIFICATION SNAPSHOT**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release restored another partially-pruned product seam that was still visible in active UI and profile editing flows:
-- premium discovery filter schema
-- profile persistence for premium discovery traits
-- server-side premium filter enforcement
-- full `/matches` advanced filter passthrough
-- upgraded discovery filter UX with reset, counts, and missing controls restored
+This release shifts restoration from one-off archive recovery into a structured repo-level recovery strategy:
+- identified the exact pre-simplification baseline
+- documented the rewind + Hetzner merge plan
+- created and pushed the dedicated restoration branch
+- produced the initial replay manifest for mandatory Hetzner/runtime commits
+- added a reusable branch-creation helper script
 
 ## ✅ Why This Matters
-Before this release, the frontend exposed premium discovery concepts like diet, politics, religion, kids, pets, and token-gated filtering, but the active backend schema and controller path were incomplete. That meant users could edit values the backend would not reliably persist and the discovery engine could reference columns that did not exist on drifted databases. This release closes that gap.
+The repo diff from the last pre-simplification snapshot to current `main` is massive. Reconstructing every removed system only by archive fragment is possible but inefficient and error-prone. A dedicated rewind branch lets us recover the broader feature-rich product surface while preserving the Hetzner deployment reality that current production depends on.

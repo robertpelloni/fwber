@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.2] - 2026-04-05 — Pre-Simplification Rewind Branch + Replay Plan
+
+### Added
+- Added `docs/ai/planning/pre-simplification-hetzner-rewind-plan.md` with the full rewind strategy, commit classification, execution phases, and mermaid flow.
+- Added `ops/git/create-pre-simplification-restore-branch.sh` to reproducibly create/push the rewind branch.
+- Added `ops/git/hetzner-replay-commits.txt` to classify mandatory infrastructure and runtime-hardening commits for replay.
+
+### Changed
+- Created and pushed `restore/pre-simplification-hetzner` from baseline `a636a53c3`, the final pre-simplification snapshot before `v1.2.0`.
+- Project planning docs now pivot from one-off archive restoration toward a full rewind-branch merge strategy with current Hetzner production hardening preserved.
+
 ## [1.9.1] - 2026-04-05 — Premium Discovery Filter Restoration
 
 ### Added
