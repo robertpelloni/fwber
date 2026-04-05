@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
+
+### Fixed
+- Hardened `NodeInfoController` so public discovery endpoints no longer 500 when optional federation-era schema columns like `user_profiles.is_federated` are absent.
+- Added/validated regression coverage for `.well-known/nodeinfo` and `/nodeinfo/2.0` on minimal schemas.
+- Updated the dedicated frontend GitHub workflow to Node.js 24 so GitHub Actions uses the same major runtime family as the locally validated lockfile/build environment.
+
 ## [1.6.7] - 2026-04-05 — Frontend CI Node Runtime Alignment
 
 ### Fixed

@@ -1,17 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.6.7 (Frontend CI Node Runtime Alignment)
+# PROJECT_STATUS.md - fwber v1.6.8 (NodeInfo 500 Recovery + Frontend CI Runtime Fix)
 
 **Date:** 2026-04-05
-**Version:** 1.6.7 "Frontend CI Node Runtime Alignment"
-**Status:** ✅ **FRONTEND CI ROOT-CAUSED TO NODE/NPM GENERATION DRIFT; ALIGNMENT PATCH APPLIED**
+**Version:** 1.6.8 "NodeInfo 500 Recovery + Frontend CI Runtime Fix"
+**Status:** ✅ **PUBLIC DISCOVERY 500 ROOT-CAUSED; FRONTEND CI RUNTIME ALIGNMENT STAGED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release targets the last visible modern CI failure.
+This release clears another live production 500 and stages the frontend CI runtime fix.
 
 Delivered:
-- upgraded the dedicated frontend workflow to Node.js 24
-- aligned GitHub frontend build runtime with the npm/lockfile generation environment that now exists locally
+- `NodeInfoController` now degrades cleanly when federation-era columns are absent
+- public discovery endpoints are covered against minimal-schema drift
+- frontend GitHub build workflow is upgraded to Node.js 24
 
 ## ✅ Why This Matters
-After the lockfile resync, the remaining frontend CI failure was still coming from the older GitHub runner npm stack, not the app code itself. Aligning the runtime removes that toolchain mismatch.
+Live production inspection showed `/nodeinfo/2.0` was still 500ing due to a missing `is_federated` column. That is now fixed in source and covered by tests.
