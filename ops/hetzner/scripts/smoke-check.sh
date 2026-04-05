@@ -49,7 +49,6 @@ REPORT_JSON_PATH="${FWBER_REPORT_JSON_PATH:-}"
 REPORT_MD_PATH="${FWBER_REPORT_MD_PATH:-}"
 ROAST_PAYLOAD='{"name":"Alex","job":"Bartender","trait":"always late","mode":"roast"}'
 LOGIN_PAYLOAD='{"email":"smoke-check-invalid@example.com","password":"definitely-not-valid"}'
-GEO_QUERY_URL="${GEO_URL%/}/nearby?lat=40.7580&lng=-73.9855&radius_m=500"
 STARTED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
 pass_count=0
@@ -186,6 +185,31 @@ extract_host() {
   host="${host%%/*}"
   host="${host%%:*}"
   printf '%s' "$host"
+}
+
+normalize_api_url() {
+  local url="$1"
+
+  if [[ "$url" != */api ]]; then
+    url="${url%/}/api"
+  fi
+
+  printf '%s' "$url"
+}
+
+load_reverb_app_key_from_backend() {
+  if [[ -n "$REVERB_APP_KEY" ]]; then
+    return
+  fi
+
+  if [[ ! -f "$BACKEND_DIR/artisan" ]] || ! command -v php >/dev/null 2>&1; then
+    return
+  fi
+
+  local discovered_key=''
+  if discovered_key="$(cd "$BACKEND_DIR" && php artisan tinker --execute="echo (string) config('reverb.apps.apps.0.key');" 2>/dev/null | tr -d '\r' | tail -n 1)" && [[ -n "$discovered_key" ]]; then
+    REVERB_APP_KEY="$discovered_key"
+  fi
 }
 
 resolve_host_with_python() {
@@ -712,6 +736,10 @@ run_optional_authenticated_checks() {
 
 main() {
   require_command curl
+
+  API_URL="$(normalize_api_url "$API_URL")"
+  GEO_QUERY_URL="${GEO_URL%/}/nearby?lat=40.7580&lng=-73.9855&radius_m=500"
+  load_reverb_app_key_from_backend
 
   info 'Starting fwber post-deploy smoke check.'
   info "API URL: $API_URL"

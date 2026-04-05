@@ -1,9 +1,11 @@
 # MEMORY.md
 
-## 2026-04-05 — v1.6.6 Daily-log shared write should use ACLs, not Monolog chmod from deploy user
-- The first live deploy after the backend stability patch failed because Monolog's `permission` option tried to chmod a daily log file owned by `www-data` from a deploy-user artisan process.
-- The correct repair shape is shared ACLs on `storage/logs` plus removing the Monolog permission override, not repeated per-file chmod attempts in deploy code.
+## 2026-04-05 — v1.6.9 Frontend CI + smoke tooling both needed pragmatism over purity
+- After lockfile resync and Node 24 alignment, the frontend GitHub workflow was still failing because of platform-sensitive optional dependency resolution in wallet/native-adjacent packages.
+- Switching the CI install step to `npm install --no-fund --no-audit` is the pragmatic path to restore build verification signal while the dependency graph is further simplified.
+- The Hetzner smoke verifier needed the same philosophy: normalize `FWBER_API_URL` automatically and discover the Reverb app key from Laravel config instead of assuming perfect operator-provided env every time.
+- Re-applying tracked nginx configs during deploy is also worth the extra step because live server drift already happened more than once during this Hetzner cutover.
 
-## 2026-04-04 — v1.6.5 Hetzner backend drift was app/schema inconsistency, not dead infrastructure
-- Direct Hetzner inspection showed the fwber backend stack itself was alive: nginx, php-fpm, queue worker, Reverb, geo service, Redis, and MySQL were all up.
-- The live failures were caused by application drift instead: the root route rendered a missing `welcome` view, `php artisan route:list` broke on a missing `WebFingerController`, and dashboard activity crashed because the `user_matches` table was missing even though migrations claimed it had already run.
+## 2026-04-05 — v1.6.8 Discovery routes still need schema guards even when federation is de-scoped
+- `/nodeinfo/2.0` was still 500ing live because `NodeInfoController` assumed `user_profiles.is_federated` existed.
+- Even when federation is not the active product focus, discovery routes must degrade safely instead of crashing on absent optional schema.

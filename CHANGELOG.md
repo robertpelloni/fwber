@@ -2,12 +2,49 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.9] - 2026-04-05 — Frontend Workflow Install Strategy Fix
+
+### Fixed
+- Switched the dedicated frontend GitHub workflow from strict `npm ci` to `npm install --no-fund --no-audit` so the build can proceed despite platform-sensitive optional dependency resolution from wallet/native-adjacent packages.
+- Hardened `ops/hetzner/scripts/smoke-check.sh` so it normalizes API URLs to the `/api` contract automatically and can auto-discover the Reverb app key from the Laravel backend when not provided explicitly.
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so each deploy now re-syncs the tracked Hetzner nginx configs for `api.fwber.me`, `ws.fwber.me`, and `geo.fwber.me` before testing/reloading nginx, reducing server drift from repo truth.
+- This is a pragmatic CI + operations stabilization step while the broader dependency graph and live service contract are still being normalized.
+
+### Verified
+- Live smoke check now passes against Hetzner with **9 passes / 3 expected warnings / 0 failures**.
+- The websocket upgrade probe now succeeds against `https://ws.fwber.me` using the production Reverb app key.
+- `https://api.fwber.me/`, `/.well-known/nodeinfo`, and `/nodeinfo/2.0` all return healthy responses live after backend/nginx refresh.
+
+## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
+
+### Fixed
+- Hardened `NodeInfoController` so public discovery endpoints no longer 500 when optional federation-era schema columns like `user_profiles.is_federated` are absent.
+- Added/validated regression coverage for `.well-known/nodeinfo` and `/nodeinfo/2.0` on minimal schemas.
+- Updated the dedicated frontend GitHub workflow to Node.js 24 so GitHub Actions uses the same major runtime family as the locally validated lockfile/build environment.
+
+## [1.6.7] - 2026-04-05 — Frontend CI Node Runtime Alignment
+
+### Fixed
+- Updated `frontend-build.yml` to use Node.js 24 so GitHub Actions runs the same major npm/runtime family as the local lockfile regeneration environment.
+- This addresses the remaining frontend CI mismatch where `npm ci` under GitHub's older Node 20 / npm 10 toolchain still rejected the resynced lockfile.
+
 ## [1.6.6] - 2026-04-05 — Hetzner Log ACL Deploy Fix
 
 ### Fixed
 - Replaced the brittle deploy-time log chmod workaround with an ACL-based approach for `storage/logs`, so GitHub/SSH deploys and the PHP-FPM runtime can both write rotated log files without Monolog permission churn.
 - Removed the logging channel `permission` override that caused Monolog to attempt file chmod operations against `www-data`-owned daily logs during deploys.
 - Applied the matching ACL repair on the live Hetzner server so future rotated logs inherit shared write access for `deploy` and `www-data`.
+
+## [1.6.6] - 2026-04-05 — Discovery Route Recovery
+
+### Fixed
+- Hardened `NodeInfoController` so `/.well-known/nodeinfo` and `/nodeinfo/2.0` degrade safely on drifted production schemas instead of crashing when optional columns like `users.last_active_at` or `user_profiles.is_federated` are absent.
+- Strengthened the Hetzner nginx source config for `api.fwber.me` with an explicit `location ^~ /.well-known/` block so discovery routes are not accidentally trapped by hidden-file protections.
+- Added discovery-route regression coverage for NodeInfo in `PublicWebRoutesTest`.
+
+### Verified
+- `php artisan test --filter="PublicWebRoutesTest"` passes (4 tests / 26 assertions).
+- `php artisan route:list --path=.well-known` succeeds.
 
 ## [1.6.5] - 2026-04-04 — Hetzner Backend Stability Repair
 

@@ -32,6 +32,18 @@ if [ "$(id -u)" -ne 0 ]; then
   SUDO_BIN="sudo"
 fi
 
+sync_nginx_site() {
+  local source_path="$1"
+  local site_name="$2"
+
+  if [ ! -f "$source_path" ]; then
+    return
+  fi
+
+  $SUDO_BIN cp "$source_path" "/etc/nginx/sites-available/$site_name"
+  $SUDO_BIN ln -sf "/etc/nginx/sites-available/$site_name" "/etc/nginx/sites-enabled/$site_name"
+}
+
 cd "$REPO_ROOT"
 git pull origin main
 
@@ -55,6 +67,11 @@ if [ -d "$GEO_DIR" ]; then
   cargo build --release
 fi
 
+sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/api.fwber.me.conf" "api.fwber.me"
+sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/ws.fwber.me.conf" "ws.fwber.me"
+sync_nginx_site "$REPO_ROOT/ops/hetzner/nginx/geo.fwber.me.conf" "geo.fwber.me"
+$SUDO_BIN nginx -t
+
 $SUDO_BIN systemctl restart fwber-queue
 $SUDO_BIN systemctl restart fwber-reverb
 $SUDO_BIN systemctl restart fwber-geo
@@ -69,6 +86,10 @@ if [ "${FWBER_RUN_SMOKE_CHECK:-0}" = "1" ] && [ -x "$SMOKE_CHECK_SCRIPT" ]; then
 
   FWBER_BACKEND_DIR="$BACKEND_DIR" \
   FWBER_REPORT_DIR="$REPORT_DIR" \
+  FWBER_API_URL="https://api.fwber.me/api" \
+  FWBER_FRONTEND_URL="https://www.fwber.me" \
+  FWBER_WS_URL="https://ws.fwber.me" \
+  FWBER_GEO_URL="https://geo.fwber.me" \
   "$SMOKE_CHECK_SCRIPT"
 
   CURRENT_REPORT_JSON="$REPORT_DIR/smoke-check-summary.json"
