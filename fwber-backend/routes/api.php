@@ -155,6 +155,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('premium/purchase', [\App\Http\Controllers\PremiumController::class, 'purchasePremium']);
     Route::get('premium/who-likes-you', [\App\Http\Controllers\PremiumController::class, 'getWhoLikesYou']);
 
+    // Boosts
+    Route::post('boosts/purchase', [\App\Http\Controllers\BoostController::class, 'purchaseBoost']);
+    Route::get('boosts/active', [\App\Http\Controllers\BoostController::class, 'getActiveBoost']);
+    Route::get('boosts/history', [\App\Http\Controllers\BoostController::class, 'getBoostHistory']);
+
     // Video Chat
     Route::post('video/initiate', [\App\Http\Controllers\VideoChatController::class, 'initiate']);
     Route::post('video/signal', [\App\Http\Controllers\VideoChatController::class, 'signal']);

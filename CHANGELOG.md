@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.9] - 2026-04-05 — Profile Boost Restoration
+
+### Added
+- Restored the compact boosts backend with boost purchase, active boost status, and boost history endpoints.
+- Restored the `boosts` schema through a deployment-safe migration and added `BoostRestoreTest` coverage.
+
+### Changed
+- Repaired frontend boost API/hooks to match the restored backend response shape.
+- Added a live boost call-to-action and active-boost status panel to `/matches`, reconnecting the existing boost modal to real backend behavior.
+- Wallet-backed token spending now covers another previously-dead feature path via boost purchases.
+
 ## [1.8.8] - 2026-04-05 — Gift Economy Surface Restoration
 
 ### Added

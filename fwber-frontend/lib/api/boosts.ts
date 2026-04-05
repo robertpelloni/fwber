@@ -30,7 +30,7 @@ export async function getActiveBoost(): Promise<Boost | null> {
   try {
     const response = await api.get<ActiveBoostResponse>('/boosts/active');
     return response.data;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

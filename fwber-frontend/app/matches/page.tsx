@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, X, Star, MessageCircle, MapPin, Info, Mic2, Play, Pause, Compass } from 'lucide-react';
+import { Heart, X, Star, MessageCircle, MapPin, Info, Mic2, Play, Pause, Compass, Rocket, TimerReset } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { useToast } from '@/lib/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,8 @@ import AppHeader from '@/components/AppHeader';
 import MatchFilter from '@/components/MatchFilter';
 import Image from 'next/image';
 import ProfileViewModal from '@/components/ProfileViewModal';
+import BoostPurchaseModal from '@/components/BoostPurchaseModal';
+import { useActiveBoost } from '@/lib/hooks/use-boosts';
 import type { Match } from '@/lib/api/matches';
 
 export default function MatchesPage() {
@@ -19,10 +21,19 @@ export default function MatchesPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isBoostModalOpen, setIsBoostModalOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { success, error, ToastContainer } = useToast();
   const router = useRouter();
+  const { data: activeBoost } = useActiveBoost();
+
+  const remainingBoostMinutes = useMemo(() => {
+    if (!activeBoost?.expires_at) return 0;
+
+    const diff = new Date(activeBoost.expires_at).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / 60000));
+  }, [activeBoost]);
 
   const toggleAudio = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -128,6 +139,28 @@ export default function MatchesPage() {
         <div className="mx-auto max-w-md px-4 py-8">
           <ToastContainer />
           <div className="mb-4 space-y-4">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Discovery Boost</h2>
+                  {activeBoost ? (
+                    <p className="mt-1 flex items-center gap-2 text-sm font-medium text-green-600 dark:text-green-400">
+                      <Rocket className="h-4 w-4" />
+                      Boost Active · {activeBoost.boost_type} · about {remainingBoostMinutes} min left
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Boost your profile visibility to rise faster in nearby discovery.</p>
+                  )}
+                </div>
+                <Button
+                  onClick={() => setIsBoostModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
+                >
+                  {activeBoost ? <TimerReset className="h-4 w-4" /> : <Rocket className="h-4 w-4" />}
+                  {activeBoost ? 'Boost Active' : 'Boost Profile'}
+                </Button>
+              </div>
+            </div>
             <MatchFilter onFilterChange={handleFilterChange} />
           </div>
 
@@ -324,6 +357,11 @@ export default function MatchesPage() {
               messagesExchanged={0}
             />
           )}
+
+          <BoostPurchaseModal
+            isOpen={isBoostModalOpen}
+            onClose={() => setIsBoostModalOpen(false)}
+          />
         </div>
       </div>
     </ProtectedRoute>
