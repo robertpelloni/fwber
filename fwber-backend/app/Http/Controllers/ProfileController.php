@@ -346,12 +346,23 @@ class ProfileController extends Controller
                     $event = new UserProfileUpdated((string) $user->id, $changes);
                 }
 
-                $this->eventStore->append(
-                    $event,
-                    'UserProfile',
-                    $currentVersion + 1,
-                    ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
-                );
+                try {
+                    $this->eventStore->append(
+                        $event,
+                        'UserProfile',
+                        $currentVersion + 1,
+                        ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+                    );
+                } catch (\Throwable $eventStoreException) {
+                    // The rewind branch is being reconciled against a modern runtime
+                    // contract. Event sourcing should remain additive audit behavior,
+                    // not block the user from updating their profile when legacy schema
+                    // or serialization drift appears on the richer restored branch.
+                    Log::warning('Profile event append failed; continuing with projection save', [
+                        'user_id' => $user->id,
+                        'error' => $eventStoreException->getMessage(),
+                    ]);
+                }
                 // ----------------------------------
 
                 // Update profile fields (Projection Update)

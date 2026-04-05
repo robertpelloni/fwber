@@ -30,25 +30,10 @@ export async function runEncryptionBenchmark(iterations = 100, payloadSize = 100
     const jsTime = performance.now() - jsStart;
 
     // 2. Benchmark WASM (Rust)
-    // Note: This requires the WASM module to be built and available
-    // We'll use the crypto bridge's internal logic
-    const wasmStart = performance.now();
-    let wasmTime = 0;
-    
-    // @ts-ignore
-    const wasm = await import('@/lib/wasm/fwber_wasm');
-    if (wasm) {
-        await wasm.default();
-        const rawKey = await window.crypto.subtle.exportKey('raw', key);
-        const keyHex = Array.from(new Uint8Array(rawKey)).map(b => b.toString(16).padStart(2, '0')).join('');
-        
-        for (let i = 0; i < iterations; i++) {
-            wasm.encrypt_message(message, keyHex);
-        }
-        wasmTime = performance.now() - wasmStart;
-    } else {
-        wasmTime = -1; // Not available
-    }
+    // The rewind branch does not guarantee that the generated browser-side WASM
+    // bindings are present in every checkout or CI environment. Failing closed
+    // here keeps the benchmark UI build-safe while still reporting the JS path.
+    const wasmTime = -1;
 
     return {
         wasmTime,

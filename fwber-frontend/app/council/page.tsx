@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
-import { Gavel, Clock, Users, Zap, Loader2, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Gavel, Clock, Users, Zap, Loader2, ShieldCheck, TrendingUp, ExternalLink } from 'lucide-react';
 import AppHeader from '@/components/AppHeader';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -275,9 +275,5 @@ function ProposalCard({
                 </div>
             </div>
         </Card>
-    );
-}
-            </main>
-        </div>
     );
 }

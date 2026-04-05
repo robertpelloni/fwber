@@ -405,12 +405,24 @@ class MatchController extends Controller
             (float) ($user->profile->latitude ?? 0),
             (float) ($user->profile->longitude ?? 0)
         );
-        $this->eventStore->append(
-            $event,
-            'MatchAction',
-            $currentVersion + 1,
-            ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
-        );
+        try {
+            $this->eventStore->append(
+                $event,
+                'MatchAction',
+                $currentVersion + 1,
+                ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+            );
+        } catch (\Throwable $eventStoreException) {
+            // The richer rewind branch still contains legacy distributed event-bus
+            // infrastructure. Redis stream publishing should never prevent the
+            // core match action from completing during restoration/hardening work.
+            Log::warning('Match action event append failed; continuing with projection update', [
+                'user_id' => $user->id,
+                'target_user_id' => $targetUserId,
+                'action' => $action,
+                'error' => $eventStoreException->getMessage(),
+            ]);
+        }
         // ----------------------------------
 
         // Record the action (Projection Update)

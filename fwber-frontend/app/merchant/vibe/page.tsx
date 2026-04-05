@@ -16,8 +16,6 @@ import { Radio, Zap, Shield, Send, ArrowLeft, Target } from 'lucide-react';
 import Link from 'next/link';
 import NeighborhoodVibe from '@/components/merchant/NeighborhoodVibe';
 
-import { useSearchParams } from 'next/navigation';
-
 export default function VibeBroadcastPage() {
     const { token, user } = useAuth();
     const router = useRouter();
