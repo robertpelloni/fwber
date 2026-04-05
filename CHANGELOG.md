@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
+
+### Fixed
+- Hardened `NodeInfoController` so public discovery endpoints no longer 500 when optional federation-era schema columns like `user_profiles.is_federated` are absent.
+- Added/validated regression coverage for `.well-known/nodeinfo` and `/nodeinfo/2.0` on minimal schemas.
+- Updated the dedicated frontend GitHub workflow to Node.js 24 so GitHub Actions uses the same major runtime family as the locally validated lockfile/build environment.
+
+## [1.6.7] - 2026-04-05 — Frontend CI Node Runtime Alignment
+
+### Fixed
+- Updated `frontend-build.yml` to use Node.js 24 so GitHub Actions runs the same major npm/runtime family as the local lockfile regeneration environment.
+- This addresses the remaining frontend CI mismatch where `npm ci` under GitHub's older Node 20 / npm 10 toolchain still rejected the resynced lockfile.
+
+## [1.6.6] - 2026-04-05 — Hetzner Log ACL Deploy Fix
+
+### Fixed
+- Replaced the brittle deploy-time log chmod workaround with an ACL-based approach for `storage/logs`, so GitHub/SSH deploys and the PHP-FPM runtime can both write rotated log files without Monolog permission churn.
+- Removed the logging channel `permission` override that caused Monolog to attempt file chmod operations against `www-data`-owned daily logs during deploys.
+- Applied the matching ACL repair on the live Hetzner server so future rotated logs inherit shared write access for `deploy` and `www-data`.
+
+## [1.6.6] - 2026-04-05 — Discovery Route Recovery
+
+### Fixed
+- Hardened `NodeInfoController` so `/.well-known/nodeinfo` and `/nodeinfo/2.0` degrade safely on drifted production schemas instead of crashing when optional columns like `users.last_active_at` or `user_profiles.is_federated` are absent.
+- Strengthened the Hetzner nginx source config for `api.fwber.me` with an explicit `location ^~ /.well-known/` block so discovery routes are not accidentally trapped by hidden-file protections.
+- Added discovery-route regression coverage for NodeInfo in `PublicWebRoutesTest`.
+
+### Verified
+- `php artisan test --filter="PublicWebRoutesTest"` passes (4 tests / 26 assertions).
+- `php artisan route:list --path=.well-known` succeeds.
+
 ## [1.6.5] - 2026-04-04 — Hetzner Backend Stability Repair
 
 ### Fixed

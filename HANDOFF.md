@@ -1,119 +1,73 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.6.5
+> **Version Reached:** 1.6.8
 > **Current Model:** GPT
 
 ## Executive Summary
-The work shifted from workflow stabilization into direct live backend error repair after inspecting the Hetzner production app itself.
+This session continued the live production 500 sweep and found another real public-backend failure after the earlier Hetzner repairs.
 
-This session completed **v1.6.5 "Hetzner Backend Stability Repair"**.
-
-The key finding is important:
-- the Hetzner infrastructure was alive
-- but several production 500s were caused by **application drift**, not dead services
+Completed in **v1.6.8 "NodeInfo 500 Recovery + Frontend CI Runtime Fix"**:
+- root/backend discovery routes were rechecked live
+- `api.fwber.me/` is now healthy
+- WebFinger is no longer exploding
+- `/nodeinfo/2.0` was still 500ing due to a missing `user_profiles.is_federated` column assumption
+- frontend CI still needed one more environment alignment step: Node 24 in GitHub Actions
 
 ---
 
 ## What Was Root-Caused
-Direct live inspection found multiple real backend issues:
 
-### 1. `https://api.fwber.me/` returned 500
-Cause:
-- backend web root still tried to render a non-existent `welcome` view in production
+### 1. Root route recovery is successful
+Confirmed live:
+- `https://api.fwber.me/` now returns `200` with backend JSON status payload
 
-### 2. `php artisan route:list` failed on Hetzner
-Cause:
-- `routes/web.php` referenced `App\Http\Controllers\WebFingerController`
-- that controller file did not exist in the active backend
+That means the earlier root-route 500 repair is now actually working in production.
 
-### 3. Dashboard activity/stats could 500 on live schema drift
-Cause:
-- live drift showed `user_matches` may be missing even when migration history implies the matching schema already ran
-- dashboard code assumed the table existed
-- there was also a PHP 8.4 bug where `limit` could remain a string and later break `array_slice()`
+### 2. WebFinger recovery is successful
+Confirmed live:
+- `https://api.fwber.me/.well-known/webfinger?resource=acct:test@api.fwber.me`
+  returns a sane non-500 JSON/JRD response
 
-### 4. Deploy-time artisan commands could fail on daily log rotation
-Cause:
-- log files created by the web runtime could be owned by `www-data` with insufficient permissions for later deploy-user artisan commands to append
-- this surfaced as permission-denied failures while trying to log exceptions during artisan execution
+That confirms the missing `WebFingerController` problem is resolved.
+
+### 3. `/nodeinfo/2.0` still 500ed
+Live log inspection showed the actual cause:
+- SQL error: missing `user_profiles.is_federated`
+
+So although public discovery routes were mostly repaired, `NodeInfoController` was still assuming a federation-era optional column existed.
+
+### 4. Frontend workflow still red after lockfile resync
+The remaining frontend CI failure after the lockfile resync was still `npm ci` under GitHub.
+
+Important nuance:
+- local lockfile regeneration/validation happened under **Node 24 / npm 11**
+- GitHub frontend workflow was still pinned to **Node 20 / npm 10**
+
+That runtime-family mismatch was the likely remaining CI blocker, so the workflow was aligned to Node 24.
 
 ---
 
 ## What Was Changed
 
-### Backend route repair
+### NodeInfo schema guard (already now in source state)
+`fwber-backend/app/Http/Controllers/NodeInfoController.php`
+- added strict types + `Schema` guards
+- made NodeInfo degrade safely when optional federation-era columns are absent
+- prevents `/nodeinfo/2.0` from crashing on minimal or post-simplification schemas
+
+### Public route regression coverage
+`fwber-backend/tests/Feature/PublicWebRoutesTest.php`
+- validated `.well-known/nodeinfo`
+- validated `/nodeinfo/2.0` degrades cleanly on minimal schema
+
+### Frontend CI runtime alignment
+`.github/workflows/frontend-build.yml`
+- updated workflow to **Node.js 24**
+- aligns GitHub Actions with the runtime family used when the frontend lockfile was regenerated and locally validated
+
+### Docs / release tracking
 Updated:
-- `fwber-backend/routes/web.php`
-
-Changes:
-- replaced the broken root route with a lightweight JSON backend status payload
-- kept public discovery routes but made them point at a real controller implementation
-
-### Missing controller restored
-Added:
-- `fwber-backend/app/Http/Controllers/WebFingerController.php`
-
-This stops the discovery route surface from breaking route loading and public web discovery.
-
-### Dashboard hardening
-Updated:
-- `fwber-backend/app/Http/Controllers/DashboardController.php`
-- `fwber-backend/tests/Feature/DashboardEndpointsTest.php`
-
-Changes:
-- degrade to zero stats/activity when `user_matches` is missing
-- fix PHP 8.4-safe limit handling
-- expanded regression coverage for drifted schema behavior
-
-### Corrective schema repair migration
-Added:
-- `fwber-backend/database/migrations/2026_04_05_000000_restore_match_tables_if_missing.php`
-
-Purpose:
-- repair live environments where migration history drifted from actual tables and matching tables are absent
-
-### Public web route tests
-Added:
-- `fwber-backend/tests/Feature/PublicWebRoutesTest.php`
-
-Coverage:
-- backend root route returns JSON status payload
-- WebFinger endpoint requires the expected resource query parameter
-
-### Logging permission hardening
-Updated:
-- `fwber-backend/config/logging.php`
-- `ops/hetzner/scripts/deploy-backend.sh`
-
-Changes:
-- daily log channels now create files with group-writable permissions
-- deploy script makes a best-effort pass over existing log files to restore writeability before later artisan commands are blocked by rotation ownership drift
-
----
-
-## Validation Performed
-Executed locally:
-- `php artisan test --filter="DashboardEndpointsTest|PublicWebRoutesTest"`
-- `php artisan route:list --path=.well-known`
-
-Results:
-- **6 tests passed / 29 assertions**
-- route list for public discovery routes succeeded
-
-Live inspection also confirmed the pre-fix production symptoms were real.
-
----
-
-## Files Changed
-- `fwber-backend/app/Http/Controllers/DashboardController.php`
-- `fwber-backend/app/Http/Controllers/WebFingerController.php`
-- `fwber-backend/config/logging.php`
-- `fwber-backend/routes/web.php`
-- `fwber-backend/database/migrations/2026_04_05_000000_restore_match_tables_if_missing.php`
-- `fwber-backend/tests/Feature/DashboardEndpointsTest.php`
-- `fwber-backend/tests/Feature/PublicWebRoutesTest.php`
-- `ops/hetzner/scripts/deploy-backend.sh`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -125,19 +79,48 @@ Live inspection also confirmed the pre-fix production symptoms were real.
 
 ---
 
+## Validation Performed
+### Backend route checks
+Confirmed live:
+- `https://api.fwber.me/` → 200 JSON
+- `https://api.fwber.me/.well-known/webfinger?...` → no 500
+- `https://api.fwber.me/nodeinfo/2.0` → still 500 before this release due to missing `is_federated`
+
+### Backend tests
+Executed successfully:
+- `php artisan test --filter='PublicWebRoutesTest'`
+
+Result:
+- **4 tests passed / 26 assertions**
+
+---
+
+## Files Changed This Slice
+- `.github/workflows/frontend-build.yml`
+- `CHANGELOG.md`
+- `PROJECT_STATUS.md`
+- `TODO.md`
+- `MEMORY.md`
+- `ROADMAP.md`
+- `DEPLOY.md`
+- `HANDOFF.md`
+- version files
+
+(Plus the already-present source-side NodeInfo hardening now reflected in current HEAD.)
+
+---
+
 ## Git / Release
-- **Target Version:** `1.6.5`
-- **Recommended Commit Message:** `fix: repair live hetzner backend route and schema drift failures (v1.6.5)`
+- **Target Version:** `1.6.8`
+- **Recommended Commit Message:** `fix: recover nodeinfo endpoint and align frontend ci to node 24 (v1.6.8)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push `v1.6.5`
-2. Deploy the backend patch to Hetzner
-3. Re-verify live:
-   - `https://api.fwber.me/`
-   - dashboard stats/activity endpoints
-   - route cache / artisan route:list behavior
-4. Continue frontend live verification and broader restoration planning only after 500s are under control
+1. Commit and push `v1.6.8`
+2. Let Hetzner backend deploy pick up the NodeInfo guard
+3. Re-check live `/nodeinfo/2.0`
+4. Re-run frontend GitHub build under Node 24
+5. Continue production 500 sweep before attempting massive full feature restoration
 
 No processes were manually killed.
