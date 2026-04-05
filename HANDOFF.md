@@ -5,100 +5,148 @@
 > **Current Model:** GPT
 
 ## Executive Summary
-This session continued the production-hardening loop after confirming that:
-- Hetzner backend deploys are green again
-- backend CI is green again
-- repository hygiene is green again
-- but the dedicated frontend GitHub build was still failing even after lockfile resync and Node 24 alignment
+This session continued the Hetzner stabilization loop and focused on making the **verification/deploy layer trustworthy again** after the backend itself had already become healthier.
 
-That remaining frontend failure turned out to be a CI install-strategy problem caused by platform-sensitive optional dependencies.
+The main success is concrete and live, not theoretical:
+- `api.fwber.me` root works
+- NodeInfo discovery works
+- the Hetzner smoke check now passes with **9 passes / 3 expected warnings / 0 failures**
+- websocket upgrade verification now succeeds against `ws.fwber.me`
 
-This session completed **v1.6.9 "Frontend Workflow Install Strategy Fix"**.
+This session finalized the current working batch as **v1.6.9 "Frontend Workflow Install Strategy Fix"**, while also folding in substantial Hetzner smoke/deploy contract hardening.
 
 ---
 
-## What Was Root-Caused
-### 1. Backend side kept improving
-By this point:
-- `api.fwber.me/` was confirmed healthy and returning JSON
-- WebFinger no longer 500ed
-- Hetzner deploy workflow was green again after ACL-based log repair
+## What Was Root-Caused This Session
+### 1. The backend had become healthier than the verifier
+After earlier backend recovery steps, the live stack was clearly improving, but the verification layer still had drift/ergonomics problems:
+- manual smoke invocations could accidentally omit `/api`
+- websocket verification could silently skip if the Reverb key was not provided perfectly
+- nginx site configs on the server had already drifted away from repo-tracked source-of-truth configs at least once
 
-### 2. Frontend GitHub build still failed
-Even after:
-- lockfile resync
-- upgrading the workflow to Node 24
+### 2. Realtime was healthier than plain GET probes suggested
+A proper websocket upgrade probe matters more than a naive `GET /` against `ws.fwber.me`.
+After hardening the verifier and using the real app-key path, the websocket probe succeeded.
 
-GitHub still failed during frontend dependency installation.
-
-Failure signature:
-- `npm ci` rejected the install because of platform-sensitive optional dependency drift
-- errors referenced packages like:
-  - `bufferutil`
-  - `utf-8-validate`
-  - nested `react-native`
-  - nested `react@19.2.4`
-
-This points at wallet/native-adjacent dependency branches behaving differently between environments, even when the actual local build succeeds.
-
-### 3. Conclusion
-The issue was no longer about source app correctness.
-It was about using a too-strict install mode for a dependency graph that still contains optional/platform-variant branches.
+### 3. Server config drift is a real Hetzner operational risk
+The repo-tracked nginx configs were better than what was actually live on the box.
+That means deploy behavior should not assume the server is already aligned; it should re-apply tracked config where appropriate.
 
 ---
 
 ## What Was Changed
+### Frontend CI stabilization already present in current batch
+Tracked in `1.6.9`:
+- `.github/workflows/frontend-build.yml`
+- frontend workflow install step switched from `npm ci` to `npm install --no-fund --no-audit`
+
+### Smoke-check hardening
 Updated:
-- `.github/workflows/frontend-build.yml`
+- `ops/hetzner/scripts/smoke-check.sh`
 
-Change:
-- replaced `npm ci` with:
-  - `npm install --no-fund --no-audit`
+Changes:
+- normalizes `FWBER_API_URL` to the canonical `/api` contract automatically
+- derives `GEO_QUERY_URL` after normalization
+- auto-discovers `REVERB_APP_KEY` from Laravel config when not supplied explicitly
 
-Why:
-- this restores build verification signal while the dependency graph is still being simplified
-- the workflow still performs the real production build, which is the important verification target right now
+Why this matters:
+- fewer false negatives from operator-supplied base URLs
+- fewer skipped websocket checks due to env drift
 
----
+### Deploy script hardening
+Updated:
+- `ops/hetzner/scripts/deploy-backend.sh`
 
-## Validation Context
-### Already green
-- `Deploy Backend (Hetzner)` ✅
-- `Backend CI (Tests & Linting)` ✅
-- `Repository Hygiene` ✅
+Changes:
+- added helper to re-sync tracked nginx site configs from repo to server
+- re-applies tracked configs for:
+  - `api.fwber.me`
+  - `ws.fwber.me`
+  - `geo.fwber.me`
+- runs `nginx -t` before reload
+- supplies canonical live URLs into the smoke-check invocation
 
-### Remaining next validation target
-- rerun `Frontend Build & Deploy (Vercel)` after this install-strategy fix lands
+Why this matters:
+- reduces config drift between repo truth and server truth
+- keeps post-deploy smoke runs consistent
 
----
-
-## Files Changed in This Slice
-- `.github/workflows/frontend-build.yml`
+### Documentation / release sync
+Updated:
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
-- `MEMORY.md`
 - `ROADMAP.md`
+- `MEMORY.md`
 - `DEPLOY.md`
-- `HANDOFF.md`
 - version files
 
 ---
 
-## Git / Release
-- **Target Version:** `1.6.9`
-- **Recommended Commit Message:** `fix: use npm install in frontend github workflow for optional dependency drift (v1.6.9)`
+## Live Validation Performed
+### Hetzner backend activation / verification
+Confirmed on the live server:
+- `user_matches=yes`
+- `match_actions=yes`
+- `php artisan deploy:verify --json` => healthy
+- `https://api.fwber.me/` => `200 OK`
+
+### Discovery route recovery
+Confirmed live after nginx/backend refresh plus graceful PHP-FPM reload:
+- `https://api.fwber.me/.well-known/nodeinfo` => `200 OK`
+- `https://api.fwber.me/nodeinfo/2.0` => `200 OK`
+- `https://api.fwber.me/.well-known/webfinger?resource=acct:test@api.fwber.me` => app-level `404` JRD response (acceptable for a nonexistent acct)
+
+### Smoke-check result
+Ran the hardened smoke-check against the live stack and got:
+- **passes=9**
+- **warnings=3**
+- **failures=0**
+
+This included:
+- frontend reachability pass
+- API health/liveness/readiness passes
+- invalid-login contract pass
+- public roast preview pass
+- geo nearby pass
+- websocket upgrade pass
+
+### Realtime result
+The websocket upgrade probe now succeeds against:
+- `https://ws.fwber.me`
+
+This means the next realtime concern is no longer “can a websocket handshake happen at all?” but rather:
+- does the actual frontend UX/authenticated broadcast flow behave correctly in-browser?
 
 ---
 
-## Best Next Steps
-1. Commit and push `v1.6.9`
-2. Re-run `Frontend Build & Deploy (Vercel)`
-3. Re-check live `/nodeinfo/2.0` after the current backend deploy path has the guarded controller in place
-4. Continue live frontend runtime verification:
-   - dashboard API behavior
-   - E2E restore behavior
-   - realtime connected badge
-5. Only then begin broader full-feature restoration planning
+## Remaining Known Issues
+### 1. Mercure remains unresolved
+- `mercure.fwber.me` is still not part of a healthy public contract
+- nothing meaningful is listening behind the configured upstream
+- this is now a clear product/ops decision: provision it properly or retire/remove it from the active surface
+
+### 2. Frontend live UX still needs browser-level verification
+Even with backend + websocket probes healthy, the live frontend should still be checked for:
+- correct API origin usage
+- header connection badge behavior
+- broadcast auth flow
+- dashboard rendering against the recovered backend
+
+### 3. GitHub frontend workflow still needs re-run confirmation
+The workflow has now been changed again (`npm install --no-fund --no-audit`), but that still needs confirmation from an actual GitHub Actions run.
+
+---
+
+## Recommended Immediate Next Steps
+1. Commit and push the current `1.6.9` working tree
+2. Re-run the GitHub frontend workflow and confirm green status
+3. Verify the live frontend in-browser against the recovered backend/realtime stack
+4. Decide whether `mercure.fwber.me` is being provisioned or removed from the public contract
+5. Continue the broader production 500 sweep only after frontend runtime behavior is confirmed
+
+---
+
+## Recommended Commit Message
+- `fix(ops): harden hetzner smoke checks and config sync (v1.6.9)`
 
 No processes were manually killed.

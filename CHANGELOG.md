@@ -6,7 +6,14 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Switched the dedicated frontend GitHub workflow from strict `npm ci` to `npm install --no-fund --no-audit` so the build can proceed despite platform-sensitive optional dependency resolution from wallet/native-adjacent packages.
-- This is a pragmatic CI stabilization step while the broader dependency graph is still being reduced and normalized.
+- Hardened `ops/hetzner/scripts/smoke-check.sh` so it normalizes API URLs to the `/api` contract automatically and can auto-discover the Reverb app key from the Laravel backend when not provided explicitly.
+- Hardened `ops/hetzner/scripts/deploy-backend.sh` so each deploy now re-syncs the tracked Hetzner nginx configs for `api.fwber.me`, `ws.fwber.me`, and `geo.fwber.me` before testing/reloading nginx, reducing server drift from repo truth.
+- This is a pragmatic CI + operations stabilization step while the broader dependency graph and live service contract are still being normalized.
+
+### Verified
+- Live smoke check now passes against Hetzner with **9 passes / 3 expected warnings / 0 failures**.
+- The websocket upgrade probe now succeeds against `https://ws.fwber.me` using the production Reverb app key.
+- `https://api.fwber.me/`, `/.well-known/nodeinfo`, and `/nodeinfo/2.0` all return healthy responses live after backend/nginx refresh.
 
 ## [1.6.8] - 2026-04-05 — NodeInfo 500 Recovery + Frontend CI Runtime Fix
 

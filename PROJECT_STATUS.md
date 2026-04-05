@@ -7,11 +7,17 @@
 ---
 
 ## 🎯 What This Release Delivered
-This release applies a pragmatic CI fix after the frontend workflow remained blocked by platform-sensitive dependency resolution.
+This release applies a pragmatic CI + operations stabilization pass after the frontend workflow and post-deploy verification layer both showed environment-sensitive drift.
 
 Delivered:
 - switched the frontend GitHub workflow from `npm ci` to `npm install --no-fund --no-audit`
-- kept the build validation step intact
+- hardened the Hetzner smoke-check script so it auto-normalizes the API base URL and can discover the Reverb app key from the backend config
+- hardened the Hetzner deploy script so it re-applies tracked nginx configs for api/ws/geo before nginx validation + reload
+- confirmed a clean live smoke result on Hetzner, including websocket upgrade verification
 
 ## ✅ Why This Matters
-The frontend dependency graph still includes wallet/native-adjacent packages whose optional/platform-sensitive resolution can diverge between local and GitHub Linux environments. This change restores CI signal while deeper dependency cleanup remains pending.
+The frontend dependency graph still includes wallet/native-adjacent packages whose optional/platform-sensitive resolution can diverge between local and GitHub Linux environments. At the same time, the production verifier itself needed to be more resistant to operator/env drift.
+
+This release improves both:
+- CI signal becomes more resilient
+- deploy-time verification becomes closer to a real source-of-truth contract check

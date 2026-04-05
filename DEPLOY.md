@@ -171,6 +171,8 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - the dedicated frontend GitHub build now targets Node.js 24 so CI uses the same runtime family as the locally verified lockfile/build flow
 - public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
 - the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
+- the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, and `geo.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
+- the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
 - `HETZNER_HOST`
 - `HETZNER_USERNAME`
 - `HETZNER_SSH_KEY`
@@ -180,6 +182,17 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 
 ```bash
 FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
+```
+
+That path now performs a more trustworthy verification pass by:
+- using the canonical `https://api.fwber.me/api` base automatically
+- reloading tracked nginx site configs before testing
+- attempting a real websocket upgrade probe using the configured Reverb app key when available
+
+A recent live Hetzner run completed with:
+
+```bash
+passes=9 warnings=3 failures=0
 ```
 
 That path now writes timestamped smoke-check reports under:

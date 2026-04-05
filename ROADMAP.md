@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.6.8 "NodeInfo 500 Recovery + Frontend CI Runtime Fix"
+> **Current Version:** 1.6.9 "Frontend Workflow Install Strategy Fix"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,9 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.6.8)
+### Phase 5: Production Scale (COMPLETED - v1.6.9)
+- **Frontend Workflow Install Strategy Fix:** Switched the dedicated frontend GitHub workflow to `npm install --no-fund --no-audit` so frontend CI can proceed despite platform-sensitive optional dependency resolution in the current dependency graph.
+- **Hetzner Smoke/Deploy Contract Hardening:** Hardened smoke-check URL normalization + Reverb key discovery, re-synced tracked nginx configs during deploy, and re-verified the live Hetzner stack with a clean 9/3/0 smoke result including websocket upgrade success.
 - **NodeInfo 500 Recovery + Frontend CI Runtime Fix:** Hardened `NodeInfoController` against missing federation-era schema and aligned the frontend GitHub build to Node.js 24 so both discovery endpoints and frontend CI stop failing for infrastructure/toolchain reasons.
 - **Hetzner Log ACL Deploy Fix:** Replaced the broken daily-log permission approach with shared ACLs for `deploy` and `www-data`, fixing deploy-time failures caused by rotated log ownership drift on Hetzner.
 - **Hetzner Backend Stability Repair:** Replaced the broken root backend route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables discovered during live Hetzner inspection.
