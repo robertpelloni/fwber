@@ -33,4 +33,4 @@ jobs:
             export FWBER_REVERB_APP_KEY="${HETZNER_REVERB_APP_KEY:-}"
             export FWBER_RUN_SMOKE_CHECK="${FWBER_RUN_SMOKE_CHECK:-0}"
             cd "$REPO_ROOT"
-            ./ops/hetzner/scripts/deploy-backend.sh
+            bash ./ops/hetzner/scripts/deploy-backend.sh
