@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.4 monetization and token-era features feel far more coherent once grouped as one economy surface
+- Premium, wallet, referrals, boosts, gifts, and unlock mechanics were already restored enough to function, but they still read as isolated monetization remnants before this tranche.
+- A dedicated economy hub makes it clearer that these are part of one business/access layer rather than unrelated pages.
+- Using already-imported dashboard icons for new cards avoided the tiny missing-import seam that showed up in the prior two dashboard expansions.
+
 ## 2026-04-06 — v1.8.3 the profile and media layer becomes much more legible once identity controls are treated as a first-class hub
 - Profile, photos, verification, and physical-profile settings were already present, but users still had to remember scattered routes to reach them.
 - A dedicated identity hub helps the rewind branch feel closer to a finished product because self-presentation is central to the dating flow, not a side setting.

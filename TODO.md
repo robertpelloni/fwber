@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.3
+> **Version:** 1.8.4
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Economy Hub Recovery**: Added a new `/economy` hub and surfaced premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one coherent restored destination.
 - [x] **Rewind Identity Hub Recovery**: Added a new `/identity` hub and surfaced profile, photos, identity settings, verification, physical-profile controls, and security/recovery access from one coherent restored destination.
 - [x] **Rewind Operations Hub Recovery**: Added a new `/operations` hub and surfaced safety, settings, security, merchant flows, and moderation/travel operational tooling from one coherent restored destination.
 - [x] **Rewind Connections Hub Recovery**: Added a new `/connections` hub and surfaced messages, friends, activity, notifications, matches, and groups from one coherent restored destination.

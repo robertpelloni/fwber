@@ -255,6 +255,13 @@ export default function DashboardPage() {
                       accent="blue"
                     />
                     <FeatureSurfaceCard
+                      href="/economy"
+                      title="Premium & Economy"
+                      description="Open premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one restored hub."
+                      icon={<Wallet className="h-5 w-5" />}
+                      accent="green"
+                    />
+                    <FeatureSurfaceCard
                       href="/operations"
                       title="Trust & Operations"
                       description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."

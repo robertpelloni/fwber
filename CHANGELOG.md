@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.4] - 2026-04-06 — Rewind Economy Hub Recovery
+
+### Added
+- Added a new top-level `/economy` page that consolidates premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Economy`.
+- Expanded the dashboard restored-sections grid so the premium/token economy cluster is visible alongside identity, operations, connections, studio, scenes, spaces, places, reputation, and other restored product areas.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new economy hub in the route manifest.
+
 ## [1.8.3] - 2026-04-06 — Rewind Identity Hub Recovery
 
 ### Added
