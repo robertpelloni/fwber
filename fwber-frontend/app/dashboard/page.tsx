@@ -26,6 +26,7 @@ import {
   Share2,
   Radio,
   Map,
+  Award,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -219,6 +220,13 @@ export default function DashboardPage() {
                       description="Open nearby people, venues, deals, date planning, and location-aware surfaces from one local-discovery hub."
                       icon={<Map className="h-5 w-5" />}
                       accent="green"
+                    />
+                    <FeatureSurfaceCard
+                      href="/reputation"
+                      title="Reputation & Trust"
+                      description="Open achievements, verification, profile views, and social-proof surfaces from one trust-focused hub."
+                      icon={<Award className="h-5 w-5" />}
+                      accent="yellow"
                     />
                     <FeatureSurfaceCard
                       href="/unlocks"

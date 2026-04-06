@@ -1,18 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.7.7 (Rewind Places Hub + Avatar Provider Test Fallback)
+# PROJECT_STATUS.md - fwber v1.7.8 (Rewind Reputation Hub Recovery)
 
 **Date:** 2026-04-06
-**Version:** 1.7.7 "Rewind Places Hub + Avatar Provider Test Fallback"
-**Status:** ✅ **RESTORE BRANCH NOW EXPOSES THE LOCAL-DISCOVERY CLUSTER AS A REAL DESTINATION WHILE ANOTHER AVATAR-CI DRIFT VECTOR IS PATCHED**
+**Version:** 1.7.8 "Rewind Reputation Hub Recovery"
+**Status:** ✅ **RESTORE BRANCH NOW EXPOSES THE TRUST / SOCIAL-PROOF CLUSTER AS A COHERENT TOP-LEVEL DESTINATION**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release paired another coherent surface recovery with another direct backend-CI stabilization move.
+This release continued the coherent-surface restoration pattern by grouping trust and social-proof features into one restored destination.
 
 Delivered:
-- added a dedicated `/places` hub for nearby people, venues, deals, date planning, location settings, and safety-in-context
-- expanded navigation and dashboard cards so the local-discovery cluster is surfaced more clearly
-- pinned the implicit avatar-generation testing fallback provider to DALL-E when no explicit provider is passed, keeping richer avatar assertions aligned with historical expectations
+- added a dedicated `/reputation` hub
+- surfaced achievements, leaderboard, profile views, verification, and related trust flows through one page
+- expanded navigation and dashboard cards so this cluster is easier to discover from the signed-in shell
 
 ## ✅ Why This Matters
-The rewind branch keeps getting stronger when each iteration restores one more coherent user-facing cluster while also shrinking another narrow backend CI seam. This keeps the branch moving toward a broad restored product that still remains compatible with modern Hetzner deployment expectations.
+The richer branch already contained multiple reputation-adjacent systems, but they still felt scattered. The new hub makes them feel intentionally restored while keeping the frontend production build green and the branch compatible with modern deployment expectations.

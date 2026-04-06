@@ -39,6 +39,7 @@ import {
   Lock,
   Radio,
   Map,
+  Award,
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -90,6 +91,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/video', label: 'Video', icon: Phone },
     { href: '/spaces', label: 'Spaces', icon: Radio },
     { href: '/places', label: 'Places', icon: Map },
+    { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },
     { href: '/roast', label: 'Roast', icon: Flame },
     { href: '/share-unlock', label: 'Share Unlocks', icon: Sparkles },

@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.7.8 trust and social-proof surfaces also become much more legible when grouped into a reputation hub
+- Achievements, leaderboard, profile views, and verification already existed, but were scattered enough to still feel partially restored.
+- A dedicated reputation hub is another high-leverage way to make existing restored systems feel like a coherent product area without destabilizing runtime behavior.
+- The same hub strategy is now clearly working across unlocks, spaces, places, and reputation clusters.
+
 ## 2026-04-06 — v1.7.7 the local-discovery / places cluster also benefits from a hub pattern, just like unlocks and spaces
 - Nearby people, venues, deals, date planning, location settings, and safety are all related enough that they feel stronger as one restored destination.
 - This keeps the richer branch legible as more systems come back online.

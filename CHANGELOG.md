@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.8] - 2026-04-06 — Rewind Reputation Hub Recovery
+
+### Added
+- Added a new top-level `/reputation` page that consolidates achievements, leaderboard, profile views, verification, and related trust/reputation surfaces into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Reputation`.
+- Expanded the dashboard restored-sections grid so the trust / social-proof cluster is surfaced alongside places, spaces, unlocks, boosts, gifts, referrals, video, merchant, and wallet-era systems.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new reputation hub in the route manifest.
+
 ## [1.7.7] - 2026-04-06 — Rewind Places Hub + Avatar Provider Test Fallback
 
 ### Added

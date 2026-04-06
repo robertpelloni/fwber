@@ -1,14 +1,14 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-06
-> **Version Reached:** 1.7.7
+> **Version Reached:** 1.7.8
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session kept the rewind branch moving with the same dual-track pattern:
+This continuation session kept the rewind branch moving with the same two-track strategy that has been working well:
 1. restore more approved removed systems as coherent top-level destinations
-2. continue shaving down the remaining narrow backend CI seams so the branch stays on a realistic Hetzner-safe promotion path
+2. keep backend CI drift under control through explicit, narrowly targeted fixes
 
 Already pushed earlier in the broader continuation:
 - `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
@@ -18,61 +18,50 @@ Already pushed earlier in the broader continuation:
 - `efbfc096a` — `fix: refresh rewind avatar prompt profile resolution (v1.7.4)`
 - `d135b66ec` — `feat: restore rewind live spaces hub (v1.7.5)`
 - `a83fe15a5` — `fix: restore rewind avatar prompt interest labels (v1.7.6)`
+- `17ab34090` — `feat: restore rewind places hub and avatar provider fallback (v1.7.7)`
 
 Completed in this slice:
-- added a new top-level `/places` hub page for local-discovery surfaces
+- added a new top-level `/reputation` page as a trust/social-proof hub
 - expanded restored-features navigation and dashboard cards to include that hub
-- added another avatar-generation CI compatibility guard by pinning implicit test fallback provider selection to DALL-E when no explicit provider is supplied
-- validated another successful restore-branch frontend production build
-- recorded release metadata for **v1.7.7**
+- validated another successful restore-branch frontend production build with `/reputation` present in the manifest
+- recorded release metadata for **v1.7.8**
 
 No processes were manually killed.
 
 ---
 
 ## What Was Added
-### `fwber-frontend/app/places/page.tsx`
-Added a dedicated top-level `Places & Nearby` hub.
+### `fwber-frontend/app/reputation/page.tsx`
+Added a dedicated `Reputation & Trust` hub.
 
-The page consolidates several already-present but scattered local-discovery surfaces into one coherent restored destination:
-- `/nearby`
-- `/venues`
-- `/date-planner`
-- `/deals`
-- `/location-settings`
-- `/safety`
+This page consolidates several already-present but scattered trust/social-proof surfaces into one coherent restored destination:
+- `/achievements`
+- `/leaderboard`
+- `/profile-views`
+- `/settings/verification`
+- `/matches/dashboard`
+- supporting vouch/reputation context
 
 ### Why this matters
-These surfaces are part of the branch’s place-aware, meetup-oriented discovery cluster. Even when the routes already exist, they feel under-restored if they remain fragmented.
+The branch already contained multiple reputation-adjacent systems, but they were scattered enough that they still felt partially restored.
 
-A dedicated hub makes the cluster feel intentional and easier to navigate.
+A dedicated hub makes the trust/social-proof cluster feel intentional and easier to navigate.
 
 ---
 
 ## Navigation / Dashboard Changes
 ### `fwber-frontend/components/AppHeader.tsx`
 Extended restored-features navigation to include:
-- `/places`
+- `/reputation`
 
 ### `fwber-frontend/app/dashboard/page.tsx`
 Added a new restored-sections card for:
-- `Places & Nearby`
+- `Reputation & Trust`
 
-This continues the broader pattern of making restored clusters visible from the main signed-in shell instead of hiding them as scattered subroutes.
-
----
-
-## Backend CI Compatibility Change
-### `fwber-backend/app/Services/AvatarGenerationService.php`
-Added another testing-compatibility guard:
-- when running in `testing` and no explicit provider is passed, default the implicit provider to `dalle`
-
-### Why this matters
-The richer rewind avatar-generation suite historically assumes DALL-E as the implicit provider for prompt-shape assertions.
-
-If configuration drift leaves the provider default ambiguous during CI, tests can still fail for the wrong reason even after prompt-content fixes have been applied.
-
-This change keeps the implicit testing path aligned with those older expectations without affecting explicit provider selections or production runtime behavior.
+This continues the now-proven restoration pattern:
+- real top-level destinations
+- dashboard visibility
+- restored-features navigation visibility
 
 ---
 
@@ -84,19 +73,15 @@ Executed:
 Result:
 - successful production build
 - route manifest now includes:
-  - `/places`
+  - `/reputation`
 
-This preserves the branch’s current strong frontend signal:
-- repeated successful production builds after each restoration tranche
+This keeps the rewind branch aligned with the user’s requirement that restoration still remain compatible with modern deployment expectations.
 
 ---
 
 ## Files Changed This Slice
-### Backend
-- `fwber-backend/app/Services/AvatarGenerationService.php`
-
 ### Frontend
-- `fwber-frontend/app/places/page.tsx`
+- `fwber-frontend/app/reputation/page.tsx`
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
 
@@ -117,18 +102,18 @@ This preserves the branch’s current strong frontend signal:
 
 ## Git / Release
 ### Current tranche target
-- **Target Version:** `1.7.7`
-- **Recommended Commit Message:** `feat: restore rewind places hub and avatar provider fallback (v1.7.7)`
+- **Target Version:** `1.7.8`
+- **Recommended Commit Message:** `feat: restore rewind reputation hub (v1.7.8)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.7.7` places-hub + avatar-provider-fallback tranche.
+1. Commit and push the `v1.7.8` reputation-hub tranche.
 2. Re-check the latest restore-branch GitHub Actions runs.
-3. If backend CI remains red, continue inspecting only the next explicit failure.
-4. Keep restoring approved removed systems using the same working pattern:
+3. If backend CI remains red, keep inspecting only the next explicit failure rather than broad guessing.
+4. Continue restoring approved removed systems using the same working pattern:
    - real top-level destinations
    - dashboard visibility
    - restored-features navigation visibility
    - no regressions against modern Hetzner/runtime expectations
-5. Keep the rewind branch on the path toward becoming a realistic Hetzner-deployable replacement line rather than just a loose archive of old features.
+5. Keep the rewind branch converging toward a broadly restored but still deployable Hetzner-ready candidate line.
