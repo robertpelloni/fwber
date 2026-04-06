@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.9 "Rewind Dashboard Domain Organization"
+> **Current Version:** 1.8.10 "Rewind Sidebar Domain Organization"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.9)
+### Phase 5: Production Scale (COMPLETED - v1.8.10)
+- **Rewind Sidebar Domain Organization:** Reorganized the sidebar and mobile restored-surfaces navigation so the app shell mirrors the dashboard’s domain-based product map.
 - **Rewind Dashboard Domain Organization:** Reorganized the signed-in dashboard so restored surfaces are grouped by product domain rather than presented as a flat recovery list.
 - **Rewind Matching Hub Recovery:** Added a real top-level matching hub for recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context so the core attraction funnel feels intentionally restored.
 - **Rewind Support Hub Recovery:** Added a real top-level support hub for help, contact, privacy policy, terms, safety resources, and blocked-user controls so the trust-information layer feels intentionally restored.

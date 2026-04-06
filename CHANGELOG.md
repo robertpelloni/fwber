@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.10] - 2026-04-06 — Rewind Sidebar Domain Organization
+
+### Changed
+- Reorganized the sidebar and mobile restored-surfaces navigation into clearer domain groups: dating loop, identity/trust, premium/growth, creative/live, and local business.
+- Reduced navigation sprawl in the signed-in shell by turning the restored-features rail into a grouped product map instead of a flat list.
+
+### Fixed
+- Repaired a build regression where the imported `Map` icon shadowed the global `Map` constructor inside the new explore-section helper; switched to `globalThis.Map` after production prerendering exposed the issue on `/wallet`.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the grouped sidebar/mobile navigation refactor.
+
 ## [1.8.9] - 2026-04-06 — Rewind Dashboard Domain Organization
 
 ### Changed

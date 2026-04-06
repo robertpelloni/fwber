@@ -1,54 +1,77 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-06
-> **Version Reached:** 1.8.9
+> **Version Reached:** 1.8.10
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation moved from adding yet another hub to improving how the restored branch is presented as a whole:
-1. identified that the dashboard had reached the point of restored-surface sprawl
-2. reorganized the dashboard’s restored-surfaces area by product domain
-3. validated the frontend production build successfully on the first pass
-4. updated release tracking to **v1.8.9**
-5. kept coherence improving without touching backend contracts
+This continuation followed the dashboard-organization pass with a shell-organization pass so the product map stays consistent across the signed-in experience:
+1. identified that the sidebar/mobile restored-features navigation still looked like a flat backlog even after the dashboard was grouped
+2. reorganized the sidebar and mobile restored-surfaces navigation by product domain
+3. hit a narrow production build regression caused by `Map` icon shadowing the global constructor inside the new helper
+4. repaired it by switching to `globalThis.Map`
+5. reran the production build successfully
+6. updated release tracking to **v1.8.10**
 
 No processes were manually killed.
 
 ---
 
 ## What Changed In This Continuation
-### `fwber-frontend/app/dashboard/page.tsx`
-Refined the signed-in dashboard’s restored-sections area.
+### `fwber-frontend/components/AppHeader.tsx`
+Refined the restored-features navigation in both the sidebar and mobile menu.
 
-Instead of one long flat grid of mixed cards, restored surfaces are now grouped under clearer product-domain headings:
-- **Core dating loop**
-- **Identity, trust & support**
-- **Premium, growth & playful surfaces**
-- **Community, live & local business**
+Instead of one long flat list, restored surfaces are now grouped into clearer product-domain sections:
+- **Dating loop**
+- **Identity & trust**
+- **Premium & growth**
+- **Creative & live**
+- **Local business**
 
 ### Why this matters
-The rewind branch now has many restored hubs. Once that happens, the next problem is no longer missing routes — it is navigational sprawl.
+After grouping the dashboard in the prior tranche, the shell itself still felt inconsistent because the left rail and mobile menu were presenting restored destinations as a flat list.
 
-This pass makes the dashboard feel more like a product map and less like an accumulating changelog of recovered features.
+This pass makes the shell match the dashboard’s domain-based product map and improves perceived coherence across the whole signed-in app.
 
 ---
 
-## Build Validation
+## Build Validation + Narrow Fix
+### First build result
 Executed:
 - `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
 
-Result:
-- successful production build on the first pass
-- no new route additions in this tranche, but the grouped dashboard structure compiled and rendered cleanly in production mode
+Initial result:
+- build failed while prerendering `/wallet`
+- explicit error: `TypeError: F.A is not a constructor`
 
-This again confirms the current pattern is working well: focused UI refinement, immediate production validation, no unnecessary backend churn.
+### Root cause
+The refactor introduced:
+- `new Map(...)`
+
+inside `fwber-frontend/components/AppHeader.tsx`, but this file also imports `Map` from `lucide-react`. That meant the code was accidentally calling the icon component instead of the global `Map` constructor.
+
+### Fix applied
+Updated:
+- `fwber-frontend/components/AppHeader.tsx`
+
+Change:
+- replaced `new Map(...)` with `new globalThis.Map(...)`
+
+### Second build result
+Re-ran:
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
+
+Result:
+- successful production build on the second pass
+
+This is another strong example of the current workflow working well: focused shell refactor, immediate production validation, narrow repair, green result.
 
 ---
 
 ## Files Changed In This Continuation
 ### Frontend
-- `fwber-frontend/app/dashboard/page.tsx`
+- `fwber-frontend/components/AppHeader.tsx`
 
 ### Docs / release tracking
 - `VERSION`
@@ -67,14 +90,14 @@ This again confirms the current pattern is working well: focused UI refinement, 
 
 ## Git / Release State
 ### Current tranche target
-- **Target Version:** `1.8.9`
-- **Recommended Commit Message:** `feat: organize rewind dashboard domains (v1.8.9)`
+- **Target Version:** `1.8.10`
+- **Recommended Commit Message:** `feat: organize rewind sidebar domains (v1.8.10)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.9` dashboard-organization tranche.
-2. Re-check the newest Actions list so the `v1.8.8` and then `v1.8.9` runs can be watched explicitly.
-3. Continue with polish passes on any remaining rough edges now that most major user-facing layers have landing pages.
+1. Commit and push the `v1.8.10` sidebar-organization tranche.
+2. Re-check the newest Actions list so the `v1.8.9` and then `v1.8.10` runs can be watched explicitly.
+3. Continue with polish passes on any remaining rough edges now that the dashboard and shell both express the restored branch as a product map.
 4. Keep using full production builds after every shell/dashboard refinement.
-5. Preserve the current bias toward improvements that increase product coherence without risking the green backend CI streak.
+5. Preserve the current bias toward coherence-improving refinements that stay friendly to the green backend CI streak.

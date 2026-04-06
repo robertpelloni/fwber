@@ -56,6 +56,12 @@ interface NavItem {
   icon: LucideIcon
 }
 
+interface ExploreSection {
+  id: string
+  label: string
+  links: NavItem[]
+}
+
 const hardNavigationRoutes = new Set(['/help', '/nearby'])
 
 function shouldDisablePrefetch(href: string) {
@@ -86,28 +92,28 @@ const accountLinks: NavItem[] = [
 
 function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null): NavItem[] {
   const links: NavItem[] = [
+    { href: '/matching', label: 'Matching', icon: Heart },
+    { href: '/scenes', label: 'Scenes', icon: Compass },
+    { href: '/connections', label: 'Connections', icon: HeartHandshake },
+    { href: '/places', label: 'Places', icon: Map },
+    { href: '/plans', label: 'Plans', icon: Calendar },
+    { href: '/identity', label: 'Identity', icon: User },
+    { href: '/reputation', label: 'Reputation', icon: Award },
+    { href: '/support', label: 'Support', icon: CircleHelp },
+    { href: '/operations', label: 'Operations', icon: Shield },
+    { href: '/economy', label: 'Economy', icon: Wallet },
     { href: '/premium', label: 'Gold', icon: Crown },
     { href: '/wallet', label: 'Wallet', icon: Wallet },
     { href: '/referrals', label: 'Referrals', icon: Sparkles },
     { href: '/boosts', label: 'Boosts', icon: Rocket },
     { href: '/gifts', label: 'Gifts', icon: Gift },
+    { href: '/unlocks', label: 'Unlocks', icon: Lock },
+    { href: '/share-unlock', label: 'Share Unlocks', icon: Sparkles },
+    { href: '/studio', label: 'Studio', icon: Wand2 },
+    { href: '/roast', label: 'Roast', icon: Flame },
     { href: '/video', label: 'Video', icon: Phone },
     { href: '/spaces', label: 'Spaces', icon: Radio },
-    { href: '/places', label: 'Places', icon: Map },
-    { href: '/scenes', label: 'Scenes', icon: Compass },
-    { href: '/studio', label: 'Studio', icon: Wand2 },
-    { href: '/connections', label: 'Connections', icon: HeartHandshake },
-    { href: '/identity', label: 'Identity', icon: User },
-    { href: '/economy', label: 'Economy', icon: Wallet },
     { href: '/commerce', label: 'Commerce', icon: Store },
-    { href: '/plans', label: 'Plans', icon: Calendar },
-    { href: '/matching', label: 'Matching', icon: Heart },
-    { href: '/support', label: 'Support', icon: CircleHelp },
-    { href: '/operations', label: 'Operations', icon: Shield },
-    { href: '/reputation', label: 'Reputation', icon: Award },
-    { href: '/unlocks', label: 'Unlocks', icon: Lock },
-    { href: '/roast', label: 'Roast', icon: Flame },
-    { href: '/share-unlock', label: 'Share Unlocks', icon: Sparkles },
     {
       href: user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register',
       label: user?.role === 'merchant' ? 'Merchant' : 'Sell Local',
@@ -120,6 +126,51 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
   }
 
   return links
+}
+
+function getExploreSections(user: { role?: string; is_moderator?: boolean } | null): ExploreSection[] {
+  const links = getExploreLinks(user)
+
+  const hrefMap = new globalThis.Map(links.map((link) => [link.href, link]))
+  const merchantHref = user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'
+
+  const sections: Array<{ id: string; label: string; hrefs: string[] }> = [
+    {
+      id: 'dating',
+      label: 'Dating loop',
+      hrefs: ['/matching', '/scenes', '/connections', '/places', '/plans'],
+    },
+    {
+      id: 'trust',
+      label: 'Identity & trust',
+      hrefs: ['/identity', '/reputation', '/support', '/operations'],
+    },
+    {
+      id: 'premium',
+      label: 'Premium & growth',
+      hrefs: ['/economy', '/premium', '/wallet', '/referrals', '/boosts', '/gifts', '/unlocks', '/share-unlock'],
+    },
+    {
+      id: 'creative',
+      label: 'Creative & live',
+      hrefs: ['/studio', '/roast', '/video', '/spaces'],
+    },
+    {
+      id: 'local-business',
+      label: 'Local business',
+      hrefs: ['/commerce', merchantHref, '/moderation'],
+    },
+  ]
+
+  return sections
+    .map((section) => ({
+      id: section.id,
+      label: section.label,
+      links: section.hrefs
+        .map((href) => hrefMap.get(href))
+        .filter((link): link is NavItem => Boolean(link)),
+    }))
+    .filter((section) => section.links.length > 0)
 }
 
 function isActivePath(pathname: string, href: string) {
@@ -173,7 +224,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
   const userInitial = userDisplayName.charAt(0).toUpperCase()
   const homeHref = user ? '/dashboard' : '/'
   const shouldShowBackButton = pathname !== homeHref
-  const exploreLinks = getExploreLinks(user as { role?: string; is_moderator?: boolean } | null)
+  const exploreSections = getExploreSections(user as { role?: string; is_moderator?: boolean } | null)
 
   const handleLogout = () => {
     logout()
@@ -338,13 +389,22 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
             <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950/60">
               <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Restored surfaces</p>
-              <div className="space-y-1">
-                {exploreLinks.map((link) => {
-                  const active = isActivePath(pathname, link.href)
-                  return renderNavLink(link, getNavLinkClasses(active, true), {
-                    onClick: () => setMobileMenuOpen(false),
-                  })
-                })}
+              <div className="space-y-3">
+                {exploreSections.map((section) => (
+                  <div key={section.id}>
+                    <p className="px-1 pb-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
+                      {section.label}
+                    </p>
+                    <div className="space-y-1">
+                      {section.links.map((link) => {
+                        const active = isActivePath(pathname, link.href)
+                        return renderNavLink(link, getNavLinkClasses(active, true), {
+                          onClick: () => setMobileMenuOpen(false),
+                        })
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -429,11 +489,18 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
 
             <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/60">
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Restored features</p>
-              <div className="space-y-1">
-                {exploreLinks.map((link) => {
-                  const active = isActivePath(pathname, link.href)
-                  return renderNavLink(link, getNavLinkClasses(active, true))
-                })}
+              <div className="space-y-4">
+                {exploreSections.map((section) => (
+                  <div key={section.id}>
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">{section.label}</p>
+                    <div className="space-y-1">
+                      {section.links.map((link) => {
+                        const active = isActivePath(pathname, link.href)
+                        return renderNavLink(link, getNavLinkClasses(active, true))
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

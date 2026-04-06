@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.10 once the dashboard is organized, the sidebar must mirror that product map or the shell still feels inconsistent
+- Grouping only the dashboard was not enough; the left rail and mobile menu still looked like a flat backlog of restored routes.
+- The imported `Map` icon shadowing the global `Map` constructor is a good reminder to be careful with global names when refactoring navigation helpers in icon-heavy React files.
+- Matching dashboard structure with sidebar structure materially improves perceived product coherence without adding any new backend obligations.
+
 ## 2026-04-06 — v1.8.9 once enough hubs exist, dashboard organization becomes more valuable than adding yet another top-level route
 - The rewind branch reached the point where the main problem was no longer missing destinations, but dashboard sprawl.
 - Grouping restored surfaces by domain makes the branch feel like a product map rather than an accumulation of cards.
