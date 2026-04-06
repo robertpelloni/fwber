@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.11 shell consistency work is worth treating as a first-class release once the branch becomes broad enough
+- Once many restored hubs exist, information architecture fixes stop being cosmetic and start being core product work.
+- The `globalThis.Map` fix is a reminder that icon imports can collide with global names in React files, especially during helper-heavy refactors.
+- The branch is now mature enough that product-map consistency across dashboard and shell is a measurable quality improvement, not mere polish theater.
+
 ## 2026-04-06 — v1.8.10 once the dashboard is organized, the sidebar must mirror that product map or the shell still feels inconsistent
 - Grouping only the dashboard was not enough; the left rail and mobile menu still looked like a flat backlog of restored routes.
 - The imported `Map` icon shadowing the global `Map` constructor is a good reminder to be careful with global names when refactoring navigation helpers in icon-heavy React files.

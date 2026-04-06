@@ -1,19 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.8.10 (Rewind Sidebar Domain Organization)
+# PROJECT_STATUS.md - fwber v1.8.11 (Rewind Shell Product-Map Consistency)
 
 **Date:** 2026-04-06
-**Version:** 1.8.10 "Rewind Sidebar Domain Organization"
-**Status:** ✅ **RESTORED SURFACES ARE NOW GROUPED BY PRODUCT DOMAIN IN BOTH THE DASHBOARD AND APP SHELL NAVIGATION**
+**Version:** 1.8.11 "Rewind Shell Product-Map Consistency"
+**Status:** ✅ **DASHBOARD AND APP SHELL NOW PRESENT THE RESTORED BRANCH AS THE SAME DOMAIN-BASED PRODUCT MAP**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release followed the dashboard organization pass by applying the same product-domain structure to the app shell navigation.
+This release followed the dashboard-domain and sidebar-domain work with a consistency pass that makes the signed-in shell and dashboard tell the same product story.
 
 Delivered:
-- reorganized the sidebar and mobile restored-surfaces navigation into clearer grouped sections
-- aligned the shell with the dashboard’s domain-based product map
-- caught and repaired a narrow production-only regression caused by the imported `Map` icon shadowing the global constructor in the new helper
-- preserved green local production build validation without introducing backend-risk changes
+- kept the grouped sidebar/mobile navigation structure and validated it in production mode
+- documented and preserved the global-constructor fix that prevented the grouped navigation helper from breaking `/wallet` prerendering
+- reinforced the branch’s product-map presentation across dashboard and shell instead of leaving one structured and the other incidental
 
 ## ✅ Why This Matters
-The rewind branch now has enough restored destinations that shell organization matters as much as route restoration. Grouping the sidebar by domain makes the signed-in app easier to navigate, easier to demo, and more obviously centered on the user-approved core product areas rather than a flat list of recovered links.
+The rewind branch now has enough restored breadth that information architecture matters almost as much as route recovery. This release locks in a consistent shell-level mental model, making the restored branch easier to navigate, easier to demo, and easier for future agents to extend without drifting back into flat route sprawl.

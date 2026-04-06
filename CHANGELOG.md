@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.11] - 2026-04-06 — Rewind Shell Product-Map Consistency
+
+### Changed
+- Refined the signed-in shell so the sidebar and mobile restored-surfaces navigation now mirror the dashboard’s domain-based organization instead of presenting a flat feature list.
+- Clarified the restored branch as a product map across both dashboard and shell, with grouped dating, trust, premium, creative/live, and local-business sections.
+
+### Fixed
+- Repaired a production-only regression where the imported `Map` icon shadowed the global `Map` constructor during the new grouped-navigation helper refactor; switched to `globalThis.Map`.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the shell navigation grouping refactor.
+- Confirmed `v1.8.10` dashboard/sidebar organization precedent stayed compatible with restore-branch frontend production builds before shipping this shell-consistency release.
+
 ## [1.8.10] - 2026-04-06 — Rewind Sidebar Domain Organization
 
 ### Changed

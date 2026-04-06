@@ -388,7 +388,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
             </nav>
 
             <div className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-950/60">
-              <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Restored surfaces</p>
+              <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Product map</p>
               <div className="space-y-3">
                 {exploreSections.map((section) => (
                   <div key={section.id}>
@@ -476,7 +476,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                 </div>
               </div>
               <p className="text-xs leading-5 text-gray-500 dark:text-gray-400">
-                The left rail now favors the restored, user-approved surfaces instead of excluded federation or journal-era branches.
+                The left rail now presents the restored, user-approved product map instead of drifting into excluded federation or journal-era branches.
               </p>
             </div>
 
@@ -488,7 +488,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
             </nav>
 
             <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/60">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Restored features</p>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Product map</p>
               <div className="space-y-4">
                 {exploreSections.map((section) => (
                   <div key={section.id}>

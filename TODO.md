@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.10
+> **Version:** 1.8.11
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Shell Product-Map Consistency**: Locked in domain-based shell organization, documented the `globalThis.Map` fix, and kept the signed-in shell aligned with the dashboard’s restored product map.
 - [x] **Rewind Sidebar Domain Organization**: Reorganized the sidebar and mobile restored-surfaces navigation into domain groups so the app shell now mirrors the dashboard’s product map instead of presenting a flat feature list.
 - [x] **Rewind Dashboard Domain Organization**: Reorganized the dashboard’s restored-surfaces area into product-domain sections so the restored branch feels more intentionally structured and less like a flat list of recovered routes.
 - [x] **Rewind Matching Hub Recovery**: Added a new `/matching` hub and surfaced recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context from one coherent restored destination.
