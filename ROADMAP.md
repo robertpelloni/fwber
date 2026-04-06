@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.7.8 "Rewind Reputation Hub Recovery"
+> **Current Version:** 1.7.9 "Rewind Scenes Hub Recovery"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.7.8)
+### Phase 5: Production Scale (COMPLETED - v1.7.9)
+- **Rewind Scenes Hub Recovery:** Added a real top-level scenes/discovery hub for recommendations, groups, topics, matches, match dashboard, and leaderboard-style discovery so the community/discovery cluster feels intentionally restored.
 - **Rewind Reputation Hub Recovery:** Added a real top-level reputation hub for achievements, leaderboard, profile views, verification, and adjacent trust flows so the social-proof cluster feels intentionally restored.
 - **Rewind Places Hub + Avatar Provider Test Fallback:** Added a real top-level places hub for the local-discovery cluster and pinned the implicit testing fallback provider to DALL-E for rewind avatar-generation compatibility.
 - **Rewind Avatar Prompt Interest Label Fix:** Reformatted normalized profile-interest values back into human-readable themed labels during avatar prompt generation, targeting another narrow restore-branch avatar-generation CI seam without affecting deployment/runtime contracts.

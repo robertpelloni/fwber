@@ -40,6 +40,7 @@ import {
   Radio,
   Map,
   Award,
+  Compass,
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -91,6 +92,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/video', label: 'Video', icon: Phone },
     { href: '/spaces', label: 'Spaces', icon: Radio },
     { href: '/places', label: 'Places', icon: Map },
+    { href: '/scenes', label: 'Scenes', icon: Compass },
     { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },
     { href: '/roast', label: 'Roast', icon: Flame },

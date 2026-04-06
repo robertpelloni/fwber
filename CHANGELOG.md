@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.9] - 2026-04-06 — Rewind Scenes Hub Recovery
+
+### Added
+- Added a new top-level `/scenes` page that consolidates recommendations, groups, topic hubs, matches, match dashboard, and leaderboard-style discovery surfaces into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Scenes`.
+- Expanded the dashboard restored-sections grid so the discovery/community cluster is visible alongside spaces, places, reputation, unlocks, boosts, gifts, referrals, video, and merchant-era systems.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new scenes hub in the route manifest.
+
 ## [1.7.8] - 2026-04-06 — Rewind Reputation Hub Recovery
 
 ### Added

@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.7.9 the broader discovery/community surface also benefits from hub consolidation once the major leaf pages exist
+- Recommendations, groups, topics, matches, and match-overview pages were all already present, but still fragmented enough to under-sell how much of the old surface had already come back.
+- A scenes/discovery hub is a strong restore move because it links the branch’s social-discovery layer into a coherent destination without requiring new backend contract work.
+- The hub pattern is now proving reusable across unlocks, spaces, places, reputation, and scenes.
+
 ## 2026-04-06 — v1.7.8 trust and social-proof surfaces also become much more legible when grouped into a reputation hub
 - Achievements, leaderboard, profile views, and verification already existed, but were scattered enough to still feel partially restored.
 - A dedicated reputation hub is another high-leverage way to make existing restored systems feel like a coherent product area without destabilizing runtime behavior.

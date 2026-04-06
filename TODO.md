@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.7.8
+> **Version:** 1.7.9
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Scenes Hub Recovery**: Added a new `/scenes` hub and surfaced recommendations, groups, topics, matches, match dashboard, and leaderboard-style discovery from one coherent restored destination.
 - [x] **Rewind Reputation Hub Recovery**: Added a new `/reputation` hub and surfaced achievements, leaderboard, profile views, verification, and adjacent trust signals from one coherent restored destination.
 - [x] **Rewind Places Hub + Avatar Provider Test Fallback**: Added a new `/places` hub for local-discovery surfaces and pinned implicit avatar test provider fallback to DALL-E for the richer rewind test contract.
 - [x] **Rewind Avatar Prompt Interest Label Fix**: Title-cased normalized interest labels in avatar prompt generation so the restore branch better matches the richer avatar-generation test contract.

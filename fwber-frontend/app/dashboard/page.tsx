@@ -27,6 +27,7 @@ import {
   Radio,
   Map,
   Award,
+  Compass,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -220,6 +221,13 @@ export default function DashboardPage() {
                       description="Open nearby people, venues, deals, date planning, and location-aware surfaces from one local-discovery hub."
                       icon={<Map className="h-5 w-5" />}
                       accent="green"
+                    />
+                    <FeatureSurfaceCard
+                      href="/scenes"
+                      title="Scenes & Discovery"
+                      description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one restored hub."
+                      icon={<Compass className="h-5 w-5" />}
+                      accent="purple"
                     />
                     <FeatureSurfaceCard
                       href="/reputation"
