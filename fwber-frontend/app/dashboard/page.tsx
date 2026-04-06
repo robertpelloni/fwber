@@ -24,6 +24,7 @@ import {
   Phone,
   Lock,
   Share2,
+  Radio,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -203,6 +204,13 @@ export default function DashboardPage() {
                       description="Open call history and start restored video calls from a top-level page."
                       icon={<Phone className="h-5 w-5" />}
                       accent="blue"
+                    />
+                    <FeatureSurfaceCard
+                      href="/spaces"
+                      title="Live Spaces"
+                      description="Open chatrooms, audio rooms, local pulse, boards, burner links, and conference pulse from one top-level hub."
+                      icon={<Radio className="h-5 w-5" />}
+                      accent="purple"
                     />
                     <FeatureSurfaceCard
                       href="/unlocks"

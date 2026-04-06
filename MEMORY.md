@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.7.5 live/community features also benefit from a hub pattern when the branch already contains many scattered route surfaces
+- Chatrooms, audio rooms, bulletin boards, burner links, and pulse surfaces were already present, but still felt fragmented.
+- A dedicated live-spaces hub is a strong restore move because it groups several already-restored systems into one top-level area without destabilizing backend/runtime behavior.
+- This same pattern should keep being used for any remaining scattered feature clusters on the rewind branch.
+
 ## 2026-04-06 — v1.7.4 stale Eloquent relation caches can masquerade as missing-feature bugs on the rewind branch
 - The remaining avatar-generation CI failure was likely not about providers anymore but about prompt generation reading a stale cached `profile` relation after the test created the profile in a separate statement.
 - On the richer rewind branch, several systems create related rows after the base model exists, so direct relation queries are sometimes safer than trusting cached relation state in high-signal logic.
