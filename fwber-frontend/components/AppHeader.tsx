@@ -100,6 +100,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/identity', label: 'Identity', icon: User },
     { href: '/economy', label: 'Economy', icon: Wallet },
     { href: '/commerce', label: 'Commerce', icon: Store },
+    { href: '/plans', label: 'Plans', icon: Calendar },
     { href: '/operations', label: 'Operations', icon: Shield },
     { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },

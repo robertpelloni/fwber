@@ -269,6 +269,13 @@ export default function DashboardPage() {
                       accent="orange"
                     />
                     <FeatureSurfaceCard
+                      href="/plans"
+                      title="Plans & Meetups"
+                      description="Open events, date planning, nearby discovery, venues, and deals from one restored local outing hub."
+                      icon={<Calendar className="h-5 w-5" />}
+                      accent="purple"
+                    />
+                    <FeatureSurfaceCard
                       href="/operations"
                       title="Trust & Operations"
                       description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."

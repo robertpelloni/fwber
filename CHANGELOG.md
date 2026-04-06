@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.6] - 2026-04-06 — Rewind Plans Hub Recovery
+
+### Added
+- Added a new top-level `/plans` page that consolidates events, event creation, date planning, nearby discovery, venues, and deals into one restored outing-focused destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Plans`.
+- Expanded the dashboard restored-sections grid so the real-world outing and meetup layer is visible alongside commerce, economy, identity, operations, connections, studio, scenes, spaces, places, and other restored product areas.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new plans hub in the route manifest.
+
 ## [1.8.5] - 2026-04-06 — Rewind Commerce Hub Recovery
 
 ### Added

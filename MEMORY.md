@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.6 the branch now benefits from a dedicated plans hub because dating value includes execution, not just discovery
+- Events, nearby, venues, deals, and date planning collectively represent the real-world follow-through layer of the product.
+- Grouping them under one plans/meetups destination improves the product story: match -> plan -> meet.
+- This hub complements places rather than replacing it; places remains location/discovery-oriented while plans emphasizes execution and outings.
+
 ## 2026-04-06 — v1.8.5 merchant tooling benefits from having its own commerce hub instead of being buried inside operations alone
 - Merchant onboarding, dashboard, analytics, promotions, and vibe broadcasting are substantial enough to deserve their own product area.
 - The operations hub is still useful for trust/control access, but a dedicated commerce hub makes business-side restoration much easier to evaluate.
