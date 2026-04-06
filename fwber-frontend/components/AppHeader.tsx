@@ -41,6 +41,7 @@ import {
   Map,
   Award,
   Compass,
+  Wand2,
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -93,6 +94,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/spaces', label: 'Spaces', icon: Radio },
     { href: '/places', label: 'Places', icon: Map },
     { href: '/scenes', label: 'Scenes', icon: Compass },
+    { href: '/studio', label: 'Studio', icon: Wand2 },
     { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },
     { href: '/roast', label: 'Roast', icon: Flame },

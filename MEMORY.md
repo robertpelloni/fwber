@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.0 AI and viral tooling become much easier to reason about once treated as a single studio surface
+- Roast, roast-date, wingman, content generation, and bounties all read like part of the same playful growth/creator zone once exposed together.
+- This hub adds meaningful product legibility without needing any risky backend changes, which fits the current rewind strategy extremely well.
+- The green `v1.7.9` backend/frontend runs increase confidence that these incremental surface recoveries are not destabilizing the branch.
+
 ## 2026-04-06 — v1.7.9 the broader discovery/community surface also benefits from hub consolidation once the major leaf pages exist
 - Recommendations, groups, topics, matches, and match-overview pages were all already present, but still fragmented enough to under-sell how much of the old surface had already come back.
 - A scenes/discovery hub is a strong restore move because it links the branch’s social-discovery layer into a coherent destination without requiring new backend contract work.

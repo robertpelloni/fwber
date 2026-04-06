@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - 2026-04-06 — Rewind Studio Hub Recovery
+
+### Added
+- Added a new top-level `/studio` page that consolidates roast tools, AI content generation, wingman utilities, bounty discovery, and adjacent creative/viral surfaces into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Studio`.
+- Expanded the dashboard restored-sections grid so the AI/creative/viral cluster is visible alongside scenes, spaces, places, reputation, unlocks, boosts, gifts, referrals, video, and merchant-era systems.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new studio hub in the route manifest.
+- Confirmed `v1.7.9` scenes-hub GitHub Actions finished green for both backend CI and frontend build/deploy.
+
 ## [1.7.9] - 2026-04-06 — Rewind Scenes Hub Recovery
 
 ### Added

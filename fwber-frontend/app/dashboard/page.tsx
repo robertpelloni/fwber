@@ -28,6 +28,7 @@ import {
   Map,
   Award,
   Compass,
+  Wand2,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -228,6 +229,13 @@ export default function DashboardPage() {
                       description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one restored hub."
                       icon={<Compass className="h-5 w-5" />}
                       accent="purple"
+                    />
+                    <FeatureSurfaceCard
+                      href="/studio"
+                      title="Studio & AI"
+                      description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one restored hub."
+                      icon={<Wand2 className="h-5 w-5" />}
+                      accent="pink"
                     />
                     <FeatureSurfaceCard
                       href="/reputation"

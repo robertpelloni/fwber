@@ -1,68 +1,68 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-06
-> **Version Reached:** 1.7.9
+> **Version Reached:** 1.8.0
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session kept the rewind branch moving with the same successful pattern:
-1. continue restoring approved removed systems as coherent top-level destinations
-2. keep backend CI convergence in sight by avoiding destabilizing changes and only adding targeted compatibility guards when needed
+This continuation session preserved the same high-confidence rewind pattern:
+1. check whether the latest restore tranche stayed green
+2. continue restoring approved removed systems as coherent top-level hubs rather than scattering links across the shell
+3. avoid destabilizing backend contracts unless a failing CI seam explicitly requires it
 
-Already pushed earlier in the broader continuation:
-- `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
-- `6dc1b159c` — `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
-- `f576ae411` — `feat: restore rewind boosts gifts referrals and video surfaces (v1.7.2)`
-- `d6d7cfa22` — `feat: restore rewind unlock hub and paywall navigation (v1.7.3)`
-- `efbfc096a` — `fix: refresh rewind avatar prompt profile resolution (v1.7.4)`
-- `d135b66ec` — `feat: restore rewind live spaces hub (v1.7.5)`
-- `a83fe15a5` — `fix: restore rewind avatar prompt interest labels (v1.7.6)`
-- `17ab34090` — `feat: restore rewind places hub and avatar provider fallback (v1.7.7)`
-- `714af1eb7` — `feat: restore rewind reputation hub (v1.7.8)`
+## CI / Stability Findings
+A major confidence milestone was confirmed at the start of this slice:
+- `cb2d780c1` — `feat: restore rewind scenes hub (v1.7.9)` finished **green** in both workflows
+  - Backend CI: ✅ success
+  - Frontend Build & Deploy: ✅ success
 
-Completed in this slice:
-- added a new top-level `/scenes` page as a discovery/community hub
-- expanded restored-features navigation and dashboard cards to include that hub
-- validated another successful restore-branch frontend production build
-- recorded release metadata for **v1.7.9**
+This means the branch now has a strong run of recent fully green rewind tranches:
+- `17ab34090` (`v1.7.7`) ✅ backend + frontend
+- `714af1eb7` (`v1.7.8`) ✅ backend + frontend
+- `cb2d780c1` (`v1.7.9`) ✅ backend + frontend
 
-No processes were manually killed.
+That sustained result strongly suggests the compatibility-fix strategy is working and that incremental surface restoration is no longer destabilizing the branch.
 
 ---
 
-## What Was Added
-### `fwber-frontend/app/scenes/page.tsx`
-Added a dedicated `Scenes & Discovery` hub.
+## What Was Added In This Slice
+### `fwber-frontend/app/studio/page.tsx`
+Added a new top-level `Studio & AI` hub.
 
-This page consolidates several already-present but scattered discovery/community surfaces into one coherent restored destination:
-- `/recommendations`
-- `/groups`
-- `/topics`
-- `/matches`
-- `/matches/dashboard`
-- `/leaderboard`
+This page consolidates the broader creative / AI / viral tooling cluster into one intentional destination:
+- `/roast`
+- `/roast-date`
+- `/content-generation`
+- `/wingman`
+- `/bounties`
+- `/analytics`
 
 ### Why this matters
-The branch already contained a strong amount of discovery/community functionality, but it was fragmented enough to still feel partially restored.
+The rewind branch already had a surprisingly rich set of AI and playful content tools, but they were still hidden across disconnected routes.
 
-The scenes hub makes that cluster legible and intentional from the signed-in shell.
+The new studio hub turns that cluster into a legible product area instead of an accidental collection of leftovers from the fuller snapshot.
 
 ---
 
 ## Navigation / Dashboard Changes
 ### `fwber-frontend/components/AppHeader.tsx`
 Extended restored-features navigation to include:
-- `/scenes`
+- `/studio`
 
 ### `fwber-frontend/app/dashboard/page.tsx`
 Added a new restored-sections card for:
-- `Scenes & Discovery`
+- `Studio & AI`
 
-This continues the now-established restore pattern of:
-- real top-level destinations
-- dashboard visibility
-- restored-features navigation visibility
+This keeps following the same proven restore pattern used for:
+- activity / notifications
+- boosts / gifts / referrals / video
+- unlocks
+- spaces
+- places
+- reputation
+- scenes
+- now studio
 
 ---
 
@@ -74,15 +74,15 @@ Executed:
 Result:
 - successful production build
 - route manifest now includes:
-  - `/scenes`
+  - `/studio`
 
-This preserves the branch’s strong frontend signal while the backend CI convergence work continues in parallel.
+This keeps the rewind branch’s frontend signal strong while recent backend CI results remain green.
 
 ---
 
 ## Files Changed This Slice
 ### Frontend
-- `fwber-frontend/app/scenes/page.tsx`
+- `fwber-frontend/app/studio/page.tsx`
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
 
@@ -103,14 +103,16 @@ This preserves the branch’s strong frontend signal while the backend CI conver
 
 ## Git / Release
 ### Current tranche target
-- **Target Version:** `1.7.9`
-- **Recommended Commit Message:** `feat: restore rewind scenes hub (v1.7.9)`
+- **Target Version:** `1.8.0`
+- **Recommended Commit Message:** `feat: restore rewind studio hub (v1.8.0)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.7.9` scenes-hub tranche.
-2. Re-check the latest restore-branch GitHub Actions runs.
-3. If backend CI stays green on the latest compatibility fixes, continue pushing more coherent surface recovery hubs.
-4. If backend CI turns red again, inspect only the next explicit failure and patch it directly.
-5. Keep the rewind branch converging toward a broad restored product that still remains realistically Hetzner-deployable.
+1. Commit and push the `v1.8.0` studio-hub tranche.
+2. Watch the fresh backend/frontend Actions runs for that commit.
+3. If green again, continue restoring the next coherent top-level cluster instead of chasing low-value scattered links.
+4. If a backend CI failure reappears, patch only the next explicit seam.
+5. Keep excluded systems de-emphasized even if old pages remain present in the rewind snapshot.
+
+No processes were manually killed.
