@@ -1,110 +1,107 @@
 # HANDOFF - End of GPT Session
 
-> **Timestamp:** 2026-04-05
-> **Version Reached:** 1.7.3
+> **Timestamp:** 2026-04-06
+> **Version Reached:** 1.7.4
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session kept restoring approved removed surfaces on the rewind branch while preserving successful production frontend builds and modern Hetzner compatibility expectations.
+This continuation session pushed the rewind branch in two tracks at once:
+1. continued restoring approved removed systems as real user-facing surfaces
+2. continued converting explicit backend CI failures into source-level compatibility fixes so the branch stays on a Hetzner-safe promotion path
 
-Already pushed during this broader sequence:
+Already pushed during the broader continuation:
 - `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
 - `6dc1b159c` — `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
 - `f576ae411` — `feat: restore rewind boosts gifts referrals and video surfaces (v1.7.2)`
+- `d6d7cfa22` — `feat: restore rewind unlock hub and paywall navigation (v1.7.3)`
 
 Completed in this slice:
-- added a new top-level `/unlocks` page as a coherent hub for paywall/token-gated surfaces
-- expanded restored-features navigation and dashboard cards to include the unlock/paywall cluster more directly
-- validated another successful restore-branch frontend production build
-- prepared and recorded release metadata for **v1.7.3**
+- investigated the next concrete backend CI failure after `v1.7.2`
+- identified the remaining explicit failing seam as `AvatarGenerationTest > service generates prompt with detailed attributes`
+- patched avatar prompt generation to query the latest persisted profile row directly instead of trusting a potentially stale cached relation
+- recorded release metadata for **v1.7.4**
 
 No processes were manually killed.
 
 ---
 
-## What Was Added
-### `fwber-frontend/app/unlocks/page.tsx`
-Added a dedicated unlock hub page that consolidates several scattered token/paywall-era systems into one restored destination.
+## What Was Investigated
+### Failed backend run inspected
+- **Run:** `24015171853`
+- **Commit:** `f576ae411` (`v1.7.2`)
 
-The page now links directly to:
-- `/premium/unlocks`
-- `/who-likes-you`
-- `/share-unlock`
-- `/photos/reveals`
+### What the log showed
+The backend suite was overwhelmingly green.
+The remaining explicit failure had narrowed to:
+- `Tests\Feature\AvatarGenerationTest > service generates prompt with detailed attributes`
 
-Why this matters:
-- the user explicitly wants the removed token-era surface cluster restored
-- those routes already existed, but they were still fragmented and easy to miss
-- the unlock hub turns them into a coherent first-class product area instead of a set of hidden subroutes
+This is strong evidence that the branch is progressing correctly:
+- frontend CI has repeatedly gone green
+- backend failures are shrinking into isolated behavioral mismatches
+- the right strategy remains targeted repair, not broad rollback
 
 ---
 
-## Navigation / Dashboard Changes
-### `fwber-frontend/components/AppHeader.tsx`
-Extended restored-features navigation to include:
-- `/unlocks`
+## Root Cause Analysis
+The likely issue was no longer provider selection or cache mocking.
 
-This now sits alongside the other recovered restore-branch surfaces such as:
-- premium
-- wallet
-- referrals
+The avatar-generation test creates a `User` first and then creates a `UserProfile` in a separate statement.
+
+That means prompt generation can fail if it relies on:
+- a cached `$user->profile` relation
+- that was loaded earlier as `null`
+- and never refreshed before the prompt is assembled
+
+In that case the generated prompt behaves as though the user has no profile, causing the HTTP assertion callback to fail because expected profile-derived strings are missing.
+
+This kind of stale relation state is a classic rewind-branch compatibility problem:
+- not a missing system
+- not a deployment blocker directly
+- but a subtle test-contract mismatch caused by how older/fuller flows interact with modernized code paths
+
+---
+
+## What Was Changed
+### `fwber-backend/app/Services/AvatarGenerationService.php`
+Changed the start of `buildPrompt(...)` from:
+- relying on `$user->profile`
+
+to:
+- querying `$user->profile()->first()` directly
+
+### Why this is correct
+This ensures prompt generation reads the latest persisted profile row even when:
+- the profile was created after the user model instance already existed
+- the relation cache on the model is stale
+
+### Why this is safe for Hetzner/runtime behavior
+- it does not change route contracts
+- it does not alter provider/network behavior directly
+- it simply makes prompt assembly more reliably reflect the actual database state
+- that is safe in production and helpful in CI
+
+---
+
+## Validation Context
+Earlier in this broader continuation, frontend recovery for additional restored surfaces remained green under production build:
 - boosts
 - gifts
+- referrals
 - video
-- roast
-- share unlocks
-- merchant
-- moderation
+- unlock hub
 
-### `fwber-frontend/app/dashboard/page.tsx`
-Expanded the restored-sections grid with:
-- `Unlock Center`
-- explicit `Share Unlocks` card
+This slice focused specifically on the next backend CI seam after those restorations.
 
-This improves visibility of the token-gated/paywall cluster from the first signed-in screen.
-
----
-
-## Validation Performed
-### Restore-branch frontend build
-Executed:
-- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
-
-Result:
-- successful production build
-- route manifest now includes:
-  - `/unlocks`
-
-This keeps the rewind branch aligned with the requirement that restoration still remain compatible with modern deployment expectations.
-
----
-
-## Current Restore-Branch CI State
-At the time of this handoff:
-- the latest pushed branch tip from the previous tranche (`f576ae411`, v1.7.2) had fresh GitHub Actions runs in progress/completing
-- frontend CI for multiple recent rewind pushes has been green
-- backend CI still requires continued targeted repair of explicit remaining failures rather than broad speculation
-
-That remains the correct strategy:
-1. restore more approved surface area
-2. immediately inspect the next concrete backend CI seam
-3. patch it directly
-4. keep the branch deploy-safe for Hetzner promotion
+A fresh backend/frontend GitHub Actions cycle should be triggered after pushing this `v1.7.4` repair.
 
 ---
 
 ## Files Changed This Slice
-### Frontend
-- `fwber-frontend/app/unlocks/page.tsx`
-- `fwber-frontend/components/AppHeader.tsx`
-- `fwber-frontend/app/dashboard/page.tsx`
+### Backend
+- `fwber-backend/app/Services/AvatarGenerationService.php`
 
 ### Docs / release tracking
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -112,23 +109,28 @@ That remains the correct strategy:
 - `ROADMAP.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
+- `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 
 ---
 
 ## Git / Release
 ### Current tranche target
-- **Target Version:** `1.7.3`
-- **Recommended Commit Message:** `feat: restore rewind unlock hub and paywall navigation (v1.7.3)`
+- **Target Version:** `1.7.4`
+- **Recommended Commit Message:** `fix: refresh rewind avatar prompt profile resolution (v1.7.4)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.7.3` unlock-hub tranche.
+1. Commit and push the `v1.7.4` avatar prompt relation-refresh fix.
 2. Re-check the latest restore-branch GitHub Actions runs.
-3. If backend CI is still red, inspect the next concrete failing seam and patch it directly.
-4. Continue restoring approved removed systems with the same pattern:
-   - real top-level destinations
-   - dashboard visibility
-   - left-rail/restored-features visibility
-   - no regressions against modern Hetzner/runtime expectations
-5. Likely next useful candidates are any remaining restored-but-fragmented surfaces that still only exist as subroutes, modals, or inline triggers rather than coherent destinations.
+3. If backend CI still remains red, inspect the next explicit failure only and patch it directly.
+4. Continue restoring approved removed systems as real destinations while preserving the same constraints:
+   - successful frontend production builds
+   - no regressions against modern Hetzner/runtime assumptions
+   - excluded systems kept out of the primary restored scope emphasis
+5. Keep alternating between:
+   - surface recovery (so removed systems feel restored)
+   - CI/runtime repair (so the branch remains promotable)

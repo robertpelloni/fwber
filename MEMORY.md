@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.7.4 stale Eloquent relation caches can masquerade as missing-feature bugs on the rewind branch
+- The remaining avatar-generation CI failure was likely not about providers anymore but about prompt generation reading a stale cached `profile` relation after the test created the profile in a separate statement.
+- On the richer rewind branch, several systems create related rows after the base model exists, so direct relation queries are sometimes safer than trusting cached relation state in high-signal logic.
+- This is another example of why branch-local compatibility fixes remain necessary even after large replay tranches succeed.
+
 ## 2026-04-05 — v1.7.3 the paywall/unlock cluster benefits from a hub pattern, not just many isolated pages
 - Even after restoring boosts, gifts, referrals, and video as separate destinations, the token-gated unlock surfaces were still fragmented.
 - A dedicated unlock hub is a higher-leverage restore shape because it turns several scattered routes into one coherent destination for the paywall-era product layer.

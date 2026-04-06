@@ -386,7 +386,12 @@ class AvatarGenerationService
 
     private function buildPrompt(User $user, array $options): string
     {
-        $profile = $user->profile;
+        // The rewind suite often creates a user first and attaches a profile in a
+        // later statement. Relying on the potentially cached `$user->profile`
+        // relation can therefore leave us with a stale `null` relation even
+        // though the row now exists. Querying the relation directly keeps prompt
+        // generation aligned with the fuller old-suite contract.
+        $profile = $user->profile()->first();
         $parts = [];
 
         // Helper to get attribute from options or profile

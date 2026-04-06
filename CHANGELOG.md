@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.4] - 2026-04-06 — Rewind Avatar Prompt Relation Refresh Fix
+
+### Fixed
+- Updated restore-branch avatar prompt generation to load the latest persisted profile row directly instead of relying on a potentially stale cached `$user->profile` relation.
+- This specifically targets the remaining rewind backend CI failure where `AvatarGenerationTest` expected rich profile attributes in the generated prompt but the service could still build prompts as though no profile existed.
+- The fix remains runtime-safe for Hetzner because it only changes how the profile is resolved during prompt assembly, not the outward API contract.
+
 ## [1.7.3] - 2026-04-05 — Rewind Unlock Hub + Paywall Surface Navigation Recovery
 
 ### Added
