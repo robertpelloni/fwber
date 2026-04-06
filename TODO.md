@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.7.1
+> **Version:** 1.7.2
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video**: Added dedicated top-level pages for these restored systems and surfaced them in the dashboard + restored-features navigation so the richer branch exposes more of the approved token-era product again.
 - [x] **Rewind CI Repair for Avatar Requests + Recommendation Caching**: Patched restore-branch avatar generation to preserve outbound HTTP fake assertions in tests and restored tagged caching in `RecommendationController`, directly targeting the next backend CI blockers.
 - [x] **Rewind Navigation Recovery + Missing Activity Surfaces**: Reworked the restore-branch shell to spotlight approved restored areas, added real `/activity` and `/notifications` pages, added shared notification route helpers, and rebuilt the dashboard around visible restored surfaces; validated with a successful frontend production build.
 - [x] **Restore Branch CI Compatibility Sweep**: Repaired avatar-generation config/prompt compatibility, tagged-cache mock behavior, frontend Sentry App Router instrumentation, broken WASM import assumptions, and stale Sentry webpack options in the rewind branch; validated with `php artisan test` (**425 passed / 8 skipped**) and successful frontend build.

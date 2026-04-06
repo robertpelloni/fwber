@@ -18,6 +18,10 @@ import {
   Bell,
   Calendar,
   Plane,
+  Sparkles,
+  Rocket,
+  Gift,
+  Phone,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -169,6 +173,34 @@ export default function DashboardPage() {
                       description="Browse and create local events without digging through dead or hidden navigation."
                       icon={<Calendar className="h-5 w-5" />}
                       accent="purple"
+                    />
+                    <FeatureSurfaceCard
+                      href="/referrals"
+                      title="Referrals & Payouts"
+                      description="Open invite links, vouch growth, pending cash, and reward stats in a dedicated referral hub."
+                      icon={<Sparkles className="h-5 w-5" />}
+                      accent="green"
+                    />
+                    <FeatureSurfaceCard
+                      href="/boosts"
+                      title="Profile Boosts"
+                      description="Purchase visibility boosts and review boost history from a dedicated route."
+                      icon={<Rocket className="h-5 w-5" />}
+                      accent="orange"
+                    />
+                    <FeatureSurfaceCard
+                      href="/gifts"
+                      title="Gift Shop"
+                      description="Review received gifts and open a dedicated token gift surface outside inline profile modals."
+                      icon={<Gift className="h-5 w-5" />}
+                      accent="pink"
+                    />
+                    <FeatureSurfaceCard
+                      href="/video"
+                      title="Video Calls"
+                      description="Open call history and start restored video calls from a top-level page."
+                      icon={<Phone className="h-5 w-5" />}
+                      accent="blue"
                     />
                     <FeatureSurfaceCard
                       href="/settings/travel"

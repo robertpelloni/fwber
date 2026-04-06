@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.2] - 2026-04-05 — Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video
+
+### Added
+- Added dedicated restore-branch pages for `/boosts`, `/gifts`, `/referrals`, and `/video` so these restored systems are reachable from stable top-level destinations instead of only through scattered modals or hidden triggers.
+- `Boosts` now exposes active boost status, history, and the restored boost-purchase modal from a first-class page.
+- `Gifts` now exposes received gifts plus a dedicated token gift-sending surface.
+- `Referrals` now exposes referral stats, payout summary, and invite-link management outside the popup-only flow.
+- `Video` now exposes call history and a direct call-launch surface using the restored video-call modal.
+
+### Changed
+- Expanded the restore-branch app shell restored-features rail and dashboard cards so boosts, gifts, referrals, and video now show up alongside wallet, roast, merchant, premium, and moderation surfaces.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the new route + navigation recovery.
+- The production route manifest now includes `/boosts`, `/gifts`, `/referrals`, and `/video` on the rewind branch.
+
 ## [1.7.1] - 2026-04-05 — Rewind CI Repair for Avatar Requests + Recommendation Caching
 
 ### Fixed

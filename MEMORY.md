@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-05 — v1.7.2 many "restored" systems still need real top-level destinations or they will continue to feel half-dead
+- The rewind branch already contained boosts, gifts, referrals, and video functionality, but these systems still relied too heavily on scattered modals or inline triggers.
+- Adding real pages for them is high leverage because it turns hidden implementation into visible restored product surface without destabilizing Hetzner deployment contracts.
+- The restore strategy should keep pairing backend/contract recovery with page-level destination recovery so features are not only present, but actually reachable.
+
 ## 2026-04-05 — v1.7.1 some rewind-branch test failures are caused by testing shortcuts that are harmless in lean branches but wrong for full-surface suites
 - The avatar-generation code was still using testing-only early returns when provider credentials were absent, which prevented `Http::assertSent()`-style rewind tests from ever observing outbound generation calls.
 - Recommendation responses on the richer branch also needed their older tagged-cache contract restored because the CI suite asserts personalized recommendation caching explicitly.

@@ -1,186 +1,194 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.7.1
+> **Version Reached:** 1.7.2
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This session continued the rewind-branch recovery in two connected phases:
-1. committed and pushed the previously validated shell/navigation recovery as **v1.7.0**
-2. immediately investigated the next restore-branch backend CI blockers and patched them as **v1.7.1**
+This session kept pushing the restore branch in the exact direction the user requested: restore more of what was removed while preserving a deployable modern baseline.
 
-The current guiding principle remains unchanged:
-- restore everything the user approved
-- keep excluded systems out of the primary product emphasis
-- keep modern Hetzner/runtime compatibility intact so the branch can actually deploy when it is promoted
+The session produced three concrete restore-branch tranches in sequence:
+- **v1.7.0** — navigation + missing activity/notification destinations
+- **v1.7.1** — direct backend CI contract repair for avatar requests and recommendation caching
+- **v1.7.2** — new top-level recovered surfaces for boosts, gifts, referrals, and video
 
 No processes were manually killed.
 
 ---
 
-## Phase A — v1.7.0 Was Finalized and Pushed
-The restore worktree had an already-validated but uncommitted navigation/surface recovery tranche.
+## What Was Finalized and Pushed First
+### v1.7.0 — `81f486d93`
+Committed and pushed:
+- `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
 
-That work was committed and pushed as:
-- **Commit:** `81f486d93`
-- **Message:** `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
+This completed the already-validated shell recovery tranche:
+- `/activity`
+- `/notifications`
+- `AppHeader` / left-rail scope cleanup
+- dashboard restored-surface recovery
 
-### What v1.7.0 delivered
-- real `/activity` page
-- real `/notifications` page
-- shared notification route helpers
-- app shell/left rail aligned to approved restored scope
-- dashboard rebuilt to surface restored features more coherently
-- successful restore-branch frontend production build validation
+### v1.7.1 — `6dc1b159c`
+Committed and pushed:
+- `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
 
-This directly addressed the user complaint that the rewind branch did not yet *feel* as restored as it should.
-
----
-
-## Phase B — Next Backend CI Failures Were Investigated
-After pushing `v1.7.0`, the next priority was backend CI alignment.
-
-I inspected the prior failed backend run for `d86d0cbd6`:
-- **Run:** `24008637953`
-
-### What the failed log showed
-The suite was overwhelmingly green except for two focused failures:
-1. `Tests\Feature\AvatarGenerationTest > service generates prompt with detailed attributes`
-2. `Tests\Feature\Caching\ControllerCachingTest`
-
-That was an excellent signal because it means the richer rewind branch is not collapsing broadly. It is continuing to fail at narrow, specific compatibility seams.
+This directly targeted the next two backend CI failures:
+- avatar generation tests needed observable outbound HTTP behavior under `Http::fake()`
+- recommendation controller needed tagged caching to satisfy the richer branch’s mocked cache contract
 
 ---
 
-## Root Cause Analysis
+## New Restoration Work in This Slice
+### v1.7.2 — Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video
+This tranche focused on restoring more of the approved token-era feature cluster as real user-facing destinations instead of leaving them hidden behind modals or scattered triggers.
 
-### 1. Avatar-generation test failure
-The rewind branch still had testing-mode shortcuts in `AvatarGenerationService`.
+### Pages added
+#### 1. `fwber-frontend/app/boosts/page.tsx`
+Added a dedicated boosts hub that exposes:
+- active boost status
+- boost history
+- direct access to `BoostPurchaseModal`
 
-Why that matters:
-- in testing, if a provider credential was absent, the service returned a fake success payload early
-- but the richer rewind suite expects outbound HTTP image-generation requests to still be attempted under `Http::fake()`
-- that means `Http::assertSent()` never saw a request, so the test failed even though the service returned a nominal success shape
+Why it matters:
+- boosts existed as backend + modal behavior, but not as a top-level surface
+- this makes the boost system feel truly restored in the branch
 
-### 2. Recommendation caching test failure
-The `ControllerCachingTest` expected personalized recommendations to use tagged caching.
+#### 2. `fwber-frontend/app/gifts/page.tsx`
+Added a dedicated gifts page that exposes:
+- received gifts
+- dedicated send-gift entry using `GiftShopModal`
 
-But `RecommendationController` was directly calling the recommendation service without wrapping the response in `TaggedCache::remember(...)`.
+Why it matters:
+- gifts were present as components/API, but not a stable destination
+- now there is a real route for the restored gifting system
 
-That broke the mocked contract:
-- `Cache::tags([...])` was expected once
-- no call happened
-- CI failed
+#### 3. `fwber-frontend/app/referrals/page.tsx`
+Added a dedicated referrals and payouts hub that exposes:
+- referral summary
+- invite link management
+- pending cash/token stats
+- access to `ReferralModal`
+
+Why it matters:
+- the referral system was too popup-only before
+- now the restored viral/payout layer is visible and navigable as a real page
+
+#### 4. `fwber-frontend/app/video/page.tsx`
+Added a dedicated video-call page that exposes:
+- `CallHistory`
+- direct call initiation via `VideoCallModal`
+
+Why it matters:
+- video chat is part of the approved restoration scope
+- this creates a real destination instead of requiring chat-only or inline entry points
 
 ---
 
-## What Was Changed for v1.7.1
+## Navigation / Dashboard Expansion
+### `fwber-frontend/components/AppHeader.tsx`
+Extended the restore-branch restored-features rail to include:
+- `/referrals`
+- `/boosts`
+- `/gifts`
+- `/video`
 
-### 1. `fwber-backend/app/Services/AvatarGenerationService.php`
-Adjusted provider behavior under tests.
+These now sit alongside the already restored surfaces:
+- premium
+- wallet
+- roast
+- share unlocks
+- merchant
+- moderation
 
-#### New behavior
-Instead of returning early in testing when credentials are missing, the service now injects deterministic placeholder credentials:
-- DALL-E → `testing-openai-key`
-- Gemini → `testing-gemini-key`
-- Replicate → `testing-replicate-token`
+### `fwber-frontend/app/dashboard/page.tsx`
+Expanded the restored-sections grid with cards for:
+- referrals & payouts
+- profile boosts
+- gift shop
+- video calls
 
-#### Why this is correct
-This preserves the observable request contract under `Http::fake()` and matches the richer rewind suite’s expectations without compromising real production behavior.
-
-The live/runtime behavior is unchanged for non-testing environments:
-- missing credentials still raise real configuration exceptions outside tests
-
-### 2. `fwber-backend/app/Http/Controllers/RecommendationController.php`
-Restored tagged caching around personalized recommendations.
-
-#### New behavior
-- imports `App\Support\TaggedCache`
-- builds a user-scoped recommendation cache key based on:
-  - user id
-  - types
-  - context
-  - limit
-- wraps recommendation generation in:
-  - `TaggedCache::remember(["recommendations:user:{id}"], ...)`
-
-#### Why this is correct
-This aligns the branch with:
-- the older broader cache expectations
-- the CI suite’s mocked `Cache::tags(...)` contract
-- the practical need to avoid recomputing recommendation payloads repeatedly on the richer restored branch
+This is important because the user explicitly wants the removed systems restored in a way that actually feels complete. If restored systems are not visible on the dashboard or navigation shell, they still feel partially dead.
 
 ---
 
 ## Validation Performed
-
 ### Restore-branch frontend build
-Executed again to keep the previously staged surface recovery honest:
+Executed:
 - `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
 
 Result:
 - successful production build
+- route manifest now includes:
+  - `/boosts`
+  - `/gifts`
+  - `/referrals`
+  - `/video`
 
-### Targeted restore-branch backend tests
-Executed:
-- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-backend`
+### Restore-branch backend targeted validation from prior tranche
+Executed earlier in this same broader continuation:
 - `php artisan test --filter='AvatarGenerationTest|ControllerCachingTest'`
 
-Local result on this workstation:
+Result on this workstation:
+- Redis-gated cases skipped cleanly due missing local PHP Redis extension
 - non-Redis subset passed
-- Redis-gated cases skipped cleanly because the local machine does not have the PHP Redis extension available
 
-This is still useful validation because it confirms:
-- touched files parse and execute correctly
-- non-Redis paths remain stable
-- the remaining CI-facing expectations are now patched at the source for environments where the Redis extension is present
+### GitHub Actions state
+After `v1.7.1` push, fresh restore-branch runs were triggered:
+- Backend CI and Frontend Build for `6dc1b159c`
+
+After `v1.7.2` is committed/pushed, another fresh restore-branch CI/build cycle should be triggered against the broader surface state.
 
 ---
 
 ## Files Changed This Slice
+### Frontend pages added
+- `fwber-frontend/app/boosts/page.tsx`
+- `fwber-frontend/app/gifts/page.tsx`
+- `fwber-frontend/app/referrals/page.tsx`
+- `fwber-frontend/app/video/page.tsx`
 
-### v1.7.0 commit finalized this previously staged tranche
+### Frontend pages/components updated
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
-- `fwber-frontend/app/activity/page.tsx`
-- `fwber-frontend/app/notifications/page.tsx`
-- `fwber-frontend/lib/notifications.ts`
-- docs/version files for `v1.7.0`
 
-### v1.7.1 tranche
-- `fwber-backend/app/Services/AvatarGenerationService.php`
-- `fwber-backend/app/Http/Controllers/RecommendationController.php`
+### Docs / versioning
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
 - `MEMORY.md`
 - `ROADMAP.md`
 - `docs/SUBMODULE_DASHBOARD.md`
+- `HANDOFF.md`
 - `VERSION`
 - `VERSION.md`
 - `fwber-backend/VERSION`
 - `fwber-frontend/VERSION`
-- `HANDOFF.md`
 
 ---
 
 ## Git / Release
-### Already committed and pushed
-- **`81f486d93`** — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
+### Already committed and pushed in this session
+- `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
+- `6dc1b159c` — `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
 
 ### Current tranche target
-- **Target Version:** `1.7.1`
-- **Recommended Commit Message:** `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
+- **Target Version:** `1.7.2`
+- **Recommended Commit Message:** `feat: restore rewind boosts gifts referrals and video surfaces (v1.7.2)`
+
+---
+
+## Key Analysis
+The restore strategy is working best when it alternates between:
+1. **compatibility repair** so the branch keeps moving toward green CI and modern Hetzner safety
+2. **surface recovery** so restored systems become real, navigable product areas instead of hidden code paths
+
+This session did exactly that.
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.7.1` rewind-branch backend CI repair.
-2. Let the fresh restore-branch backend/frontend runs execute.
-3. If backend CI is still red, inspect the next concrete failure and patch it directly rather than broad guessing.
-4. Continue restoring approved removed systems while keeping excluded areas out of the main shell emphasis:
-   - keep excluding ActivityPub/Federation from user-facing restoration scope
-   - keep excluding Governance/DAO/Council/On-chain from user-facing restoration scope
-   - keep excluding Journals/Scrapbooks/Icebreakers/extra profile-social layer from user-facing restoration scope
-5. Preserve Hetzner/runtime compatibility as a non-negotiable baseline while broadening the restored surface.
+1. Commit and push the `v1.7.2` surface-recovery tranche.
+2. Re-check the fresh restore-branch GitHub Actions runs.
+3. If backend CI remains red, inspect the next explicit failing seam and patch it directly.
+4. Continue restoring approved removed systems with real destinations, likely next candidates being any remaining hidden token-era or commerce-adjacent surfaces that still exist only as components or inline triggers.
+5. Keep Hetzner/runtime compatibility as a hard requirement throughout.

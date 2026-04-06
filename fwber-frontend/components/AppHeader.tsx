@@ -33,6 +33,9 @@ import {
   Store,
   Sparkles,
   Gavel,
+  Gift,
+  Rocket,
+  Phone,
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -78,6 +81,10 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
   const links: NavItem[] = [
     { href: '/premium', label: 'Gold', icon: Crown },
     { href: '/wallet', label: 'Wallet', icon: Wallet },
+    { href: '/referrals', label: 'Referrals', icon: Sparkles },
+    { href: '/boosts', label: 'Boosts', icon: Rocket },
+    { href: '/gifts', label: 'Gifts', icon: Gift },
+    { href: '/video', label: 'Video', icon: Phone },
     { href: '/roast', label: 'Roast', icon: Flame },
     { href: '/share-unlock', label: 'Share Unlocks', icon: Sparkles },
     {
