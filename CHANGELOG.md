@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.9] - 2026-04-06 — Rewind Dashboard Domain Organization
+
+### Changed
+- Reorganized the rewind dashboard’s restored-surfaces area into clearer domain sections: core dating loop, identity/trust/support, premium/growth/playful surfaces, and community/live/local business.
+- Reduced the sense of dashboard clutter by emphasizing the new top-level hub pages as the main way to navigate the restored branch.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the dashboard restructuring.
+- The dashboard remains the main signed-in map of restored product areas while preserving the long green frontend/backend CI trend on adjacent tranches.
+
 ## [1.8.8] - 2026-04-06 — Rewind Matching Hub Recovery
 
 ### Added

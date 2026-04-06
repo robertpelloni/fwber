@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.8
+> **Version:** 1.8.9
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Dashboard Domain Organization**: Reorganized the dashboard’s restored-surfaces area into product-domain sections so the restored branch feels more intentionally structured and less like a flat list of recovered routes.
 - [x] **Rewind Matching Hub Recovery**: Added a new `/matching` hub and surfaced recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context from one coherent restored destination.
 - [x] **Rewind Support Hub Recovery**: Added a new `/support` hub and surfaced help, support contact, privacy policy, terms, safety, and blocked-user controls from one coherent restored destination.
 - [x] **Rewind Plans Hub Recovery**: Added a new `/plans` hub and surfaced events, event creation, date planning, nearby discovery, venues, and deals from one coherent restored destination.

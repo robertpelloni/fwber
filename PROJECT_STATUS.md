@@ -1,19 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.8.8 (Rewind Matching Hub Recovery)
+# PROJECT_STATUS.md - fwber v1.8.9 (Rewind Dashboard Domain Organization)
 
 **Date:** 2026-04-06
-**Version:** 1.8.8 "Rewind Matching Hub Recovery"
-**Status:** ✅ **RESTORE BRANCH NOW EXPOSES THE CORE DATING / ATTRACTION / MATCH-CONVERSION FUNNEL AS A COHERENT TOP-LEVEL DESTINATION**
+**Version:** 1.8.9 "Rewind Dashboard Domain Organization"
+**Status:** ✅ **RESTORED SURFACES ARE NOW GROUPED BY PRODUCT DOMAIN IN THE SIGNED-IN DASHBOARD**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release continued the hub-restoration strategy by grouping the branch’s primary dating funnel into one dedicated destination.
+This release shifted from adding another top-level hub to refining how all the restored hubs are presented together.
 
 Delivered:
-- added a dedicated `/matching` page
-- surfaced recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context from one coherent destination
-- expanded navigation and dashboard cards so the branch’s core attraction funnel is easy to reach from the signed-in shell
-- preserved green local production build validation without introducing any backend-risk changes
+- reorganized the dashboard’s restored-surfaces area into clearer product-domain sections
+- grouped the branch around core dating, identity/trust/support, premium/growth, and community/live/business areas
+- reduced visual sprawl so the rewind branch now feels more intentionally structured rather than merely broad
+- preserved green local production build validation without introducing backend-risk changes
 
 ## ✅ Why This Matters
-This is one of the most important coherence passes so far because the product’s main value proposition is matching based on mutual preference and proximity. The new matching hub makes that core loop legible and intentional, rather than leaving the most important routes split across separate pages.
+The rewind branch now has many restored destinations. Organizing them by domain is the next maturity step: it makes the product easier to understand, easier to demo, and easier to validate as a cohesive whole instead of a long unordered list of recovered routes.

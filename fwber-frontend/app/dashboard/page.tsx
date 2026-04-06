@@ -149,200 +149,179 @@ export default function DashboardPage() {
                   <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
                     These are the user-approved restored surfaces that should feel first-class again in the rewind branch, without re-elevating excluded federation, governance, or journal-era branches.
                   </p>
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <FeatureSurfaceCard
-                      href="/premium"
-                      title="Gold Premium"
-                      description="Upgrade, review billing, and jump into premium access flows from a visible dashboard card."
-                      icon={<Crown className="h-5 w-5" />}
-                      accent="yellow"
-                    />
-                    <FeatureSurfaceCard
-                      href="/wallet"
-                      title="Wallet & Referrals"
-                      description="Open token balance, referrals, payouts, and unlock-related wallet tooling from one place."
-                      icon={<Wallet className="h-5 w-5" />}
-                      accent="green"
-                    />
-                    <FeatureSurfaceCard
-                      href="/roast"
-                      title="Profile Roast"
-                      description="Use the restored AI roast surface to get public profile feedback and rewrite ideas."
-                      icon={<Flame className="h-5 w-5" />}
-                      accent="orange"
-                    />
-                    <FeatureSurfaceCard
-                      href="/notifications"
-                      title="Notifications Inbox"
-                      description="Recovered the full-screen notifications view so bell routes lead to a real inbox again."
-                      icon={<Bell className="h-5 w-5" />}
-                      accent="blue"
-                    />
-                    <FeatureSurfaceCard
-                      href="/events"
-                      title="Events"
-                      description="Browse and create local events without digging through dead or hidden navigation."
-                      icon={<Calendar className="h-5 w-5" />}
-                      accent="purple"
-                    />
-                    <FeatureSurfaceCard
-                      href="/referrals"
-                      title="Referrals & Payouts"
-                      description="Open invite links, vouch growth, pending cash, and reward stats in a dedicated referral hub."
-                      icon={<Sparkles className="h-5 w-5" />}
-                      accent="green"
-                    />
-                    <FeatureSurfaceCard
-                      href="/boosts"
-                      title="Profile Boosts"
-                      description="Purchase visibility boosts and review boost history from a dedicated route."
-                      icon={<Rocket className="h-5 w-5" />}
-                      accent="orange"
-                    />
-                    <FeatureSurfaceCard
-                      href="/gifts"
-                      title="Gift Shop"
-                      description="Review received gifts and open a dedicated token gift surface outside inline profile modals."
-                      icon={<Gift className="h-5 w-5" />}
-                      accent="pink"
-                    />
-                    <FeatureSurfaceCard
-                      href="/video"
-                      title="Video Calls"
-                      description="Open call history and start restored video calls from a top-level page."
-                      icon={<Phone className="h-5 w-5" />}
-                      accent="blue"
-                    />
-                    <FeatureSurfaceCard
-                      href="/spaces"
-                      title="Live Spaces"
-                      description="Open chatrooms, audio rooms, local pulse, boards, burner links, and conference pulse from one top-level hub."
-                      icon={<Radio className="h-5 w-5" />}
-                      accent="purple"
-                    />
-                    <FeatureSurfaceCard
-                      href="/places"
-                      title="Places & Nearby"
-                      description="Open nearby people, venues, deals, date planning, and location-aware surfaces from one local-discovery hub."
-                      icon={<Map className="h-5 w-5" />}
-                      accent="green"
-                    />
-                    <FeatureSurfaceCard
-                      href="/scenes"
-                      title="Scenes & Discovery"
-                      description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one restored hub."
-                      icon={<Compass className="h-5 w-5" />}
-                      accent="purple"
-                    />
-                    <FeatureSurfaceCard
-                      href="/studio"
-                      title="Studio & AI"
-                      description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one restored hub."
-                      icon={<Wand2 className="h-5 w-5" />}
-                      accent="pink"
-                    />
-                    <FeatureSurfaceCard
-                      href="/connections"
-                      title="Connections"
-                      description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one restored hub."
-                      icon={<HeartHandshake className="h-5 w-5" />}
-                      accent="red"
-                    />
-                    <FeatureSurfaceCard
-                      href="/identity"
-                      title="Identity & Profile"
-                      description="Open profile, photos, verification, and identity-focused settings from one restored hub."
-                      icon={<User className="h-5 w-5" />}
-                      accent="blue"
-                    />
-                    <FeatureSurfaceCard
-                      href="/economy"
-                      title="Premium & Economy"
-                      description="Open premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one restored hub."
-                      icon={<Wallet className="h-5 w-5" />}
-                      accent="green"
-                    />
-                    <FeatureSurfaceCard
-                      href="/commerce"
-                      title="Merchants & Commerce"
-                      description="Open merchant onboarding, business operations, analytics, promotions, and local broadcast tooling from one restored hub."
-                      icon={<Store className="h-5 w-5" />}
-                      accent="orange"
-                    />
-                    <FeatureSurfaceCard
-                      href="/plans"
-                      title="Plans & Meetups"
-                      description="Open events, date planning, nearby discovery, venues, and deals from one restored local outing hub."
-                      icon={<Calendar className="h-5 w-5" />}
-                      accent="purple"
-                    />
-                    <FeatureSurfaceCard
-                      href="/matching"
-                      title="Matching & Attraction"
-                      description="Open recommendations, matches, admirers, profile-view intent, and nearby dating signals from one restored hub."
-                      icon={<Heart className="h-5 w-5" />}
-                      accent="pink"
-                    />
-                    <FeatureSurfaceCard
-                      href="/support"
-                      title="Support & Policies"
-                      description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one restored hub."
-                      icon={<CircleHelp className="h-5 w-5" />}
-                      accent="blue"
-                    />
-                    <FeatureSurfaceCard
-                      href="/operations"
-                      title="Trust & Operations"
-                      description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."
-                      icon={<Shield className="h-5 w-5" />}
-                      accent="red"
-                    />
-                    <FeatureSurfaceCard
-                      href="/reputation"
-                      title="Reputation & Trust"
-                      description="Open achievements, verification, profile views, and social-proof surfaces from one trust-focused hub."
-                      icon={<Award className="h-5 w-5" />}
-                      accent="yellow"
-                    />
-                    <FeatureSurfaceCard
-                      href="/unlocks"
-                      title="Unlock Center"
-                      description="Jump into token-gated perks, share unlocks, and premium reveal surfaces from one recovery hub."
-                      icon={<Lock className="h-5 w-5" />}
-                      accent="yellow"
-                    />
-                    <FeatureSurfaceCard
-                      href="/share-unlock"
-                      title="Share Unlocks"
-                      description="Open the viral unlock route directly instead of hunting through hidden CTA chains."
-                      icon={<Share2 className="h-5 w-5" />}
-                      accent="purple"
-                    />
-                    <FeatureSurfaceCard
-                      href="/settings/travel"
-                      title="Travel Mode"
-                      description="Open the restored travel-mode controls directly from the dashboard."
-                      icon={<Plane className="h-5 w-5" />}
-                      accent="slate"
-                    />
-                    <FeatureSurfaceCard
-                      href={user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'}
-                      title={user?.role === 'merchant' ? 'Merchant Portal' : 'Become a Merchant'}
-                      description={user?.role === 'merchant'
-                        ? 'Run storefront inventory, redemptions, analytics, and trust status.'
-                        : 'Open a storefront, list redeemable items, and show up in nearby marketplace results.'}
-                      icon={<Store className="h-5 w-5" />}
-                      accent="pink"
-                    />
-                    {(user as { is_moderator?: boolean } | null)?.is_moderator ? (
-                      <FeatureSurfaceCard
-                        href="/moderation"
-                        title="Moderation"
-                        description="Open the moderation dashboard for reports, merchant review, and trust tooling."
-                        icon={<Gavel className="h-5 w-5" />}
-                        accent="slate"
-                      />
-                    ) : null}
+                  <div className="space-y-6">
+                    <div>
+                      <div className="mb-3 flex items-center gap-2">
+                        <Heart className="h-4 w-4 text-pink-500" />
+                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Core dating loop</h4>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <FeatureSurfaceCard
+                          href="/matching"
+                          title="Matching & Attraction"
+                          description="Open recommendations, matches, admirers, profile-view intent, and nearby dating signals from one restored hub."
+                          icon={<Heart className="h-5 w-5" />}
+                          accent="pink"
+                        />
+                        <FeatureSurfaceCard
+                          href="/connections"
+                          title="Connections"
+                          description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one restored hub."
+                          icon={<HeartHandshake className="h-5 w-5" />}
+                          accent="red"
+                        />
+                        <FeatureSurfaceCard
+                          href="/scenes"
+                          title="Scenes & Discovery"
+                          description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one restored hub."
+                          icon={<Compass className="h-5 w-5" />}
+                          accent="purple"
+                        />
+                        <FeatureSurfaceCard
+                          href="/places"
+                          title="Places & Nearby"
+                          description="Open nearby people, venues, deals, date planning, and location-aware surfaces from one local-discovery hub."
+                          icon={<Map className="h-5 w-5" />}
+                          accent="green"
+                        />
+                        <FeatureSurfaceCard
+                          href="/plans"
+                          title="Plans & Meetups"
+                          description="Open events, date planning, nearby discovery, venues, and deals from one restored local outing hub."
+                          icon={<Calendar className="h-5 w-5" />}
+                          accent="purple"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-3 flex items-center gap-2">
+                        <User className="h-4 w-4 text-blue-500" />
+                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Identity, trust & support</h4>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <FeatureSurfaceCard
+                          href="/identity"
+                          title="Identity & Profile"
+                          description="Open profile, photos, verification, and identity-focused settings from one restored hub."
+                          icon={<User className="h-5 w-5" />}
+                          accent="blue"
+                        />
+                        <FeatureSurfaceCard
+                          href="/reputation"
+                          title="Reputation & Trust"
+                          description="Open achievements, verification, profile views, and social-proof surfaces from one trust-focused hub."
+                          icon={<Award className="h-5 w-5" />}
+                          accent="yellow"
+                        />
+                        <FeatureSurfaceCard
+                          href="/operations"
+                          title="Trust & Operations"
+                          description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."
+                          icon={<Shield className="h-5 w-5" />}
+                          accent="red"
+                        />
+                        <FeatureSurfaceCard
+                          href="/support"
+                          title="Support & Policies"
+                          description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one restored hub."
+                          icon={<CircleHelp className="h-5 w-5" />}
+                          accent="blue"
+                        />
+                        <FeatureSurfaceCard
+                          href="/settings/travel"
+                          title="Travel Mode"
+                          description="Open the restored travel-mode controls directly from the dashboard."
+                          icon={<Plane className="h-5 w-5" />}
+                          accent="slate"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-3 flex items-center gap-2">
+                        <Wallet className="h-4 w-4 text-green-500" />
+                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Premium, growth & playful surfaces</h4>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <FeatureSurfaceCard
+                          href="/economy"
+                          title="Premium & Economy"
+                          description="Open premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one restored hub."
+                          icon={<Wallet className="h-5 w-5" />}
+                          accent="green"
+                        />
+                        <FeatureSurfaceCard
+                          href="/unlocks"
+                          title="Unlock Center"
+                          description="Jump into token-gated perks, share unlocks, and premium reveal surfaces from one recovery hub."
+                          icon={<Lock className="h-5 w-5" />}
+                          accent="yellow"
+                        />
+                        <FeatureSurfaceCard
+                          href="/studio"
+                          title="Studio & AI"
+                          description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one restored hub."
+                          icon={<Wand2 className="h-5 w-5" />}
+                          accent="pink"
+                        />
+                        <FeatureSurfaceCard
+                          href="/video"
+                          title="Video Calls"
+                          description="Open call history and start restored video calls from a top-level page."
+                          icon={<Phone className="h-5 w-5" />}
+                          accent="blue"
+                        />
+                        <FeatureSurfaceCard
+                          href="/share-unlock"
+                          title="Share Unlocks"
+                          description="Open the viral unlock route directly instead of hunting through hidden CTA chains."
+                          icon={<Share2 className="h-5 w-5" />}
+                          accent="purple"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="mb-3 flex items-center gap-2">
+                        <Store className="h-4 w-4 text-orange-500" />
+                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Community, live & local business</h4>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                        <FeatureSurfaceCard
+                          href="/spaces"
+                          title="Live Spaces"
+                          description="Open chatrooms, audio rooms, local pulse, boards, burner links, and conference pulse from one top-level hub."
+                          icon={<Radio className="h-5 w-5" />}
+                          accent="purple"
+                        />
+                        <FeatureSurfaceCard
+                          href="/commerce"
+                          title="Merchants & Commerce"
+                          description="Open merchant onboarding, business operations, analytics, promotions, and local broadcast tooling from one restored hub."
+                          icon={<Store className="h-5 w-5" />}
+                          accent="orange"
+                        />
+                        <FeatureSurfaceCard
+                          href={user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'}
+                          title={user?.role === 'merchant' ? 'Merchant Portal' : 'Become a Merchant'}
+                          description={user?.role === 'merchant'
+                            ? 'Run storefront inventory, redemptions, analytics, and trust status.'
+                            : 'Open a storefront, list redeemable items, and show up in nearby marketplace results.'}
+                          icon={<Store className="h-5 w-5" />}
+                          accent="pink"
+                        />
+                        {(user as { is_moderator?: boolean } | null)?.is_moderator ? (
+                          <FeatureSurfaceCard
+                            href="/moderation"
+                            title="Moderation"
+                            description="Open the moderation dashboard for reports, merchant review, and trust tooling."
+                            icon={<Gavel className="h-5 w-5" />}
+                            accent="slate"
+                          />
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.9 once enough hubs exist, dashboard organization becomes more valuable than adding yet another top-level route
+- The rewind branch reached the point where the main problem was no longer missing destinations, but dashboard sprawl.
+- Grouping restored surfaces by domain makes the branch feel like a product map rather than an accumulation of cards.
+- This kind of structure pass is a good follow-up after multiple consecutive successful hub restorations because it increases coherence without risking backend contracts.
+
 ## 2026-04-06 — v1.8.8 the branch needed an explicit matching hub because the core product loop is more important than any supporting system
 - Recommendations, matches, who-likes-you, profile views, and nearby signals all contribute directly to the main dating funnel.
 - Grouping them into one matching destination sharpens the branch around the product’s actual purpose: mutual preference + proximity + conversion.
