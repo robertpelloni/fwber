@@ -1,113 +1,68 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-05
-> **Version Reached:** 1.7.2
+> **Version Reached:** 1.7.3
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This session kept pushing the restore branch in the exact direction the user requested: restore more of what was removed while preserving a deployable modern baseline.
+This continuation session kept restoring approved removed surfaces on the rewind branch while preserving successful production frontend builds and modern Hetzner compatibility expectations.
 
-The session produced three concrete restore-branch tranches in sequence:
-- **v1.7.0** — navigation + missing activity/notification destinations
-- **v1.7.1** — direct backend CI contract repair for avatar requests and recommendation caching
-- **v1.7.2** — new top-level recovered surfaces for boosts, gifts, referrals, and video
+Already pushed during this broader sequence:
+- `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
+- `6dc1b159c` — `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
+- `f576ae411` — `feat: restore rewind boosts gifts referrals and video surfaces (v1.7.2)`
+
+Completed in this slice:
+- added a new top-level `/unlocks` page as a coherent hub for paywall/token-gated surfaces
+- expanded restored-features navigation and dashboard cards to include the unlock/paywall cluster more directly
+- validated another successful restore-branch frontend production build
+- prepared and recorded release metadata for **v1.7.3**
 
 No processes were manually killed.
 
 ---
 
-## What Was Finalized and Pushed First
-### v1.7.0 — `81f486d93`
-Committed and pushed:
-- `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
+## What Was Added
+### `fwber-frontend/app/unlocks/page.tsx`
+Added a dedicated unlock hub page that consolidates several scattered token/paywall-era systems into one restored destination.
 
-This completed the already-validated shell recovery tranche:
-- `/activity`
-- `/notifications`
-- `AppHeader` / left-rail scope cleanup
-- dashboard restored-surface recovery
+The page now links directly to:
+- `/premium/unlocks`
+- `/who-likes-you`
+- `/share-unlock`
+- `/photos/reveals`
 
-### v1.7.1 — `6dc1b159c`
-Committed and pushed:
-- `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
-
-This directly targeted the next two backend CI failures:
-- avatar generation tests needed observable outbound HTTP behavior under `Http::fake()`
-- recommendation controller needed tagged caching to satisfy the richer branch’s mocked cache contract
+Why this matters:
+- the user explicitly wants the removed token-era surface cluster restored
+- those routes already existed, but they were still fragmented and easy to miss
+- the unlock hub turns them into a coherent first-class product area instead of a set of hidden subroutes
 
 ---
 
-## New Restoration Work in This Slice
-### v1.7.2 — Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video
-This tranche focused on restoring more of the approved token-era feature cluster as real user-facing destinations instead of leaving them hidden behind modals or scattered triggers.
-
-### Pages added
-#### 1. `fwber-frontend/app/boosts/page.tsx`
-Added a dedicated boosts hub that exposes:
-- active boost status
-- boost history
-- direct access to `BoostPurchaseModal`
-
-Why it matters:
-- boosts existed as backend + modal behavior, but not as a top-level surface
-- this makes the boost system feel truly restored in the branch
-
-#### 2. `fwber-frontend/app/gifts/page.tsx`
-Added a dedicated gifts page that exposes:
-- received gifts
-- dedicated send-gift entry using `GiftShopModal`
-
-Why it matters:
-- gifts were present as components/API, but not a stable destination
-- now there is a real route for the restored gifting system
-
-#### 3. `fwber-frontend/app/referrals/page.tsx`
-Added a dedicated referrals and payouts hub that exposes:
-- referral summary
-- invite link management
-- pending cash/token stats
-- access to `ReferralModal`
-
-Why it matters:
-- the referral system was too popup-only before
-- now the restored viral/payout layer is visible and navigable as a real page
-
-#### 4. `fwber-frontend/app/video/page.tsx`
-Added a dedicated video-call page that exposes:
-- `CallHistory`
-- direct call initiation via `VideoCallModal`
-
-Why it matters:
-- video chat is part of the approved restoration scope
-- this creates a real destination instead of requiring chat-only or inline entry points
-
----
-
-## Navigation / Dashboard Expansion
+## Navigation / Dashboard Changes
 ### `fwber-frontend/components/AppHeader.tsx`
-Extended the restore-branch restored-features rail to include:
-- `/referrals`
-- `/boosts`
-- `/gifts`
-- `/video`
+Extended restored-features navigation to include:
+- `/unlocks`
 
-These now sit alongside the already restored surfaces:
+This now sits alongside the other recovered restore-branch surfaces such as:
 - premium
 - wallet
+- referrals
+- boosts
+- gifts
+- video
 - roast
 - share unlocks
 - merchant
 - moderation
 
 ### `fwber-frontend/app/dashboard/page.tsx`
-Expanded the restored-sections grid with cards for:
-- referrals & payouts
-- profile boosts
-- gift shop
-- video calls
+Expanded the restored-sections grid with:
+- `Unlock Center`
+- explicit `Share Unlocks` card
 
-This is important because the user explicitly wants the removed systems restored in a way that actually feels complete. If restored systems are not visible on the dashboard or navigation shell, they still feel partially dead.
+This improves visibility of the token-gated/paywall cluster from the first signed-in screen.
 
 ---
 
@@ -119,39 +74,37 @@ Executed:
 Result:
 - successful production build
 - route manifest now includes:
-  - `/boosts`
-  - `/gifts`
-  - `/referrals`
-  - `/video`
+  - `/unlocks`
 
-### Restore-branch backend targeted validation from prior tranche
-Executed earlier in this same broader continuation:
-- `php artisan test --filter='AvatarGenerationTest|ControllerCachingTest'`
+This keeps the rewind branch aligned with the requirement that restoration still remain compatible with modern deployment expectations.
 
-Result on this workstation:
-- Redis-gated cases skipped cleanly due missing local PHP Redis extension
-- non-Redis subset passed
+---
 
-### GitHub Actions state
-After `v1.7.1` push, fresh restore-branch runs were triggered:
-- Backend CI and Frontend Build for `6dc1b159c`
+## Current Restore-Branch CI State
+At the time of this handoff:
+- the latest pushed branch tip from the previous tranche (`f576ae411`, v1.7.2) had fresh GitHub Actions runs in progress/completing
+- frontend CI for multiple recent rewind pushes has been green
+- backend CI still requires continued targeted repair of explicit remaining failures rather than broad speculation
 
-After `v1.7.2` is committed/pushed, another fresh restore-branch CI/build cycle should be triggered against the broader surface state.
+That remains the correct strategy:
+1. restore more approved surface area
+2. immediately inspect the next concrete backend CI seam
+3. patch it directly
+4. keep the branch deploy-safe for Hetzner promotion
 
 ---
 
 ## Files Changed This Slice
-### Frontend pages added
-- `fwber-frontend/app/boosts/page.tsx`
-- `fwber-frontend/app/gifts/page.tsx`
-- `fwber-frontend/app/referrals/page.tsx`
-- `fwber-frontend/app/video/page.tsx`
-
-### Frontend pages/components updated
+### Frontend
+- `fwber-frontend/app/unlocks/page.tsx`
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
 
-### Docs / versioning
+### Docs / release tracking
+- `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -159,36 +112,23 @@ After `v1.7.2` is committed/pushed, another fresh restore-branch CI/build cycle 
 - `ROADMAP.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
 
 ---
 
 ## Git / Release
-### Already committed and pushed in this session
-- `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
-- `6dc1b159c` — `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
-
 ### Current tranche target
-- **Target Version:** `1.7.2`
-- **Recommended Commit Message:** `feat: restore rewind boosts gifts referrals and video surfaces (v1.7.2)`
-
----
-
-## Key Analysis
-The restore strategy is working best when it alternates between:
-1. **compatibility repair** so the branch keeps moving toward green CI and modern Hetzner safety
-2. **surface recovery** so restored systems become real, navigable product areas instead of hidden code paths
-
-This session did exactly that.
+- **Target Version:** `1.7.3`
+- **Recommended Commit Message:** `feat: restore rewind unlock hub and paywall navigation (v1.7.3)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.7.2` surface-recovery tranche.
-2. Re-check the fresh restore-branch GitHub Actions runs.
-3. If backend CI remains red, inspect the next explicit failing seam and patch it directly.
-4. Continue restoring approved removed systems with real destinations, likely next candidates being any remaining hidden token-era or commerce-adjacent surfaces that still exist only as components or inline triggers.
-5. Keep Hetzner/runtime compatibility as a hard requirement throughout.
+1. Commit and push the `v1.7.3` unlock-hub tranche.
+2. Re-check the latest restore-branch GitHub Actions runs.
+3. If backend CI is still red, inspect the next concrete failing seam and patch it directly.
+4. Continue restoring approved removed systems with the same pattern:
+   - real top-level destinations
+   - dashboard visibility
+   - left-rail/restored-features visibility
+   - no regressions against modern Hetzner/runtime expectations
+5. Likely next useful candidates are any remaining restored-but-fragmented surfaces that still only exist as subroutes, modals, or inline triggers rather than coherent destinations.

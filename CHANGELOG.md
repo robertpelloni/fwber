@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.3] - 2026-04-05 — Rewind Unlock Hub + Paywall Surface Navigation Recovery
+
+### Added
+- Added a new top-level `/unlocks` page that consolidates token-gated and paywall-era surfaces into a single recovery hub.
+- The new unlock center links directly to premium unlock catalog, who-likes-you, share unlocks, and photo reveal flows.
+
+### Changed
+- Expanded the restore-branch restored-features navigation to include `Unlocks` as a first-class surface.
+- Expanded the dashboard restored-sections grid so unlock/paywall-era systems are now visible alongside boosts, gifts, referrals, video, wallet, merchant, and roast surfaces.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the new unlock-hub surface recovery.
+- The rewind branch route manifest now includes `/unlocks` as a production-build-safe destination.
+
 ## [1.7.2] - 2026-04-05 — Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video
 
 ### Added

@@ -36,6 +36,7 @@ import {
   Gift,
   Rocket,
   Phone,
+  Lock,
 } from 'lucide-react'
 
 interface AppHeaderProps {
@@ -85,6 +86,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/boosts', label: 'Boosts', icon: Rocket },
     { href: '/gifts', label: 'Gifts', icon: Gift },
     { href: '/video', label: 'Video', icon: Phone },
+    { href: '/unlocks', label: 'Unlocks', icon: Lock },
     { href: '/roast', label: 'Roast', icon: Flame },
     { href: '/share-unlock', label: 'Share Unlocks', icon: Sparkles },
     {

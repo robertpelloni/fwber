@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-05 — v1.7.3 the paywall/unlock cluster benefits from a hub pattern, not just many isolated pages
+- Even after restoring boosts, gifts, referrals, and video as separate destinations, the token-gated unlock surfaces were still fragmented.
+- A dedicated unlock hub is a higher-leverage restore shape because it turns several scattered routes into one coherent destination for the paywall-era product layer.
+- This kind of hub is useful when the underlying systems are already present but still feel scattered from the user’s perspective.
+
 ## 2026-04-05 — v1.7.2 many "restored" systems still need real top-level destinations or they will continue to feel half-dead
 - The rewind branch already contained boosts, gifts, referrals, and video functionality, but these systems still relied too heavily on scattered modals or inline triggers.
 - Adding real pages for them is high leverage because it turns hidden implementation into visible restored product surface without destabilizing Hetzner deployment contracts.

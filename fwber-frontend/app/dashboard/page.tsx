@@ -22,6 +22,8 @@ import {
   Rocket,
   Gift,
   Phone,
+  Lock,
+  Share2,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -201,6 +203,20 @@ export default function DashboardPage() {
                       description="Open call history and start restored video calls from a top-level page."
                       icon={<Phone className="h-5 w-5" />}
                       accent="blue"
+                    />
+                    <FeatureSurfaceCard
+                      href="/unlocks"
+                      title="Unlock Center"
+                      description="Jump into token-gated perks, share unlocks, and premium reveal surfaces from one recovery hub."
+                      icon={<Lock className="h-5 w-5" />}
+                      accent="yellow"
+                    />
+                    <FeatureSurfaceCard
+                      href="/share-unlock"
+                      title="Share Unlocks"
+                      description="Open the viral unlock route directly instead of hunting through hidden CTA chains."
+                      icon={<Share2 className="h-5 w-5" />}
+                      accent="purple"
                     />
                     <FeatureSurfaceCard
                       href="/settings/travel"
