@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.5] - 2026-04-06 — Rewind Commerce Hub Recovery
+
+### Added
+- Added a new top-level `/commerce` page that consolidates merchant onboarding, dashboard operations, merchant profile, promotions, analytics, vibe broadcasting, and adjacent business-control entry points into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Commerce`.
+- Expanded the dashboard restored-sections grid so the merchant and local-commerce cluster is visible alongside economy, identity, operations, connections, studio, scenes, spaces, places, and other restored product areas.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new commerce hub in the route manifest.
+
 ## [1.8.4] - 2026-04-06 — Rewind Economy Hub Recovery
 
 ### Added

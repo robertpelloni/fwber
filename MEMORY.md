@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.5 merchant tooling benefits from having its own commerce hub instead of being buried inside operations alone
+- Merchant onboarding, dashboard, analytics, promotions, and vibe broadcasting are substantial enough to deserve their own product area.
+- The operations hub is still useful for trust/control access, but a dedicated commerce hub makes business-side restoration much easier to evaluate.
+- The branch is now reaching the point where most meaningful restored layers have a clear top-level landing page, which is improving perceived completeness dramatically.
+
 ## 2026-04-06 — v1.8.4 monetization and token-era features feel far more coherent once grouped as one economy surface
 - Premium, wallet, referrals, boosts, gifts, and unlock mechanics were already restored enough to function, but they still read as isolated monetization remnants before this tranche.
 - A dedicated economy hub makes it clearer that these are part of one business/access layer rather than unrelated pages.

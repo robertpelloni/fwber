@@ -99,6 +99,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/connections', label: 'Connections', icon: HeartHandshake },
     { href: '/identity', label: 'Identity', icon: User },
     { href: '/economy', label: 'Economy', icon: Wallet },
+    { href: '/commerce', label: 'Commerce', icon: Store },
     { href: '/operations', label: 'Operations', icon: Shield },
     { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },

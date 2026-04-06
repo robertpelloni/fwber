@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.4 "Rewind Economy Hub Recovery"
+> **Current Version:** 1.8.5 "Rewind Commerce Hub Recovery"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.4)
+### Phase 5: Production Scale (COMPLETED - v1.8.5)
+- **Rewind Commerce Hub Recovery:** Added a real top-level commerce hub for merchant onboarding, dashboard operations, profile, promotions, analytics, vibe broadcasting, and adjacent business controls so the merchant/local-commerce layer feels intentionally restored.
 - **Rewind Economy Hub Recovery:** Added a real top-level economy hub for premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows so the token/premium layer feels intentionally restored.
 - **Rewind Identity Hub Recovery:** Added a real top-level identity hub for profile, photos, identity settings, verification, physical-profile controls, and security/recovery access so the self-presentation layer feels intentionally restored.
 - **Rewind Operations Hub Recovery:** Added a real top-level operations hub for safety, settings, security, merchant flows, and moderation/travel controls so the trust-and-operations layer feels intentionally restored.

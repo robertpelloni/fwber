@@ -262,6 +262,13 @@ export default function DashboardPage() {
                       accent="green"
                     />
                     <FeatureSurfaceCard
+                      href="/commerce"
+                      title="Merchants & Commerce"
+                      description="Open merchant onboarding, business operations, analytics, promotions, and local broadcast tooling from one restored hub."
+                      icon={<Store className="h-5 w-5" />}
+                      accent="orange"
+                    />
+                    <FeatureSurfaceCard
                       href="/operations"
                       title="Trust & Operations"
                       description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."
