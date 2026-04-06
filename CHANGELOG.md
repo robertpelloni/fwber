@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.3] - 2026-04-06 — Rewind Identity Hub Recovery
+
+### Added
+- Added a new top-level `/identity` page that consolidates profile, photos, identity settings, verification, physical-profile controls, and security/recovery access into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Identity`.
+- Expanded the dashboard restored-sections grid so the profile/identity/media cluster is visible alongside operations, connections, studio, scenes, spaces, places, reputation, unlocks, boosts, gifts, referrals, video, and merchant-era systems.
+
+### Fixed
+- Repaired a dashboard build regression by importing `User` for the new identity dashboard card after the first local production build exposed the missing symbol during prerender.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new identity hub in the route manifest.
+
 ## [1.8.2] - 2026-04-06 — Rewind Operations Hub Recovery
 
 ### Added

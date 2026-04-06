@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   Heart,
   Users,
+  User,
   MessageSquare,
   TrendingUp,
   Clock,
@@ -245,6 +246,13 @@ export default function DashboardPage() {
                       description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one restored hub."
                       icon={<HeartHandshake className="h-5 w-5" />}
                       accent="red"
+                    />
+                    <FeatureSurfaceCard
+                      href="/identity"
+                      title="Identity & Profile"
+                      description="Open profile, photos, verification, and identity-focused settings from one restored hub."
+                      icon={<User className="h-5 w-5" />}
+                      accent="blue"
                     />
                     <FeatureSurfaceCard
                       href="/operations"

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.2 "Rewind Operations Hub Recovery"
+> **Current Version:** 1.8.3 "Rewind Identity Hub Recovery"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.2)
+### Phase 5: Production Scale (COMPLETED - v1.8.3)
+- **Rewind Identity Hub Recovery:** Added a real top-level identity hub for profile, photos, identity settings, verification, physical-profile controls, and security/recovery access so the self-presentation layer feels intentionally restored.
 - **Rewind Operations Hub Recovery:** Added a real top-level operations hub for safety, settings, security, merchant flows, and moderation/travel controls so the trust-and-operations layer feels intentionally restored.
 - **Rewind Connections Hub Recovery:** Added a real top-level connections hub for messages, friends, activity, notifications, matches, and groups so the direct-social layer feels intentionally restored.
 - **Rewind Studio Hub Recovery:** Added a real top-level studio hub for roast, roast-date, content generation, wingman, bounties, and analytics so the AI/creative/viral cluster feels intentionally restored.

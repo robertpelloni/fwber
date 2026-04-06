@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.3 the profile and media layer becomes much more legible once identity controls are treated as a first-class hub
+- Profile, photos, verification, and physical-profile settings were already present, but users still had to remember scattered routes to reach them.
+- A dedicated identity hub helps the rewind branch feel closer to a finished product because self-presentation is central to the dating flow, not a side setting.
+- The repeated missing-import build seams on new dashboard cards are trivial to fix and reinforce the value of running a full production build after every UI tranche.
+
 ## 2026-04-06 — v1.8.2 trust and control surfaces benefit from the same hub treatment as social and discovery systems
 - Safety, settings, security, merchant, and moderation-adjacent routes felt restored but still operationally scattered before this tranche.
 - A single operations hub improves branch legibility while also helping future testers find the product’s trust-sensitive controls quickly.
