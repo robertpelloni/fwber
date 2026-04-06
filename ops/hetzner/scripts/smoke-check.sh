@@ -581,7 +581,6 @@ run_http_check() {
   local body_regex="$5"
   local payload="${6:-}"
   local bearer_token="${7:-}"
-  local severity="${8:-fail}"
 
   local response_file
   local error_file
@@ -618,11 +617,7 @@ run_http_check() {
     curl_error="$(tr '\n' ' ' < "$error_file")"
     add_snapshot "$label" "$method" "$url" 'connect_error' '' '' '' '' '' "$(printf '%s' "$curl_error" | head -c 240)"
     rm -f "$response_file" "$error_file" "$headers_file"
-    if [[ "$severity" == "warn" ]]; then
-      warn_case "$label" "Request failed to connect: ${curl_error:-curl error}"
-    else
-      fail_case "$label" "Request failed to connect: ${curl_error:-curl error}"
-    fi
+    fail_case "$label" "Request failed to connect: ${curl_error:-curl error}"
     return
   fi
 
@@ -665,20 +660,12 @@ run_http_check() {
   done
 
   if [[ "$expected_code_matched" != "1" ]]; then
-    if [[ "$severity" == "warn" ]]; then
-      warn_case "$label" "Returned HTTP $http_code, expected one of [$expected_codes]. Body: $(printf '%s' "$response_body" | head -c 400)"
-    else
-      fail_case "$label" "Returned HTTP $http_code, expected one of [$expected_codes]. Body: $(printf '%s' "$response_body" | head -c 400)"
-    fi
+    fail_case "$label" "Returned HTTP $http_code, expected one of [$expected_codes]. Body: $(printf '%s' "$response_body" | head -c 400)"
     return
   fi
 
   if [[ -n "$body_regex" ]] && ! grep -Eq "$body_regex" <<<"$response_body"; then
-    if [[ "$severity" == "warn" ]]; then
-      warn_case "$label" "Returned HTTP $http_code but body did not match /$body_regex/. Body: $(printf '%s' "$response_body" | head -c 400)"
-    else
-      fail_case "$label" "Returned HTTP $http_code but body did not match /$body_regex/. Body: $(printf '%s' "$response_body" | head -c 400)"
-    fi
+    fail_case "$label" "Returned HTTP $http_code but body did not match /$body_regex/. Body: $(printf '%s' "$response_body" | head -c 400)"
     return
   fi
 
@@ -713,9 +700,9 @@ check_websocket_upgrade() {
     printf 'Origin: %s\r\n' "$WS_ORIGIN"
     printf 'Connection: Upgrade\r\n'
     printf 'Upgrade: websocket\r\n'
-    printf 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n'
+    printf 'Sec-WebSocket-Key: SGV0em5lclNtb2tlQ2hlY2s=\r\n'
     printf 'Sec-WebSocket-Version: 13\r\n\r\n'
-  } | timeout 12s openssl s_client -quiet -connect "${ws_host}:443" -servername "$ws_host" 2>/dev/null | head -n 1 || true)"
+  } | openssl s_client -quiet -connect "${ws_host}:443" -servername "$ws_host" 2>/dev/null | head -n 1)"
 
   if grep -Eq '101[[:space:]]+Switching Protocols' <<<"$handshake_response"; then
     pass_case "$label" "Received a successful websocket upgrade from $WS_URL."
@@ -766,12 +753,7 @@ main() {
   run_http_check 'API liveness endpoint' GET "${API_URL%/}/health/liveness" '200' '"status"[[:space:]]*:[[:space:]]*"alive"'
   run_http_check 'API readiness endpoint' GET "${API_URL%/}/health/readiness" '200' '"status"[[:space:]]*:[[:space:]]*"ready"'
   run_http_check 'Invalid-login contract check' POST "${API_URL%/}/auth/login" '422' 'Invalid credentials' "$LOGIN_PAYLOAD"
-
-  # Public roast can be the first AI-facing request after deploy. Warm it once
-  # so transient first-hit cold-path failures do not pollute the actual smoke
-  # result if the immediately-following real contract check succeeds.
-  curl -sS -X POST "${API_URL%/}/public/roast" -H 'Accept: application/json' -H 'Content-Type: application/json' --data "$ROAST_PAYLOAD" >/dev/null 2>&1 || true
-  run_http_check 'Public roast preview check' POST "${API_URL%/}/public/roast" '200' '"is_preview"[[:space:]]*:[[:space:]]*true' "$ROAST_PAYLOAD" '' 'warn'
+  run_http_check 'Public roast preview check' POST "${API_URL%/}/public/roast" '200' '"is_preview"[[:space:]]*:[[:space:]]*true' "$ROAST_PAYLOAD"
   run_http_check 'Geo nearby endpoint' GET "$GEO_QUERY_URL" '200' '"users"'
   check_websocket_upgrade
   run_optional_authenticated_checks

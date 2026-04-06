@@ -12,32 +12,19 @@ import type {
   ErrorResponse,
   PaginatedResponse,
 } from './types';
-import { safeLocalStorageGet, safeLocalStorageRemove } from '@/lib/browser-storage';
 
-function normalizeApiOrigin(rawUrl?: string | null): string {
-  const fallbackOrigin = 'https://api.fwber.me'
-
-  if (!rawUrl) {
-    return fallbackOrigin
+// Ensure BASE_URL hits the Next.js proxy in browser, and absolute URL on server
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    // In the browser, ALWAYS use the local Next.js proxy to bypass CORS
+    return '/api';
   }
+  // On the server (SSR), we need the absolute URL to hit DreamHost directly
+  const url = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
+  return url.replace(/\/$/, '') + '/api';
+};
 
-  const trimmed = rawUrl.trim()
-  if (!trimmed) {
-    return fallbackOrigin
-  }
-
-  return trimmed.replace(/\/api\/?$/, '').replace(/\/$/, '') || fallbackOrigin
-}
-
-export function getPublicApiOrigin(): string {
-  return normalizeApiOrigin(process.env.NEXT_PUBLIC_API_URL)
-}
-
-export function getApiBaseUrl(): string {
-  return `${getPublicApiOrigin()}/api`
-}
-
-const BASE_URL = getApiBaseUrl()
+const BASE_URL = getBaseUrl();
 let currentAuthToken: string | null = null;
 
 export function setApiClientAuthToken(token: string | null): void {
@@ -161,7 +148,7 @@ export class NetworkError extends Error {
  * Get authorization headers from localStorage
  */
 function getAuthHeaders(): Record<string, string> {
-  const token = currentAuthToken ?? safeLocalStorageGet('fwber_token');
+  const token = currentAuthToken ?? (typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
@@ -267,8 +254,8 @@ async function request<T>(
           // If auth error in browser, clear storage and redirect
           if (apiError.isAuthError && typeof window !== 'undefined' && hadAuthHeader) {
             setApiClientAuthToken(null);
-            safeLocalStorageRemove('fwber_token');
-            safeLocalStorageRemove('fwber_user');
+            localStorage.removeItem('fwber_token');
+            localStorage.removeItem('fwber_user');
             // Check if we are already on login page to avoid redirect loops
             if (!window.location.pathname.includes('/login')) {
               window.location.href = '/login?reason=session_expired';

@@ -1,5 +1,4 @@
 import { apiClient } from './client';
-import { safeLocalStorageGet, safeLocalStorageKeys, safeLocalStorageRemove, safeLocalStorageSet } from '@/lib/browser-storage';
 
 export interface Recommendation {
   id: string;
@@ -214,7 +213,7 @@ export async function getCachedRecommendations(
   }
 ): Promise<RecommendationResponse> {
   // Check localStorage cache first
-  const cached = safeLocalStorageGet(`recommendations_${cacheKey}`);
+  const cached = localStorage.getItem(`recommendations_${cacheKey}`);
   if (cached) {
     const data = JSON.parse(cached);
     const cacheAge = Date.now() - data.timestamp;
@@ -229,7 +228,7 @@ export async function getCachedRecommendations(
   const response = await getRecommendations(params);
   
   // Cache the response
-  safeLocalStorageSet(`recommendations_${cacheKey}`, JSON.stringify({
+  localStorage.setItem(`recommendations_${cacheKey}`, JSON.stringify({
     response,
     timestamp: Date.now(),
   }));
@@ -241,10 +240,10 @@ export async function getCachedRecommendations(
  * Clear recommendation cache
  */
 export function clearRecommendationCache(): void {
-  const keys = safeLocalStorageKeys();
+  const keys = Object.keys(localStorage);
   keys.forEach(key => {
     if (key.startsWith('recommendations_')) {
-      safeLocalStorageRemove(key);
+      localStorage.removeItem(key);
     }
   });
 }
@@ -256,12 +255,12 @@ export function getRecommendationCacheInfo(): {
   cacheKeys: string[];
   totalSize: number;
 } {
-  const keys = safeLocalStorageKeys();
+  const keys = Object.keys(localStorage);
   const recommendationKeys = keys.filter(key => key.startsWith('recommendations_'));
   
   let totalSize = 0;
   recommendationKeys.forEach(key => {
-    const value = safeLocalStorageGet(key);
+    const value = localStorage.getItem(key);
     if (value) {
       totalSize += value.length;
     }

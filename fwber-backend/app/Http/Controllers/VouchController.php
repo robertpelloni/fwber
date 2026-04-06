@@ -5,24 +5,46 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Social\StoreVouchRequest;
 use App\Models\User;
 use App\Models\Vouch;
-use App\Services\ReferralCommissionService;
+use App\Notifications\PushMessage;
+use App\Services\AchievementService;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 
 class VouchController extends Controller
 {
-    public function __construct(private readonly ReferralCommissionService $referralCommissionService)
+    protected $achievementService;
+
+    public function __construct(AchievementService $achievementService)
     {
+        $this->achievementService = $achievementService;
     }
 
     /**
-     * Generate a stable referral-code-based vouch link for the signed-in user.
+     * @OA\Post(
+     *     path="/vouch/generate-link",
+     *     tags={"Viral"},
+     *     summary="Generate a unique vouch link for the user",
+     *
+     *     @OA\Response(response=200, description="Vouch link generated")
+     * )
      */
     public function generateLink(Request $request): JsonResponse
     {
-        $user = $this->referralCommissionService->ensureReferralCode($request->user());
-        $url = rtrim((string) config('referrals.frontend_url', config('app.frontend_url', 'https://fwber.me')), '/').'/vouch/'.$user->referral_code;
+        $user = $request->user();
+        app(TokenDistributionService::class)->ensureReferralCode($user);
+        // Generate a signed URL that expires in 7 days
+        // This ensures the link is tied to this specific user and adds a layer of trust
+        // We use 'vouch.create' as the named route on the frontend (conceptually),
+        // but here we just return the URL string.
+
+        // Actually, for a simple public link, we can just use the referral code or ID.
+        // But a signed URL is safer if we want to prevent enumeration.
+        // Let's stick to referral_code for simplicity and shareability as established in other viral features.
+        // However, the instructions mentioned "generateLink".
+
+        $url = rtrim((string) config('referrals.frontend_url', 'https://fwber.me'), '/').'/vouch/'.$user->referral_code;
 
         return response()->json([
             'url' => $url,
@@ -31,45 +53,78 @@ class VouchController extends Controller
     }
 
     /**
-     * Submit a public vouch using the owner's referral code.
+     * @OA\Post(
+     *     path="/public/vouch",
+     *     tags={"Viral"},
+     *     summary="Submit a public vouch",
      *
-     * The frontend and shared links already use referral-code URLs, so the
-     * controller accepts that shape directly instead of forcing callers to know
-     * internal numeric user ids.
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="referral_code", type="string"),
+     *             @OA\Property(property="type", type="string", enum={"safe", "fun", "hot"}),
+     *             @OA\Property(property="relationship_type", type="string"),
+     *             @OA\Property(property="comment", type="string"),
+     *             @OA\Property(property="voucher_name", type="string")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=200, description="Vouch recorded")
+     * )
      */
     public function store(StoreVouchRequest $request): JsonResponse
     {
-        $validated = $request->validated();
-        $user = User::query()->where('referral_code', $validated['referral_code'])->firstOrFail();
+
+        $user = User::where('referral_code', $request->referral_code)->firstOrFail();
+
         $ip = $request->ip();
 
-        $exists = Vouch::query()
-            ->where('to_user_id', $user->id)
+        // Simple rate limit: Prevent duplicate vouch of same type from same IP
+        $exists = Vouch::where('to_user_id', $user->id)
             ->where('ip_address', $ip)
-            ->where('type', $validated['type'])
+            ->where('type', $request->type)
             ->exists();
 
         if ($exists) {
             return response()->json(['message' => 'Vouch recorded successfully.']);
         }
 
-        $payload = [
+        Vouch::create([
             'to_user_id' => $user->id,
-            'type' => $validated['type'],
+            'type' => $request->type,
+            'relationship_type' => $request->relationship_type,
+            'comment' => $request->comment,
+            'voucher_name' => $request->voucher_name,
             'ip_address' => $ip,
-        ];
+        ]);
 
-        if (Schema::hasColumn('vouches', 'relationship_type')) {
-            $payload['relationship_type'] = $validated['relationship_type'] ?? 'friend';
-        }
-        if (Schema::hasColumn('vouches', 'comment')) {
-            $payload['comment'] = $validated['comment'] ?? '';
-        }
-        if (Schema::hasColumn('vouches', 'voucher_name')) {
-            $payload['voucher_name'] = $validated['voucher_name'] ?? 'Someone';
+        try {
+            $vouchCount = $user->vouches()->count();
+            $this->achievementService->checkAndUnlock($user, 'vouches_received', $vouchCount);
+        } catch (\Exception $e) {
+            // Ignore achievement check failures
         }
 
-        Vouch::query()->create($payload);
+        try {
+            $emoji = match ($request->type) {
+                'safe' => '🛡️',
+                'fun' => '🎉',
+                'hot' => '🔥',
+                default => '👍',
+            };
+
+            $voucher = $request->voucher_name ?? 'Someone';
+            $user->notify(new PushMessage(
+                "New Vouch! $emoji",
+                "$voucher vouched for you as {$request->type}!",
+                '/profile',
+                'social'
+            ));
+        } catch (\Exception $e) {
+            // Ignore notification failures
+        }
 
         return response()->json(['message' => 'Vouch recorded successfully.']);
     }

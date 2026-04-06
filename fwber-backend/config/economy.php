@@ -14,7 +14,6 @@ return [
     'photo_unlock_cost' => 50,
     'boost_cost' => 100,
     'super_like_cost' => 10,
-    'premium_filter_threshold' => 100,
 
     // Rewards (in tokens)
     'signup_bonus' => 100,

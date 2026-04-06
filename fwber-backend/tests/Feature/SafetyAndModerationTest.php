@@ -62,15 +62,16 @@ class SafetyAndModerationTest extends TestCase
         $artifact = ProximityArtifact::create([
             'user_id' => $user->id,
             'type' => 'board_post',
-            'latitude' => 40.7128,
-            'longitude' => -74.0060,
-            'geohash' => 'dr5rsge8',
-            'metadata' => ['content' => 'Hello World'],
+            'content' => 'Hello World',
+            'location_lat' => 40.7128,
+            'location_lng' => -74.0060,
+            'visibility_radius_m' => 50,
+            'expires_at' => now()->addDay(),
         ]);
 
         $this->assertDatabaseHas('proximity_artifacts', [
             'id' => $artifact->id,
-            'latitude' => 40.7128,
+            'content' => 'Hello World',
         ]);
     }
 }

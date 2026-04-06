@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { getApiBaseUrl } from '@/lib/api/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -48,7 +47,7 @@ function RegisterForm() {
       setFormData(prev => ({ ...prev, referralCode: ref }))
       
       // Verify referral code
-      fetch(`${getApiBaseUrl()}/auth/referral/${ref}`)
+      fetch(`/api/auth/referral/${ref}`)
         .then(res => res.json())
         .then(data => {
           if (data.valid) {

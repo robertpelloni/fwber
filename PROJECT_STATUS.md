@@ -1,20 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.9.10 (Extended Browser Storage Guard Sweep)
+# PROJECT_STATUS.md - fwber v1.8.11 (Rewind Shell Product-Map Consistency)
 
-**Date:** 2026-04-05
-**Version:** 1.9.10 "Extended Browser Storage Guard Sweep"
-**Status:** ✅ **MAINLINE FRONTEND STORAGE ACCESS IS HARDENED MORE BROADLY; STRICT BROWSER CONTEXTS SHOULD NO LONGER TRIP MULTIPLE AUXILIARY STORAGE PATHS**
+**Date:** 2026-04-06
+**Version:** 1.8.11 "Rewind Shell Product-Map Consistency"
+**Status:** ✅ **DASHBOARD AND APP SHELL NOW PRESENT THE RESTORED BRANCH AS THE SAME DOMAIN-BASED PRODUCT MAP**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release followed the initial dashboard storage repair with a wider frontend sweep so the fix does not stop at auth/E2E only.
+This release followed the dashboard-domain and sidebar-domain work with a consistency pass that makes the signed-in shell and dashboard tell the same product story.
 
 Delivered:
-- additional local-storage callers now use safe wrappers instead of direct browser storage access
-- cache utilities for recommendations and AI content no longer assume unrestricted localStorage enumeration
-- photo upload/fetch and verification flows no longer read auth tokens directly from blocked storage
-- offline sync metadata and preview telemetry no longer use raw localStorage access
-- auxiliary IndexedDB-backed stores now fail gracefully when browser policy blocks storage
+- kept the grouped sidebar/mobile navigation structure and validated it in production mode
+- documented and preserved the global-constructor fix that prevented the grouped navigation helper from breaking `/wallet` prerendering
+- reinforced the branch’s product-map presentation across dashboard and shell instead of leaving one structured and the other incidental
 
 ## ✅ Why This Matters
-The first storage hardening release fixed the most obvious dashboard paths, but a privacy-first app still needs its secondary caches, offline stores, and media helpers to behave safely in restrictive WebView/privacy contexts. This release widens that protection while keeping the frontend production build green.
+The rewind branch now has enough restored breadth that information architecture matters almost as much as route recovery. This release locks in a consistent shell-level mental model, making the restored branch easier to navigate, easier to demo, and easier for future agents to extend without drifting back into flat route sprawl.

@@ -1,5 +1,4 @@
 import { apiClient } from './client';
-import { safeLocalStorageGet, safeLocalStorageKeys, safeLocalStorageRemove, safeLocalStorageSet } from '@/lib/browser-storage';
 import { wingmanApi } from './wingman';
 
 export interface ProfileContentRequest {
@@ -269,7 +268,7 @@ export async function getCachedContentSuggestions(
   request: any
 ): Promise<ContentGenerationResponse> {
   // Check localStorage cache first
-  const cached = safeLocalStorageGet(`content_generation_${cacheKey}`);
+  const cached = localStorage.getItem(`content_generation_${cacheKey}`);
   if (cached) {
     const data = JSON.parse(cached);
     const cacheAge = Date.now() - data.timestamp;
@@ -298,7 +297,7 @@ export async function getCachedContentSuggestions(
   }
   
   // Cache the response
-  safeLocalStorageSet(`content_generation_${cacheKey}`, JSON.stringify({
+  localStorage.setItem(`content_generation_${cacheKey}`, JSON.stringify({
     response,
     timestamp: Date.now(),
   }));
@@ -310,10 +309,10 @@ export async function getCachedContentSuggestions(
  * Clear content generation cache
  */
 export function clearContentGenerationCache(): void {
-  const keys = safeLocalStorageKeys();
+  const keys = Object.keys(localStorage);
   keys.forEach(key => {
     if (key.startsWith('content_generation_')) {
-      safeLocalStorageRemove(key);
+      localStorage.removeItem(key);
     }
   });
 }
@@ -325,12 +324,12 @@ export function getContentGenerationCacheInfo(): {
   cacheKeys: string[];
   totalSize: number;
 } {
-  const keys = safeLocalStorageKeys();
+  const keys = Object.keys(localStorage);
   const contentGenerationKeys = keys.filter(key => key.startsWith('content_generation_'));
   
   let totalSize = 0;
   contentGenerationKeys.forEach(key => {
-    const value = safeLocalStorageGet(key);
+    const value = localStorage.getItem(key);
     if (value) {
       totalSize += value.length;
     }

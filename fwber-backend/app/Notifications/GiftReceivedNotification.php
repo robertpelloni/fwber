@@ -8,8 +8,6 @@ use App\Notifications\Traits\ChecksNotificationPreferences;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\ExpoPushNotifications\ExpoChannel;
-use NotificationChannels\ExpoPushNotifications\ExpoMessage;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
@@ -17,47 +15,67 @@ class GiftReceivedNotification extends Notification implements ShouldQueue
 {
     use ChecksNotificationPreferences, Queueable;
 
-    public function __construct(
-        public User $sender,
-        public Gift $gift,
-        public ?string $message = null,
-    ) {}
+    public $sender;
 
+    public $gift;
+
+    public $message;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct(User $sender, Gift $gift, ?string $message = null)
+    {
+        $this->sender = $sender;
+        $this->gift = $gift;
+        $this->message = $message;
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
-        return $this->getChannels($notifiable, 'gift_received', ['database', WebPushChannel::class, ExpoChannel::class]);
+        // Use 'gift_received' preference key, default to database and push
+        // Note: You might need to add 'gift_received' to the valid types in ChecksNotificationPreferences if it validates strictly
+        // For now assuming it falls back to defaults if not found or we can use a generic type
+        return $this->getChannels($notifiable, 'gift_received', ['database', WebPushChannel::class]);
     }
 
+    /**
+     * Get the web push representation of the notification.
+     */
     public function toWebPush($notifiable, $notification)
     {
+        $body = "You received a {$this->gift->name}!";
+        if ($this->message) {
+            $body .= " \"{$this->message}\"";
+        }
+
         return (new WebPushMessage)
-            ->title('Gift received')
-            ->body("{$this->sender->name} sent you {$this->gift->name}.")
-            ->action('Open Wallet', 'open_wallet')
-            ->data($this->toArray($notifiable));
+            ->title('New Gift from '.$this->sender->name)
+            ->body($body)
+            ->action('View Gifts', 'view_gifts')
+            ->data(['url' => '/profile']); // Or wherever gifts are viewed
     }
 
-    public function toExpoPush($notifiable)
-    {
-        return (new ExpoMessage())
-            ->title('Gift received')
-            ->body("{$this->sender->name} sent you {$this->gift->name}.")
-            ->data($this->toArray($notifiable))
-            ->priority('high');
-    }
-
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'gift',
-            'title' => 'Gift received',
-            'body' => "{$this->sender->name} sent you {$this->gift->name}.",
-            'message' => $this->message ?: "{$this->sender->name} sent you {$this->gift->name}.",
-            'url' => '/wallet?tab=gifts',
+            'type' => 'gift_received',
             'sender_id' => $this->sender->id,
             'sender_name' => $this->sender->name,
             'gift_id' => $this->gift->id,
             'gift_name' => $this->gift->name,
+            'gift_icon' => $this->gift->icon_url,
+            'message' => $this->message,
         ];
     }
 }

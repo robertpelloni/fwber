@@ -20,6 +20,11 @@ import { isFeatureEnabled } from '@/lib/featureFlags'
 import ProfileTabs from '@/components/profile/ProfileTabs'
 import VerificationCard from '@/components/VerificationCard'
 // import { ProfileRoast } from '@/components/profile/ProfileRoast' // Deprecated inline roast
+import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis'
+import { VibeCheck } from '@/components/profile/VibeCheck'
+import { DatingFortune } from '@/components/profile/DatingFortune'
+import { CosmicMatch } from '@/components/profile/CosmicMatch'
+import { NemesisFinder } from '@/components/profile/NemesisFinder'
 import { VouchLinkCard } from '@/components/profile/VouchLinkCard'
 
 export default function ProfilePage() {
@@ -574,8 +579,30 @@ export default function ProfilePage() {
         </Card>
 
 
-        {/* Safety & Vouching */}
+        {/* AI Wingman Features */}
         <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProfileAnalysis />
+          {/* <ProfileRoast /> Replaced by the new Viral Roast Page */}
+          <Card className="bg-gradient-to-br from-orange-900 to-red-900 text-white border-orange-500/30 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🔥</span> Roast My Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-orange-100/80 mb-4">
+                Ready to get humbled? Let our AI roast your profile choices. Or switch to &quot;Hype Mode&quot; for an ego boost.
+              </p>
+              <a href="/roast" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-orange-900 hover:bg-orange-100 h-10 px-4 py-2 w-full">
+                Go to Roast Page
+              </a>
+            </CardContent>
+          </Card>
+          <VibeCheck />
+          <DatingFortune />
+          <CosmicMatch userId={user?.id || 'me'} />
+          <NemesisFinder />
           <VouchLinkCard />
         </div>
 

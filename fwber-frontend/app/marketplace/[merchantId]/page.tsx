@@ -1,92 +1,129 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { Package, Store, MapPin, ReceiptText, Navigation } from 'lucide-react'
-import AppHeader from '@/components/AppHeader'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { marketplaceApi } from '@/lib/api/marketplace'
-import { useToast } from '@/components/ToastProvider'
-import { DigitalReceipt } from '@/components/marketplace/DigitalReceipt'
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { marketplaceApi, InventoryItem } from '@/lib/api/marketplace';
+import { useAuth } from '@/lib/auth-context';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/use-toast';
+import { ShoppingBag, ArrowLeft, Loader2, Coins, CheckCircle2, QrCode } from 'lucide-react';
+import AppHeader from '@/components/AppHeader';
+import { DigitalReceipt } from '@/components/marketplace/DigitalReceipt';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function MarketplaceMerchantPage() {
-  const params = useParams<{ merchantId: string }>()
-  const { showError, showSuccess } = useToast()
-  const [receipt, setReceipt] = useState<null | { id: number | string; itemName: string; price: string | number; merchantName: string; timestamp: string; redemptionCode?: string }>(null)
+export default function MarketplacePage() {
+    const params = useParams();
+    const merchantId = params.merchantId as string;
+    const { token, user } = useAuth();
+    const { toast } = useToast();
+    const router = useRouter();
 
-  const merchant = useQuery({
-    queryKey: ['marketplace-merchant', params.merchantId],
-    queryFn: () => marketplaceApi.getInventory(params.merchantId),
-    enabled: !!params.merchantId,
-  })
+    const [items, setItems] = useState<InventoryItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [purchasingId, setPurchasingId] = useState<number | null>(null);
+    const [lastTransaction, setLastTransaction] = useState<any>(null);
 
-  const purchase = async (itemId: number, itemName: string, price: string | number) => {
-    try {
-      const result = await marketplaceApi.purchaseItem(itemId)
-      showSuccess('Purchase completed', result.message)
-      setReceipt({
-        id: result.receipt?.id || result.redemption_code,
-        itemName,
-        price,
-        merchantName: result.merchant_name || merchant.data?.merchant.business_name || 'Merchant',
-        timestamp: result.receipt?.paid_at || new Date().toISOString(),
-        redemptionCode: result.redemption_code,
-      })
-      merchant.refetch()
-    } catch (error) {
-      showError('Purchase failed', error instanceof Error ? error.message : 'Unable to complete marketplace purchase.')
-    }
-  }
+    useEffect(() => {
+        if (merchantId) {
+            marketplaceApi.getInventory(merchantId)
+                .then(res => setItems(res.items))
+                .finally(() => setLoading(false));
+        }
+    }, [merchantId]);
 
-  return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <AppHeader title="Marketplace" />
-        <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          {merchant.isLoading ? <div className="text-sm text-gray-500">Loading storefront…</div> : merchant.data && (
-            <div className="space-y-6">
-              <Card className="overflow-hidden border-emerald-200 dark:border-emerald-900/40">
-                <CardHeader className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-white">
-                  <CardTitle className="flex items-center gap-3 text-3xl font-black"><Store className="h-7 w-7" />{merchant.data.merchant.business_name}</CardTitle>
-                  <CardDescription className="text-emerald-50">{merchant.data.merchant.description || 'Browse locally redeemable items from this merchant storefront.'}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 p-6">
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-700 dark:text-gray-300">
-                    <div className="inline-flex items-center gap-2"><Package className="h-4 w-4 text-emerald-600" />{merchant.data.items.length} items available</div>
-                    {(merchant.data.merchant.location_name || merchant.data.merchant.address) && <div className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.location_name || merchant.data.merchant.address}</div>}
-                    {merchant.data.merchant.latitude != null && merchant.data.merchant.longitude != null && <div className="inline-flex items-center gap-2"><Navigation className="h-4 w-4 text-emerald-600" />{merchant.data.merchant.latitude.toFixed(4)}, {merchant.data.merchant.longitude.toFixed(4)}</div>}
-                    {merchant.data.merchant.trust_score != null && <div className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">Trust {merchant.data.merchant.trust_score} · {merchant.data.merchant.trust_tier}</div>}
-                  </div>
-                </CardContent>
-              </Card>
+    const handlePurchase = async (item: InventoryItem) => {
+        if (!confirm(`Spend ${item.price_tokens} FWB Tokens on "${item.name}"?`)) return;
 
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {merchant.data.items.map((item) => (
-                  <Card key={item.id}>
-                    <CardHeader>
-                      <CardTitle>{item.name}</CardTitle>
-                      <CardDescription>{item.description || 'Local redemption item.'}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="text-3xl font-black text-gray-900 dark:text-white">${Number(item.price_usd).toFixed(2)}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">Stock remaining: {item.stock_count}</div>
-                      {item.distance_m != null && <div className="text-xs text-gray-500 dark:text-gray-400">Approx. {Math.round(item.distance_m)}m away</div>}
-                      <Button className="w-full" onClick={() => purchase(item.id, item.name, item.price_usd)} disabled={item.stock_count < 1}>
-                        <ReceiptText className="mr-2 h-4 w-4" />
-                        {item.stock_count < 1 ? 'Sold out' : 'Buy now'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-        </main>
-        {receipt && <DigitalReceipt {...receipt} onClose={() => setReceipt(null)} />}
-      </div>
-    </ProtectedRoute>
-  )
+        try {
+            setPurchasingId(item.id);
+            const res = await marketplaceApi.purchaseItem(item.id);
+            setLastTransaction({
+                id: res.redemption_code,
+                itemName: item.name,
+                price: item.price_tokens,
+                merchantName: 'Venue', // In a real app, fetch this from res
+                timestamp: new Date().toISOString(),
+                redemptionCode: res.redemption_code
+            });
+            toast({
+                title: "Purchase Successful!",
+                description: `You bought ${item.name}.`,
+            });
+        } catch (err: any) {
+            toast({
+                variant: "destructive",
+                title: "Purchase Failed",
+                description: err.message || "Insufficient tokens or out of stock.",
+            });
+        } finally {
+            setPurchasingId(null);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+            <AppHeader />
+            <main className="max-w-4xl mx-auto px-4 py-8">
+                <div className="flex items-center gap-4 mb-8">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                        <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                    <div>
+                        <h1 className="text-2xl font-black italic uppercase tracking-tighter">Venue Marketplace</h1>
+                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-widest">Spend your FWB Tokens here</p>
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className="flex justify-center py-20">
+                        <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {items.map(item => (
+                            <Card key={item.id} className="overflow-hidden border-zinc-200 dark:border-zinc-800">
+                                {item.image_url && (
+                                    <div className="relative h-48 w-full">
+                                        <Image src={item.image_url} alt={item.name} fill className="object-cover" />
+                                    </div>
+                                )}
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <CardTitle className="text-xl font-bold">{item.name}</CardTitle>
+                                        <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 flex items-center gap-1">
+                                            <Coins className="w-3 h-3 fill-current" />
+                                            {item.price_tokens}
+                                        </Badge>
+                                    </div>
+                                    <CardDescription>{item.description}</CardDescription>
+                                </CardHeader>
+                                <CardFooter className="bg-zinc-50 dark:bg-zinc-900/50 p-4">
+                                    <Button 
+                                        className="w-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 font-black uppercase italic"
+                                        disabled={purchasingId === item.id || item.stock_count <= 0}
+                                        onClick={() => handlePurchase(item)}
+                                    >
+                                        {purchasingId === item.id ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ShoppingBag className="w-4 h-4 mr-2" />}
+                                        {item.stock_count <= 0 ? 'Out of Stock' : 'Buy with Tokens'}
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </main>
+
+            <AnimatePresence>
+                {lastTransaction && (
+                    <DigitalReceipt 
+                        {...lastTransaction}
+                        onClose={() => setLastTransaction(null)}
+                    />
+                )}
+            </AnimatePresence>
+        </div>
+    );
 }

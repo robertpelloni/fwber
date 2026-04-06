@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { safeLocalStorageGet, safeSessionStorageGet, safeSessionStorageSet } from '@/lib/browser-storage';
 
 export function useAnalytics() {
     const pathname = usePathname();
@@ -10,10 +9,10 @@ export function useAnalytics() {
     // Initialize session ID
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            let sid = safeSessionStorageGet('fwber_analytics_session_id');
+            let sid = sessionStorage.getItem('fwber_analytics_session_id');
             if (!sid) {
                 sid = crypto.randomUUID();
-                safeSessionStorageSet('fwber_analytics_session_id', sid);
+                sessionStorage.setItem('fwber_analytics_session_id', sid);
             }
             sessionIdRef.current = sid;
         }
@@ -23,10 +22,10 @@ export function useAnalytics() {
         if (typeof window === 'undefined') return;
 
         // Use current session ID or generate a temporary one if not ready
-        const sid = sessionIdRef.current || safeSessionStorageGet('fwber_analytics_session_id') || crypto.randomUUID();
+        const sid = sessionIdRef.current || sessionStorage.getItem('fwber_analytics_session_id') || crypto.randomUUID();
 
         // Use the same token key as AuthContext
-        const token = safeLocalStorageGet('fwber_token');
+        const token = localStorage.getItem('fwber_token');
 
         const payloadData = {
             session_id: sid,

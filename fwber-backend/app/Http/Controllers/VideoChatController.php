@@ -7,85 +7,84 @@ use App\Http\Requests\VideoChat\InitiateVideoChatRequest;
 use App\Http\Requests\VideoChat\SignalVideoChatRequest;
 use App\Http\Requests\VideoChat\UpdateVideoCallStatusRequest;
 use App\Models\VideoCall;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VideoChatController extends Controller
 {
     /**
-     * Persist a new call log before WebRTC signaling proceeds.
-     *
-     * Storing the call up front gives the frontend a stable call id for later
-     * status updates, missed-call handling, and call-history rendering.
+     * Handle WebRTC signaling messages
      */
-    public function initiate(InitiateVideoChatRequest $request): JsonResponse
+    public function signal(SignalVideoChatRequest $request)
     {
-        $call = VideoCall::query()->create([
-            'caller_id' => $request->user()->id,
-            'receiver_id' => (int) $request->integer('recipient_id'),
-            'started_at' => now(),
-            'status' => 'initiated',
-        ]);
 
-        return response()->json($call, 201);
-    }
+        $sender = Auth::user();
+        $recipientId = $request->input('recipient_id');
+        $signal = $request->input('signal');
+        $callId = $request->input('call_id');
 
-    /**
-     * Relay SDP / ICE messages over Reverb so the existing frontend video modal
-     * can complete its peer-connection handshake.
-     */
-    public function signal(SignalVideoChatRequest $request): JsonResponse
-    {
-        VideoSignal::dispatch(
-            $request->user()->id,
-            (int) $request->integer('recipient_id'),
-            $request->validated('signal'),
-            $request->validated('call_id')
-        );
+        // Publish to recipient's private channel via Pusher
+        VideoSignal::dispatch($sender->id, $recipientId, $signal, $callId);
 
         return response()->json(['status' => 'sent']);
     }
 
-    public function updateStatus(UpdateVideoCallStatusRequest $request, int $id): JsonResponse
+    /**
+     * Initiate a new video call log
+     */
+    public function initiate(InitiateVideoChatRequest $request)
     {
-        $call = VideoCall::query()->findOrFail($id);
-        $userId = $request->user()->id;
 
-        if ($call->caller_id !== $userId && $call->receiver_id !== $userId) {
-            return response()->json([
-                'message' => 'Unauthorized to update this video call.',
-            ], 403);
-        }
+        $call = VideoCall::create([
+            'caller_id' => Auth::id(),
+            'receiver_id' => $request->recipient_id,
+            'started_at' => now(),
+            'status' => 'initiated',
+        ]);
 
-        $payload = [
-            'status' => $request->validated('status'),
-        ];
-
-        if ($payload['status'] === 'connected' && ! $call->started_at) {
-            $payload['started_at'] = now();
-        }
-
-        if (in_array($payload['status'], ['ended', 'missed', 'rejected'], true)) {
-            $payload['ended_at'] = now();
-            $payload['duration'] = $request->integer('duration') ?: ($call->started_at ? now()->diffInSeconds($call->started_at) : null);
-        }
-
-        $call->update($payload);
-
-        return response()->json($call->fresh());
+        return response()->json($call);
     }
 
-    public function history(Request $request): JsonResponse
+    /**
+     * Update call status (connected, rejected, ended, etc.)
+     */
+    public function updateStatus(UpdateVideoCallStatusRequest $request, $id)
     {
-        $userId = $request->user()->id;
 
-        $calls = VideoCall::query()
-            ->with(['caller:id,name,avatar_url', 'receiver:id,name,avatar_url'])
-            ->where(function ($query) use ($userId): void {
-                $query->where('caller_id', $userId)
-                    ->orWhere('receiver_id', $userId);
-            })
-            ->latest()
+        $call = VideoCall::findOrFail($id);
+
+        // Ensure user is participant
+        if ($call->caller_id !== Auth::id() && $call->receiver_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $updateData = ['status' => $request->status];
+
+        if ($request->status === 'ended') {
+            $updateData['ended_at'] = now();
+            if ($request->has('duration')) {
+                $updateData['duration'] = $request->duration;
+            } elseif ($call->started_at) {
+                $updateData['duration'] = now()->diffInSeconds($call->started_at);
+            }
+        }
+
+        $call->update($updateData);
+
+        return response()->json($call);
+    }
+
+    /**
+     * Get call history for the authenticated user
+     */
+    public function history(Request $request)
+    {
+        $userId = Auth::id();
+
+        $calls = VideoCall::with(['caller:id,name,avatar_url', 'receiver:id,name,avatar_url'])
+            ->where('caller_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->orderBy('created_at', 'desc')
             ->paginate(20);
 
         return response()->json($calls);

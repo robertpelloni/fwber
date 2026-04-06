@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.9.10 "Extended Browser Storage Guard Sweep"
+> **Current Version:** 1.8.11 "Rewind Shell Product-Map Consistency"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,34 +47,30 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.9.10)
-- **Extended Browser Storage Guard Sweep:** Extended blocked-storage hardening into auxiliary frontend modules including offline sync metadata, preview telemetry, photo/verification token lookups, recommendation/content-generation caches, message storage, and vault storage so stricter browser contexts no longer explode outside the initial dashboard/E2E paths.
-- **Dashboard Storage Guard + E2E Restore Probe Hardening:** Hardened auth persistence, API auth-header lookup, realtime bootstrap, and E2E IndexedDB bootstrap against blocked browser storage contexts; also verified live that `api/security/keys/restore` is publicly present on Hetzner and responds with `401` when unauthenticated.
-- **Restore Branch Messaging + WebFinger Stabilization:** Added direct restore-branch fixes for local/federated message receiver validation, non-blocking message event append, and federated-only WebFinger actor URI behavior, then validated the targeted backend tests locally.
-- **Restore Branch Profile + Frontend Build Stabilization:** Added direct restore-branch fixes for profile persistence, match-action event-bus drift, missing frontend UI primitives, and broken council/merchant/WASM sources, then validated key tests plus local frontend build.
-- **Restore Branch Route Drift Recovery Replay:** Replayed root-route recovery, match-table drift recovery, dashboard endpoint coverage, and nodeinfo/frontend-CI alignment onto `restore/pre-simplification-hetzner`, advancing the rewind branch to `81ee89400`.
-- **Restore Branch Smoke Suite + Deploy Hardening Replay:** Replayed deployment health, smoke automation/reporting, ACL/logging hardening, and nginx/deploy hardening onto `restore/pre-simplification-hetzner`, then added direct Linux route-namespace casing fixes.
-- **Restore Branch Workflow Stabilization Replay:** Replayed the GitHub Hetzner backend deploy workflow and the workflow-stabilization sweep onto `restore/pre-simplification-hetzner`, then pushed branch tip `82ff8e6f6`.
-- **Restore Branch Hetzner Replay Kickoff:** Created a dedicated restore worktree, replayed the first two Hetzner commits onto `restore/pre-simplification-hetzner`, and pushed branch tip `96c10825f`.
-- **Pre-Simplification Rewind Branch + Replay Plan:** Created and pushed `restore/pre-simplification-hetzner`, documented the rewind baseline at `a636a53c3`, and produced the initial Hetzner/runtime replay manifest.
-- **Premium Discovery Filter Restoration:** Restored premium discovery schema, profile persistence, full `/matches` advanced filter passthrough, server-side token gating, and expanded filter UX so the active discovery screen matches the product contract again.
-- **Token-Gated Unlock Surface Restoration:** Restored match insights unlocks, private photo unlocks, generic content unlock ledger routes, and locked/unlocked frontend UX for another major token-spend surface cluster.
-- **Profile Boost Restoration:** Restored boost purchase/status/history endpoints and reconnected the live `/matches` UI to the boost purchase flow so another token-spend surface works again.
-- **Gift Economy Surface Restoration:** Restored gift catalog/send/received endpoints, gift notifications, and a real `/wallet?tab=gifts` destination so token-era gift UI has a working backend contract again.
-- **Non-Critical Roast Smoke Classification:** Reclassified the public roast preview smoke assertion as warning-level so deploys stop failing solely on the known transient AI preview issue while still preserving diagnostics.
-- **Smoke Roast Warmup Stabilization:** Warm the public roast preview endpoint once before the asserted smoke call so transient first-hit deploy behavior does not produce a false-negative smoke failure.
-- **Smoke Check Timeout + Roast Fallback Hardening:** Added a bounded websocket smoke timeout and hardened public roast preview generation against broader AI-driver failures so deploy validation stops hanging or returning avoidable live 500s.
-- **Hetzner Nginx Sync Helper Integration:** Added a root-owned helper path on the live server and updated the deploy script to use it, so GitHub Hetzner deploys can refresh tracked nginx configs without requiring blanket passwordless sudo for raw filesystem writes.
-- **Hetzner Deploy Privilege Recovery:** Hardened the backend deploy script so missing passwordless sudo for nginx config file writes no longer aborts an otherwise successful Hetzner deployment.
-- **Referral, Payout & Video Chat Restoration:** Restored referral validation, signup/premium referral rewards, vouch links keyed by referral code, video call initiate/signal/status/history endpoints, and expanded `/wallet` into a wallet + referrals + payout hub.
-- **Wallet Surface Restoration:** Restored the compact wallet backend/API surface and added a real `/wallet` page so token-linked dead routes now land somewhere useful again.
-- **Events Surface Restoration:** Restored the events backend/API surface, event invitation flow, and frontend pages for listing, viewing, and creating events.
-- **Hetzner Repo Ownership Repair:** Repaired mixed ownership inside the live checkout after the automated deploy workflow failed on `.git/objects` write permissions, restoring deploy-user control of the repo.
-- **Dead Surface Recovery: Activity, Notifications, Travel:** Restored `/activity`, `/notifications`, and `/settings/travel` so prominent signed-in links now land on real pages again.
-- **Friends System Restoration:** Restored the friends backend/API surface, added a new `/friends` page, and put Friends back into the authenticated navigation so long-dead social links resolve again.
-- **Mercure Surface Retirement:** Added a tracked Hetzner nginx config that returns an explicit retired response for `mercure.fwber.me` and wired it into the deploy script so the dead upstream is no longer presented as an active broken production service.
-- **Frontend Workflow Install Strategy Fix:** Switched the dedicated frontend GitHub workflow to `npm install --no-fund --no-audit` so frontend CI can proceed despite platform-sensitive optional dependency resolution in the current dependency graph.
-- **Hetzner Smoke/Deploy Contract Hardening:** Hardened smoke-check URL normalization + Reverb key discovery, re-synced tracked nginx configs during deploy, and re-verified the live Hetzner stack with a clean 9/3/0 smoke result including websocket upgrade success.
+### Phase 5: Production Scale (COMPLETED - v1.8.11)
+- **Rewind Shell Product-Map Consistency:** Locked in consistent domain-based organization across the dashboard and app shell so the restored branch reads as one coherent product map.
+- **Rewind Sidebar Domain Organization:** Reorganized the sidebar and mobile restored-surfaces navigation so the app shell mirrors the dashboard’s domain-based product map.
+- **Rewind Dashboard Domain Organization:** Reorganized the signed-in dashboard so restored surfaces are grouped by product domain rather than presented as a flat recovery list.
+- **Rewind Matching Hub Recovery:** Added a real top-level matching hub for recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context so the core attraction funnel feels intentionally restored.
+- **Rewind Support Hub Recovery:** Added a real top-level support hub for help, contact, privacy policy, terms, safety resources, and blocked-user controls so the trust-information layer feels intentionally restored.
+- **Rewind Plans Hub Recovery:** Added a real top-level plans hub for events, event creation, date planning, nearby discovery, venues, and deals so the real-world outing layer feels intentionally restored.
+- **Rewind Commerce Hub Recovery:** Added a real top-level commerce hub for merchant onboarding, dashboard operations, profile, promotions, analytics, vibe broadcasting, and adjacent business controls so the merchant/local-commerce layer feels intentionally restored.
+- **Rewind Economy Hub Recovery:** Added a real top-level economy hub for premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows so the token/premium layer feels intentionally restored.
+- **Rewind Identity Hub Recovery:** Added a real top-level identity hub for profile, photos, identity settings, verification, physical-profile controls, and security/recovery access so the self-presentation layer feels intentionally restored.
+- **Rewind Operations Hub Recovery:** Added a real top-level operations hub for safety, settings, security, merchant flows, and moderation/travel controls so the trust-and-operations layer feels intentionally restored.
+- **Rewind Connections Hub Recovery:** Added a real top-level connections hub for messages, friends, activity, notifications, matches, and groups so the direct-social layer feels intentionally restored.
+- **Rewind Studio Hub Recovery:** Added a real top-level studio hub for roast, roast-date, content generation, wingman, bounties, and analytics so the AI/creative/viral cluster feels intentionally restored.
+- **Rewind Scenes Hub Recovery:** Added a real top-level scenes/discovery hub for recommendations, groups, topics, matches, match dashboard, and leaderboard-style discovery so the community/discovery cluster feels intentionally restored.
+- **Rewind Reputation Hub Recovery:** Added a real top-level reputation hub for achievements, leaderboard, profile views, verification, and adjacent trust flows so the social-proof cluster feels intentionally restored.
+- **Rewind Places Hub + Avatar Provider Test Fallback:** Added a real top-level places hub for the local-discovery cluster and pinned the implicit testing fallback provider to DALL-E for rewind avatar-generation compatibility.
+- **Rewind Avatar Prompt Interest Label Fix:** Reformatted normalized profile-interest values back into human-readable themed labels during avatar prompt generation, targeting another narrow restore-branch avatar-generation CI seam without affecting deployment/runtime contracts.
+- **Rewind Live-Spaces Hub Recovery:** Added a real top-level live-spaces hub and surfaced chatrooms, proximity chatrooms, audio rooms, bulletin boards, local pulse, conference pulse, and burner bridge from one coherent restored destination.
+- **Rewind Avatar Prompt Relation Refresh Fix:** Patched avatar prompt generation to resolve the latest stored profile row directly, targeting the remaining explicit avatar-generation backend CI failure without regressing modern Hetzner/runtime compatibility.
+- **Rewind Unlock Hub + Paywall Surface Navigation Recovery:** Added a real top-level unlock hub and surfaced premium unlocks, who-likes-you, share unlocks, and photo reveals through the dashboard + restored-features navigation so the token-gated cluster feels like a coherent restored system.
+- **Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video:** Added real top-level pages for these restored token-era systems and surfaced them in the dashboard + restored-features navigation so the richer branch exposes more of the approved pre-simplification product again.
+- **Rewind CI Repair for Avatar Requests + Recommendation Caching:** Repaired two concrete restore-branch backend CI blockers by preserving outbound avatar-generation request behavior under HTTP fakes and restoring tagged recommendation caching expected by the richer branch’s controller-caching suite.
+- **Rewind Navigation Recovery + Missing Activity Surfaces:** Reworked the restore-branch app shell so approved restored surfaces are visible again, added real top-level `/activity` and `/notifications` pages, and rebuilt the dashboard around the rewind branch’s approved scope instead of excluded federation/journal-era emphasis.
+- **Restore Branch CI Compatibility Sweep:** Repaired restore-branch avatar-generation config/prompt drift, tagged-cache mock compatibility, stale frontend Sentry App Router wiring, missing WASM artifact assumptions, and deprecated Sentry Next.js build options so the broader rewind branch is much closer to the earlier full-surface state while remaining buildable/testable under modern tooling.
 - **NodeInfo 500 Recovery + Frontend CI Runtime Fix:** Hardened `NodeInfoController` against missing federation-era schema and aligned the frontend GitHub build to Node.js 24 so both discovery endpoints and frontend CI stop failing for infrastructure/toolchain reasons.
 - **Hetzner Log ACL Deploy Fix:** Replaced the broken daily-log permission approach with shared ACLs for `deploy` and `www-data`, fixing deploy-time failures caused by rotated log ownership drift on Hetzner.
 - **Hetzner Backend Stability Repair:** Replaced the broken root backend route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables discovered during live Hetzner inspection.
@@ -122,8 +118,8 @@ Explicitly still excluded from restoration:
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Inspect Latest Restore-Branch CI On `35bdf54f5`:** Confirm whether the direct messaging/WebFinger stabilization fixes remove the newest backend failures.
-2. **Continue Mandatory Hetzner Replay:** Next targets should include executable-bit tracking and roast-preview smoke hardening, then continue remaining runtime fixes that still matter on the full-feature branch.
-3. **Systematically Repair Remaining Behavioral Drift:** Governance, caching expectations, federation edges, and deeper full-feature frontend contracts are likely next once the newly-fixed profile/messaging/webfinger blockers are out of the way.
-4. **Compare Rewind Branch Against Main After Each Tranche:** Identify which post-simplification fixes still matter after infra replay.
-5. **DreamHost Retirement:** Once the rewind-merge restoration is stable on Hetzner, retire the old DreamHost backend path and remove stale provider dependencies.
+1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
+2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
+3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
+4. **Deploy NodeInfo Guard + Re-run Frontend Build Under Node 24:** Confirm discovery routes stop 500ing and the frontend workflow goes green.
+5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.

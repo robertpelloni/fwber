@@ -11,27 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uuid')->unique();
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
-            $table->text('body');
-            $table->string('type')->default('text'); // text, audio, image
-            $table->boolean('is_encrypted')->default(false);
-            $table->timestamp('read_at')->nullable();
-            
-            // Audio support
-            $table->text('transcription')->nullable();
-            $table->integer('duration_seconds')->nullable();
-            
-            // Moderation
-            $table->boolean('is_flagged')->default(false);
-            $table->string('flag_reason')->nullable();
-
-            $table->timestamps();
-            $table->index(['sender_id', 'receiver_id']);
-        });
+        if (! Schema::hasTable('messages')) {
+            Schema::create('messages', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
+                $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
+                $table->text('content')->nullable();
+                $table->string('message_type')->default('text');
+                $table->string('media_url')->nullable();
+                $table->string('media_type')->nullable();
+                $table->integer('media_duration')->nullable();
+                $table->string('thumbnail_url')->nullable();
+                $table->boolean('is_read')->default(false);
+                $table->timestamp('sent_at')->nullable();
+                $table->timestamp('read_at')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

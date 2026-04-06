@@ -1,244 +1,520 @@
-'use client'
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import AppHeader from '@/components/AppHeader'
-import { useAuth } from '@/lib/auth-context'
+import { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { HeartHandshake, Link2, Search, UserPlus, Users } from 'lucide-react';
+import FriendList from '@/components/friends/FriendList';
+import FriendRequestList from '@/components/friends/FriendRequestList';
+import { api } from '@/lib/api/client';
+import { useToast } from '@/lib/hooks/use-toast';
 import {
-  getFriends,
-  getFriendRequests,
-  searchUsers,
-  sendFriendRequest,
-  respondToFriendRequest,
-  removeFriend,
-  type FriendUser,
-  type FriendRequest,
-} from '@/lib/api/friends'
-import { Search, UserPlus, Users, Mail, Check, X, Trash2 } from 'lucide-react'
+  createRelationshipLink,
+  deleteRelationshipLink,
+  getPendingRelationshipLinkRequests,
+  getRelationshipLinks,
+  respondToRelationshipLink,
+  updateRelationshipLink,
+  type RelationshipLink,
+  type RelationshipLinkType,
+  type RelationshipLinkVisibility,
+} from '@/lib/api/relationships';
+
+interface FriendUser {
+  id: number;
+  name: string;
+  email: string;
+  profile?: {
+    display_name?: string;
+    avatar_url?: string;
+  };
+}
+
+interface FriendRequest {
+  id: number;
+  status: 'pending' | 'accepted' | 'declined';
+  user?: FriendUser;
+}
+
+const relationshipTypeOptions: RelationshipLinkType[] = ['dating', 'partner', 'spouse', 'other'];
+const relationshipVisibilityOptions: RelationshipLinkVisibility[] = ['public', 'friends', 'private'];
 
 export default function FriendsPage() {
-  const { token } = useAuth()
-  const [friends, setFriends] = useState<FriendUser[]>([])
-  const [requests, setRequests] = useState<FriendRequest[]>([])
-  const [results, setResults] = useState<FriendUser[]>([])
-  const [query, setQuery] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSearching, setIsSearching] = useState(false)
+  const [activeTab, setActiveTab] = useState('friends');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [friends, setFriends] = useState<FriendUser[]>([]);
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [searchResults, setSearchResults] = useState<FriendUser[]>([]);
+  const [relationshipLinks, setRelationshipLinks] = useState<RelationshipLink[]>([]);
+  const [relationshipRequests, setRelationshipRequests] = useState<RelationshipLink[]>([]);
+  const [selectedFriendId, setSelectedFriendId] = useState('');
+  const [relationshipType, setRelationshipType] = useState<RelationshipLinkType>('dating');
+  const [relationshipVisibility, setRelationshipVisibility] = useState<RelationshipLinkVisibility>('friends');
+  const [relationshipNote, setRelationshipNote] = useState('');
+  const [loading, setLoading] = useState(true);
+  const { success, error, ToastContainer } = useToast();
 
-  const loadData = useCallback(async () => {
-    if (!token) return
-
-    setIsLoading(true)
+  const fetchData = useCallback(async () => {
     try {
-      const [friendsData, requestsData] = await Promise.all([
-        getFriends(token),
-        getFriendRequests(token),
-      ])
-
-      setFriends(Array.isArray(friendsData) ? friendsData : [])
-      setRequests(Array.isArray(requestsData) ? requestsData : [])
+      const [friendsRes, requestsRes, linksRes, linkRequestsRes] = await Promise.all([
+        api.get<FriendUser[]>('/friends'),
+        api.get<FriendRequest[]>('/friends/requests'),
+        getRelationshipLinks(),
+        getPendingRelationshipLinkRequests(),
+      ]);
+      setFriends(Array.isArray(friendsRes) ? friendsRes : []);
+      setRequests(Array.isArray(requestsRes) ? requestsRes : []);
+      setRelationshipLinks(Array.isArray(linksRes) ? linksRes : []);
+      setRelationshipRequests(Array.isArray(linkRequestsRes) ? linkRequestsRes : []);
+    } catch (err) {
+      console.error('Error fetching friends data:', err);
+      error('Failed to load friends data');
     } finally {
-      setIsLoading(false)
+      setLoading(false);
     }
-  }, [token])
+  }, [error]);
 
   useEffect(() => {
-    void loadData()
-  }, [loadData])
+    fetchData();
+  }, [fetchData]);
 
-  const handleSearch = async () => {
-    if (!token || !query.trim()) {
-      setResults([])
-      return
-    }
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
 
-    setIsSearching(true)
     try {
-      const data = await searchUsers(token, query.trim())
-      setResults(Array.isArray(data) ? data : [])
+      setLoading(true);
+      const response = await api.get<FriendUser[]>('/friends/search', {
+        params: { q: searchQuery },
+      });
+      setSearchResults(Array.isArray(response) ? response : []);
+      setActiveTab('search');
+    } catch (err) {
+      console.error('Error searching users:', err);
+      error('Failed to search users');
     } finally {
-      setIsSearching(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleSendRequest = async (friendId: number) => {
-    if (!token) return
-    await sendFriendRequest(token, friendId)
-    alert('Friend request sent!')
-  }
+  const sendFriendRequest = async (userId: number) => {
+    try {
+      await api.post('/friends/requests', { friend_id: userId });
+      success('Friend request sent');
+      setSearchResults((prev) => prev.filter((u) => u.id !== userId));
+    } catch (err) {
+      console.error('Error sending friend request:', err);
+      error('Failed to send friend request');
+    }
+  };
 
-  const handleRespond = async (userId: number, status: 'accepted' | 'declined') => {
-    if (!token) return
-
-    await respondToFriendRequest(token, userId, status)
-    await loadData()
-  }
+  const handleRespondToRequest = async (requesterUserId: number, status: 'accepted' | 'declined') => {
+    try {
+      await api.post(`/friends/requests/${requesterUserId}`, { status });
+      success(status === 'accepted' ? 'Friend request accepted' : 'Friend request rejected');
+      fetchData();
+    } catch (err) {
+      console.error('Error responding to friend request:', err);
+      error(`Failed to ${status === 'accepted' ? 'accept' : 'reject'} friend request`);
+    }
+  };
 
   const handleRemoveFriend = async (friendId: number) => {
-    if (!token) return
-    await removeFriend(token, friendId)
-    await loadData()
-  }
+    if (!confirm('Are you sure you want to remove this friend?')) return;
 
-  const existingFriendIds = useMemo(() => new Set(friends.map((friend) => friend.id)), [friends])
-  const existingRequestIds = useMemo(() => new Set(requests.map((request) => request.user_id)), [requests])
+    try {
+      await api.delete(`/friends/${friendId}`);
+      success('Friend removed');
+      setFriends((prev) => prev.filter((f) => f.id !== friendId));
+      setRelationshipLinks((prev) => prev.filter((link) => link.related_user?.id !== friendId));
+    } catch (err) {
+      console.error('Error removing friend:', err);
+      error('Failed to remove friend');
+    }
+  };
+
+  const handleCreateRelationshipLink = async () => {
+    if (!selectedFriendId) {
+      error('Choose a friend first.');
+      return;
+    }
+
+    try {
+      await createRelationshipLink({
+        related_user_id: Number(selectedFriendId),
+        relationship_type: relationshipType,
+        visibility: relationshipVisibility,
+        note: relationshipNote.trim() || undefined,
+      });
+      setSelectedFriendId('');
+      setRelationshipType('dating');
+      setRelationshipVisibility('friends');
+      setRelationshipNote('');
+      success('Relationship link request sent.');
+      fetchData();
+    } catch (err) {
+      console.error('Error creating relationship link:', err);
+      error('Failed to send relationship link request');
+    }
+  };
+
+  const handleRespondToRelationshipLink = async (linkId: number, status: 'accepted' | 'declined') => {
+    try {
+      await respondToRelationshipLink(linkId, status);
+      success(status === 'accepted' ? 'Relationship link confirmed.' : 'Relationship link request declined.');
+      fetchData();
+    } catch (err) {
+      console.error('Error responding to relationship link:', err);
+      error('Failed to respond to relationship link request');
+    }
+  };
+
+  const handleUpdateRelationshipLink = async (
+    linkId: number,
+    payload: Partial<{ relationship_type: RelationshipLinkType; visibility: RelationshipLinkVisibility; note: string | null }>
+  ) => {
+    try {
+      const updatedLink = await updateRelationshipLink(linkId, payload);
+      setRelationshipLinks((prev) => prev.map((link) => (link.id === linkId ? updatedLink : link)));
+      success('Relationship link updated.');
+    } catch (err) {
+      console.error('Error updating relationship link:', err);
+      error('Failed to update relationship link');
+    }
+  };
+
+  const handleDeleteRelationshipLink = async (linkId: number) => {
+    if (!confirm('Remove this relationship link?')) return;
+
+    try {
+      await deleteRelationshipLink(linkId);
+      setRelationshipLinks((prev) => prev.filter((link) => link.id !== linkId));
+      success('Relationship link removed.');
+    } catch (err) {
+      console.error('Error deleting relationship link:', err);
+      error('Failed to remove relationship link');
+    }
+  };
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-        <AppHeader title="Friends" />
-        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Friends</h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Restore the lightweight social graph around trusted connections without dragging the app back into bloated feed mechanics.
-            </p>
-          </div>
+    <div className="container mx-auto max-w-4xl p-4">
+      <ToastContainer />
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div>
+          <h1 className="text-2xl font-bold">Friends & Connections</h1>
+          <p className="text-gray-500">Manage your friends, requests, and mutual relationship links</p>
+        </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <section className="space-y-6">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div className="mb-4 flex items-center gap-2">
-                  <Search className="h-5 w-5 text-blue-500" />
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Find people</h2>
+        <form onSubmit={handleSearch} className="flex w-full gap-2 md:w-auto">
+          <Input
+            placeholder="Search users..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-xs"
+          />
+          <Button type="submit" size="icon">
+            <Search className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
+
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
+        <Button
+          variant={activeTab === 'friends' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('friends')}
+          className="flex gap-2"
+        >
+          <Users className="h-4 w-4" />
+          Friends ({friends.length})
+        </Button>
+        <Button
+          variant={activeTab === 'requests' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('requests')}
+          className="flex gap-2"
+        >
+          <UserPlus className="h-4 w-4" />
+          Requests ({requests.length})
+        </Button>
+        <Button
+          variant={activeTab === 'relationships' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('relationships')}
+          className="flex gap-2"
+        >
+          <HeartHandshake className="h-4 w-4" />
+          Links ({relationshipLinks.length})
+        </Button>
+        <Button
+          variant={activeTab === 'relationship-requests' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('relationship-requests')}
+          className="flex gap-2"
+        >
+          <Link2 className="h-4 w-4" />
+          Link Requests ({relationshipRequests.length})
+        </Button>
+        {searchResults.length > 0 && (
+          <Button
+            variant={activeTab === 'search' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('search')}
+          >
+            Search Results
+          </Button>
+        )}
+      </div>
+
+      <Card>
+        <CardContent className="p-6">
+          {loading ? (
+            <div className="py-8 text-center">Loading...</div>
+          ) : (
+            <>
+              {activeTab === 'friends' && (
+                <FriendList friends={friends} onRemoveFriend={handleRemoveFriend} />
+              )}
+
+              {activeTab === 'requests' && (
+                <FriendRequestList
+                  friendRequests={requests}
+                  onRespondToRequest={handleRespondToRequest}
+                />
+              )}
+
+              {activeTab === 'relationships' && (
+                <div className="space-y-6">
+                  <div className="rounded-2xl border border-rose-100 bg-rose-50/60 p-5">
+                    <h3 className="text-lg font-semibold text-gray-900">Create a relationship link</h3>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Relationship links require mutual confirmation and work only with accepted friends.
+                    </p>
+
+                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                      <label className="space-y-2">
+                        <span className="text-sm font-medium text-gray-700">Friend</span>
+                        <select
+                          value={selectedFriendId}
+                          onChange={(e) => setSelectedFriendId(e.target.value)}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          <option value="">Select a friend</option>
+                          {friends.map((friend) => (
+                            <option key={friend.id} value={friend.id}>
+                              {friend.profile?.display_name || friend.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="space-y-2">
+                        <span className="text-sm font-medium text-gray-700">Relationship type</span>
+                        <select
+                          value={relationshipType}
+                          onChange={(e) => setRelationshipType(e.target.value as RelationshipLinkType)}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          {relationshipTypeOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="space-y-2">
+                        <span className="text-sm font-medium text-gray-700">Visibility</span>
+                        <select
+                          value={relationshipVisibility}
+                          onChange={(e) => setRelationshipVisibility(e.target.value as RelationshipLinkVisibility)}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          {relationshipVisibilityOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="space-y-2 md:col-span-2">
+                        <span className="text-sm font-medium text-gray-700">Note</span>
+                        <input
+                          value={relationshipNote}
+                          onChange={(e) => setRelationshipNote(e.target.value)}
+                          maxLength={280}
+                          placeholder="Optional context for the other person"
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        />
+                      </label>
+                    </div>
+
+                    <div className="mt-4 flex justify-end">
+                      <Button onClick={handleCreateRelationshipLink}>Send link request</Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {relationshipLinks.length === 0 ? (
+                      <p className="text-sm text-gray-500">No confirmed relationship links yet.</p>
+                    ) : (
+                      relationshipLinks.map((link) => (
+                        <RelationshipLinkCard
+                          key={link.id}
+                          link={link}
+                          onSave={handleUpdateRelationshipLink}
+                          onDelete={handleDeleteRelationshipLink}
+                        />
+                      ))
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <input
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search by name or email"
-                    className="flex-1 rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-                  />
-                  <button
-                    onClick={handleSearch}
-                    disabled={isSearching}
-                    className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
-                  >
-                    {isSearching ? 'Searching…' : 'Search'}
-                  </button>
-                </div>
+              )}
 
-                <div className="mt-4 grid gap-3">
-                  {results.map((user) => {
-                    const isFriend = existingFriendIds.has(user.id)
-                    const hasPendingRequest = existingRequestIds.has(user.id)
-
-                    return (
-                      <div key={user.id} className="shadow rounded-2xl border border-gray-200 p-4 dark:border-gray-800">
-                        <div className="flex items-start justify-between gap-4">
+              {activeTab === 'relationship-requests' && (
+                <div className="space-y-4">
+                  {relationshipRequests.length === 0 ? (
+                    <p className="text-sm text-gray-500">No pending relationship link requests.</p>
+                  ) : (
+                    relationshipRequests.map((link) => (
+                      <div key={link.id} className="rounded-lg border border-gray-200 p-4">
+                        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                           <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white">{user.name}</h3>
-                            <p className="mt-1 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                              <Mail className="h-4 w-4" />
-                              {user.email}
+                            <p className="font-semibold text-gray-900">
+                              {link.related_user?.display_name || link.related_user?.name || 'Connection'} wants to link as{' '}
+                              {link.relationship_type_label.toLowerCase()}
                             </p>
-                          </div>
-                          <div>
-                            {isFriend ? (
-                              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300">
-                                Already friends
-                              </span>
-                            ) : hasPendingRequest ? (
-                              <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
-                                Request pending
-                              </span>
-                            ) : (
-                              <button
-                                onClick={() => handleSendRequest(user.id)}
-                                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
-                              >
-                                <UserPlus className="h-4 w-4" />
-                                Send Request
-                              </button>
+                            <p className="mt-1 text-sm text-gray-500">
+                              Visibility: {link.visibility_label}
+                            </p>
+                            {link.note && (
+                              <p className="mt-2 text-sm text-gray-600">{link.note}</p>
                             )}
                           </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </section>
-
-            <section className="space-y-6">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div className="mb-4 flex items-center gap-2">
-                  <Users className="h-5 w-5 text-pink-500" />
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Friends</h2>
-                </div>
-
-                {isLoading ? (
-                  <p className="text-sm text-gray-500">Loading friends…</p>
-                ) : friends.length === 0 ? (
-                  <p className="text-sm text-gray-500">No accepted friends yet.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {friends.map((friend) => (
-                      <div key={friend.id} className="rounded-2xl border border-gray-200 p-4 dark:border-gray-800">
-                        <div className="flex items-center justify-between gap-4">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white">{friend.name}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{friend.email}</p>
-                          </div>
-                          <button
-                            onClick={() => handleRemoveFriend(friend.id)}
-                            className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 dark:border-red-900/40 dark:hover:bg-red-950/20"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div className="mb-4 flex items-center gap-2">
-                  <UserPlus className="h-5 w-5 text-orange-500" />
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Friend Requests</h2>
-                </div>
-
-                {isLoading ? (
-                  <p className="text-sm text-gray-500">Loading requests…</p>
-                ) : requests.length === 0 ? (
-                  <p className="text-sm text-gray-500">No pending requests right now.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {requests.map((request) => (
-                      <div key={request.id} className="rounded-2xl border border-gray-200 p-4 dark:border-gray-800">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-white">{request.user?.name || 'Unknown User'}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{request.user?.email}</p>
-                          </div>
                           <div className="flex gap-2">
-                            <button
-                              onClick={() => handleRespond(request.user_id, 'accepted')}
-                              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700"
-                            >
-                              <Check className="h-4 w-4" />
-                              Accept
-                            </button>
-                            <button
-                              onClick={() => handleRespond(request.user_id, 'declined')}
-                              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-                            >
-                              <X className="h-4 w-4" />
+                            <Button onClick={() => handleRespondToRelationshipLink(link.id, 'accepted')}>Accept</Button>
+                            <Button variant="outline" onClick={() => handleRespondToRelationshipLink(link.id, 'declined')}>
                               Decline
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </section>
-          </div>
-        </main>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'search' && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Search Results</h3>
+                  {searchResults.length === 0 ? (
+                    <p className="text-gray-500">No users found</p>
+                  ) : (
+                    <div className="grid gap-4">
+                      {searchResults.map((user: FriendUser) => (
+                        <div key={user.id} className="flex items-center justify-between rounded-lg border p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
+                              {user.name?.charAt(0) || '?'}
+                            </div>
+                            <div>
+                              <p className="font-medium">{user.name}</p>
+                              <p className="text-sm text-gray-500">{user.email}</p>
+                            </div>
+                          </div>
+                          <Button size="sm" onClick={() => sendFriendRequest(user.id)}>
+                            Add Friend
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function RelationshipLinkCard({
+  link,
+  onSave,
+  onDelete,
+}: {
+  link: RelationshipLink;
+  onSave: (
+    linkId: number,
+    payload: Partial<{ relationship_type: RelationshipLinkType; visibility: RelationshipLinkVisibility; note: string | null }>
+  ) => void;
+  onDelete: (linkId: number) => void;
+}) {
+  const [relationshipType, setRelationshipType] = useState<RelationshipLinkType>(link.relationship_type);
+  const [visibility, setVisibility] = useState<RelationshipLinkVisibility>(link.visibility);
+  const [note, setNote] = useState(link.note || '');
+
+  return (
+    <div className="rounded-2xl border border-gray-200 p-4 shadow-sm">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <p className="font-semibold text-gray-900">
+            {link.related_user?.display_name || link.related_user?.name || 'Connection'}
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Confirmed {link.confirmed_at ? new Date(link.confirmed_at).toLocaleDateString() : 'recently'}
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => onDelete(link.id)}>
+          Remove
+        </Button>
       </div>
-    </ProtectedRoute>
-  )
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <label className="space-y-2">
+          <span className="text-sm font-medium text-gray-700">Relationship type</span>
+          <select
+            value={relationshipType}
+            onChange={(e) => setRelationshipType(e.target.value as RelationshipLinkType)}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          >
+            {relationshipTypeOptions.map((option) => (
+              <option key={option} value={option}>
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="space-y-2">
+          <span className="text-sm font-medium text-gray-700">Visibility</span>
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value as RelationshipLinkVisibility)}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          >
+            {relationshipVisibilityOptions.map((option) => (
+              <option key={option} value={option}>
+                {option.charAt(0).toUpperCase() + option.slice(1)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="space-y-2 md:col-span-2">
+          <span className="text-sm font-medium text-gray-700">Note</span>
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            maxLength={280}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          />
+        </label>
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <Button onClick={() => onSave(link.id, { relationship_type: relationshipType, visibility, note: note || null })}>
+          Save changes
+        </Button>
+      </div>
+    </div>
+  );
 }

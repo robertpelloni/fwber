@@ -61,12 +61,6 @@ const nextConfig = {
   experimental: {
     optimizeCss: false,
     optimizePackageImports: ['@tanstack/react-query', 'lucide-react'],
-    webpackBuildWorker: true,
-  },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -161,6 +155,14 @@ const nextConfig = {
       {
         source: '/api/:path*', 
         destination: 'https://api.fwber.me/api/:path*',
+      },
+      {
+        source: '/.well-known/webfinger',
+        destination: 'https://api.fwber.me/.well-known/webfinger',
+      },
+      {
+        source: '/.well-known/nodeinfo',
+        destination: 'https://api.fwber.me/.well-known/nodeinfo',
       },
     ];
   },

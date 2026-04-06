@@ -2,15 +2,13 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo, useCallback } from 'react'
 import { logAuth, setUserContext, clearUserContext } from './logger'
-import { getApiBaseUrl, setApiClientAuthToken } from './api/client'
-import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageRemove } from './browser-storage'
+import { setApiClientAuthToken } from './api/client'
 
 // Types
 interface User {
   id: number
   email: string
   role?: string
-  is_moderator?: boolean
   name: string
   emailVerifiedAt: string | null
   createdAt: string
@@ -74,37 +72,10 @@ interface AuthContextType extends AuthState {
   updateUser: (user: User) => void
 }
 
-const BROWSER_API_BASE_URL = getApiBaseUrl()
+const BROWSER_API_BASE_URL = '/api'
 
 function isTransientAuthResponse(status: number): boolean {
   return status >= 500 || status === 429
-}
-
-async function parseAuthResponse(response: Response): Promise<Record<string, any>> {
-  const contentType = response.headers.get('content-type') || ''
-
-  if (contentType.includes('application/json')) {
-    return await response.json()
-  }
-
-  const rawText = await response.text()
-
-  if (!rawText) {
-    return {}
-  }
-
-  try {
-    return JSON.parse(rawText)
-  } catch {
-    return {
-      message: rawText
-        .replace(/<[^>]+>/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .slice(0, 400) || 'Unexpected server response',
-      raw: rawText.slice(0, 1000),
-    }
-  }
 }
 
 function restoreCachedAuth(
@@ -147,15 +118,8 @@ function clearStoredAuth(): void {
   }
 
   setApiClientAuthToken(null)
-  safeLocalStorageRemove('fwber_token')
-  safeLocalStorageRemove('fwber_user')
-
-  // --- NATIVE BRIDGE: Clear token in mobile app to prevent ghost background pings ---
-  if ((window as any).ReactNativeWebView) {
-    (window as any).ReactNativeWebView.postMessage(JSON.stringify({
-      type: 'CLEAR_AUTH_TOKEN'
-    }));
-  }
+  localStorage.removeItem('fwber_token')
+  localStorage.removeItem('fwber_user')
 }
 
 function persistStoredAuth(user: User, token: string): void {
@@ -164,16 +128,8 @@ function persistStoredAuth(user: User, token: string): void {
   }
 
   setApiClientAuthToken(token)
-  safeLocalStorageSet('fwber_token', token)
-  safeLocalStorageSet('fwber_user', JSON.stringify(user))
-
-  // --- NATIVE BRIDGE: Push token to mobile app if running in WebView ---
-  if ((window as any).ReactNativeWebView) {
-    (window as any).ReactNativeWebView.postMessage(JSON.stringify({
-      type: 'SET_AUTH_TOKEN',
-      token: token
-    }));
-  }
+  localStorage.setItem('fwber_token', token)
+  localStorage.setItem('fwber_user', JSON.stringify(user))
 }
 
 // Initial state
@@ -270,16 +226,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState)
 
-  // --- NATIVE BRIDGE: Token Sync ---
-  useEffect(() => {
-    if (state.isAuthenticated && state.token && (window as any).ReactNativeWebView) {
-      (window as any).ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'SET_AUTH_TOKEN',
-        token: state.token
-      }));
-    }
-  }, [state.isAuthenticated, state.token]);
-
   // Initialize auth state from localStorage
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -291,9 +237,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initializeAuth = async () => {
       try {
-        const token = safeLocalStorageGet('fwber_token')
-        const userStr = safeLocalStorageGet('fwber_user')
-        const devToken = safeLocalStorageGet('auth_token')
+        const token = localStorage.getItem('fwber_token')
+        const userStr = localStorage.getItem('fwber_user')
+        const devToken = localStorage.getItem('auth_token')
 
         // Development bypass: if we have 'auth_token' = 'dev', treat as authenticated
         if (devToken === 'dev') {
@@ -355,7 +301,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (!response.ok) {
             if (response.status === 403) {
-              const data = await parseAuthResponse(response);
+              const data = await response.json();
               if (data.code === 'GLOBAL_BAN') {
                   dispatch({ type: 'BANNED' });
                   return;
@@ -420,7 +366,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (err) {
         console.error('AuthContext: Critical Init Error', err)
 
-        if (restoreCachedAuth(safeLocalStorageGet('fwber_user'), safeLocalStorageGet('fwber_token'), cancelled, dispatch)) {
+        if (restoreCachedAuth(localStorage.getItem('fwber_user'), localStorage.getItem('fwber_token'), cancelled, dispatch)) {
           return
         }
 
@@ -446,8 +392,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (typeof window !== 'undefined') {
       if (state.isAuthenticated && state.token && state.user) {
-        safeLocalStorageSet('fwber_token', state.token)
-        safeLocalStorageSet('fwber_user', JSON.stringify(state.user))
+        localStorage.setItem('fwber_token', state.token)
+        localStorage.setItem('fwber_user', JSON.stringify(state.user))
       } else {
         clearStoredAuth()
       }
@@ -455,7 +401,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.isAuthenticated, state.token, state.user, state.isLoading])
 
   // Ensure browser requests use the Next.js proxy to avoid cross-origin session drift.
-  const API_BASE_URL = BROWSER_API_BASE_URL
+  const API_BASE_URL = typeof window !== 'undefined'
+    ? BROWSER_API_BASE_URL
+    : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api')
 
   // Login function
   const login = useCallback(async (email: string, password: string) => {
@@ -476,7 +424,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       clearTimeout(timeoutId);
 
-      const data = await parseAuthResponse(response)
+      const data = await response.json()
 
       if (!response.ok) {
         logAuth.login(email, false, data.message)
@@ -521,7 +469,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ wallet_address: walletAddress, signature, message }),
       })
 
-      const data = await parseAuthResponse(response)
+      const data = await response.json()
 
       if (!response.ok) {
         logAuth.login(walletAddress, false, data.message)
@@ -564,7 +512,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }),
       })
 
-      const data = await parseAuthResponse(response)
+      const data = await response.json()
 
       if (!response.ok) {
         throw new Error(data.message || 'Two factor verification failed')
@@ -625,7 +573,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: body,
       })
 
-      const data = await parseAuthResponse(response)
+      const data = await response.json()
 
       if (!response.ok) {
         logAuth.register(email, false, data.message)

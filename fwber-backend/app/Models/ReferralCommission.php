@@ -3,15 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * Compact referral commission ledger restored for the Hetzner-era rebuild.
- *
- * We intentionally keep the model small but explicit so referral payouts can be
- * tracked, premium purchase rewards can be audited, and the wallet surface can
- * show real pending cash instead of placeholder numbers.
- */
 class ReferralCommission extends Model
 {
     protected $fillable = [
@@ -31,26 +23,26 @@ class ReferralCommission extends Model
 
     protected $casts = [
         'cash_amount' => 'decimal:2',
-        'token_amount' => 'decimal:2',
+        'token_amount' => 'decimal:4',
         'metadata' => 'array',
     ];
 
-    public function purchaser(): BelongsTo
+    public function purchaser()
     {
         return $this->belongsTo(User::class, 'purchaser_user_id');
     }
 
-    public function beneficiary(): BelongsTo
+    public function beneficiary()
     {
         return $this->belongsTo(User::class, 'beneficiary_user_id');
     }
 
-    public function payment(): BelongsTo
+    public function payment()
     {
         return $this->belongsTo(Payment::class);
     }
 
-    public function subscription(): BelongsTo
+    public function subscription()
     {
         return $this->belongsTo(Subscription::class);
     }

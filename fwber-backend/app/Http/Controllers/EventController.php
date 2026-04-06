@@ -4,99 +4,515 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EventRsvpRequest;
 use App\Http\Requests\StoreEventRequest;
+use App\Models\Chatroom;
 use App\Models\Event;
 use App\Models\EventAttendee;
-use Illuminate\Http\JsonResponse;
+use App\Models\Payment;
+use App\Services\EventRankingService;
+use App\Services\Payment\PaymentGatewayInterface;
+use App\Services\TokenDistributionService;
+use App\Support\TaggedCache;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    protected $paymentGateway;
+
+    protected $tokenService;
+
+    protected $rankingService;
+
+    public function __construct(PaymentGatewayInterface $paymentGateway, TokenDistributionService $tokenService, EventRankingService $rankingService)
     {
-        $query = Event::query()->with('creator')->withCount('attendees');
-
-        if ($request->filled('type')) {
-            $query->where('type', $request->string('type'));
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->string('status'));
-        } else {
-            $query->where('status', '!=', 'cancelled');
-        }
-
-        $events = $query->orderBy('starts_at')->paginate(20);
-
-        return response()->json($events);
+        $this->paymentGateway = $paymentGateway;
+        $this->tokenService = $tokenService;
+        $this->rankingService = $rankingService;
     }
 
-    public function store(StoreEventRequest $request): JsonResponse
+    /**
+     * @OA\Get(
+     *     path="/api/events",
+     *     summary="List nearby events",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="latitude",
+     *         in="query",
+     *         description="User's latitude for geospatial search",
+     *         required=false,
+     *
+     *         @OA\Schema(type="number", format="float")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="longitude",
+     *         in="query",
+     *         description="User's longitude for geospatial search",
+     *         required=false,
+     *
+     *         @OA\Schema(type="number", format="float")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="radius",
+     *         in="query",
+     *         description="Search radius in kilometers (default: 10)",
+     *         required=false,
+     *
+     *         @OA\Schema(type="number", format="float", default=10)
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="ranking_strategy",
+     *         in="query",
+     *         description="Discovery ordering strategy",
+     *         required=false,
+     *
+     *         @OA\Schema(type="string", enum={"trust-aware", "distance-only"}, default="trust-aware")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter by event status",
+     *         required=false,
+     *
+     *         @OA\Schema(type="string", enum={"upcoming", "ongoing", "completed", "cancelled"})
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of events with attendee counts",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event")),
+     *             @OA\Property(property="current_page", type="integer"),
+     *             @OA\Property(property="per_page", type="integer"),
+     *             @OA\Property(property="total", type="integer")
+     *         )
+     *     )
+     * )
+     */
+    public function index(Request $request)
     {
+        $rankingStrategy = $request->input('ranking_strategy', 'trust-aware');
+        $perPage = 20;
+        $page = max(1, (int) $request->input('page', 1));
+
+        // Generate cache key based on query parameters
+        $cacheKey = config('optimization.cache_version').':events:index:'.md5(json_encode([
+            'lat' => $request->latitude,
+            'lon' => $request->longitude,
+            'radius' => $request->radius,
+            'ranking_strategy' => $rankingStrategy,
+            'viewer_id' => $rankingStrategy === 'trust-aware' ? Auth::id() : null,
+            'status' => $request->status,
+            'type' => $request->type,
+        ]));
+
+        // Cache for 5 minutes with tagged caching
+        $events = TaggedCache::remember(['events'], $cacheKey, function () use ($request, $rankingStrategy) {
+            $query = Event::query();
+            $latitude = null;
+            $longitude = null;
+
+            // Geospatial filter
+            if ($request->has(['latitude', 'longitude', 'radius'])) {
+                $latitude = (float) $request->latitude;
+                $longitude = (float) $request->longitude;
+                $radius = max(0.1, (float) $request->radius); // km
+
+                if (DB::getDriverName() === 'sqlite') {
+                    // Simple box approximation for testing
+                    $latRange = $radius / 111;
+                    $lonRange = $radius / (111 * cos(deg2rad($latitude)));
+
+                    $query->whereBetween('latitude', [$latitude - $latRange, $latitude + $latRange])
+                        ->whereBetween('longitude', [$longitude - $lonRange, $longitude + $lonRange]);
+                } else {
+                    $distanceSql = '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
+
+                    $query->select('*')
+                        ->selectRaw("{$distanceSql} AS distance", [$latitude, $longitude, $latitude])
+                        // Avoid relying on HAVING against a selected alias during pagination count queries.
+                        ->whereRaw("{$distanceSql} < ?", [$latitude, $longitude, $latitude, $radius]);
+                }
+            } else {
+                $query->orderBy('starts_at', 'asc');
+            }
+
+            // Status filter
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            } else {
+                $query->where('status', '!=', 'cancelled');
+            }
+
+            // Type filter
+            if ($request->has('type')) {
+                $query->where('type', $request->type);
+            }
+
+            $events = $query->withCount('attendees')->get();
+
+            if ($latitude !== null && $longitude !== null) {
+                $events->each(function (Event $event) use ($latitude, $longitude) {
+                    $event->distance_meters = app(\App\Services\LocationService::class)->calculateDistance(
+                        $latitude,
+                        $longitude,
+                        $event->latitude,
+                        $event->longitude
+                    );
+                });
+
+                if ($rankingStrategy === 'trust-aware' && Auth::check()) {
+                    $events = $this->rankingService->rankNearby(Auth::user(), $events, $latitude, $longitude);
+                } else {
+                    $events = $events->sortBy('distance_meters')->values();
+                }
+            } else {
+                $events = $events->sortBy('starts_at')->values();
+            }
+
+            return $events->values();
+        }, 300);
+
+        $paginatedEvents = new LengthAwarePaginator(
+            $events->forPage($page, $perPage)->values(),
+            $events->count(),
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
+        $payload = $paginatedEvents->toArray();
+        $payload['meta'] = array_merge($payload['meta'] ?? [], [
+            'ranking_strategy' => $this->rankingService->buildRankingStrategy(),
+        ]);
+
+        return response()->json($payload);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/events",
+     *     summary="Create a new event",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *             required={"title", "description", "location_name", "latitude", "longitude", "starts_at", "ends_at"},
+     *
+     *             @OA\Property(property="title", type="string", maxLength=255),
+     *             @OA\Property(property="description", type="string"),
+     *             @OA\Property(property="location_name", type="string"),
+     *             @OA\Property(property="latitude", type="number", format="float"),
+     *             @OA\Property(property="longitude", type="number", format="float"),
+     *             @OA\Property(property="starts_at", type="string", format="date-time"),
+     *             @OA\Property(property="ends_at", type="string", format="date-time"),
+     *             @OA\Property(property="max_attendees", type="integer", nullable=true),
+     *             @OA\Property(property="price", type="number", format="float", nullable=true),
+     *             @OA\Property(property="shared_group_ids", type="array", @OA\Items(type="integer"), nullable=true)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Event created successfully",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/Event")
+     *     ),
+     *
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function store(StoreEventRequest $request)
+    {
+        $validated = $request->validated();
+
         $event = Event::create([
-            ...$request->validated(),
-            'created_by_user_id' => $request->user()->id,
+            ...$validated,
+            'created_by_user_id' => Auth::id(),
             'status' => 'upcoming',
         ]);
 
-        EventAttendee::firstOrCreate([
-            'event_id' => $event->id,
-            'user_id' => $request->user()->id,
-        ], [
-            'status' => 'attending',
-            'paid' => true,
+        // Create a dedicated chatroom for this event
+        $chatroom = Chatroom::create([
+            'name' => $event->title,
+            'description' => 'Official discussion for event: '.$event->title,
+            'type' => 'event',
+            'category' => 'event',
+            'created_by' => Auth::id(),
+            'is_public' => false, // Only accessible by attendees? Or public?
+            'is_active' => true,
+            'settings' => ['event_id' => $event->id],
         ]);
 
-        return response()->json($event->load('creator')->loadCount('attendees'), 201);
+        // Add creator as admin
+        $chatroom->addMember(Auth::user(), 'admin');
+
+        // Link chatroom to event
+        $event->update(['chatroom_id' => $chatroom->id]);
+
+        // Attach shared groups if provided
+        if ($request->has('shared_group_ids')) {
+            $groupIds = $request->input('shared_group_ids');
+            // Validate user is admin of these groups or they are connected?
+            // For now, simple attachment
+            $event->groups()->attach($groupIds);
+        }
+
+        // Invalidate events cache
+        TaggedCache::flush(['events']);
+
+        return response()->json($event, 201);
     }
 
-    public function show(int $id): JsonResponse
+    /**
+     * @OA\Get(
+     *     path="/api/events/{id}",
+     *     summary="Get event details",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Event details with creator and attendees",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/Event")
+     *     ),
+     *
+     *     @OA\Response(response=404, description="Event not found")
+     * )
+     */
+    public function show($id)
     {
-        $event = Event::with(['creator', 'attendees.user'])
+        $event = Event::with(['creator', 'attendees.user', 'groups', 'chatroom'])
             ->withCount('attendees')
             ->findOrFail($id);
 
         return response()->json($event);
     }
 
-    public function myEvents(Request $request): JsonResponse
+    /**
+     * @OA\Get(
+     *     path="/api/events/my",
+     *     summary="Get user's created and attending events",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's events",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event"))
+     *         )
+     *     )
+     * )
+     */
+    public function myEvents(Request $request)
     {
-        $user = $request->user();
+        $user = Auth::user();
 
-        $events = Event::query()
-            ->withCount('attendees')
-            ->where('created_by_user_id', $user->id)
-            ->orWhereHas('attendees', function ($query) use ($user): void {
-                $query->where('user_id', $user->id)->where('status', 'attending');
+        // Events created by user OR events user is attending
+        $events = Event::where('created_by_user_id', $user->id)
+            ->orWhereHas('attendees', function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('status', 'attending');
             })
-            ->orderByDesc('starts_at')
+            ->withCount('attendees')
+            ->orderBy('starts_at', 'desc')
             ->paginate(20);
 
         return response()->json($events);
     }
 
-    public function rsvp(EventRsvpRequest $request, int $id): JsonResponse
+    /**
+     * @OA\Post(
+     *     path="/api/events/{id}/rsvp",
+     *     summary="RSVP to an event",
+     *     tags={"Events"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *
+     *             @OA\Property(property="status", type="string", enum={"attending", "maybe", "declined"})
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="RSVP updated successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="rsvp", type="object")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=400, description="Event is full"),
+     *     @OA\Response(response=404, description="Event not found")
+     * )
+     */
+    public function rsvp(EventRsvpRequest $request, $id)
     {
-        $event = Event::findOrFail($id);
-        $user = $request->user();
-        $status = $request->validated()['status'];
+        // Eager load attendees and creator
+        $event = Event::with(['attendees', 'creator'])->findOrFail($id);
+        $user = Auth::user();
+
+        // Check max attendees
+        if ($request->status === 'attending' && $event->max_attendees) {
+            $currentAttendees = $event->attendees->where('status', 'attending')->count();
+            // If user is already attending, don't count them again
+            $isAlreadyAttending = $event->attendees
+                ->where('user_id', $user->id)
+                ->where('status', 'attending')
+                ->isNotEmpty();
+
+            if (! $isAlreadyAttending && $currentAttendees >= $event->max_attendees) {
+                return response()->json(['message' => 'Event is full'], 400);
+            }
+        }
+
+        $existingAttendee = $event->attendees->where('user_id', $user->id)->first();
+        $alreadyPaid = $existingAttendee && $existingAttendee->paid;
+
+        $paymentData = [];
+
+        // Handle Payment Logic if switching to attending and not paid
+        $hasPrice = $event->price > 0 || $event->token_cost > 0;
+
+        if ($request->status === 'attending' && $hasPrice && ! $alreadyPaid) {
+            $paymentMethod = $request->input('payment_method');
+
+            // If no payment method provided for a paid event, return error
+            if (! $paymentMethod) {
+                return response()->json(['error' => 'Payment method required for paid events'], 400);
+            }
+
+            $transactionId = null;
+
+            if ($paymentMethod === 'token') {
+                $tokenCost = $event->token_cost ?? ($event->price * 10);
+
+                if ($tokenCost > 0) {
+                    try {
+                        // P2P Payment: Deduct from Attendee, Credit Organizer
+                        $this->tokenService->transferTokens(
+                            $user,
+                            $event->creator,
+                            $tokenCost,
+                            'event_ticket',
+                            "Ticket for event: {$event->title}",
+                            ['event_id' => $event->id]
+                        );
+
+                        $transactionId = 'token_'.uniqid();
+                    } catch (\Exception $e) {
+                        return response()->json(['error' => $e->getMessage()], 400);
+                    }
+                }
+            } else {
+                // Stripe (Only checks fiat price)
+                if ($event->price <= 0) {
+                    return response()->json(['error' => 'This event has no fiat price.'], 400);
+                }
+                $paymentMethodId = $request->input('payment_method_id');
+                if (! $paymentMethodId) {
+                    return response()->json(['error' => 'Payment method ID required for paid events'], 400);
+                }
+
+                try {
+                    $result = $this->paymentGateway->charge($event->price, 'USD', $paymentMethodId);
+                    if (! $result->success) {
+                        return response()->json(['error' => 'Payment failed: '.$result->message], 400);
+                    }
+                    $transactionId = $result->transactionId;
+
+                    // Log Payment
+                    Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $event->price,
+                        'currency' => 'USD',
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => "Ticket for event: {$event->title}",
+                        'metadata' => $result->data,
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Payment error: '.$e->getMessage()], 500);
+                }
+            }
+
+            $paymentData = [
+                'paid' => true,
+                'payment_method' => $paymentMethod,
+                'transaction_id' => $transactionId,
+            ];
+        }
 
         $attendee = EventAttendee::updateOrCreate(
-            [
-                'event_id' => $event->id,
-                'user_id' => $user->id,
-            ],
-            [
-                'status' => $status,
-                'paid' => (float) ($event->price ?? 0) <= 0,
-                'payment_method' => $request->input('payment_method'),
-                'transaction_id' => $request->input('payment_method_id'),
-            ]
+            ['event_id' => $event->id, 'user_id' => $user->id],
+            array_merge(['status' => $request->status], $paymentData)
         );
 
-        return response()->json([
-            'message' => 'RSVP updated successfully.',
-            'status' => $attendee->status,
-        ]);
+        // Add user to the event chatroom if they are attending
+        if ($event->chatroom_id && $request->status === 'attending') {
+            $chatroom = Chatroom::find($event->chatroom_id);
+            if ($chatroom && ! $chatroom->hasMember($user)) {
+                $chatroom->addMember($user, 'member');
+            }
+        }
+        // Remove from chatroom if declined/not attending (optional policy choice)
+        // For now, let's keep them in unless they leave manually, or maybe remove them?
+        // Let's implement removal logic if status is 'declined'
+        if ($event->chatroom_id && $request->status === 'declined') {
+            $chatroom = Chatroom::find($event->chatroom_id);
+            if ($chatroom && $chatroom->hasMember($user)) {
+                $chatroom->removeMember($user);
+            }
+        }
+
+        // Invalidate events cache (attendee counts changed)
+        TaggedCache::flush(['events']);
+
+        return response()->json($attendee);
     }
 }

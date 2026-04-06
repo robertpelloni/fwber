@@ -1,0 +1,195 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Topic;
+use App\Models\User;
+use App\Models\UserProfile;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class ProfileUpdateTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_update_travel_mode_settings()
+    {
+        $user = User::factory()->create();
+        $profile = UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'is_travel_mode' => false,
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'is_travel_mode' => true,
+            'travel_location' => [
+                'name' => 'Paris, France',
+                'latitude' => 48.8566,
+                'longitude' => 2.3522,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('user_profiles', [
+            'user_id' => $user->id,
+            'is_travel_mode' => true,
+            'travel_location_name' => 'Paris, France',
+            'travel_latitude' => 48.8566,
+            'travel_longitude' => 2.3522,
+        ]);
+    }
+
+    public function test_can_disable_travel_mode()
+    {
+        $user = User::factory()->create();
+        $profile = UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'is_travel_mode' => true,
+            'travel_location_name' => 'Paris, France',
+            'travel_latitude' => 48.8566,
+            'travel_longitude' => 2.3522,
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'is_travel_mode' => false,
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('user_profiles', [
+            'user_id' => $user->id,
+            'is_travel_mode' => false,
+            // Fields should remain but flag is false
+            'travel_location_name' => 'Paris, France',
+        ]);
+    }
+
+    public function test_basic_profile_update_with_birthdate()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'display_name' => 'Updated Name',
+            'birthdate' => '1995-05-05',
+            'gender' => 'male',
+            'looking_for' => ['dating'],
+            'location' => [
+                'latitude' => 40.7128,
+                'longitude' => -74.0060,
+                'city' => 'New York',
+                'state' => 'NY',
+            ],
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_onboarding_profile_update()
+    {
+        $user = User::factory()->create();
+
+        // Mimic the payload from frontend
+        $payload = [
+            'display_name' => 'New User',
+            'birthdate' => '1990-01-01',
+            'gender' => 'female',
+            'location' => [
+                'city' => 'San Francisco',
+                'state' => 'CA',
+                // latitude and longitude might be missing if user didn't use geolocation
+            ],
+        ];
+
+        $response = $this->actingAs($user)->putJson('/api/profile', $payload);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('user_profiles', [
+            'user_id' => $user->id,
+            'display_name' => 'New User',
+            'location_name' => 'San Francisco, CA',
+        ]);
+    }
+
+    public function test_preferences_age_range_validation()
+    {
+        $user = User::factory()->create();
+
+        // Test valid range
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'preferences' => [
+                'age_range_min' => 25,
+                'age_range_max' => 35,
+            ],
+        ]);
+        $response->assertStatus(200);
+
+        // Test invalid range (min > max)
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'preferences' => [
+                'age_range_min' => 40,
+                'age_range_max' => 30,
+            ],
+        ]);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['preferences.age_range_min', 'preferences.age_range_max']);
+    }
+
+    public function test_profile_update_with_empty_birthdate()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $payload = [
+            'birthdate' => '',
+        ];
+
+        $response = $this->putJson('/api/profile', $payload);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_profile_update_canonicalizes_interest_topics_and_syncs_followed_topics(): void
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->create([
+            'user_id' => $user->id,
+            'interests' => [],
+        ]);
+
+        $topic = Topic::firstOrCreate(
+            ['slug' => 'nightlife'],
+            [
+                'label' => 'Nightlife',
+                'description' => 'Late-night scenes and venues.',
+                'emoji' => '🌃',
+                'category' => 'culture',
+                'aliases' => ['warehouse'],
+                'is_featured' => true,
+                'sort_order' => 1,
+            ]
+        );
+
+        $response = $this->actingAs($user)->putJson('/api/profile', [
+            'interests' => ['warehouse', 'zine-making'],
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('topic_user_follows', [
+            'user_id' => $user->id,
+            'topic_id' => $topic->id,
+        ]);
+
+        $storedInterests = $user->fresh()->profile->interests;
+        $interestTopicSlugs = collect($response->json('data.profile.interest_topics'))->pluck('slug');
+        $nightlifeTopic = collect($response->json('data.profile.interest_topics'))
+            ->firstWhere('slug', 'nightlife');
+
+        $this->assertContains('nightlife', $storedInterests);
+        $this->assertContains('zine-making', $storedInterests);
+        $this->assertTrue($interestTopicSlugs->contains('nightlife'));
+        $this->assertSame('both', $nightlifeTopic['match_source'] ?? null);
+    }
+}

@@ -103,11 +103,11 @@ export default function HomePage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
               <Link
-                href="/register"
+                href="/rate-my-pussy"
                 className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-black py-4 px-10 rounded-full text-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center animate-bounce hover:animate-none"
               >
                 <Heart className="w-6 h-6 mr-2 fill-current" />
-                Create Anonymous Account
+                Rate My Cat
               </Link>
               <Link
                 href="/roast"

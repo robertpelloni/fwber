@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth-context';
 
@@ -18,21 +18,29 @@ interface ActiveBoostResponse {
 
 export function useActiveBoost() {
   const { token, isAuthenticated } = useAuth();
-
   return useQuery({
     queryKey: ['active-boost'],
     enabled: isAuthenticated && !!token,
     queryFn: async () => {
-      const response = await api.get<ActiveBoostResponse>('/boosts/active');
-      return response.data;
+      try {
+        const response = await api.get<ActiveBoostResponse>('/boosts/active');
+        return response.data;
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
     },
-    refetchInterval: (query) => (query.state.data ? 60000 : false),
+    refetchInterval: (query) => {
+      // If we have an active boost, poll every minute to check expiration
+      return query.state.data ? 60000 : false;
+    },
   });
 }
 
 export function useBoostHistory() {
   const { token, isAuthenticated } = useAuth();
-
   return useQuery({
     queryKey: ['boost-history'],
     enabled: isAuthenticated && !!token,
@@ -45,17 +53,16 @@ export function usePurchaseBoost() {
   const { token, isAuthenticated } = useAuth();
 
   return useMutation({
-    mutationFn: async ({ type, paymentMethod }: { type: 'standard' | 'super'; paymentMethod?: 'stripe' | 'token' }) => {
+    mutationFn: async ({ type, paymentMethod }: { type: 'standard' | 'super', paymentMethod?: 'stripe' | 'token' }) => {
       if (!isAuthenticated || !token) {
         throw new Error('Authentication required');
       }
 
-      return api.post<Boost>('/boosts/purchase', { type, payment_method: paymentMethod });
+      return await api.post<Boost>('/boosts/purchase', { type, payment_method: paymentMethod });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['active-boost'] });
       queryClient.invalidateQueries({ queryKey: ['boost-history'] });
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
     },
   });
 }

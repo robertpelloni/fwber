@@ -1,102 +1,68 @@
 # HANDOFF - End of GPT Session
 
-> **Timestamp:** 2026-04-05
-> **Version Reached:** 1.9.10
+> **Timestamp:** 2026-04-06
+> **Version Reached:** 1.8.11
 > **Current Model:** GPT
+> **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session stayed on `main` long enough to complete a second, broader browser-storage hardening sweep after the user surfaced live dashboard/runtime console errors.
-
-The first patch fixed the primary dashboard/E2E/auth paths. This second tranche widened the protection to the rest of the frontend helper layer so strict browser contexts and mobile WebViews do not keep finding new raw storage crash points one feature at a time.
-
-Completed in **v1.9.10 "Extended Browser Storage Guard Sweep"**:
-- replaced raw storage access in additional frontend modules with safe helpers
-- hardened auxiliary IndexedDB-backed modules to tolerate blocked browser storage
-- verified the mainline frontend still builds successfully
-- prepared the repo to resume restoration work with fewer live runtime distractions
+This continuation treated shell consistency as a first-class release instead of just a side effect of the previous refactor:
+1. validated that grouped shell navigation was the right next coherence pass after grouped dashboard domains
+2. documented and preserved the `globalThis.Map` production fix discovered during prerender validation
+3. kept the shell and dashboard aligned as the same restored product map
+4. updated release tracking to **v1.8.11**
+5. avoided any backend-risk changes while continuing to improve branch maturity
 
 No processes were manually killed.
 
 ---
 
-## What Was Changed
+## What Changed In This Continuation
+### `fwber-frontend/components/AppHeader.tsx`
+The grouped sidebar/mobile restored-surfaces organization remains the key code change in this release.
 
-### 1. `fwber-frontend/lib/browser-storage.ts`
-Extended the shared safety layer with:
-- `safeLocalStorageKeys()`
-- `canUseIndexedDB()`
+The important outcome is that the shell now mirrors the dashboard’s domain-based structure rather than presenting restored destinations as a flat list.
 
-This lets cache-clearing code and IndexedDB callers avoid repeating unsafe feature-detection patterns.
-
-### 2. `fwber-frontend/lib/offline-store.ts`
-Hardened offline sync storage:
-- guards IndexedDB availability before opening the database
-- catches blocked `indexedDB.open(...)`
-- moved last-sync metadata to safe local-storage wrappers
-
-### 3. `fwber-frontend/lib/previewTelemetry.ts`
-Replaced raw auth-token local-storage reads with safe lookup wrappers.
-
-### 4. `fwber-frontend/lib/api/photos.ts`
-Replaced direct token reads with safe wrappers across:
-- generic request auth header lookup
-- upload flow
-- original-photo fetch flow
-- hook bootstrap paths that read stored tokens
-
-### 5. `fwber-frontend/lib/api/verification.ts`
-Replaced direct auth-token local-storage reads with a safe wrapper.
-
-### 6. `fwber-frontend/lib/api/recommendations.ts`
-Hardened recommendation cache helpers:
-- safe local-storage get
-- safe set
-- safe key enumeration
-- safe cache removal
-
-### 7. `fwber-frontend/lib/api/content-generation.ts`
-Applied the same safe-storage pattern to AI content-generation caching helpers.
-
-### 8. `fwber-frontend/lib/messageStorage.ts`
-Added IndexedDB availability guards and wrapped `indexedDB.open(...)` so blocked browser contexts fail gracefully instead of throwing low-level message-storage errors.
-
-### 9. `fwber-frontend/lib/vault/storage.ts`
-Applied the same IndexedDB guard pattern to the local media vault storage layer.
+### Why this matters
+At this stage, the branch has enough restored breadth that information architecture is no longer superficial polish. It directly affects:
+- navigability
+- demo clarity
+- future extension discipline
+- perceived product maturity
 
 ---
 
-## Validation Performed
+## Build Validation + Narrow Fix Context
+### Production seam captured in this release
+During the navigation-grouping refactor, production prerendering exposed a narrow but real bug:
+- imported `Map` icon from `lucide-react`
+- helper used `new Map(...)`
+- icon symbol shadowed the global constructor
 
-### Frontend build
+### Fix retained
+The code now correctly uses:
+- `new globalThis.Map(...)`
+
+### Validation
 Executed:
-- `cd C:/Users/hyper/workspace/fwber/fwber-frontend && npm run build`
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
 
 Result:
-- successful production build
+- successful production build after the fix
 
-### Storage sweep verification
-A follow-up grep over `fwber-frontend/lib/**` confirmed that the remaining storage access points are now:
-- centralized inside the guarded helper layer
-- or intentionally wrapped IndexedDB open paths with availability checks / try-catch handling
+This is exactly the kind of source-level seam the current workflow is designed to surface and repair cheaply.
 
 ---
 
-## Why This Matters
-The user wants everything restored, but restoration work gets derailed if the active deployed shell keeps producing live runtime errors.
+## Files Changed In This Continuation
+### Frontend
+- `fwber-frontend/components/AppHeader.tsx`
 
-This tranche reduces the chance that:
-- a privacy-hardened browser
-- a restrictive mobile WebView
-- or a blocked-storage embed/session context
-
-will keep surfacing a new uncaught storage failure every time the user opens another restored surface.
-
-That keeps the active line healthier while the broader rewind branch continues to absorb removed systems.
-
----
-
-## Files Changed This Slice
+### Docs / release tracking
 - `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -104,26 +70,19 @@ That keeps the active line healthier while the broader rewind branch continues t
 - `ROADMAP.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
-- `fwber-frontend/lib/browser-storage.ts`
-- `fwber-frontend/lib/offline-store.ts`
-- `fwber-frontend/lib/previewTelemetry.ts`
-- `fwber-frontend/lib/api/photos.ts`
-- `fwber-frontend/lib/api/verification.ts`
-- `fwber-frontend/lib/api/recommendations.ts`
-- `fwber-frontend/lib/api/content-generation.ts`
-- `fwber-frontend/lib/messageStorage.ts`
-- `fwber-frontend/lib/vault/storage.ts`
 
 ---
 
-## Git / Release
-- **Target Version:** `1.9.10`
-- **Recommended Commit Message:** `fix: extend browser storage guards across frontend helpers (v1.9.10)`
+## Git / Release State
+### Current tranche target
+- **Target Version:** `1.8.11`
+- **Recommended Commit Message:** `feat: lock rewind shell product map consistency (v1.8.11)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push `v1.9.10`.
-2. Let the frontend deployment propagate.
-3. Resume broader restoration work on `restore/pre-simplification-hetzner`, since the live mainline shell is now less likely to distract with storage-runtime noise.
-4. Keep verifying that restore-branch feature additions still align with Hetzner deployment/runtime hardening instead of reintroducing old assumptions.
+1. Commit and push the `v1.8.11` shell-consistency tranche.
+2. Re-check the newest Actions list so the `v1.8.10` and then `v1.8.11` runs can be watched explicitly.
+3. Continue with polish passes on any remaining rough edges now that dashboard and shell both express the restored branch as a coherent product map.
+4. Keep using full production builds after every shell/dashboard refinement.
+5. Preserve the current bias toward coherence-improving refinements that stay friendly to the long green backend CI streak.

@@ -1,73 +1,86 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use App\Models\InventoryRedemption;
-use App\Models\MerchantInventory;
-use App\Models\MerchantPayment;
-use Carbon\Carbon;
+use App\Services\MerchantAnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MerchantAnalyticsController extends Controller
 {
+    public function __construct(
+        private readonly MerchantAnalyticsService $analyticsService
+    ) {}
+
     public function index(Request $request): JsonResponse
     {
         $merchant = $request->user()->merchantProfile;
+
+        if (! $merchant) {
+            return response()->json(['message' => 'Merchant profile not found.'], 404);
+        }
+
+        $range = $request->input('range', '7d');
+
+        return response()->json([
+            'kpis' => $this->analyticsService->getKPIs($merchant, $range),
+            'retention' => $this->analyticsService->getRetention($merchant, $range),
+            'promotions' => $this->analyticsService->getPromotionsPerformance($merchant, $range),
+            'broadcasts' => $this->analyticsService->getBroadcastHistory($merchant, $range),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *   path="/merchant-portal/analytics/export",
+     *   tags={"Merchant Analytics"},
+     *   summary="Export Merchant Data to CSV",
+     *   description="Generates a CSV report of merchant promotions and broadcasts.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="CSV generated")
+     * )
+     */
+    public function exportCsv(Request $request)
+    {
+        $merchant = $request->user()->merchantProfile;
+
         if (! $merchant) {
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
         $range = $request->input('range', '30d');
-        $startDate = $this->resolveRangeStart($range);
+        $promotions = $this->analyticsService->getPromotionsPerformance($merchant, $range);
 
-        $payments = MerchantPayment::query()
-            ->where('merchant_profile_id', $merchant->id)
-            ->when($startDate, fn ($query) => $query->where('created_at', '>=', $startDate));
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=fwber_merchant_report.csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
 
-        $inventoryIds = MerchantInventory::where('merchant_profile_id', $merchant->id)->pluck('id');
-        $redemptions = InventoryRedemption::query()
-            ->whereIn('merchant_inventory_id', $inventoryIds)
-            ->when($startDate, fn ($query) => $query->where('created_at', '>=', $startDate));
+        $columns = ['ID', 'Title', 'Views', 'Clicks', 'Redemptions', 'Revenue', 'Conversion Rate'];
 
-        $grossRevenue = (float) (clone $payments)->where('status', 'succeeded')->sum('amount');
-        $orders = (clone $payments)->where('status', 'succeeded')->count();
-        $redeemed = (clone $redemptions)->whereNotNull('redeemed_at')->count();
-        $created = (clone $redemptions)->count();
+        $callback = function() use($promotions, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
 
-        $topItems = MerchantInventory::query()
-            ->where('merchant_profile_id', $merchant->id)
-            ->withCount(['redemptions as redemptions_count' => function ($query) use ($startDate) {
-                if ($startDate) {
-                    $query->where('created_at', '>=', $startDate);
-                }
-            }])
-            ->orderByDesc('redemptions_count')
-            ->limit(5)
-            ->get(['id', 'name', 'price_usd', 'stock_count', 'is_available']);
-
-        return response()->json([
-            'summary' => [
-                'gross_revenue' => $grossRevenue,
-                'orders' => $orders,
-                'issued_redemptions' => $created,
-                'redeemed_redemptions' => $redeemed,
-                'redemption_rate' => $created > 0 ? round(($redeemed / $created) * 100, 1) : 0,
-                'average_order_value' => $orders > 0 ? round($grossRevenue / $orders, 2) : 0,
-            ],
-            'top_items' => $topItems,
-            'recent_payments' => (clone $payments)->latest()->limit(10)->get(),
-            'recent_redemptions' => (clone $redemptions)->with(['inventory', 'user'])->latest()->limit(10)->get(),
-        ]);
-    }
-
-    protected function resolveRangeStart(string $range): ?Carbon
-    {
-        return match ($range) {
-            '7d' => now()->subDays(7),
-            '30d' => now()->subDays(30),
-            '90d' => now()->subDays(90),
-            default => null,
+            foreach ($promotions as $promo) {
+                fputcsv($file, [
+                    $promo['id'],
+                    $promo['title'],
+                    $promo['views'],
+                    $promo['clicks'],
+                    $promo['redemptions'],
+                    $promo['revenue'],
+                    $promo['conversionRate'] . '%'
+                ]);
+            }
+            fclose($file);
         };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

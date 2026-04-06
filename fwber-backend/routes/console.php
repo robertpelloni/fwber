@@ -67,6 +67,26 @@ Artisan::command('schema:fix-missing', function () {
 Schedule::command('model:prune')->daily();
 Schedule::command('sanctum:prune-expired --hours=24')->daily();
 
+// Background jobs for premium features
+use App\Jobs\CleanupExpiredSubscriptions;
+use App\Jobs\ExpireBoosts;
+use App\Jobs\SendEventReminders;
+
+// Expire boosts every 15 minutes
+Schedule::job(new ExpireBoosts)->everyFifteenMinutes()
+    ->name('expire-boosts')
+    ->withoutOverlapping();
+
+// Send event reminders every hour
+Schedule::job(new SendEventReminders)->hourly()
+    ->name('send-event-reminders')
+    ->withoutOverlapping();
+
+// Cleanup expired subscriptions daily at 2 AM
+Schedule::job(new CleanupExpiredSubscriptions)->dailyAt('02:00')
+    ->name('cleanup-expired-subscriptions')
+    ->withoutOverlapping();
+
 // Analyze slow requests for performance alerts every hour
 use App\Jobs\AnalyzeSlowRequests;
 
@@ -77,4 +97,16 @@ Schedule::job(new AnalyzeSlowRequests)->hourly()
 // Cache warming
 Schedule::command('cache:warm')->everyFiveMinutes()
     ->name('warm-cache')
+    ->withoutOverlapping();
+
+// --- GOVERNANCE & FEDERATION AUTOMATION ---
+
+// Process expired governance proposals every minute
+Schedule::job(new \App\Jobs\ProcessGovernanceProposals)->everyMinute()
+    ->name('process-governance-proposals')
+    ->withoutOverlapping();
+
+// Ingest all federated content every 5 minutes
+Schedule::job(new \App\Jobs\IngestAllFederatedContent)->everyFiveMinutes()
+    ->name('ingest-federated-content')
     ->withoutOverlapping();

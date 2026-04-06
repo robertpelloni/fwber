@@ -58,10 +58,6 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
       return true;
     }
 
-    if (typeof window !== 'undefined' && /(^|\.)fwber\.me$/i.test(window.location.hostname)) {
-      return true;
-    }
-
     return Boolean(
       process.env.NEXT_PUBLIC_REVERB_HOST ||
       process.env.NEXT_PUBLIC_PUSHER_HOST ||

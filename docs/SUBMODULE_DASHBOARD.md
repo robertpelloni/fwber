@@ -1,7 +1,7 @@
 # FWBER Submodule & Repository Dashboard
 
-> **Generated on:** 2026-04-05
-> **Current Global Version:** 1.9.10
+> **Generated on:** 2026-04-06
+> **Current Global Version:** 1.8.11
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
@@ -24,13 +24,13 @@ fwber/
 ## 📦 Active Logical Packages
 
 ### 1. `fwber-backend`
-- **Version:** inherits global `1.9.10`
+- **Version:** inherits global `1.8.11`
 - **Role:** Core API and business logic.
 - **Owns:** auth, onboarding, profiles, photos, proximity matching, messages, block/report safety actions, notification APIs, E2E key backup/restore.
 - **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `1.9.10`
+- **Version:** inherits global `1.8.11`
 - **Role:** Main user-facing product surface.
 - **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
 - **Key stack:** Next.js app router, React, Tailwind CSS.
@@ -46,7 +46,7 @@ fwber/
 - **Notes:** frontend includes graceful fallbacks when WASM tooling or artifacts are unavailable.
 
 ### 5. `mobile`
-- **Version:** inherits global `1.4.5`
+- **Version:** inherits global `1.8.11`
 - **Role:** Native mobile shell for push notifications, secure token storage, NFC, and background location.
 - **Key stack:** Expo, React Native WebView, expo-notifications, expo-location.
 
@@ -78,6 +78,8 @@ fwber/
 - Smoke-check runs can now also be compared across deploys via drift JSON/Markdown artifacts, making it easier to detect what changed between report generations.
 - Smoke-check/diff outputs can now also be condensed into compact notification artifacts and optionally posted to a webhook for chatops-style deploy summaries.
 - The fwber backend runtime is now actually deployed on Hetzner with local MySQL, Redis, Reverb, queue, and geo services active; the remaining migration work is primarily public DNS/TLS cutover.
+- The restore-branch frontend shell now exposes approved rewind surfaces like activity, notifications, travel mode, wallet, roast, merchant, and moderation directly from the signed-in app instead of primarily spotlighting excluded branches.
+- The dedicated rewind worktree is now also aligned with current frontend Sentry App Router conventions and no longer assumes generated WASM bindings are always present, reducing restore-branch-only CI/build drift.
 - The deploy script now also handles non-root operator execution more safely by auto-using `sudo` for systemd/nginx actions when required.
 - The smoke-check websocket probe now uses a valid RFC-compliant handshake key, eliminating a post-cutover false-negative seen during live Hetzner validation.
 - Merchant discovery is now geo-aware again through persisted storefront coordinates and distance-ranked nearby marketplace responses.

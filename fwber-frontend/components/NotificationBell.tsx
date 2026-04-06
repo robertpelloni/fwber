@@ -6,11 +6,10 @@ import { Bell, X, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calend
 import { useAuth } from '@/lib/auth-context';
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import { api } from '@/lib/api/client';
-import { getNotificationRoute, normalizeNotificationType } from '@/lib/notifications';
 
 interface Notification {
   id: string;
-  type: string;
+  type: 'message' | 'match' | 'like' | 'friend_request' | 'view' | 'system' | 'gift' | 'event';
   title: string;
   body: string;
   timestamp: string;
@@ -122,7 +121,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   }, [isOpen]);
 
   const getNotificationIcon = (type: Notification['type']) => {
-    switch (normalizeNotificationType(type)) {
+    switch (type) {
       case 'message':
         return <MessageSquare className="h-4 w-4 text-blue-500" />;
       case 'match':
@@ -145,7 +144,22 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   };
 
   const getNotificationLink = (notification: Notification): string => {
-    return getNotificationRoute(notification);
+    switch (notification.type) {
+      case 'message':
+        return `/messages?user=${notification.data?.user_id}`;
+      case 'match':
+        return `/matches`;
+      case 'friend_request':
+        return `/friends`;
+      case 'view':
+        return `/profile/${notification.data?.user_id}`;
+      case 'gift':
+        return `/wallet?tab=gifts`;
+      case 'event':
+        return `/events/${notification.data?.event_id ?? ''}`;
+      default:
+        return '#';
+    }
   };
 
   const formatTime = (timestamp: string): string => {

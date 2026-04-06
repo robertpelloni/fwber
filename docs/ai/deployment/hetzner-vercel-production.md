@@ -1,6 +1,6 @@
 # Hetzner + Vercel Production Blueprint
 
-> **Version:** 1.5.6
+> **Version:** 1.5.3
 > **Status:** Recommended deployment topology for restored fwber stack
 
 This document captures the production topology now recommended for fwber after the phased restoration of:
@@ -152,9 +152,6 @@ After cutover:
 - [ ] DNS appendix rows are reviewed so host resolution matches the intended Hetzner/Vercel split
 - [ ] drift-diff artifacts are reviewed against the previous smoke report when a prior deploy report exists
 - [ ] notification artifacts/webhook output are reviewed if deploy notifications are enabled
-- [ ] public `api.fwber.me` and `geo.fwber.me` DNS/TLS cutover is completed if the backend runtime has already been deployed to Hetzner
-- [ ] deploy script is verified from the intended operator account (`deploy` or `root`) after the privilege-hardening update
-- [ ] websocket smoke validation passes with the corrected handshake probe after public cutover
 - [ ] `/api/health`, `/api/health/liveness`, and `/api/health/readiness` respond correctly
 - [ ] auth routes behave correctly
 - [ ] websocket connection succeeds

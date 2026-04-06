@@ -3,67 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\LoginWithWalletRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
-use App\Services\ReferralCommissionService;
+use App\Services\TokenDistributionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly ReferralCommissionService $referralCommissionService)
-    {
-    }
-
     private function hydrateAuthUser(User $user): User
     {
-        // The frontend still expects social-proof and referral counters on the
-        // auth payload. We hydrate them here so login/register/me all share the
-        // same richer response shape.
-        $query = $user->load('profile');
+        $tokenService = app(TokenDistributionService::class);
+        $tokenService->ensureReferralCode($user);
 
-        $counts = [];
-        if (Schema::hasTable('vouches')) {
-            $counts[] = 'vouches';
-        }
-        if (Schema::hasColumn('users', 'referrer_id')) {
-            $counts[] = 'referrals';
-        }
-
-        return empty($counts) ? $query : $query->loadCount($counts);
+        return $user->load('profile')->loadCount(['referrals', 'vouches']);
     }
 
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request, TokenDistributionService $tokenService)
     {
         $validated = $request->validated();
-        $referrer = $this->referralCommissionService->lookupReferrer($validated['referral_code'] ?? null);
 
-        $payload = [
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-        ];
+            'referral_code' => $tokenService->generateReferralCode(),
+        ]);
 
-        if (Schema::hasColumn('users', 'referrer_id')) {
-            $payload['referrer_id'] = $referrer?->id;
-        }
-
-        $user = User::create($payload);
-
-        $user = $this->referralCommissionService->ensureReferralCode($user);
-
-        if (Schema::hasColumn('users', 'referrer_id') && $referrer && $referrer->id !== $user->id) {
-            $this->referralCommissionService->awardSignupRewards($user, $referrer);
-        }
+        // Process tokens
+        $tokenService->processSignupBonus($user, $validated['referral_code'] ?? null);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $this->hydrateAuthUser($user->fresh()),
+            'user' => $this->hydrateAuthUser($user),
         ]);
     }
 
@@ -79,7 +56,10 @@ class AuthController extends Controller
             ]);
         }
 
+        // Standard authentication
         $isStandardAuth = Hash::check($validated['password'], $user->password);
+
+        // Decoy authentication
         $isDecoyAuth = ! $isStandardAuth && $user->decoy_password && Hash::check($validated['password'], $user->decoy_password);
 
         if (! $isStandardAuth && ! $isDecoyAuth) {
@@ -89,7 +69,9 @@ class AuthController extends Controller
         }
 
         if ($isDecoyAuth) {
+            // Swap to the actual decoy user object
             if (! $user->decoy_user_id) {
+                // Failsafe in case decoy_user_id is missing but password matched
                 throw ValidationException::withMessages([
                     'email' => ['Invalid credentials'],
                 ]);
@@ -122,6 +104,13 @@ class AuthController extends Controller
     {
         $user = $request->user();
         if ($user && $user->currentAccessToken()) {
+            \App\Facades\SecurityLog::authSuccess([
+                'action' => 'logout',
+                'user_id' => $user->id,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
             $user->currentAccessToken()->delete();
         }
 
@@ -131,5 +120,75 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return $this->hydrateAuthUser($request->user());
+    }
+
+    public function checkReferralCode($code)
+    {
+        $referrer = User::where('referral_code', $code)->withCount('vouches')->first();
+
+        if (! $referrer) {
+            return response()->json(['valid' => false], 404);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'referrer_name' => $referrer->name,
+            'referrer_avatar' => $referrer->avatar_url, // Assuming this exists
+            'has_golden_tickets' => $referrer->golden_tickets_remaining > 0,
+            'vouches_count' => $referrer->vouches_count,
+        ]);
+    }
+
+    public function loginWithWallet(LoginWithWalletRequest $request)
+    {
+        $validated = $request->validated();
+
+        $walletAddress = $validated['wallet_address'];
+        $signature = $validated['signature'];
+        $message = $validated['message'];
+
+        // Verify the signature using the Node.js script
+        $scriptPath = base_path('scripts/solana/verify_signature.cjs');
+        $command = "node {$scriptPath} ".escapeshellarg($message).' '.escapeshellarg($signature).' '.escapeshellarg($walletAddress).' 2>&1';
+
+        $output = shell_exec($command);
+        \Illuminate\Support\Facades\Log::info('Signature verification output: '.$output);
+        $result = json_decode($output, true);
+
+        if (! $result || ! isset($result['verified']) || ! $result['verified']) {
+            throw ValidationException::withMessages([
+                'signature' => ['Invalid wallet signature.'],
+            ]);
+        }
+
+        // Check if user exists with this wallet address
+        $user = User::where('wallet_address', $walletAddress)->first();
+
+        if (! $user) {
+            // Create a new user for this wallet
+            // We use a placeholder email and a random password
+            $shortAddress = substr($walletAddress, 0, 6).'...'.substr($walletAddress, -4);
+            $user = User::create([
+                'name' => "Wallet User {$shortAddress}",
+                'email' => "wallet_{$walletAddress}@fwber.com", // Unique placeholder
+                'password' => Hash::make(\Illuminate\Support\Str::random(32)),
+                'wallet_address' => $walletAddress,
+                'token_balance' => 0, // Signup bonus handled below
+            ]);
+
+            // Distribute signup bonus for new wallet user
+            /** @var \App\Services\TokenDistributionService $tokenService */
+            $tokenService = app(\App\Services\TokenDistributionService::class);
+            $tokenService->processSignupBonus($user);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $this->hydrateAuthUser($user),
+            'is_new_user' => $user->wasRecentlyCreated,
+        ]);
     }
 }

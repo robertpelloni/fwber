@@ -1,7 +1,7 @@
 // fwber.me Service Worker - PWA Offline Support
-const CACHE_NAME = 'fwber-v1.2.6';
-const API_CACHE_NAME = 'fwber-api-v1.2.6';
-const STATIC_CACHE_NAME = 'fwber-static-v1.2.6';
+const CACHE_NAME = 'fwber-v1.0.0';
+const API_CACHE_NAME = 'fwber-api-v1.0.0';
+const STATIC_CACHE_NAME = 'fwber-static-v1.0.0';
 
 // Cache strategies
 const CACHE_STRATEGIES = {
@@ -10,9 +10,9 @@ const CACHE_STRATEGIES = {
   // API calls - network first, cache fallback
   api: ['/api/'],
   // Pages - network first, cache fallback
-  pages: ['/dashboard', '/profile', '/matches', '/messages', '/nearby'],
+  pages: ['/bulletin-boards', '/dashboard', '/profile'],
   // Real-time - network only
-  realtime: ['/broadcasting', '/stream', '/websocket']
+  realtime: ['/mercure', '/stream']
 };
 
 // Install event - cache static assets
@@ -25,10 +25,10 @@ self.addEventListener('install', (event) => {
       caches.open(STATIC_CACHE_NAME).then((cache) => {
         return cache.addAll([
           '/',
+          '/bulletin-boards',
           '/dashboard',
-          '/matches',
-          '/messages',
-          '/nearby',
+          '/profile',
+          '/offline.html',
           '/manifest.json',
           '/icons/icon-192x192.png',
           '/icons/icon-512x512.png'
@@ -37,8 +37,9 @@ self.addEventListener('install', (event) => {
       // Cache API responses
       caches.open(API_CACHE_NAME).then((cache) => {
         return cache.addAll([
-          '/api/auth/me',
-          '/api/location'
+          '/api/bulletin-boards',
+          '/api/location',
+          '/api/auth/status'
         ]);
       })
     ]).then(() => {
@@ -106,7 +107,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('sync', (event) => {
   console.log('Background sync triggered:', event.tag);
   
-  if (event.tag === 'chat-sync') {
+  if (event.tag === 'bulletin-message') {
     event.waitUntil(syncOfflineMessages());
   } else if (event.tag === 'location-update') {
     event.waitUntil(syncLocationUpdates());
@@ -117,7 +118,7 @@ self.addEventListener('sync', (event) => {
 self.addEventListener('push', (event) => {
   console.log('Push notification received:', event);
   
-  let data = { title: 'fwber', body: 'New notification', url: '/dashboard' };
+  let data = { title: 'fwber.me', body: 'New notification', url: '/' };
   
   try {
     data = event.data ? event.data.json() : data;
@@ -131,7 +132,7 @@ self.addEventListener('push', (event) => {
     badge: '/icons/badge-72x72.png',
     vibrate: [200, 100, 200],
     data: {
-      url: data.url || '/dashboard',
+      url: data.url || '/',
       timestamp: Date.now()
     },
     actions: data.actions || [
@@ -144,7 +145,7 @@ self.addEventListener('push', (event) => {
   };
   
   event.waitUntil(
-    self.registration.showNotification(data.title || 'fwber', options)
+    self.registration.showNotification(data.title || 'fwber.me', options)
   );
 });
 
@@ -202,6 +203,11 @@ async function networkFirst(request, cacheName) {
       return cached;
     }
     
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      return caches.match('/offline.html');
+    }
+    
     return new Response('Offline', { status: 503 });
   }
 }
@@ -234,11 +240,79 @@ function isRealtimeRequest(url) {
 
 // Background sync functions
 async function syncOfflineMessages() {
-    // Relying on the foreground CRDT sync in useChatSync.ts
-    // In a full implementation, we'd replicate the IndexedDB IDB cursor logic here
-    console.log('Background message sync deferred to foreground React app context.');
+  try {
+    const offlineMessages = await getOfflineMessages();
+    
+    for (const message of offlineMessages) {
+      const response = await fetch('/api/bulletin-boards/' + message.boardId + '/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + message.token
+        },
+        body: JSON.stringify({
+          content: message.content,
+          lat: message.lat,
+          lng: message.lng,
+          is_anonymous: message.is_anonymous
+        })
+      });
+      
+      if (response.ok) {
+        await removeOfflineMessage(message.id);
+        console.log('Offline message synced:', message.id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to sync offline messages:', error);
+  }
 }
 
 async function syncLocationUpdates() {
-    console.log('Background location sync triggered.');
+  try {
+    const offlineLocations = await getOfflineLocations();
+    
+    for (const location of offlineLocations) {
+      const response = await fetch('/api/location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + location.token
+        },
+        body: JSON.stringify({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          accuracy: location.accuracy
+        })
+      });
+      
+      if (response.ok) {
+        await removeOfflineLocation(location.id);
+        console.log('Offline location synced:', location.id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to sync offline locations:', error);
+  }
+}
+
+// IndexedDB helpers for offline storage
+async function getOfflineMessages() {
+  // This would typically use IndexedDB
+  return [];
+}
+
+async function removeOfflineMessage(id) {
+  // This would typically use IndexedDB
+  console.log('Removing offline message:', id);
+}
+
+async function getOfflineLocations() {
+  // This would typically use IndexedDB
+  return [];
+}
+
+async function removeOfflineLocation(id) {
+  // This would typically use IndexedDB
+  console.log('Removing offline location:', id);
 }

@@ -7,7 +7,6 @@ use App\Models\Venue;
 use App\Services\Ai\Llm\LlmManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class AiWingmanService
 {
@@ -130,10 +129,8 @@ class AiWingmanService
             // Fetch nearby venues if location is provided (simplified for now)
             // In a real implementation, we would use geospatial search
             $venues = [];
-            if ($location && Schema::hasTable('venues')) {
-                // Venue-powered date ideas are optional during staged restoration.
-                // If the venue system has not been restored yet, the AI still works
-                // with profile/location context instead of crashing on a missing table.
+            if ($location) {
+                // Placeholder: Fetch top 5 active venues
                 $venues = Venue::where('is_active', true)->limit(5)->get();
             }
 
@@ -467,10 +464,7 @@ EOT;
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
-            } catch (\Throwable $e) {
-                // The public roast preview is used in smoke checks and landing pages,
-                // so backend deploys should never fail hard just because an LLM driver
-                // is misconfigured or unavailable. We degrade to a playful fallback.
+            } catch (\Exception $e) {
                 Log::error("AiWingmanService: Failed to generate generic {$mode}: ".$e->getMessage());
 
                 return "You broke the roast machine! That's how un-roastable you are. (Try again later)";
@@ -520,7 +514,7 @@ EOT;
                 ], ['temperature' => 0.9]);
 
                 return $response->content;
-            } catch (\Throwable $e) {
+            } catch (\Exception $e) {
                 Log::error("AiWingmanService: Failed to generate {$mode}: ".$e->getMessage());
 
                 return $mode === 'hype'

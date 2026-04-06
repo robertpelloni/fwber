@@ -1,27 +1,26 @@
-import axios from 'axios'
-import { getApiBaseUrl } from './client'
+import axios from 'axios';
 
-const API_URL = getApiBaseUrl()
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export interface VideoCallLog {
-  id: number
-  caller_id: number
-  receiver_id: number
-  started_at: string | null
-  created_at: string
-  ended_at: string | null
-  status: 'initiated' | 'connected' | 'missed' | 'rejected' | 'ended'
-  duration: number | null
+  id: number;
+  caller_id: number;
+  receiver_id: number;
+  started_at: string | null;
+  created_at: string;
+  ended_at: string | null;
+  status: 'initiated' | 'connected' | 'missed' | 'rejected' | 'ended';
+  duration: number | null;
   caller?: {
-    id: number
-    name: string
-    avatar_url: string | null
-  }
+    id: number;
+    name: string;
+    avatar_url: string | null;
+  };
   receiver?: {
-    id: number
-    name: string
-    avatar_url: string | null
-  }
+    id: number;
+    name: string;
+    avatar_url: string | null;
+  };
 }
 
 export const initiateCall = async (token: string, recipientId: string): Promise<VideoCallLog> => {
@@ -33,10 +32,9 @@ export const initiateCall = async (token: string, recipientId: string): Promise<
         Authorization: `Bearer ${token}`,
       },
     }
-  )
-
-  return response.data
-}
+  );
+  return response.data;
+};
 
 export const updateCallStatus = async (
   token: string,
@@ -52,17 +50,15 @@ export const updateCallStatus = async (
         Authorization: `Bearer ${token}`,
       },
     }
-  )
-
-  return response.data
-}
+  );
+  return response.data;
+};
 
 export const getCallHistory = async (token: string): Promise<VideoCallLog[]> => {
   const response = await axios.get(`${API_URL}/video/history`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  })
-
-  return response.data.data
-}
+  });
+  return response.data.data; // Assuming paginated response
+};

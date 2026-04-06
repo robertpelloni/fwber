@@ -8,9 +8,7 @@ import * as Crypto from '@/lib/e2e/crypto';
 export function useE2EEncryption() {
   const { user, isAuthenticated, token } = useAuth();
   const [isReady, setIsReady] = useState(false);
-  const [isRestorable, setIsRestorable] = useState(false);
   const [sharedKeys, setSharedKeys] = useState<Record<string, any>>({});
-  const [storageUnavailable, setStorageUnavailable] = useState(false);
 
   // Initialize Keys
   useEffect(() => {
@@ -20,62 +18,60 @@ export function useE2EEncryption() {
       try {
         let keyPair = await Storage.getKeyPair(user.id, 'ecdh');
         let metadata = await Storage.getKeyPairMetadata(user.id, 'ecdh');
-
-        setStorageUnavailable(false);
-
+        
         const KEY_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
         const needsRotation = metadata && (Date.now() - metadata.createdAt > KEY_MAX_AGE_MS);
 
         if (!keyPair || needsRotation) {
-          if (token && !storageUnavailable) {
-            try {
-              const res = await api.get<any>(`/security/keys/restore?key_type=ecdh`, {
-                headers: { Authorization: `Bearer ${token}` }
-              });
-              if (res.encrypted_private_key) {
-                console.debug('E2E: Found remote backup. Marking as restorable.');
-                setIsRestorable(true);
-                return;
-              }
-            } catch {
-              // Missing backup or auth drift should not block local generation.
-            }
-          }
-
           console.debug(needsRotation ? 'E2E keys expired. Rotating...' : 'Generating initial E2E keys...');
           keyPair = await Crypto.generateKeyPair();
           await Storage.storeKeyPair(user.id, keyPair, 'ecdh');
 
+          // --- FEDERATED KEY GENERATION ---
+          const rsaKeyPair = await Crypto.generateRsaKeyPair();
+          await Storage.storeKeyPair(user.id, rsaKeyPair, 'rsa');
+          // --------------------------------
+
           const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
           await securityApi.storePublicKey(publicKeyString);
-
+          
           if (needsRotation) {
-            setSharedKeys({});
+            setSharedKeys({}); // Clear cached shared keys on rotation
           }
         }
         setIsReady(true);
       } catch (error) {
-        if (Storage.isStorageUnavailableError(error)) {
-          setStorageUnavailable(true);
-          setIsRestorable(false);
-          setIsReady(true);
-          console.warn('E2E storage is unavailable in this browser context. Skipping local key bootstrap.');
-          return;
-        }
-
         console.error('Failed to initialize E2E encryption:', error);
       }
     };
 
     initKeys();
-  }, [user, isAuthenticated, token, storageUnavailable]);
+  }, [user, isAuthenticated]);
 
   // Get Shared Key (Derive or Cache)
   const getSharedKey = useCallback(async (peerId: string | number) => {
     if (sharedKeys[String(peerId)]) return sharedKeys[String(peerId)];
 
     if (!user) throw new Error('User not authenticated');
-    if (storageUnavailable) throw new Error('E2E storage unavailable in this browser context');
+
+    // Handle Federated Peer (URI)
+    if (typeof peerId === 'string' && peerId.startsWith('http')) {
+        try {
+            // 1. Get remote actor detail
+            const { actor } = await api.get<any>(`/federation/actors/detail?uri=${encodeURIComponent(peerId)}`);
+            if (!actor.publicKey?.publicKeyPem) throw new Error('Remote actor has no public key');
+
+            // 2. Import RSA Public Key
+            const rsaPublicKey = await Crypto.importRsaPublicKey(actor.publicKey.publicKeyPem);
+            
+            // For federated, we return the RSA key directly
+            setSharedKeys(prev => ({ ...prev, [peerId]: { type: 'rsa', key: rsaPublicKey } }));
+            return { type: 'rsa', key: rsaPublicKey };
+        } catch (error) {
+            console.error(`Federated E2E failed for ${peerId}`, error);
+            throw error;
+        }
+    }
 
     // Handle Local Peer (Number)
     const myKeys = await Storage.getKeyPair(user.id, 'ecdh');
@@ -93,109 +89,50 @@ export function useE2EEncryption() {
       console.error(`Failed to establish secure session with user ${peerId}`, error);
       throw error;
     }
-  }, [user, sharedKeys, storageUnavailable]);
-
-  const getSharedKeyRaw = useCallback(async (peerId: string | number) => {
-    const keyData = await getSharedKey(peerId);
-    if (keyData.type === 'ecdh') {
-        const rawKey = await window.crypto.subtle.exportKey('raw', keyData.key);
-        return Array.from(new Uint8Array(rawKey)).map(b => String.fromCharCode(b)).join('');
-    }
-    return null;
-  }, [getSharedKey]);
+  }, [user, sharedKeys]);
 
   const encrypt = useCallback(async (peerId: string | number, text: string) => {
     const keyData = await getSharedKey(peerId);
+    if (keyData.type === 'rsa') {
+        return Crypto.encryptWithRsa(text, keyData.key);
+    }
     return Crypto.encryptMessage(text, keyData.key);
   }, [getSharedKey]);
 
   const decrypt = useCallback(async (peerId: string | number, encryptedText: string) => {
     const keyData = await getSharedKey(peerId);
     if (!keyData) return encryptedText; // Fallback
+    
+    if (keyData.type === 'rsa') {
+        // RSA decryption requires our PRIVATE RSA key
+        const myRsaKeys = await Storage.getKeyPair(user!.id, 'rsa');
+        if (!myRsaKeys) return encryptedText;
+        return Crypto.decryptWithRsa(encryptedText, myRsaKeys.privateKey);
+    }
     return Crypto.decryptMessage(encryptedText, keyData.key);
-  }, [getSharedKey]);
+  }, [user, getSharedKey]);
 
   const regenerateKeys = useCallback(async () => {
     if (!user) return;
-    if (storageUnavailable) {
-      throw new Error('E2E storage unavailable in this browser context');
-    }
     try {
 
       const keyPair = await Crypto.generateKeyPair();
       await Storage.storeKeyPair(user.id, keyPair, 'ecdh');
+
+      const rsaKeyPair = await Crypto.generateRsaKeyPair();
+      await Storage.storeKeyPair(user.id, rsaKeyPair, 'rsa');
 
       const publicKeyString = await Crypto.exportPublicKey(keyPair.publicKey);
       await securityApi.storePublicKey(publicKeyString);
 
       // Clear cache
       setSharedKeys({});
-      setIsRestorable(false);
 
     } catch (error) {
       console.error('Failed to regenerate keys:', error);
       throw error;
     }
-  }, [user, storageUnavailable]);
+  }, [user]);
 
-  const backupKeys = useCallback(async (passphrase: string) => {
-    if (!user || !token) throw new Error('Not authenticated');
-    if (storageUnavailable) throw new Error('E2E storage unavailable in this browser context');
-
-    const ecdhKeys = await Storage.getKeyPair(user.id, 'ecdh');
-    if (!ecdhKeys) throw new Error('Local keys not found for backup');
-
-    const exportAndBackup = async (keys: CryptoKeyPair, keyType: 'ecdh') => {
-        const jwk = await window.crypto.subtle.exportKey('jwk', keys.privateKey);
-        const { ciphertext, salt, iv } = await Crypto.encryptPrivateKey(JSON.stringify(jwk), passphrase);
-
-        await api.post('/security/keys/backup', {
-            key_type: keyType,
-            encrypted_private_key: ciphertext,
-            salt,
-            iv
-        }, { headers: { Authorization: `Bearer ${token}` } });
-    };
-
-    await exportAndBackup(ecdhKeys, 'ecdh');
-    setIsRestorable(false);
-  }, [user, token, storageUnavailable]);
-
-  const restoreKeys = useCallback(async (passphrase: string) => {
-    if (!user || !token) throw new Error('Not authenticated');
-    if (storageUnavailable) throw new Error('E2E storage unavailable in this browser context');
-
-    const fetchAndImport = async (keyType: 'ecdh') => {
-        const res = await api.get<any>(`/security/keys/restore?key_type=${keyType}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-
-        const jwkString = await Crypto.decryptPrivateKey(
-            res.encrypted_private_key, 
-            res.salt, 
-            res.iv, 
-            passphrase
-        );
-
-        const jwk = JSON.parse(jwkString);
-        
-        const pubRes = await securityApi.getPublicKey(user.id);
-        const publicKey = await Crypto.importPublicKey(pubRes.data.public_key);
-
-        const algo = { name: 'ECDH', namedCurve: 'P-256' };
-        const privUsages: KeyUsage[] = ['deriveKey', 'deriveBits'];
-
-        const privateKey = await window.crypto.subtle.importKey('jwk', jwk, algo, true, privUsages);
-
-        await Storage.storeKeyPair(user.id, { publicKey, privateKey }, keyType);
-    };
-
-    await fetchAndImport('ecdh');
-    
-    setIsReady(true);
-    setIsRestorable(false);
-    setSharedKeys({});
-  }, [user, token, storageUnavailable]);
-
-  return { isReady, isRestorable, storageUnavailable, encrypt, decrypt, regenerateKeys, backupKeys, restoreKeys, getSharedKeyRaw };
+  return { isReady, encrypt, decrypt, regenerateKeys };
 }

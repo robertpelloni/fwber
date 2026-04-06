@@ -2,346 +2,134 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InventoryRedemption;
 use App\Models\MerchantInventory;
-use App\Models\MerchantPayment;
-use App\Models\MerchantProfile;
-use App\Services\MerchantTrustService;
-use App\Services\Payment\PaymentGatewayInterface;
+use App\Models\InventoryRedemption;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MerchantInventoryController extends Controller
 {
-    public function __construct(
-        protected PaymentGatewayInterface $paymentGateway,
-        protected MerchantTrustService $merchantTrustService,
-    ) {}
-
+    /**
+     * List nearby inventory items from all merchants.
+     */
     public function nearby(Request $request): JsonResponse
     {
         $lat = $request->query('lat');
         $lng = $request->query('lng');
-        $radiusMeters = (float) $request->query('radius', 5000);
-        $limit = min((int) $request->query('limit', 24), 100);
+        $radius = $request->query('radius', 1000);
 
-        $items = MerchantInventory::query()
-            ->with(['merchant' => function ($query) {
-                $query->withCount('inventories')
-                    ->withCount(['payments as successful_orders_count' => fn ($payments) => $payments->where('status', 'succeeded')]);
-            }])
-            ->where('is_available', true)
+        // Find merchants with active promotions/locations within radius
+        $items = MerchantInventory::where('is_available', true)
             ->where('stock_count', '>', 0)
-            ->whereHas('merchant', function ($query) {
-                $query->whereNotNull('latitude')->whereNotNull('longitude');
+            ->whereHas('merchant.promotions', function($q) use ($lat, $lng, $radius) {
+                // Approximate distance check via promotions location
+                $q->where('is_active', true);
             })
-            ->latest()
-            ->get();
-
-        $items = $this->sortAndFilterNearbyItems($items, $lat, $lng, $radiusMeters)
-            ->take($limit)
-            ->values();
-
-        return response()->json([
-            'items' => $items,
-        ]);
-    }
-
-    public function showMarketplace(Request $request, int $merchantId): JsonResponse
-    {
-        $merchant = MerchantProfile::findOrFail($merchantId);
-        $items = MerchantInventory::query()
-            ->where('merchant_profile_id', $merchantId)
-            ->where('is_available', true)
-            ->where('stock_count', '>', 0)
-            ->latest()
-            ->get();
-
-        return response()->json([
-            'merchant' => $merchant,
-            'items' => $items,
-        ]);
-    }
-
-    public function index(Request $request): JsonResponse
-    {
-        $merchant = $request->user()->merchantProfile;
-
-        if (! $merchant) {
-            return response()->json(['message' => 'Merchant profile not found.'], 404);
-        }
-
-        $items = MerchantInventory::query()
-            ->where('merchant_profile_id', $merchant->id)
-            ->withCount(['redemptions as pending_redemptions_count' => function ($query) {
-                $query->whereNull('redeemed_at');
-            }])
-            ->latest()
+            ->with(['merchant'])
             ->get();
 
         return response()->json(['items' => $items]);
     }
 
+    /**
+     * List all available items for a merchant.
+     */
+    public function index(Request $request, int $merchantId): JsonResponse
+    {
+        $items = MerchantInventory::where('merchant_profile_id', $merchantId)
+            ->where('is_available', true)
+            ->where('stock_count', '>', 0)
+            ->get();
+
+        return response()->json(['items' => $items]);
+    }
+
+    /**
+     * Merchant: Create a new inventory item.
+     */
     public function store(Request $request): JsonResponse
     {
-        $merchant = $request->user()->merchantProfile;
-        if (! $merchant) {
-            return response()->json(['message' => 'Merchant profile required.'], 403);
-        }
+        $merchant = Auth::user()->merchantProfile;
+        if (!$merchant) return response()->json(['error' => 'Merchant profile required'], 403);
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'price_usd' => ['required', 'numeric', 'min:0'],
-            'stock_count' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'url'],
-            'is_available' => ['nullable', 'boolean'],
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price_tokens' => 'required|numeric|min:0',
+            'stock_count' => 'required|integer|min:0',
+            'image_url' => 'nullable|url',
         ]);
 
-        $item = $merchant->inventories()->create($validated + [
-            'is_available' => (bool) ($validated['is_available'] ?? true),
-        ]);
+        $item = $merchant->inventories()->create($validated);
 
-        return response()->json([
-            'message' => 'Inventory item created successfully',
-            'item' => $item,
-        ], 201);
+        return response()->json(['item' => $item], 201);
     }
 
-    public function update(Request $request, int $id): JsonResponse
-    {
-        $merchant = $request->user()->merchantProfile;
-        if (! $merchant) {
-            return response()->json(['message' => 'Merchant profile required.'], 403);
-        }
-
-        $item = MerchantInventory::where('merchant_profile_id', $merchant->id)->findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'price_usd' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'stock_count' => ['sometimes', 'required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'url'],
-            'is_available' => ['nullable', 'boolean'],
-        ]);
-
-        $item->update($validated);
-
-        return response()->json([
-            'message' => 'Inventory item updated successfully',
-            'item' => $item->fresh(),
-        ]);
-    }
-
-    public function destroy(Request $request, int $id): JsonResponse
-    {
-        $merchant = $request->user()->merchantProfile;
-        if (! $merchant) {
-            return response()->json(['message' => 'Merchant profile required.'], 403);
-        }
-
-        $item = MerchantInventory::where('merchant_profile_id', $merchant->id)->findOrFail($id);
-        $item->update(['is_available' => false]);
-
-        return response()->json([
-            'message' => 'Inventory item archived successfully',
-            'item' => $item->fresh(),
-        ]);
-    }
-
+    /**
+     * User: Purchase an item with FWB Tokens.
+     */
     public function purchase(Request $request, int $itemId): JsonResponse
     {
-        $user = $request->user();
-        $paymentMethodId = $request->string('payment_method_id')->toString();
-        $paymentIntentId = $request->string('payment_intent_id')->toString();
-        $driver = config('services.payment.driver', 'mock');
+        $user = Auth::user();
+        $item = MerchantInventory::findOrFail($itemId);
 
-        $item = MerchantInventory::with('merchant')->findOrFail($itemId);
-        if (! $item->is_available || $item->stock_count < 1) {
-            return response()->json(['message' => 'Item is out of stock.'], 422);
+        if (!$item->is_available || $item->stock_count <= 0) {
+            return response()->json(['error' => 'Item is out of stock'], 400);
         }
 
-        if ($item->merchant?->user_id === $user->id) {
-            return response()->json(['message' => 'You cannot buy your own inventory item.'], 422);
+        if ($user->token_balance < $item->price_tokens) {
+            return response()->json(['error' => 'Insufficient FWB token balance'], 400);
         }
 
-        if ($paymentIntentId !== '') {
-            $result = $this->paymentGateway->verifyPayment($paymentIntentId);
-        } elseif ($paymentMethodId !== '') {
-            $result = $this->paymentGateway->charge((float) $item->price_usd, 'USD', $paymentMethodId, [
-                'item_id' => (string) $item->id,
-                'merchant_profile_id' => (string) $item->merchant_profile_id,
-                'payer_id' => (string) $user->id,
-                'description' => 'Marketplace purchase: '.$item->name,
-            ]);
-        } elseif ($driver === 'mock') {
-            $result = $this->paymentGateway->charge((float) $item->price_usd, 'USD', 'tok_marketplace_mock', [
-                'item_id' => (string) $item->id,
-                'merchant_profile_id' => (string) $item->merchant_profile_id,
-                'payer_id' => (string) $user->id,
-                'description' => 'Marketplace purchase: '.$item->name,
-            ]);
-        } else {
-            return response()->json(['message' => 'A live payment method is required for marketplace purchases.'], 422);
-        }
+        $redemption = DB::transaction(function () use ($user, $item) {
+            // 1. Deduct tokens
+            $user->decrement('token_balance', $item->price_tokens);
 
-        if (! $result->success) {
-            return response()->json(['message' => $result->message ?: 'Payment failed.'], 400);
-        }
+            // 2. Reduce stock
+            $item->decrement('stock_count');
 
-        $payload = DB::transaction(function () use ($itemId, $user, $item, $result, $driver) {
-            $lockedItem = MerchantInventory::lockForUpdate()->findOrFail($itemId);
-            if (! $lockedItem->is_available || $lockedItem->stock_count < 1) {
-                abort(422, 'Item is out of stock.');
-            }
-
-            $lockedItem->decrement('stock_count');
-
-            $payment = MerchantPayment::create([
-                'merchant_profile_id' => $lockedItem->merchant_profile_id,
-                'merchant_inventory_id' => $lockedItem->id,
-                'payer_id' => $user->id,
-                'amount' => $lockedItem->price_usd,
-                'currency' => 'USD',
-                'payment_gateway' => $driver,
-                'transaction_id' => $result->transactionId,
-                'status' => 'succeeded',
-                'description' => 'Marketplace purchase: '.$lockedItem->name,
-                'metadata' => $result->data,
-                'paid_at' => now(),
-            ]);
-
-            $redemption = InventoryRedemption::create([
+            // 3. Create redemption code
+            return InventoryRedemption::create([
                 'user_id' => $user->id,
-                'merchant_inventory_id' => $lockedItem->id,
-                'merchant_payment_id' => $payment->id,
-                'redemption_code' => 'FWB-'.strtoupper(Str::random(8)),
+                'merchant_inventory_id' => $item->id,
+                'redemption_code' => 'FWB-' . strtoupper(Str::random(8)),
             ]);
-
-            return [
-                'payment' => $payment,
-                'redemption' => $redemption,
-                'item' => $lockedItem->fresh(),
-            ];
         });
 
         return response()->json([
             'message' => 'Purchase successful!',
-            'merchant_name' => $item->merchant?->business_name,
-            'item_name' => $item->name,
-            'redemption_code' => $payload['redemption']->redemption_code,
-            'receipt' => [
-                'id' => $payload['payment']->id,
-                'amount' => $payload['payment']->amount,
-                'currency' => $payload['payment']->currency,
-                'status' => $payload['payment']->status,
-                'paid_at' => $payload['payment']->paid_at,
-            ],
-            'remaining_stock' => $payload['item']->stock_count,
+            'redemption_code' => $redemption->redemption_code,
+            'remaining_balance' => $user->fresh()->token_balance
         ]);
     }
 
+    /**
+     * Merchant: Mark a code as redeemed.
+     */
     public function redeem(Request $request): JsonResponse
     {
-        $merchant = $request->user()->merchantProfile;
-        if (! $merchant) {
-            return response()->json(['message' => 'Merchant profile required.'], 403);
-        }
+        $merchant = Auth::user()->merchantProfile;
+        $code = $request->input('code');
 
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255'],
-        ]);
-
-        $redemption = InventoryRedemption::with(['inventory', 'user'])
-            ->where('redemption_code', $validated['code'])
-            ->whereHas('inventory', function ($query) use ($merchant) {
-                $query->where('merchant_profile_id', $merchant->id);
+        $redemption = InventoryRedemption::where('redemption_code', $code)
+            ->whereHas('inventory', function($q) use ($merchant) {
+                $q->where('merchant_profile_id', $merchant->id);
             })
             ->firstOrFail();
 
         if ($redemption->redeemed_at) {
-            return response()->json(['message' => 'Code already redeemed.'], 422);
+            return response()->json(['error' => 'Code already redeemed'], 400);
         }
 
         $redemption->update(['redeemed_at' => now()]);
 
         return response()->json([
             'success' => true,
-            'item_name' => $redemption->inventory?->name,
-            'user_name' => $redemption->user?->name,
-            'redeemed_at' => $redemption->redeemed_at,
+            'item_name' => $redemption->inventory->name,
+            'user_name' => $redemption->user->name
         ]);
-    }
-
-    protected function sortAndFilterNearbyItems(Collection $items, mixed $lat, mixed $lng, float $radiusMeters): Collection
-    {
-        if (! is_numeric($lat) || ! is_numeric($lng)) {
-            return $items->map(function (MerchantInventory $item) {
-                $merchant = $item->merchant;
-
-                return [
-                    ...$item->toArray(),
-                    'merchant' => $merchant?->toArray(),
-                    'distance_m' => null,
-                    'lat' => $merchant?->latitude,
-                    'lng' => $merchant?->longitude,
-                ];
-            });
-        }
-
-        $latitude = (float) $lat;
-        $longitude = (float) $lng;
-
-        return $items
-            ->map(function (MerchantInventory $item) use ($latitude, $longitude, $radiusMeters) {
-                $merchant = $item->merchant;
-                $merchantLat = (float) $merchant->latitude;
-                $merchantLng = (float) $merchant->longitude;
-                $distance = $this->distanceMeters($latitude, $longitude, $merchantLat, $merchantLng);
-                $trust = $this->merchantTrustService->calculate($merchant);
-                $proximityScore = max(0, 100 * (1 - min($distance, $radiusMeters) / max($radiusMeters, 1)));
-                $rankingScore = round(($trust['trust_score'] * 0.65) + ($proximityScore * 0.35), 1);
-
-                return [
-                    ...$item->toArray(),
-                    'merchant' => [
-                        ...$merchant?->toArray(),
-                        ...$trust,
-                    ],
-                    'distance_m' => round($distance, 1),
-                    'lat' => $merchantLat,
-                    'lng' => $merchantLng,
-                    'trust_score' => $trust['trust_score'],
-                    'trust_tier' => $trust['trust_tier'],
-                    'ranking_score' => $rankingScore,
-                ];
-            })
-            ->filter(fn (array $item) => $item['distance_m'] <= $radiusMeters)
-            ->sortByDesc('ranking_score')
-            ->values();
-    }
-
-    protected function distanceMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
-    {
-        $earthRadius = 6371000;
-
-        $latFrom = deg2rad($lat1);
-        $lonFrom = deg2rad($lng1);
-        $latTo = deg2rad($lat2);
-        $lonTo = deg2rad($lng2);
-
-        $latDelta = $latTo - $latFrom;
-        $lonDelta = $lonTo - $lonFrom;
-
-        $angle = 2 * asin(sqrt(
-            pow(sin($latDelta / 2), 2) +
-            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)
-        ));
-
-        return $angle * $earthRadius;
     }
 }

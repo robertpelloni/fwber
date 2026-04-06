@@ -22,52 +22,13 @@ export interface KeyPairStorage {
 
 let dbInstance: IDBDatabase | null = null;
 
-function createStorageUnavailableError(reason = 'E2E key storage is unavailable in this browser context'): Error {
-  const error = new Error(reason);
-  error.name = 'StorageUnavailableError';
-  return error;
-}
-
-export function isStorageUnavailableError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  return error.name === 'StorageUnavailableError'
-    || /access to storage is not allowed/i.test(error.message)
-    || /indexeddb/i.test(error.message);
-}
-
-export function isIndexedDBUsable(): boolean {
-  if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
-    return false;
-  }
-
-  try {
-    return typeof indexedDB.open === 'function';
-  } catch {
-    return false;
-  }
-}
-
 async function openDatabase(): Promise<IDBDatabase> {
   if (dbInstance) return dbInstance;
 
-  if (!isIndexedDBUsable()) {
-    throw createStorageUnavailableError();
-  }
-
   return new Promise((resolve, reject) => {
-    let request: IDBOpenDBRequest;
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    try {
-      request = indexedDB.open(DB_NAME, DB_VERSION);
-    } catch (error) {
-      reject(createStorageUnavailableError(error instanceof Error ? error.message : undefined));
-      return;
-    }
-
-    request.onerror = () => reject(createStorageUnavailableError(request.error?.message || 'Failed to open E2E database'));
+    request.onerror = () => reject(new Error('Failed to open E2E database'));
 
     request.onsuccess = () => {
       dbInstance = request.result;

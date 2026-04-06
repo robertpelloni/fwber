@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Security\StoreE2EKeyRequest;
 use App\Models\User;
 use App\Models\UserPublicKey;
-use App\Models\E2EKeyBackup;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Http\Request;
 
 class E2EKeyManagementController extends Controller
 {
@@ -94,55 +92,6 @@ class E2EKeyManagementController extends Controller
             'public_key' => Crypt::decryptString($key->public_key),
             'key_type' => $key->key_type,
             'device_id' => $key->device_id,
-        ]);
-    }
-
-    /**
-     * Store a user-encrypted private key backup.
-     */
-    public function backup(Request $request)
-    {
-        $user = Auth::user();
-        
-        $validated = $request->validate([
-            'key_type' => 'required|string|in:ecdh,rsa',
-            'encrypted_private_key' => 'required|string',
-            'salt' => 'required|string',
-            'iv' => 'required|string',
-        ]);
-
-        E2EKeyBackup::updateOrCreate(
-            ['user_id' => $user->id, 'key_type' => $validated['key_type']],
-            [
-                'encrypted_private_key' => $validated['encrypted_private_key'],
-                'salt' => $validated['salt'],
-                'iv' => $validated['iv'],
-            ]
-        );
-
-        return response()->json(['message' => 'Key backup stored successfully.']);
-    }
-
-    /**
-     * Retrieve a user-encrypted private key backup.
-     */
-    public function restore(Request $request)
-    {
-        $user = Auth::user();
-        $keyType = $request->query('key_type', 'ecdh');
-
-        $backup = E2EKeyBackup::where('user_id', $user->id)
-            ->where('key_type', $keyType)
-            ->first();
-
-        if (!$backup) {
-            return response()->json(['error' => 'No backup found for this key type.'], 404);
-        }
-
-        return response()->json([
-            'encrypted_private_key' => $backup->encrypted_private_key,
-            'salt' => $backup->salt,
-            'iv' => $backup->iv,
         ]);
     }
 }

@@ -9,9 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushMessage;
-use NotificationChannels\ExpoPushNotifications\ExpoMessage;
-use NotificationChannels\Fcm\FcmMessage;
-use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
 class NewMatchNotification extends Notification implements ShouldQueue
 {
@@ -58,53 +55,7 @@ class NewMatchNotification extends Notification implements ShouldQueue
             ->title('New Match!')
             ->body("You matched with {$this->matchedUser->name}!")
             ->action('View Match', 'view_match')
-            ->data([
-                'url' => '/matches',
-                'type' => 'match',
-                'user_id' => $this->matchedUser->id,
-                'user_name' => $this->matchedUser->name,
-            ]);
-    }
-
-    /**
-     * Get the Expo representation of the notification.
-     */
-    public function toExpoPush($notifiable)
-    {
-        return (new ExpoMessage())
-            ->title('New Match!')
-            ->body("You matched with {$this->matchedUser->name}!")
-            ->data([
-                'url' => '/matches',
-                'type' => 'match',
-                'user_id' => $this->matchedUser->id,
-                'user_name' => $this->matchedUser->name,
-            ])
-            ->priority('high');
-    }
-
-    /**
-     * Get the FCM representation of the notification.
-     */
-    public function toFcm($notifiable): FcmMessage
-    {
-        return (new FcmMessage(notification: new FcmNotification(
-            title: 'New Match!',
-            body: "You matched with {$this->matchedUser->name}!",
-        )))
-            ->data([
-                'url' => '/matches',
-                'type' => 'match',
-                'user_id' => (string) $this->matchedUser->id,
-                'user_name' => $this->matchedUser->name,
-            ])
-            ->custom([
-                'android' => [
-                    'notification' => [
-                        'color' => '#FF1493',
-                    ],
-                ],
-            ]);
+            ->data(['url' => '/matches']);
     }
 
     /**
@@ -115,15 +66,9 @@ class NewMatchNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'match',
-            'title' => 'New Match!',
-            'body' => 'You matched with '.$this->matchedUser->name.'!',
-            'message' => 'You matched with '.$this->matchedUser->name.'!',
-            'url' => '/matches',
-            'user_id' => $this->matchedUser->id,
-            'user_name' => $this->matchedUser->name,
             'matched_user_id' => $this->matchedUser->id,
             'matched_user_name' => $this->matchedUser->name,
+            'message' => 'You matched with '.$this->matchedUser->name.'!',
         ];
     }
 }

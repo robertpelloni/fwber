@@ -74,7 +74,7 @@ export default function NotificationsPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Notifications</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Recovered the full notifications inbox so the bell dropdown’s “view all” action and in-app notification flows land somewhere useful.
+                  Restored the full notifications inbox so the bell dropdown and in-app notification routes land somewhere useful again.
                 </p>
               </div>
               <button

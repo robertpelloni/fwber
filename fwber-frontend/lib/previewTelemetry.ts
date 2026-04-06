@@ -1,5 +1,4 @@
 import { useCallback } from 'react'
-import { safeLocalStorageGet } from '@/lib/browser-storage'
 
 export type PreviewTelemetryEventName =
   | 'face_blur_preview_ready'
@@ -130,7 +129,7 @@ const enqueueEvent = (name: PreviewTelemetryEventName, payload: Record<string, u
 
 const postBatch = async (events: PendingTelemetryEvent[]) => {
   try {
-    const token = safeLocalStorageGet('fwber_token')
+    const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',

@@ -38,7 +38,10 @@ class WebFingerController extends Controller
         }
 
         $username = Str::before(Str::after($resource, 'acct:'), '@');
-        $user = User::query()->where('name', $username)->first();
+        $user = User::query()
+            ->where('name', $username)
+            ->whereHas('profile', fn ($query) => $query->where('is_federated', true))
+            ->first();
 
         if (! $user) {
             return response()
@@ -56,7 +59,7 @@ class WebFingerController extends Controller
                     [
                         'rel' => 'self',
                         'type' => 'application/activity+json',
-                        'href' => url('/api/users/'.$user->id),
+                        'href' => url('/api/federation/users/'.$user->id),
                     ],
                     [
                         'rel' => 'http://nodeinfo.diaspora.software/ns/schema/2.0',

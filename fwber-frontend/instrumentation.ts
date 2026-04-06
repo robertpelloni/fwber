@@ -28,3 +28,4 @@ export async function register() {
  * hook shape expected by the current Sentry Next.js SDK.
  */
 export const onRequestError = Sentry.captureRequestError
+

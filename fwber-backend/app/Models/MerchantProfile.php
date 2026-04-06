@@ -2,37 +2,50 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Compact merchant identity record restored for the marketplace phase.
+ * @property int $id
+ * @property int $user_id
+ * @property string $business_name
+ * @property string|null $description
+ * @property string $category
+ * @property string|null $address
+ * @property string $verification_status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions
+ * @property-read int|null $promotions_count
+ * @property-read \App\Models\User $user
  *
- * We keep merchant data intentionally lean: a merchant belongs to one user, can
- * expose inventory, and can accumulate payment/redemption analytics. This lets
- * us restore storefronts and local commerce without reviving the entire older
- * promotion economy in one risky sweep.
+ * @method static \Database\Factories\MerchantProfileFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereBusinessName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereCategory($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MerchantProfile whereVerificationStatus($value)
+ *
+ * @mixin \Eloquent
  */
 class MerchantProfile extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'business_name',
         'description',
         'category',
         'address',
-        'location_name',
-        'latitude',
-        'longitude',
         'verification_status',
-        'verification_notes',
-        'verified_at',
-        'verified_by',
-    ];
-
-    protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float',
-        'verified_at' => 'datetime',
     ];
 
     public function user()
@@ -40,18 +53,13 @@ class MerchantProfile extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class, 'merchant_id');
+    }
+
     public function inventories()
     {
         return $this->hasMany(MerchantInventory::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(MerchantPayment::class);
-    }
-
-    public function verifier()
-    {
-        return $this->belongsTo(User::class, 'verified_by');
     }
 }

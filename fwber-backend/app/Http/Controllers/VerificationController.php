@@ -94,7 +94,7 @@ class VerificationController extends Controller
 
             // Compare faces
             try {
-                $similarity = $this->mediaAnalysis->compareFaces($path, $primaryPhoto->storage_path);
+                $similarity = $this->mediaAnalysis->compareFaces($path, $primaryPhoto->file_path);
             } catch (\Exception $e) {
                 // Clean up on error
                 Storage::disk('public')->delete($path);

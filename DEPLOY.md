@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
 > **Last Updated:** 2026-04-05
-> **Version:** 1.9.8
+> **Version:** 1.6.8
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -170,25 +170,6 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 - shared log write access on Hetzner is now handled via ACLs on `storage/logs` rather than Monolog chmod attempts, preventing deploy-time artisan failures against rotated `www-data` log files
 - the dedicated frontend GitHub build now targets Node.js 24 so CI uses the same runtime family as the locally verified lockfile/build flow
 - public discovery routes like `/nodeinfo/2.0` must also be guarded against optional federation-era schema drift, even when federation is not the active feature focus
-- the dedicated frontend build workflow now uses `npm install --no-fund --no-audit` because optional/platform-sensitive packages were still causing `npm ci` to reject otherwise locally validated builds
-- the signed-in shell now has real `/activity`, `/notifications`, `/friends`, and `/settings/travel` pages again, reducing dead frontend links during production validation
-- live Hetzner repo ownership drift can still break deploys even when workflow logic is correct; keeping the checkout owned by `deploy` is now part of the practical runtime contract
-- the signed-in product shell now also includes restored `/wallet`, `/events`, `/friends`, `/activity`, `/notifications`, and `/settings/travel` routes, plus refreshed referral/vouch flows and video-chat backend endpoints, so post-deploy validation should exercise those features with a real session
-- the Hetzner backend deploy script now prefers a root-owned nginx sync helper on the live server, allowing GitHub deploys to refresh tracked nginx configs without requiring blanket passwordless sudo for raw filesystem writes
-- the websocket smoke probe is now bounded by a timeout, public roast preview generation has been hardened, the roast endpoint is warmed once before the asserted smoke call, and the roast smoke assertion is warning-level rather than deploy-blocking while this transient preview issue is still under investigation
-- post-deploy manual verification should now also exercise the restored gifts contract (`/api/gifts`, `/api/gifts/send`, `/api/gifts/received`, `/wallet?tab=gifts`) because gift UI and notification routes are live again
-- post-deploy manual verification should now also exercise the restored boosts contract (`/api/boosts/purchase`, `/api/boosts/active`, `/api/boosts/history`, `/matches` boost CTA) because the live matches UI now exposes boost purchases again
-- post-deploy manual verification should now also exercise the restored unlock contract (`/api/content-unlocks`, `/api/matches/{id}/insights`, `/api/matches/{id}/insights/unlock`, locked private photo reveals on public profiles) because token-gated unlock surfaces are live again
-- post-deploy manual verification should now also exercise premium discovery filtering (`/api/matches` with advanced + premium params, profile persistence for diet/politics/religion, 402 gating when balance is below threshold) because the active discovery UI depends on these contracts again
-- the new broad restoration strategy now uses `restore/pre-simplification-hetzner` as the full-feature rewind branch, but Hetzner deployment topology and smoke/verify contracts remain the production truth that any restored branch must preserve
-- first replay proof is now complete on the restore branch: Hetzner deployment docs and Hetzner ops templates/frontend env alignment were successfully cherry-picked and pushed there, establishing the branch as an active integration track rather than a dormant snapshot
-- the restore branch now also carries replayed GitHub deployment/workflow modernization so CI and deploy behavior can converge toward the current Hetzner production contract earlier in the rewind process
-- the restore branch additionally now carries deployment health endpoints, smoke-check/report tooling, ACL/logging changes, and nginx/deploy hardening, making it much closer to the current Hetzner runtime contract than the raw pre-simplification baseline
-- the restore branch now also carries root-route, nodeinfo, and match-table drift recovery work, which is important because those were real Hetzner/runtime stability fixes on `main` that the full-feature branch also needs
-- the restore branch has now entered a direct-compatibility-fix phase as well, with local fixes for event-store/event-bus drift, missing frontend primitives, and restored messaging/WebFinger contracts layered on top of the replayed Hetzner contract
-- the Hetzner deploy script now re-syncs the tracked nginx configs for `api.fwber.me`, `ws.fwber.me`, `geo.fwber.me`, and `mercure.fwber.me` before nginx validation/reload so repo truth is re-applied during deploys
-- the Hetzner smoke-check script now normalizes the backend base URL to the `/api` contract and auto-discovers the Reverb app key from Laravel config when possible, making websocket verification less dependent on perfect operator-provided env
-- `mercure.fwber.me` is now treated as a retired surface in the tracked Hetzner nginx config instead of proxying to a dead upstream and returning misleading `502` errors
 - `HETZNER_HOST`
 - `HETZNER_USERNAME`
 - `HETZNER_SSH_KEY`
@@ -198,18 +179,6 @@ GitHub Actions backend deployment should now target Hetzner as well, using `.git
 
 ```bash
 FWBER_RUN_SMOKE_CHECK=1 /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend.sh
-```
-
-That path now performs a more trustworthy verification pass by:
-- using the canonical `https://api.fwber.me/api` base automatically
-- reloading tracked nginx site configs before testing
-- attempting a real websocket upgrade probe using the configured Reverb app key when available
-- keeping retired surfaces like `mercure.fwber.me` out of the healthy production contract instead of silently proxying to dead local ports
-
-A recent live Hetzner run completed with:
-
-```bash
-passes=9 warnings=3 failures=0
 ```
 
 That path now writes timestamped smoke-check reports under:

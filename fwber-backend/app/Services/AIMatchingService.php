@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Block;
 use App\Models\DateFeedback;
 use App\Models\Group;
 use App\Models\Journal;
@@ -15,7 +14,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class AIMatchingService
 {
@@ -77,17 +75,9 @@ class AIMatchingService
                 }
 
                 // 3. Hydrate Candidates
-                // Block relationships are hard safety exclusions, not ranking hints.
-                // We remove them before any scoring so a blocked account can never
-                // bubble back into discovery through AI/vector recall.
-                $blockedUserIds = Block::relatedBlockedUserIds($user->id);
-
                 $candidates = User::whereIn('id', $candidateIds)
                     ->whereKeyNot($user->id) // Exclude self
-                    ->when($blockedUserIds !== [], function ($query) use ($blockedUserIds) {
-                        $query->whereNotIn('id', $blockedUserIds);
-                    })
-                    ->with(['profile'])
+                    ->with(['profile', 'followedTopics:id,slug,label,emoji,aliases'])
                     ->get();
 
                 // 4. Apply Hard Filters (Distance, Age, Gender) & Heuristic Scoring
@@ -213,14 +203,9 @@ class AIMatchingService
         $query = User::query()
             ->whereKeyNot($user->id)
             ->whereHas('profile')
-            ->with(['profile']);
+            ->with(['profile', 'followedTopics:id,slug,label,emoji,aliases']);
 
         $normalizedInterestFilters = $this->normalizeInterestValues($filters['interests'] ?? []);
-        $blockedUserIds = Block::relatedBlockedUserIds($user->id);
-
-        if ($blockedUserIds !== []) {
-            $query->whereNotIn('id', $blockedUserIds);
-        }
 
         // Determine effective location for the current user
         $myLat = $userProfile->is_travel_mode ? $userProfile->travel_latitude : $userProfile->latitude;
@@ -838,13 +823,6 @@ class AIMatchingService
     {
         $modifier = 0;
 
-        // The simplified core product no longer guarantees legacy post-date feedback tables.
-        // Guarding here keeps the match feed alive in fresh installs and SQLite tests while
-        // still allowing the modifier to work automatically if that table ever exists.
-        if (! Schema::hasTable('date_feedback')) {
-            return 0;
-        }
-
         // Fetch user's historical date feedback
         $feedbacks = DateFeedback::where('reporting_user_id', $user->id)
             ->with('subject.profile')
@@ -1085,20 +1063,16 @@ class AIMatchingService
             return 0;
         }
 
-        // The simplified product no longer depends on legacy topic/group/journal scene graphs.
-        // For the active app we derive "scene affinity" purely from explicit shared interests,
-        // which keeps discovery resilient even after the broader social graph was archived.
-        $sharedInterests = $this->getSharedInterests($user->profile, $candidate->profile, 10);
+        $sharedTopics = $this->getSharedFollowedTopics($user, $candidate, 10);
+        $sharedSceneTags = array_intersect(
+            $this->getViewerSceneTags($user),
+            $this->getCandidateSceneTags($candidate)
+        );
 
-        if ($sharedInterests === []) {
-            return 0;
-        }
+        $topicScore = min(60, count($sharedTopics) * 25);
+        $tagScore = min(40, count($sharedSceneTags) * 8);
 
-        $viewerInterestCount = max(1, count($this->normalizeInterestValues($user->profile->interests ?? [])));
-        $candidateInterestCount = max(1, count($this->normalizeInterestValues($candidate->profile->interests ?? [])));
-        $overlapRatio = count($sharedInterests) / max($viewerInterestCount, $candidateInterestCount);
-
-        return min(100, $overlapRatio * 100);
+        return min(100, $topicScore + $tagScore);
     }
 
     /**
@@ -1413,7 +1387,7 @@ class AIMatchingService
         // Calculate relative weights
         $likes = $actionCounts['like'] ?? 1;
         $superLikes = $actionCounts['super_like'] ?? 1;
-        $matches = DB::table('user_matches')->where('created_at', '>=', now()->subDays(30))->count() ?: 1;
+        $matches = DB::table('matches')->where('created_at', '>=', now()->subDays(30))->count() ?: 1;
 
         // Simple probability heuristic: how indicative is an action of a match?
         $likeWeight = min(0.5, ($matches / $likes) * 1.5);

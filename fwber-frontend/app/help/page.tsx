@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import {
-  CircleHelp,
+  HelpCircle,
   Shield,
+  Wallet,
   Heart,
   MessageSquare,
   Users,
@@ -12,6 +13,7 @@ import {
   Sparkles,
   Search,
   BookOpen,
+  Bot,
   Eye,
   Lock
 } from 'lucide-react'
@@ -31,6 +33,18 @@ const HELP_CATEGORIES = [
     ]
   },
   {
+    id: 'wallet-crypto',
+    title: 'Wallet & Crypto',
+    description: 'Learn about FWB tokens, Solana integration, and how to manage your funds.',
+    icon: Wallet,
+    articles: [
+      { title: 'How FWB Tokens work', slug: 'fwb-tokens' },
+      { title: 'Depositing from Solana', slug: 'deposits' },
+      { title: 'Withdrawing funds', slug: 'withdrawals' },
+      { title: 'Internal Ledger vs On-Chain', slug: 'ledger-vs-chain' },
+    ]
+  },
+  {
     id: 'safety-privacy',
     title: 'Safety & Privacy',
     description: 'Your safety is our priority. Learn about our privacy features and moderation.',
@@ -44,11 +58,25 @@ const HELP_CATEGORIES = [
   {
     id: 'features',
     title: 'Platform Features',
-    description: 'Deep dive into Matches and Proximity features.',
+    description: 'Deep dive into Matches, Chat, Groups, and Proximity features.',
     icon: BookOpen,
     articles: [
       { title: 'How Matching works', slug: 'matching' },
-      { title: 'Finding people nearby', slug: 'proximity-guide' },
+      { title: 'Proximity Chatrooms', slug: 'chatrooms-guide' },
+      { title: 'Creating & Joining Groups', slug: 'groups-guide' },
+      { title: 'Achievements & Rewards', slug: 'achievements-guide' },
+    ]
+  },
+  {
+    id: 'ai-wingman',
+    title: 'AI Wingman & Tools',
+    description: 'Learn how to use AI to generate roasts, check vibes, and get conversation suggestions.',
+    icon: Bot,
+    articles: [
+      { title: 'Cosmic Matches & Fortune', slug: 'cosmic-fortune' },
+      { title: 'Roasts & Hypes', slug: 'roasts-hypes' },
+      { title: 'Conversation Coach', slug: 'conversation-coach' },
+      { title: 'Red & Green Flags', slug: 'vibe-check' },
     ]
   },
   {
@@ -58,6 +86,7 @@ const HELP_CATEGORIES = [
     icon: Eye,
     articles: [
       { title: 'The 5 Privacy Tiers', slug: 'privacy-tiers-guide' },
+      { title: 'Sharing Unlocks', slug: 'sharing-unlocks' },
       { title: 'Managing Face Reveals', slug: 'managing-reveals' },
     ]
   },
@@ -68,6 +97,7 @@ const HELP_CATEGORIES = [
     icon: Lock,
     articles: [
       { title: 'On-Device Encryption', slug: 'on-device-encryption' },
+      { title: 'The Local Vault', slug: 'local-vault' },
       { title: 'Recovering Master Keys', slug: 'key-recovery' },
     ]
   }
@@ -127,7 +157,7 @@ export default function HelpCenter() {
                       href={`/help/${article.slug}`}
                       className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary flex items-center gap-2 group"
                     >
-                      <CircleHelp className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+                      <HelpCircle className="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
                       {article.title}
                     </Link>
                   </li>

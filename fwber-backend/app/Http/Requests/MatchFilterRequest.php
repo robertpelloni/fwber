@@ -31,8 +31,6 @@ class MatchFilterRequest extends FormRequest
             'drinking' => 'nullable|string|in:non-drinker,occasional,regular,social,sober',
             'body_type' => 'nullable|string|in:slim,athletic,average,curvy,plus-size,muscular',
             'height_min' => 'nullable|integer|min:120|max:250',
-            'has_bio' => 'nullable|boolean',
-            'verified_only' => 'nullable|boolean',
             // Premium Filters
             'cannabis' => 'nullable|string|in:non-smoker,occasional,regular',
             'diet' => 'nullable|string|in:omnivore,vegetarian,vegan,keto,paleo,halal,kosher',
@@ -64,8 +62,6 @@ class MatchFilterRequest extends FormRequest
             'body_type.in' => 'Invalid body type value.',
             'height_min.min' => 'Minimum height must be at least 120cm.',
             'height_min.max' => 'Minimum height cannot exceed 250cm.',
-            'has_bio.boolean' => 'Has bio must be true or false.',
-            'verified_only.boolean' => 'Verified only must be true or false.',
         ];
     }
 }

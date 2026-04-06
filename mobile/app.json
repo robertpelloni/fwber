@@ -17,12 +17,6 @@
       "bundleIdentifier": "com.hyperfield.fwber",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "fwber needs access to your location to find nearby matches and venues.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "fwber needs 'Always On' location access to vibrate your phone when a highly compatible match walks past you, even if the app is closed.",
-        "UIBackgroundModes": [
-          "location",
-          "fetch",
-          "remote-notification"
-        ],
         "NFCReaderUsageDescription": "fwber needs access to NFC to verify physical profile exchanges and process tap-to-pay transactions."
       },
       "entitlements": {
@@ -40,30 +34,11 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
-        "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_LOCATION",
         "NFC"
       ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "fwber needs 'Always On' location access to vibrate your phone when a highly compatible match walks past you, even if the app is closed.",
-          "isAndroidBackgroundLocationEnabled": true
-        }
-      ],
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/icon.png",
-          "color": "#ec4899"
-        }
-      ]
-    ]
+    }
   }
 }

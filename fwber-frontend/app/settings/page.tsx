@@ -17,7 +17,7 @@ import {
   BookHeart,
   Eye,
   Palette,
-  CircleHelp,
+  HelpCircle,
   ChevronRight,
   LogOut,
   CreditCard,
@@ -27,10 +27,6 @@ import {
   Download,
   Globe,
   ArrowLeft,
-  Store,
-  Crown,
-  Flame,
-  Gavel,
 } from 'lucide-react';
 
 interface SettingsLinkProps {
@@ -333,45 +329,6 @@ export default function SettingsPage() {
             </div>
           </section>
 
-          {/* Restored Features Section */}
-          <section className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              Restored Features
-            </h2>
-            <div className="space-y-3">
-              <SettingsLink
-                href="/premium"
-                icon={<Crown className="w-5 h-5" />}
-                title="Gold Premium"
-                description="Upgrade, review premium status, and open billing surfaces without hunting for a hidden route"
-                badge="Gold"
-              />
-              <SettingsLink
-                href={user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'}
-                icon={<Store className="w-5 h-5" />}
-                title={user?.role === 'merchant' ? 'Merchant Portal' : 'Become a Merchant'}
-                description={user?.role === 'merchant' ? 'Manage inventory, storefront analytics, trust score, and redemption codes' : 'Open a local storefront and sell redeemable nearby inventory'}
-                badge={user?.role === 'merchant' ? 'Merchant' : 'New'}
-              />
-              <SettingsLink
-                href="/roast"
-                icon={<Flame className="w-5 h-5" />}
-                title="Profile Roast"
-                description="Open the restored AI roast surface for profile feedback, rewrites, and shareable chaos"
-                badge="AI"
-              />
-              {user?.is_moderator && (
-                <SettingsLink
-                  href="/moderation"
-                  icon={<Gavel className="w-5 h-5" />}
-                  title="Moderation Dashboard"
-                  description="Review reports, merchant verification, queue priorities, and trust signals"
-                  badge="Staff"
-                />
-              )}
-            </div>
-          </section>
-
           {/* Privacy & Security Section */}
           <section className="mb-8">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
@@ -430,17 +387,17 @@ export default function SettingsPage() {
                 description="Manage blocked users and privacy settings"
               />
               <SettingsLink
-                href="/premium"
+                href="/settings/privacy"
                 icon={<BookHeart className="w-5 h-5" />}
-                title="Membership Benefits"
-                description="Review what Gold unlocks, including who-likes-you access and billing history"
+                title="Journal Privacy"
+                description="Choose who sees your field notes by default"
               />
               <SettingsLink
-                href="/merchant/register"
+                href="/settings/federation"
                 icon={<Globe className="w-5 h-5" />}
-                title="Local Marketplace"
-                description="Open or browse the nearby merchant storefront experience restored for local commerce"
-                badge="Nearby"
+                title="Global Federation"
+                description="Connect with Mastodon, Threads and the Fediverse"
+                badge="Beta"
               />
               <SettingsButton
                 onClick={exportStatus === 'ready' ? handleDownloadExport : handleExportData}
@@ -501,7 +458,7 @@ export default function SettingsPage() {
             <div className="space-y-3">
               <SettingsLink
                 href="/help"
-                icon={<CircleHelp className="w-5 h-5" />}
+                icon={<HelpCircle className="w-5 h-5" />}
                 title="Help & Support"
                 description="Get help with your account"
               />

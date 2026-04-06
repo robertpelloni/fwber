@@ -2,179 +2,311 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InventoryRedemption;
-use App\Models\MerchantInventory;
-use App\Models\MerchantPayment;
+use App\Http\Requests\Merchant\BrowseDealsRequest;
+use App\Http\Requests\Merchant\RegisterMerchantRequest;
+use App\Http\Requests\Merchant\StorePromotionRequest;
+use App\Http\Requests\Merchant\TrackPromotionRequest;
+use App\Http\Requests\Merchant\UpdateMerchantProfileRequest;
+use App\Http\Requests\Merchant\UpdatePromotionRequest;
 use App\Models\MerchantProfile;
-use App\Models\User;
-use App\Models\UserProfile;
-use App\Services\MerchantTrustService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use App\Models\Promotion;
+use App\Services\DealRankingService;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MerchantController extends Controller
 {
     public function __construct(
-        protected MerchantTrustService $merchantTrustService,
-    ) {}
+        private readonly DealRankingService $dealRankingService,
+    ) {
+    }
 
-    public function register(Request $request): JsonResponse
+    /**
+     * Register the current user as a merchant.
+     */
+    public function register(RegisterMerchantRequest $request)
     {
-        $validated = $request->validate([
-            'business_name' => ['required', 'string', 'max:255'],
-            'category' => ['required', 'string', 'max:100'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'location_name' => ['nullable', 'string', 'max:255'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-        ]);
+        $user = Auth::user();
 
-        $user = $request->user();
-        $locationDefaults = $this->resolveMerchantLocationDefaults($user, $validated);
-
-        $profile = MerchantProfile::updateOrCreate(
-            ['user_id' => $user->id],
-            $validated + $locationDefaults + ['verification_status' => 'pending']
-        );
-
-        if ($user->role !== 'merchant') {
-            $user->forceFill(['role' => 'merchant'])->save();
+        if ($user->role === 'merchant' || $user->merchantProfile) {
+            return response()->json(['message' => 'User is already a merchant.'], 400);
         }
 
+        $validated = $request->validated();
+
+        DB::transaction(function () use ($user, $validated) {
+            // Update user role if not already set (though check above handles it partially)
+            if ($user->role !== 'merchant') {
+                $user->role = 'merchant';
+                $user->save();
+            }
+
+            MerchantProfile::create([
+                'user_id' => $user->id,
+                'business_name' => $validated['business_name'],
+                'description' => $validated['description'] ?? null,
+                'category' => $validated['category'],
+                'address' => $validated['address'] ?? null,
+                'verification_status' => 'pending',
+            ]);
+        });
+
         return response()->json([
-            'message' => 'Merchant profile created successfully',
-            'profile' => $profile,
-            'trust' => $this->merchantTrustService->calculate($profile),
+            'message' => 'Merchant profile created successfully.',
             'user' => $user->fresh()->load('merchantProfile'),
-        ]);
+        ], 201);
     }
 
-    public function profile(Request $request): JsonResponse
+    /**
+     * Get the current user's merchant profile.
+     */
+    public function getProfile()
     {
-        $profile = $request->user()->merchantProfile;
+        $user = Auth::user();
+
+        if (! $user->merchantProfile) {
+            return response()->json(['message' => 'Merchant profile not found.'], 404);
+        }
+
+        return response()->json($user->merchantProfile);
+    }
+
+    /**
+     * Update the merchant profile.
+     */
+    public function updateProfile(UpdateMerchantProfileRequest $request)
+    {
+        $user = Auth::user();
+        $profile = $user->merchantProfile;
 
         if (! $profile) {
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
+        $validated = $request->validated();
+
+        $profile->update($validated);
+
         return response()->json([
+            'message' => 'Merchant profile updated.',
             'profile' => $profile,
-            'trust' => $this->merchantTrustService->calculate($profile),
         ]);
     }
 
-    public function updateProfile(Request $request): JsonResponse
+    /**
+     * Create a new promotion.
+     */
+    public function storePromotion(StorePromotionRequest $request)
     {
-        $profile = $request->user()->merchantProfile;
+        $user = Auth::user();
+        $profile = $user->merchantProfile;
+
+        if (! $profile) {
+            return response()->json(['message' => 'Merchant profile not found.'], 403);
+        }
+
+        // Production Requirement: Merchant must be verified to post promotions
+        if ($profile->verification_status !== 'verified') {
+            return response()->json([
+                'message' => 'Merchant verification required. Please ensure your business details are complete and contact support.',
+                'status' => $profile->verification_status,
+            ], 403);
+        }
+
+        $validated = $request->validated();
+
+        $promotion = $profile->promotions()->create($validated);
+
+        return response()->json([
+            'message' => 'Promotion created successfully.',
+            'promotion' => $promotion,
+        ], 201);
+    }
+
+    /**
+     * List merchant's promotions.
+     */
+    public function getPromotions()
+    {
+        $user = Auth::user();
+        $profile = $user->merchantProfile;
 
         if (! $profile) {
             return response()->json(['message' => 'Merchant profile not found.'], 404);
         }
 
-        $validated = $request->validate([
-            'business_name' => ['sometimes', 'required', 'string', 'max:255'],
-            'category' => ['sometimes', 'required', 'string', 'max:100'],
-            'description' => ['nullable', 'string', 'max:2000'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'location_name' => ['nullable', 'string', 'max:255'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-        ]);
+        $promotions = $profile->promotions()->orderBy('created_at', 'desc')->get();
 
-        $profile->update($validated + $this->resolveMerchantLocationDefaults($request->user(), $validated, false));
-        $freshProfile = $profile->fresh();
+        return response()->json($promotions);
+    }
+
+    /**
+     * Show a single merchant-owned promotion with interaction metrics.
+     */
+    public function showPromotion(int $promotionId)
+    {
+        $promotion = $this->resolveMerchantPromotion($promotionId);
 
         return response()->json([
-            'message' => 'Merchant profile updated successfully',
-            'profile' => $freshProfile,
-            'trust' => $this->merchantTrustService->calculate($freshProfile),
+            'promotion' => $promotion,
+            'metrics' => [
+                'views' => $promotion->views,
+                'clicks' => $promotion->clicks,
+                'redemptions' => $promotion->redemptions,
+                'conversion_rate' => $promotion->views > 0
+                    ? round(($promotion->redemptions / $promotion->views) * 100, 2)
+                    : 0.0,
+            ],
         ]);
     }
 
-    public function dashboard(Request $request): JsonResponse
+    /**
+     * Update a single merchant-owned promotion.
+     */
+    public function updatePromotion(UpdatePromotionRequest $request, int $promotionId)
     {
-        $profile = $request->user()->merchantProfile;
+        $promotion = $this->resolveMerchantPromotion($promotionId);
+        $validated = $request->validated();
 
-        if (! $profile) {
-            return response()->json(['message' => 'Merchant profile not found.'], 404);
+        if (array_key_exists('expires_at', $validated) && ! array_key_exists('starts_at', $validated)) {
+            $request->merge(['starts_at' => $promotion->starts_at?->toDateTimeString()]);
+            $validated = $request->validated();
+            unset($validated['starts_at']);
         }
 
-        $inventoryQuery = MerchantInventory::query()->where('merchant_profile_id', $profile->id);
-        $inventoryIds = $inventoryQuery->pluck('id');
-
-        $stats = [
-            'inventory_count' => (clone $inventoryQuery)->count(),
-            'active_items' => (clone $inventoryQuery)->where('is_available', true)->count(),
-            'total_stock' => (int) (clone $inventoryQuery)->sum('stock_count'),
-            'pending_redemptions' => Schema::hasTable('inventory_redemptions')
-                ? InventoryRedemption::whereIn('merchant_inventory_id', $inventoryIds)->whereNull('redeemed_at')->count()
-                : 0,
-            'redeemed_count' => Schema::hasTable('inventory_redemptions')
-                ? InventoryRedemption::whereIn('merchant_inventory_id', $inventoryIds)->whereNotNull('redeemed_at')->count()
-                : 0,
-            'gross_revenue' => Schema::hasTable('merchant_payments')
-                ? (float) MerchantPayment::where('merchant_profile_id', $profile->id)->where('status', 'succeeded')->sum('amount')
-                : 0,
-        ];
-
-        $recentInventory = MerchantInventory::where('merchant_profile_id', $profile->id)
-            ->latest()
-            ->limit(5)
-            ->get();
-
-        $recentRedemptions = Schema::hasTable('inventory_redemptions')
-            ? InventoryRedemption::with(['inventory', 'user'])
-                ->whereIn('merchant_inventory_id', $inventoryIds)
-                ->latest()
-                ->limit(5)
-                ->get()
-            : collect();
+        $promotion->update($validated);
 
         return response()->json([
-            'profile' => $profile,
-            'trust' => $this->merchantTrustService->calculate($profile),
-            'stats' => $stats,
-            'recent_inventory' => $recentInventory,
-            'recent_redemptions' => $recentRedemptions,
-            'storefront_path' => '/marketplace/'.$profile->id,
+            'message' => 'Promotion updated successfully.',
+            'promotion' => $promotion->fresh(),
         ]);
     }
 
-    protected function resolveMerchantLocationDefaults(User $user, array $validated, bool $fillFromProfileWhenMissing = true): array
+    /**
+     * Deactivate a merchant-owned promotion.
+     */
+    public function destroyPromotion(int $promotionId)
     {
-        $payload = [];
+        $promotion = $this->resolveMerchantPromotion($promotionId);
 
-        if (array_key_exists('latitude', $validated)) {
-            $payload['latitude'] = $validated['latitude'];
-        }
-        if (array_key_exists('longitude', $validated)) {
-            $payload['longitude'] = $validated['longitude'];
-        }
-        if (array_key_exists('location_name', $validated)) {
-            $payload['location_name'] = $validated['location_name'];
+        $promotion->update([
+            'is_active' => false,
+            'expires_at' => now()->lt($promotion->expires_at) ? now() : $promotion->expires_at,
+        ]);
+
+        return response()->json([
+            'message' => 'Promotion deactivated successfully.',
+            'promotion' => $promotion->fresh(),
+        ]);
+    }
+
+    /**
+     * Consumer-facing: Browse active deals/promotions nearby.
+     */
+    public function browseDeals(BrowseDealsRequest $request)
+    {
+        $validated = $request->validated();
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = $validated['radius'] ?? 5000; // 5km default
+        $rankingStrategy = $validated['ranking_strategy'] ?? 'distance';
+        $perPage = $validated['per_page'] ?? 20;
+
+        $query = Promotion::with(['merchant:id,user_id,business_name,category,description,address,verification_status'])
+            ->where('is_active', true)
+            ->where('starts_at', '<=', now())
+            ->where('expires_at', '>', now())
+            ->withinBox($lat, $lng, $radius);
+
+        // Filter by merchant category if provided
+        if (! empty($validated['category'])) {
+            $query->whereHas('merchant', function ($q) use ($validated) {
+                $q->where('category', $validated['category']);
+            });
         }
 
-        if (! $fillFromProfileWhenMissing) {
-            return $payload;
+        // Sort options
+        $sort = $validated['sort'] ?? 'distance';
+        if ($sort === 'newest') {
+            $query->orderByDesc('created_at');
+        } elseif ($sort === 'expiring') {
+            $query->orderBy('expires_at');
+        } elseif ($sort === 'discount') {
+            $query->orderByDesc('discount_value');
+        }
+        // Default: distance-based (withinBox already filters, but we could add raw distance calc)
+
+        $deals = $query->paginate($perPage);
+
+        if ($rankingStrategy === 'trust-aware' && Auth::check()) {
+            $rankedDeals = $this->dealRankingService->rankNearby(
+                Auth::user(),
+                $deals->getCollection(),
+                $lat,
+                $lng
+            );
+
+            $deals->setCollection($rankedDeals);
+            $dealsArray = $deals->toArray();
+
+            return response()->json(array_merge($dealsArray, [
+                'deals' => $dealsArray['data'],
+                'meta' => [
+                    'ranking_strategy' => $this->dealRankingService->buildRankingStrategy(),
+                ],
+            ]));
         }
 
-        $profile = $user->profile;
-        if (! $profile instanceof UserProfile) {
-            return $payload;
+        return response()->json($deals);
+    }
+
+    /**
+     * Get merchant categories for filtering.
+     */
+    public function getCategories()
+    {
+        $categories = MerchantProfile::select('category')
+            ->distinct()
+            ->whereNotNull('category')
+            ->orderBy('category')
+            ->pluck('category');
+
+        return response()->json(['categories' => $categories]);
+    }
+
+    /**
+     * Track promotion interaction (View, Click, Redemption).
+     */
+    public function trackPromotion(TrackPromotionRequest $request, $id)
+    {
+        $promotion = Promotion::findOrFail($id);
+
+        // Record the event
+        \App\Models\PromotionEvent::create([
+            'promotion_id' => $promotion->id,
+            'user_id' => Auth::id(), // Nullable for guests
+            'type' => $request->type,
+            'metadata' => $request->metadata,
+        ]);
+
+        // Update aggregate counters
+        if ($request->type === 'view') {
+            $promotion->increment('views');
+        } elseif ($request->type === 'click') {
+            $promotion->increment('clicks');
+        } elseif ($request->type === 'redemption') {
+            $promotion->increment('redemptions');
         }
 
-        if (! array_key_exists('latitude', $payload)) {
-            $payload['latitude'] = $profile->is_travel_mode ? $profile->travel_latitude : $profile->latitude;
-        }
-        if (! array_key_exists('longitude', $payload)) {
-            $payload['longitude'] = $profile->is_travel_mode ? $profile->travel_longitude : $profile->longitude;
-        }
-        if (! array_key_exists('location_name', $payload)) {
-            $payload['location_name'] = $profile->is_travel_mode ? $profile->travel_location_name : $profile->location_name;
-        }
+        return response()->json(['success' => true]);
+    }
 
-        return $payload;
+    private function resolveMerchantPromotion(int $promotionId): Promotion
+    {
+        $profile = Auth::user()?->merchantProfile;
+
+        abort_if(! $profile, 404, 'Merchant profile not found.');
+
+        return $profile->promotions()->findOrFail($promotionId);
     }
 }

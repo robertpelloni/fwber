@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\DailyActiveUser;
+use App\Services\StreakService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TrackUserActivity
 {
+    protected StreakService $streakService;
+
+    public function __construct(StreakService $streakService)
+    {
+        $this->streakService = $streakService;
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         try {
@@ -26,15 +34,23 @@ class TrackUserActivity
                             'user_id' => $user->id,
                             'date' => $today,
                         ]);
-                    } catch (\Exception $e) {}
+                    } catch (\Exception $e) {
+                        // Ignore if table missing
+                    }
 
-                    // Update Last Active
-                    $user->update(['last_active_at' => now()]);
+                    // Update Streak and Last Active
+                    try {
+                        $this->streakService->updateStreak($user);
+                    } catch (\Exception $e) {
+                        // Ignore if streak service fails
+                    }
 
+                    // Cache for 24 hours
                     Cache::put($cacheKey, true, now()->addDay());
                 }
             }
         } catch (\Throwable $e) {
+            // Fail silently to prevent blocking the request
             \Illuminate\Support\Facades\Log::error('TrackUserActivity error: '.$e->getMessage());
         }
 
