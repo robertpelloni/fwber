@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.8] - 2026-04-06 — Rewind Matching Hub Recovery
+
+### Added
+- Added a new top-level `/matching` page that consolidates recommendations, the matches feed, match dashboard, who-likes-you, profile-view signals, and nearby dating context into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Matching`.
+- Expanded the dashboard restored-sections grid so the core dating funnel is visible alongside support, plans, commerce, economy, identity, operations, connections, studio, scenes, spaces, places, reputation, and other restored product areas.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new matching hub in the route manifest.
+
 ## [1.8.7] - 2026-04-06 — Rewind Support Hub Recovery
 
 ### Added

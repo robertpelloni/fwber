@@ -277,6 +277,13 @@ export default function DashboardPage() {
                       accent="purple"
                     />
                     <FeatureSurfaceCard
+                      href="/matching"
+                      title="Matching & Attraction"
+                      description="Open recommendations, matches, admirers, profile-view intent, and nearby dating signals from one restored hub."
+                      icon={<Heart className="h-5 w-5" />}
+                      accent="pink"
+                    />
+                    <FeatureSurfaceCard
                       href="/support"
                       title="Support & Policies"
                       description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one restored hub."

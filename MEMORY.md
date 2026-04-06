@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.8 the branch needed an explicit matching hub because the core product loop is more important than any supporting system
+- Recommendations, matches, who-likes-you, profile views, and nearby signals all contribute directly to the main dating funnel.
+- Grouping them into one matching destination sharpens the branch around the product’s actual purpose: mutual preference + proximity + conversion.
+- This hub is especially valuable because it recenters the restored branch on the user’s stated core scope rather than only on auxiliary surfaces.
+
 ## 2026-04-06 — v1.8.7 support and policy pages feel much more complete once given a real signed-in landing page
 - Help, contact, privacy, terms, and blocked-user/safety references were all present, but they still felt disconnected from the restored product shell.
 - A support hub rounds out the branch by giving trust-information and policy surfaces the same level of navigational dignity as discovery, economy, identity, and commerce.
