@@ -97,6 +97,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/scenes', label: 'Scenes', icon: Compass },
     { href: '/studio', label: 'Studio', icon: Wand2 },
     { href: '/connections', label: 'Connections', icon: HeartHandshake },
+    { href: '/operations', label: 'Operations', icon: Shield },
     { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },
     { href: '/roast', label: 'Roast', icon: Flame },

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.2] - 2026-04-06 — Rewind Operations Hub Recovery
+
+### Added
+- Added a new top-level `/operations` page that consolidates safety, settings, security, merchant flows, and moderation/travel operational tooling into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Operations`.
+- Expanded the dashboard restored-sections grid so the trust/ops cluster is visible alongside connections, studio, scenes, spaces, places, reputation, unlocks, boosts, gifts, referrals, video, and merchant-era systems.
+
+### Fixed
+- Repaired a dashboard build regression by importing `Shield` for the new trust-and-operations dashboard card after the first local production build exposed the missing symbol during prerender.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new operations hub in the route manifest.
+
 ## [1.8.1] - 2026-04-06 — Rewind Connections Hub Recovery
 
 ### Added

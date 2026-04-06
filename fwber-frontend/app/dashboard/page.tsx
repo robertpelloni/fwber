@@ -23,6 +23,7 @@ import {
   Gift,
   Phone,
   Lock,
+  Shield,
   Share2,
   Radio,
   Map,
@@ -243,6 +244,13 @@ export default function DashboardPage() {
                       title="Connections"
                       description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one restored hub."
                       icon={<HeartHandshake className="h-5 w-5" />}
+                      accent="red"
+                    />
+                    <FeatureSurfaceCard
+                      href="/operations"
+                      title="Trust & Operations"
+                      description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."
+                      icon={<Shield className="h-5 w-5" />}
                       accent="red"
                     />
                     <FeatureSurfaceCard

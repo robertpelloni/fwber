@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.2 trust and control surfaces benefit from the same hub treatment as social and discovery systems
+- Safety, settings, security, merchant, and moderation-adjacent routes felt restored but still operationally scattered before this tranche.
+- A single operations hub improves branch legibility while also helping future testers find the product’s trust-sensitive controls quickly.
+- The first build failure after this tranche was a narrow missing import, which reinforces that the current workflow of build-first validation catches UI integration seams cheaply.
+
 ## 2026-04-06 — v1.8.1 the restored branch benefits from a dedicated direct-social hub once messages and friend systems are alive again
 - Messages, friends, activity, and notifications are individually restored, but they read as a more complete product once grouped into a shared connections destination.
 - This hub is especially valuable because it makes the branch feel socially usable, not just feature-rich.

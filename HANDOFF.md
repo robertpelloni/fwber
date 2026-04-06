@@ -1,115 +1,104 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-06
-> **Version Reached:** 1.8.1
+> **Version Reached:** 1.8.2
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session extended the rewind branch with two more low-risk, high-clarity surface restorations while keeping the branch stable:
-1. confirmed the previous scenes hub tranche stayed fully green in GitHub Actions
-2. restored a new top-level `Studio & AI` hub
-3. immediately followed with a new top-level `Connections` hub
-4. validated frontend production builds after each UI tranche
-5. kept avoiding risky backend changes because recent CI stability is now good enough to prioritize coherent product surfacing
-
-## CI / Stability Findings
-Confirmed at the start of this continuation:
-- `cb2d780c1` — `feat: restore rewind scenes hub (v1.7.9)` finished **green** in both workflows
-  - Backend CI: ✅ success
-  - Frontend Build & Deploy: ✅ success
-
-That means the branch now has a sustained run of fully green rewind tranches:
-- `17ab34090` (`v1.7.7`) ✅ backend + frontend
-- `714af1eb7` (`v1.7.8`) ✅ backend + frontend
-- `cb2d780c1` (`v1.7.9`) ✅ backend + frontend
-
-This streak strongly supports continuing with small, coherent surface recoveries until a concrete backend failure appears again.
-
----
-
-## What Was Added In This Continuation
-### 1. `fwber-frontend/app/studio/page.tsx`
-Added a new top-level `Studio & AI` hub.
-
-It consolidates:
-- `/roast`
-- `/roast-date`
-- `/content-generation`
-- `/wingman`
-- `/bounties`
-- `/analytics`
-
-Associated shell updates:
-- `fwber-frontend/components/AppHeader.tsx`
-- `fwber-frontend/app/dashboard/page.tsx`
-
-Validated with successful frontend production build.
-
-### 2. `fwber-frontend/app/connections/page.tsx`
-Added a new top-level `Connections` hub.
-
-It consolidates:
-- `/messages`
-- `/friends`
-- `/activity`
-- `/notifications`
-- `/matches`
-- `/groups`
-
-Associated shell updates:
-- `fwber-frontend/components/AppHeader.tsx`
-- `fwber-frontend/app/dashboard/page.tsx`
-
-Validated with successful frontend production build.
-
----
-
-## Why These Changes Matter
-The rewind branch is now visibly maturing from “a branch with many resurrected routes” into “a branch with coherent product areas.”
-
-That distinction matters because:
-- it improves perceived completeness without backend risk
-- it makes testing and future UX cleanup easier
-- it reveals which remaining route clusters are still under-surfaced
-- it keeps producing meaningful forward progress even when no urgent CI seam is failing
-
-The hub pattern is now proven across:
-- unlocks
-- spaces
-- places
-- reputation
-- scenes
-- studio
-- connections
-
----
-
-## Validation Performed
-### Build 1
-Executed:
-- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
-
-Result:
-- successful production build
-- route manifest included `/studio`
-
-### Build 2
-Executed again after the next tranche:
-- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
-
-Result:
-- successful production build
-- route manifest included `/connections`
+This continuation extended the rewind branch with another coherent top-level hub while preserving the recent green streak strategy:
+1. checked fresh restore-branch Actions status
+2. confirmed `v1.8.1` had started running while the recent prior tranches remained green
+3. identified the next under-surfaced cluster as the trust / safety / settings / merchant / moderation layer
+4. restored a new top-level `Operations` hub
+5. caught a narrow dashboard import regression during local production build validation and repaired it immediately
+6. reran the production build successfully
 
 No processes were manually killed.
 
 ---
 
+## CI / Stability Findings
+At the start of this continuation:
+- `618734696` — `feat: restore rewind connections hub (v1.8.1)` was **in progress** in both workflows
+  - Backend CI: `https://github.com/robertpelloni/fwber/actions/runs/24020179313`
+  - Frontend Build & Deploy: `https://github.com/robertpelloni/fwber/actions/runs/24020179296`
+
+Already confirmed fully green before this new tranche:
+- `07a8f4699` (`v1.8.0`) ✅ backend + frontend
+- `cb2d780c1` (`v1.7.9`) ✅ backend + frontend
+- `714af1eb7` (`v1.7.8`) ✅ backend + frontend
+- `17ab34090` (`v1.7.7`) ✅ backend + frontend
+
+This still supports the current strategy: keep restoring coherent surface clusters until a concrete backend seam appears.
+
+---
+
+## What Was Added In This Continuation
+### `fwber-frontend/app/operations/page.tsx`
+Added a new top-level `Trust & Operations` hub.
+
+This page consolidates the branch’s control / trust-sensitive surfaces into one destination:
+- `/safety`
+- `/settings`
+- `/settings/security`
+- merchant entry point (`/merchant/dashboard` or `/merchant/register` depending on role)
+- merchant insight entry point (`/merchant/analytics` or `/merchant/vibe` depending on role)
+- moderation / travel control entry point (`/moderation` for moderators, `/settings/travel` otherwise)
+
+### Why this matters
+The rewind branch already had safety, settings, merchant, and moderation-adjacent surfaces alive, but they were still scattered enough to understate how complete the operational layer had become.
+
+This hub makes the branch feel more intentional and more testable by giving trust-sensitive controls a clear home.
+
+---
+
+## Navigation / Dashboard Changes
+### `fwber-frontend/components/AppHeader.tsx`
+Extended restored-features navigation to include:
+- `/operations`
+
+### `fwber-frontend/app/dashboard/page.tsx`
+Added a new restored-sections card for:
+- `Trust & Operations`
+
+---
+
+## Build Validation + Narrow Fix
+### First build result
+Executed:
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
+
+Initial result:
+- build failed while prerendering `/dashboard`
+- explicit error: `ReferenceError: Shield is not defined`
+
+### Root cause
+The new dashboard card used `<Shield ... />` but the symbol had not been added to the `lucide-react` import list in `fwber-frontend/app/dashboard/page.tsx`.
+
+### Fix applied
+Updated:
+- `fwber-frontend/app/dashboard/page.tsx`
+
+Change:
+- added `Shield` to the import list
+
+### Second build result
+Re-ran:
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
+
+Result:
+- successful production build
+- route manifest now includes:
+  - `/operations`
+
+This is a good example of the current workflow working exactly as intended: small surface tranche, immediate build validation, narrow repair, green result.
+
+---
+
 ## Files Changed In This Continuation
 ### Frontend
-- `fwber-frontend/app/studio/page.tsx`
-- `fwber-frontend/app/connections/page.tsx`
+- `fwber-frontend/app/operations/page.tsx`
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
 
@@ -129,18 +118,15 @@ No processes were manually killed.
 ---
 
 ## Git / Release State
-### Already committed/pushed this continuation
-- `07a8f4699` — `feat: restore rewind studio hub (v1.8.0)`
-
-### Current tranche target still to commit/push
-- **Target Version:** `1.8.1`
-- **Recommended Commit Message:** `feat: restore rewind connections hub (v1.8.1)`
+### Current tranche target
+- **Target Version:** `1.8.2`
+- **Recommended Commit Message:** `feat: restore rewind operations hub (v1.8.2)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.1` connections-hub tranche.
-2. Check whether `v1.8.0` Actions have appeared and whether they stay green.
-3. Then watch `v1.8.1` Actions.
-4. Continue surfacing the next coherent remaining cluster unless backend CI presents a new explicit seam.
-5. Keep excluded systems de-emphasized even if dormant pages remain in the rewind snapshot.
+1. Commit and push the `v1.8.2` operations-hub tranche.
+2. Re-check the status of `v1.8.1` once GitHub finishes the pending runs.
+3. Then watch `v1.8.2` Actions.
+4. Continue surfacing any remaining coherent cluster before reaching for risky backend changes.
+5. Keep using build-first validation to catch narrow UI integration seams cheaply.
