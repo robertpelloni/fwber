@@ -1,36 +1,38 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-06
-> **Version Reached:** 1.8.0
+> **Version Reached:** 1.8.1
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session preserved the same high-confidence rewind pattern:
-1. check whether the latest restore tranche stayed green
-2. continue restoring approved removed systems as coherent top-level hubs rather than scattering links across the shell
-3. avoid destabilizing backend contracts unless a failing CI seam explicitly requires it
+This continuation session extended the rewind branch with two more low-risk, high-clarity surface restorations while keeping the branch stable:
+1. confirmed the previous scenes hub tranche stayed fully green in GitHub Actions
+2. restored a new top-level `Studio & AI` hub
+3. immediately followed with a new top-level `Connections` hub
+4. validated frontend production builds after each UI tranche
+5. kept avoiding risky backend changes because recent CI stability is now good enough to prioritize coherent product surfacing
 
 ## CI / Stability Findings
-A major confidence milestone was confirmed at the start of this slice:
+Confirmed at the start of this continuation:
 - `cb2d780c1` — `feat: restore rewind scenes hub (v1.7.9)` finished **green** in both workflows
   - Backend CI: ✅ success
   - Frontend Build & Deploy: ✅ success
 
-This means the branch now has a strong run of recent fully green rewind tranches:
+That means the branch now has a sustained run of fully green rewind tranches:
 - `17ab34090` (`v1.7.7`) ✅ backend + frontend
 - `714af1eb7` (`v1.7.8`) ✅ backend + frontend
 - `cb2d780c1` (`v1.7.9`) ✅ backend + frontend
 
-That sustained result strongly suggests the compatibility-fix strategy is working and that incremental surface restoration is no longer destabilizing the branch.
+This streak strongly supports continuing with small, coherent surface recoveries until a concrete backend failure appears again.
 
 ---
 
-## What Was Added In This Slice
-### `fwber-frontend/app/studio/page.tsx`
+## What Was Added In This Continuation
+### 1. `fwber-frontend/app/studio/page.tsx`
 Added a new top-level `Studio & AI` hub.
 
-This page consolidates the broader creative / AI / viral tooling cluster into one intentional destination:
+It consolidates:
 - `/roast`
 - `/roast-date`
 - `/content-generation`
@@ -38,51 +40,76 @@ This page consolidates the broader creative / AI / viral tooling cluster into on
 - `/bounties`
 - `/analytics`
 
-### Why this matters
-The rewind branch already had a surprisingly rich set of AI and playful content tools, but they were still hidden across disconnected routes.
+Associated shell updates:
+- `fwber-frontend/components/AppHeader.tsx`
+- `fwber-frontend/app/dashboard/page.tsx`
 
-The new studio hub turns that cluster into a legible product area instead of an accidental collection of leftovers from the fuller snapshot.
+Validated with successful frontend production build.
+
+### 2. `fwber-frontend/app/connections/page.tsx`
+Added a new top-level `Connections` hub.
+
+It consolidates:
+- `/messages`
+- `/friends`
+- `/activity`
+- `/notifications`
+- `/matches`
+- `/groups`
+
+Associated shell updates:
+- `fwber-frontend/components/AppHeader.tsx`
+- `fwber-frontend/app/dashboard/page.tsx`
+
+Validated with successful frontend production build.
 
 ---
 
-## Navigation / Dashboard Changes
-### `fwber-frontend/components/AppHeader.tsx`
-Extended restored-features navigation to include:
-- `/studio`
+## Why These Changes Matter
+The rewind branch is now visibly maturing from “a branch with many resurrected routes” into “a branch with coherent product areas.”
 
-### `fwber-frontend/app/dashboard/page.tsx`
-Added a new restored-sections card for:
-- `Studio & AI`
+That distinction matters because:
+- it improves perceived completeness without backend risk
+- it makes testing and future UX cleanup easier
+- it reveals which remaining route clusters are still under-surfaced
+- it keeps producing meaningful forward progress even when no urgent CI seam is failing
 
-This keeps following the same proven restore pattern used for:
-- activity / notifications
-- boosts / gifts / referrals / video
+The hub pattern is now proven across:
 - unlocks
 - spaces
 - places
 - reputation
 - scenes
-- now studio
+- studio
+- connections
 
 ---
 
 ## Validation Performed
-### Restore-branch frontend build
+### Build 1
 Executed:
 - `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
 
 Result:
 - successful production build
-- route manifest now includes:
-  - `/studio`
+- route manifest included `/studio`
 
-This keeps the rewind branch’s frontend signal strong while recent backend CI results remain green.
+### Build 2
+Executed again after the next tranche:
+- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
+
+Result:
+- successful production build
+- route manifest included `/connections`
+
+No processes were manually killed.
 
 ---
 
-## Files Changed This Slice
+## Files Changed In This Continuation
 ### Frontend
 - `fwber-frontend/app/studio/page.tsx`
+- `fwber-frontend/app/connections/page.tsx`
 - `fwber-frontend/components/AppHeader.tsx`
 - `fwber-frontend/app/dashboard/page.tsx`
 
@@ -101,18 +128,19 @@ This keeps the rewind branch’s frontend signal strong while recent backend CI 
 
 ---
 
-## Git / Release
-### Current tranche target
-- **Target Version:** `1.8.0`
-- **Recommended Commit Message:** `feat: restore rewind studio hub (v1.8.0)`
+## Git / Release State
+### Already committed/pushed this continuation
+- `07a8f4699` — `feat: restore rewind studio hub (v1.8.0)`
+
+### Current tranche target still to commit/push
+- **Target Version:** `1.8.1`
+- **Recommended Commit Message:** `feat: restore rewind connections hub (v1.8.1)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.0` studio-hub tranche.
-2. Watch the fresh backend/frontend Actions runs for that commit.
-3. If green again, continue restoring the next coherent top-level cluster instead of chasing low-value scattered links.
-4. If a backend CI failure reappears, patch only the next explicit seam.
-5. Keep excluded systems de-emphasized even if old pages remain present in the rewind snapshot.
-
-No processes were manually killed.
+1. Commit and push the `v1.8.1` connections-hub tranche.
+2. Check whether `v1.8.0` Actions have appeared and whether they stay green.
+3. Then watch `v1.8.1` Actions.
+4. Continue surfacing the next coherent remaining cluster unless backend CI presents a new explicit seam.
+5. Keep excluded systems de-emphasized even if dormant pages remain in the rewind snapshot.

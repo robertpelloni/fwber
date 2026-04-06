@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.1] - 2026-04-06 — Rewind Connections Hub Recovery
+
+### Added
+- Added a new top-level `/connections` page that consolidates messages, friends, activity, notifications, matches, and group-adjacent social flows into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Connections`.
+- Expanded the dashboard restored-sections grid so the direct-social cluster is visible alongside studio, scenes, spaces, places, reputation, unlocks, boosts, gifts, referrals, video, and merchant-era systems.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new connections hub in the route manifest.
+
 ## [1.8.0] - 2026-04-06 — Rewind Studio Hub Recovery
 
 ### Added

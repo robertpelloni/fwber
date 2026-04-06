@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.0
+> **Version:** 1.8.1
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Connections Hub Recovery**: Added a new `/connections` hub and surfaced messages, friends, activity, notifications, matches, and groups from one coherent restored destination.
 - [x] **Rewind Studio Hub Recovery**: Added a new `/studio` hub and surfaced roast, roast-date, content generation, wingman, bounties, and analytics from one coherent restored destination.
 - [x] **Rewind Scenes Hub Recovery**: Added a new `/scenes` hub and surfaced recommendations, groups, topics, matches, match dashboard, and leaderboard-style discovery from one coherent restored destination.
 - [x] **Rewind Reputation Hub Recovery**: Added a new `/reputation` hub and surfaced achievements, leaderboard, profile views, verification, and adjacent trust signals from one coherent restored destination.

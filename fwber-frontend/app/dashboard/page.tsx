@@ -29,6 +29,7 @@ import {
   Award,
   Compass,
   Wand2,
+  HeartHandshake,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -236,6 +237,13 @@ export default function DashboardPage() {
                       description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one restored hub."
                       icon={<Wand2 className="h-5 w-5" />}
                       accent="pink"
+                    />
+                    <FeatureSurfaceCard
+                      href="/connections"
+                      title="Connections"
+                      description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one restored hub."
+                      icon={<HeartHandshake className="h-5 w-5" />}
+                      accent="red"
                     />
                     <FeatureSurfaceCard
                       href="/reputation"

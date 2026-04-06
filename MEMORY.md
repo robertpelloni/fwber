@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.1 the restored branch benefits from a dedicated direct-social hub once messages and friend systems are alive again
+- Messages, friends, activity, and notifications are individually restored, but they read as a more complete product once grouped into a shared connections destination.
+- This hub is especially valuable because it makes the branch feel socially usable, not just feature-rich.
+- Continuing to use low-risk hub pages is still the safest way to expand perceived completeness while backend CI remains healthy.
+
 ## 2026-04-06 — v1.8.0 AI and viral tooling become much easier to reason about once treated as a single studio surface
 - Roast, roast-date, wingman, content generation, and bounties all read like part of the same playful growth/creator zone once exposed together.
 - This hub adds meaningful product legibility without needing any risky backend changes, which fits the current rewind strategy extremely well.

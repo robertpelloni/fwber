@@ -1,19 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.8.0 (Rewind Studio Hub Recovery)
+# PROJECT_STATUS.md - fwber v1.8.1 (Rewind Connections Hub Recovery)
 
 **Date:** 2026-04-06
-**Version:** 1.8.0 "Rewind Studio Hub Recovery"
-**Status:** ✅ **RESTORE BRANCH NOW EXPOSES THE AI / CREATIVE / VIRAL TOOLING AS A COHERENT TOP-LEVEL DESTINATION**
+**Version:** 1.8.1 "Rewind Connections Hub Recovery"
+**Status:** ✅ **RESTORE BRANCH NOW EXPOSES THE DIRECT-SOCIAL / RELATIONSHIP LAYER AS A COHERENT TOP-LEVEL DESTINATION**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release continued the top-level restoration strategy by grouping the AI, content, and playful viral surfaces into one dedicated hub.
+This release continued the hub-restoration strategy by grouping the people/network layer into one dedicated destination.
 
 Delivered:
-- added a dedicated `/studio` page
-- surfaced roast, roast-date, AI content generation, wingman, bounties, and analytics from one coherent destination
-- expanded navigation and dashboard cards so the creative/AI cluster is clearly reachable from the signed-in shell
-- verified that the previous `v1.7.9` scenes tranche completed green in GitHub Actions for both backend and frontend workflows
+- added a dedicated `/connections` page
+- surfaced messages, friends, activity, notifications, matches, and groups from one coherent social destination
+- expanded navigation and dashboard cards so the branch’s direct-social flows are easy to reach from the signed-in shell
+- preserved the branch’s frontend build health while the backend CI streak from recent tranches remains intact
 
 ## ✅ Why This Matters
-The rewind branch already contained a surprisingly rich AI/creative layer, but it was still fragmented enough to feel half-hidden. The studio hub turns that layer into an intentional product area while preserving the strong green CI/build trend that is making the restore branch increasingly credible as a deployable broad-surface candidate.
+The rewind branch already had the major one-to-one and social-routing pages restored, but they still felt fragmented. The new connections hub makes the relationship layer readable and intentional, which is exactly the kind of UX coherence needed before any broader branch promotion or Hetzner-facing reconciliation work.
