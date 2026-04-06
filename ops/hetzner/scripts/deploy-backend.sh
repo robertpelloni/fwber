@@ -4,7 +4,7 @@ set -euo pipefail
 # Zero-surprise deployment script for the Hetzner-hosted backend stack.
 #
 # It updates code, installs optimized PHP dependencies, runs safe migrations,
-# rebuilds the Rust geo service, and restarts the managed runtime services.
+# Rebuilds the Rust geo service and restarts the managed runtime services.
 
 REPO_ROOT="/var/www/fwber/repo"
 BACKEND_DIR="$REPO_ROOT/fwber-backend"
