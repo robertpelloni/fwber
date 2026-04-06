@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.7] - 2026-04-06 — Rewind Support Hub Recovery
+
+### Added
+- Added a new top-level `/support` page that consolidates help, support contact, privacy policy, terms of service, safety resources, and blocked-user controls into one restored destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Support`.
+- Expanded the dashboard restored-sections grid so help, policy, and user-protection resources are visible alongside plans, commerce, economy, identity, operations, connections, studio, scenes, spaces, places, and other restored product areas.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with the new support hub in the route manifest.
+
 ## [1.8.6] - 2026-04-06 — Rewind Plans Hub Recovery
 
 ### Added

@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.8.7 support and policy pages feel much more complete once given a real signed-in landing page
+- Help, contact, privacy, terms, and blocked-user/safety references were all present, but they still felt disconnected from the restored product shell.
+- A support hub rounds out the branch by giving trust-information and policy surfaces the same level of navigational dignity as discovery, economy, identity, and commerce.
+- This kind of tranche meaningfully improves perceived completeness even though it does not require any backend work.
+
 ## 2026-04-06 — v1.8.6 the branch now benefits from a dedicated plans hub because dating value includes execution, not just discovery
 - Events, nearby, venues, deals, and date planning collectively represent the real-world follow-through layer of the product.
 - Grouping them under one plans/meetups destination improves the product story: match -> plan -> meet.

@@ -101,6 +101,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/economy', label: 'Economy', icon: Wallet },
     { href: '/commerce', label: 'Commerce', icon: Store },
     { href: '/plans', label: 'Plans', icon: Calendar },
+    { href: '/support', label: 'Support', icon: CircleHelp },
     { href: '/operations', label: 'Operations', icon: Shield },
     { href: '/reputation', label: 'Reputation', icon: Award },
     { href: '/unlocks', label: 'Unlocks', icon: Lock },

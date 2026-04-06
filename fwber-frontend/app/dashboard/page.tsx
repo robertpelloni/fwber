@@ -25,6 +25,7 @@ import {
   Phone,
   Lock,
   Shield,
+  CircleHelp,
   Share2,
   Radio,
   Map,
@@ -274,6 +275,13 @@ export default function DashboardPage() {
                       description="Open events, date planning, nearby discovery, venues, and deals from one restored local outing hub."
                       icon={<Calendar className="h-5 w-5" />}
                       accent="purple"
+                    />
+                    <FeatureSurfaceCard
+                      href="/support"
+                      title="Support & Policies"
+                      description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one restored hub."
+                      icon={<CircleHelp className="h-5 w-5" />}
+                      accent="blue"
                     />
                     <FeatureSurfaceCard
                       href="/operations"
