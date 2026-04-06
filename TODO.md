@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.7.5
+> **Version:** 1.7.6
 > **Last Updated:** 2026-04-05
 
 ---
@@ -18,6 +18,7 @@
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 
 ## ✅ Recently Completed
+- [x] **Rewind Avatar Prompt Interest Label Fix**: Title-cased normalized interest labels in avatar prompt generation so the restore branch better matches the richer avatar-generation test contract.
 - [x] **Rewind Live-Spaces Hub Recovery**: Added a new top-level `/spaces` hub and surfaced chatrooms, audio rooms, bulletin boards, local pulse, conference pulse, burner bridge, and proximity chatrooms from one coherent restored destination.
 - [x] **Rewind Avatar Prompt Relation Refresh Fix**: Patched restore-branch avatar prompt generation to query the latest profile row directly, targeting the remaining explicit avatar-generation backend CI failure.
 - [x] **Rewind Unlock Hub + Paywall Surface Navigation Recovery**: Added a new top-level `/unlocks` page and surfaced premium unlocks, who-likes-you, share unlocks, and photo reveals through the dashboard + restored-features navigation.

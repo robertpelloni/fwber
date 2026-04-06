@@ -529,7 +529,10 @@ class AvatarGenerationService
         // Background context from interests
         $interests = $get('interests');
         if (! empty($interests) && is_array($interests)) {
-            $mainInterest = $interests[0];
+            // UserProfile normalizes interests to lowercase for matching, but the
+            // richer rewind avatar tests and prompt quality both expect a more
+            // human-readable themed label here.
+            $mainInterest = Str::title((string) $interests[0]);
             $parts[] = $mainInterest.' background theme';
         }
 

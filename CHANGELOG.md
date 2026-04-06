@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.6] - 2026-04-06 — Rewind Avatar Prompt Interest Label Fix
+
+### Fixed
+- Normalized rewind avatar prompt background-interest wording back to a human-readable title-cased label instead of leaking lowercased matching-normalization values into the prompt.
+- This specifically targets the remaining avatar-generation test expectation for `Gaming background theme` on the restore branch.
+- The fix is runtime-safe for Hetzner because it only changes prompt text quality, not request routing or deployment behavior.
+
 ## [1.7.5] - 2026-04-06 — Rewind Live-Spaces Hub Recovery
 
 ### Added

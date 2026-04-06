@@ -1,120 +1,97 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-06
-> **Version Reached:** 1.7.5
+> **Version Reached:** 1.7.6
 > **Current Model:** GPT
 > **Branch:** `restore/pre-simplification-hetzner`
 
 ## Executive Summary
-This continuation session kept following the same successful restore pattern:
-1. inspect the next concrete backend CI seam
-2. patch it directly
-3. keep restoring approved removed systems as coherent top-level destinations
-4. maintain successful production frontend builds so the branch stays compatible with modern Hetzner/Vercel deployment expectations
+This continuation session kept the rewind branch moving in the now-established two-track pattern:
+1. restore more approved removed systems as coherent top-level destinations
+2. immediately convert the next explicit backend CI seam into a source-level compatibility fix
 
-Already pushed during the broader continuation:
+Already pushed earlier in the broader continuation:
 - `81f486d93` — `feat: recover rewind navigation and missing activity surfaces (v1.7.0)`
 - `6dc1b159c` — `fix: repair rewind avatar test contracts and recommendation caching (v1.7.1)`
 - `f576ae411` — `feat: restore rewind boosts gifts referrals and video surfaces (v1.7.2)`
 - `d6d7cfa22` — `feat: restore rewind unlock hub and paywall navigation (v1.7.3)`
 - `efbfc096a` — `fix: refresh rewind avatar prompt profile resolution (v1.7.4)`
+- `d135b66ec` — `feat: restore rewind live spaces hub (v1.7.5)`
 
 Completed in this slice:
-- added a new top-level `/spaces` page as a live/community/conversation hub
-- expanded restored-features navigation and dashboard cards to include that hub
-- validated another successful restore-branch frontend production build
-- recorded release metadata for **v1.7.5**
+- inspected the still-failing avatar-generation backend CI seam again
+- identified another likely prompt mismatch source: lowercased normalized interests leaking into prompt output
+- patched avatar prompt generation to title-case interest labels before emitting the themed background phrase
+- recorded release metadata for **v1.7.6**
 
 No processes were manually killed.
 
 ---
 
 ## What Was Investigated
-### Prior backend CI failure context
-I inspected the failing backend run for `v1.7.2` and confirmed the branch had narrowed to one explicit avatar-generation failure.
+### Latest backend failure focus remained narrow
+The failing backend run continued to show a single explicit failure:
+- `Tests\Feature\AvatarGenerationTest > service generates prompt with detailed attributes`
 
-That led to the `v1.7.4` fix:
-- refresh avatar prompt profile resolution through a direct relation query
+This is a strong signal that the branch remains close:
+- frontend builds are repeatedly green
+- recently restored surface pages remain production-build-safe
+- backend CI is collapsing toward tiny prompt/behavior mismatches rather than broad systemic failures
 
-That work is already pushed and currently has fresh GitHub Actions runs in progress.
+### Likely remaining mismatch
+The avatar-generation test expects:
+- `Gaming background theme`
 
-### Why proceed with more surface restoration while CI runs
-The frontend side of the rewind branch has been consistently buildable after each recovery tranche.
-That means it is still productive to keep restoring removed surfaces as long as each tranche is validated with a production build and does not destabilize the Hetzner-safe baseline.
+But `UserProfile` normalizes interests to lowercase for matching purposes, meaning the prompt builder could still emit:
+- `gaming background theme`
 
----
-
-## New Restoration Work in This Slice
-### v1.7.5 — Rewind Live-Spaces Hub Recovery
-Added a new top-level page:
-- `fwber-frontend/app/spaces/page.tsx`
-
-This page consolidates several already-present but scattered route surfaces into one coherent live/community destination:
-- `/chatrooms`
-- `/proximity-chatrooms`
-- `/audio-rooms`
-- `/bulletin-boards`
-- `/local-pulse`
-- `/conference-pulse`
-- `/burner`
-
-### Why this matters
-These systems already existed on the branch, but they were fragmented across multiple isolated routes and protected subtrees.
-
-A dedicated hub makes them feel intentionally restored rather than merely “still somewhere in the tree.”
+That would make the `Http::assertSent()` callback fail even if the request was actually sent and the rest of the prompt was correct.
 
 ---
 
-## Navigation / Dashboard Changes
-### `fwber-frontend/components/AppHeader.tsx`
-Extended restored-features navigation to include:
-- `/spaces`
+## What Was Changed
+### `fwber-backend/app/Services/AvatarGenerationService.php`
+Updated the background-interest prompt fragment.
 
-This now sits beside the other recovered surfaces like:
+Changed from:
+- directly using the normalized interest value
+
+to:
+- `Str::title((string) $interests[0])`
+
+before appending:
+- `... background theme`
+
+### Why this is correct
+This preserves both goals:
+- interests can remain normalized/lowercased in storage for recommendation/matching quality
+- human-facing prompt output can still be readable and match richer test expectations
+
+### Why this is safe for Hetzner/runtime behavior
+- it only affects prompt text formatting
+- it does not alter route contracts, provider routing, service wiring, or deployment behavior
+- it improves both CI alignment and actual prompt quality
+
+---
+
+## Validation Context
+Earlier in this same continuation, the rewind branch kept successfully building after the latest surface recoveries, including:
 - boosts
 - gifts
 - referrals
 - video
-- unlocks
-- wallet
-- premium
-- roast
-- merchant
-- moderation
+- unlock hub
+- live spaces hub
 
-### `fwber-frontend/app/dashboard/page.tsx`
-Added a new restored-sections card for:
-- `Live Spaces`
-
-This card now exposes the broader live/community surface cluster from the dashboard directly.
-
----
-
-## Validation Performed
-### Restore-branch frontend build
-Executed:
-- `cd C:/Users/hyper/workspace/fwber_restore_worktree/fwber-frontend && npm run build`
-
-Result:
-- successful production build
-- route manifest now includes:
-  - `/spaces`
-
-This keeps the branch aligned with the requirement that restored surfaces must still be compatible with the modern deployment toolchain.
+This slice focused specifically on the next likely backend CI seam while preserving all of those restored frontend destinations.
 
 ---
 
 ## Files Changed This Slice
-### Frontend
-- `fwber-frontend/app/spaces/page.tsx`
-- `fwber-frontend/components/AppHeader.tsx`
-- `fwber-frontend/app/dashboard/page.tsx`
+### Backend
+- `fwber-backend/app/Services/AvatarGenerationService.php`
 
 ### Docs / release tracking
-- `VERSION`
-- `VERSION.md`
-- `fwber-backend/VERSION`
-- `fwber-frontend/VERSION`
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
@@ -122,23 +99,25 @@ This keeps the branch aligned with the requirement that restored surfaces must s
 - `ROADMAP.md`
 - `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
+- `VERSION`
+- `VERSION.md`
+- `fwber-backend/VERSION`
+- `fwber-frontend/VERSION`
 
 ---
 
 ## Git / Release
 ### Current tranche target
-- **Target Version:** `1.7.5`
-- **Recommended Commit Message:** `feat: restore rewind live spaces hub (v1.7.5)`
+- **Target Version:** `1.7.6`
+- **Recommended Commit Message:** `fix: restore rewind avatar prompt interest labels (v1.7.6)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.7.5` live-spaces hub tranche.
-2. Re-check the latest restore-branch GitHub Actions runs for `v1.7.4` / current tip.
-3. If backend CI remains red, keep patching the next explicit failure only.
-4. Continue restoring approved removed systems using the same successful shape:
-   - real top-level destinations
-   - dashboard visibility
-   - restored-features navigation visibility
+1. Commit and push the `v1.7.6` avatar prompt interest-label fix.
+2. Re-check the latest restore-branch GitHub Actions runs.
+3. If backend CI still remains red, continue inspecting only the next explicit failure rather than guessing.
+4. Keep restoring approved removed systems as coherent top-level surfaces while maintaining:
+   - green production frontend builds
    - no regressions against modern Hetzner/runtime expectations
-5. Keep excluding user-disallowed surface emphasis even if old routes remain present in the branch tree.
+   - excluded systems kept out of primary restored-scope emphasis

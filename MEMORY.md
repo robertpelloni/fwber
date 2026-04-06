@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.7.6 normalization layers can leak machine-friendly values into prompt-building paths unless explicitly reformatted
+- The rewind avatar-generation path uses profile interests that are normalized to lowercase for matching quality.
+- That is good for recommendation logic, but bad for human-facing prompt assertions and prompt quality unless the value is reformatted before output.
+- On the richer branch, fixing these small formatting leaks is part of CI convergence and also improves real generated prompt quality.
+
 ## 2026-04-06 — v1.7.5 live/community features also benefit from a hub pattern when the branch already contains many scattered route surfaces
 - Chatrooms, audio rooms, bulletin boards, burner links, and pulse surfaces were already present, but still felt fragmented.
 - A dedicated live-spaces hub is a strong restore move because it groups several already-restored systems into one top-level area without destabilizing backend/runtime behavior.
