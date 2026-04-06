@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-06 — v1.7.7 the local-discovery / places cluster also benefits from a hub pattern, just like unlocks and spaces
+- Nearby people, venues, deals, date planning, location settings, and safety are all related enough that they feel stronger as one restored destination.
+- This keeps the richer branch legible as more systems come back online.
+- Also, avatar-generation CI on the rewind branch may still depend on implicit-provider behavior, so locking testing fallback to DALL-E is a pragmatic compatibility move while the branch is being reconciled.
+
 ## 2026-04-06 — v1.7.6 normalization layers can leak machine-friendly values into prompt-building paths unless explicitly reformatted
 - The rewind avatar-generation path uses profile interests that are normalized to lowercase for matching quality.
 - That is good for recommendation logic, but bad for human-facing prompt assertions and prompt quality unless the value is reformatted before output.

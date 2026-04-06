@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.7.6 "Rewind Avatar Prompt Interest Label Fix"
+> **Current Version:** 1.7.7 "Rewind Places Hub + Avatar Provider Test Fallback"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.7.6)
+### Phase 5: Production Scale (COMPLETED - v1.7.7)
+- **Rewind Places Hub + Avatar Provider Test Fallback:** Added a real top-level places hub for the local-discovery cluster and pinned the implicit testing fallback provider to DALL-E for rewind avatar-generation compatibility.
 - **Rewind Avatar Prompt Interest Label Fix:** Reformatted normalized profile-interest values back into human-readable themed labels during avatar prompt generation, targeting another narrow restore-branch avatar-generation CI seam without affecting deployment/runtime contracts.
 - **Rewind Live-Spaces Hub Recovery:** Added a real top-level live-spaces hub and surfaced chatrooms, proximity chatrooms, audio rooms, bulletin boards, local pulse, conference pulse, and burner bridge from one coherent restored destination.
 - **Rewind Avatar Prompt Relation Refresh Fix:** Patched avatar prompt generation to resolve the latest stored profile row directly, targeting the remaining explicit avatar-generation backend CI failure without regressing modern Hetzner/runtime compatibility.

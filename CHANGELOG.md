@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.7] - 2026-04-06 — Rewind Places Hub + Avatar Provider Test Fallback
+
+### Added
+- Added a new top-level `/places` page that consolidates nearby people, venues, deals, date planning, location settings, and safety-in-context into one coherent local-discovery destination.
+
+### Changed
+- Expanded restore-branch restored-features navigation to include `Places`.
+- Expanded the dashboard restored-sections grid so the local-discovery / venue / nearby cluster is visible alongside spaces, unlocks, boosts, gifts, referrals, video, wallet, merchant, and roast.
+- Hardened restore-branch avatar generation to pin the implicit provider to DALL-E in testing when no explicit provider is passed, reducing one more source of drift for the richer avatar-generation CI contract.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully after the new places hub recovery.
+- The production route manifest now includes `/places` on the rewind branch.
+
 ## [1.7.6] - 2026-04-06 — Rewind Avatar Prompt Interest Label Fix
 
 ### Fixed

@@ -1,18 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.7.6 (Rewind Avatar Prompt Interest Label Fix)
+# PROJECT_STATUS.md - fwber v1.7.7 (Rewind Places Hub + Avatar Provider Test Fallback)
 
 **Date:** 2026-04-06
-**Version:** 1.7.6 "Rewind Avatar Prompt Interest Label Fix"
-**Status:** ✅ **ANOTHER NARROW BACKEND CI SEAM IS PATCHED WHILE THE RECENTLY RESTORED FRONTEND SURFACES REMAIN BUILD-SAFE**
+**Version:** 1.7.7 "Rewind Places Hub + Avatar Provider Test Fallback"
+**Status:** ✅ **RESTORE BRANCH NOW EXPOSES THE LOCAL-DISCOVERY CLUSTER AS A REAL DESTINATION WHILE ANOTHER AVATAR-CI DRIFT VECTOR IS PATCHED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release continued the rewind-branch CI tightening by fixing another likely source of the remaining avatar-generation assertion failure.
+This release paired another coherent surface recovery with another direct backend-CI stabilization move.
 
 Delivered:
-- avatar prompts now convert normalized lowercase interests back into title-cased human-readable themed labels for prompt output
-- this directly aligns the restore branch with the richer suite expectation for strings like `Gaming background theme`
-- the recently restored live-spaces, unlocks, boosts, gifts, referrals, and video surfaces remain intact and production-build-safe
+- added a dedicated `/places` hub for nearby people, venues, deals, date planning, location settings, and safety-in-context
+- expanded navigation and dashboard cards so the local-discovery cluster is surfaced more clearly
+- pinned the implicit avatar-generation testing fallback provider to DALL-E when no explicit provider is passed, keeping richer avatar assertions aligned with historical expectations
 
 ## ✅ Why This Matters
-The restore branch is now failing on increasingly small behavioral seams. Fixing those seams directly is what turns the branch from "broad but flaky" into something that can eventually replace the more selectively restored line without sacrificing Hetzner deployability.
+The rewind branch keeps getting stronger when each iteration restores one more coherent user-facing cluster while also shrinking another narrow backend CI seam. This keeps the branch moving toward a broad restored product that still remains compatible with modern Hetzner deployment expectations.

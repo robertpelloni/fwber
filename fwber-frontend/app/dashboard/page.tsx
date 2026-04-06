@@ -25,6 +25,7 @@ import {
   Lock,
   Share2,
   Radio,
+  Map,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -211,6 +212,13 @@ export default function DashboardPage() {
                       description="Open chatrooms, audio rooms, local pulse, boards, burner links, and conference pulse from one top-level hub."
                       icon={<Radio className="h-5 w-5" />}
                       accent="purple"
+                    />
+                    <FeatureSurfaceCard
+                      href="/places"
+                      title="Places & Nearby"
+                      description="Open nearby people, venues, deals, date planning, and location-aware surfaces from one local-discovery hub."
+                      icon={<Map className="h-5 w-5" />}
+                      accent="green"
                     />
                     <FeatureSurfaceCard
                       href="/unlocks"
