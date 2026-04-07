@@ -1,24 +1,24 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.11
-> **Last Updated:** 2026-04-05
+> **Version:** 1.8.13
+> **Last Updated:** 2026-04-07
 
 ---
 
-## 🔴 Critical: Restore Branch Completion
-- [ ] **Re-run GitHub Backend CI on `restore/pre-simplification-hetzner`**: Confirm the avatar-generation and tagged-cache compatibility repairs eliminate the previously observed red run.
-- [ ] **Continue Broad Rewind Reconciliation**: Stop doing only tiny selective restores and instead bring the restore branch the rest of the way toward the broader 2–3-day-ago surface, while still excluding federation, governance, and journals/scrapbooks/icebreakers.
-- [x] **Audit Remaining Restore-Branch Runtime Drift**: Identified 'ghosted' migrations on production where the ledger says they ran but tables were missing; added a comprehensive repair migration (`v1.8.12`).
+## 🔴 Critical: Restoration Excellence
+- [x] **Audit Remaining Restore-Branch Runtime Drift**: Identified 'ghosted' migrations on production; added a comprehensive repair migration (`v1.8.12`).
 - [x] **Promote Restore Branch Once Stable**: Main mainline now fully replaced with the stable restored product surface.
+- [ ] **Continue Broad Product Polish**: Start a second pass on individual hub pages to ensure all restored leaf components are fully functional.
 
 ## 🟡 High: Production & Deployment Verification
 - [x] **Deploy NodeInfo 500 Fix to Hetzner**: Fix confirmed working live via `curl` check.
 - [x] **Verify Live Frontend API Recovery**: Confirmed `api.fwber.me` responds correctly and frontend build uses correct proxy.
 - [ ] **Repair / Confirm Realtime Contract**: Re-check the live header connection badge and websocket/broadcast-auth behavior after the backend/public-route repair deploy.
-- [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
+- [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
 
 ## ✅ Recently Completed
-- [x] **Rewind Shell Product-Map Consistency**: Locked in domain-based shell organization, documented the `globalThis.Map` fix, and kept the signed-in shell aligned with the dashboard’s restored product map.
+- [x] **Surface Polish & Runtime Hardening**: Hardened `VectorService` against missing RediSearch, surfaced `/rate-my-pussy`, `/groups/matching`, and `/gifts/history` in their respective hubs, and removed excluded links from Settings.
+- [x] **Production Schema Repair**: Added a corrective migration to eliminate 500 errors caused by 'ghost' migrations; ensuring the production database actually holds the tables and columns required by the restored codebase.
 - [x] **Rewind Sidebar Domain Organization**: Reorganized the sidebar and mobile restored-surfaces navigation into domain groups so the app shell now mirrors the dashboard’s product map instead of presenting a flat feature list.
 - [x] **Rewind Dashboard Domain Organization**: Reorganized the dashboard’s restored-surfaces area into product-domain sections so the restored branch feels more intentionally structured and less like a flat list of recovered routes.
 - [x] **Rewind Matching Hub Recovery**: Added a new `/matching` hub and surfaced recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context from one coherent restored destination.

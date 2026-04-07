@@ -42,6 +42,13 @@ const economySurfaces = [
     accent: 'from-pink-500 to-rose-500',
   },
   {
+    href: '/gifts/history',
+    title: 'Gift History',
+    description: 'Review your full gifting history, including tokens sent and received across the social layer.',
+    icon: Sparkles,
+    accent: 'from-purple-500 to-indigo-500',
+  },
+  {
     href: '/unlocks',
     title: 'Unlock Center',
     description: 'Reach the token-gated unlock and paywall-era surfaces that monetize access and reveals.',

@@ -1,7 +1,7 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.12 "Production Schema Repair"
-> **Last Updated:** 2026-04-05
+> **Current Version:** 1.8.13 "Surface Polish & Runtime Hardening"
+> **Last Updated:** 2026-04-07
 
 ---
 
@@ -16,7 +16,7 @@ That simplification intentionally retired large systems first so the repo could 
 - safety tooling
 - lean onboarding/profile flows
 
-### The Controlled Restoration Wave (ACTIVE / PARTIALLY COMPLETED)
+### The Controlled Restoration Wave (COMPLETED)
 After the simplification stabilized, selected systems were restored in a compact and production-oriented form based on explicit user approval.
 
 Restored:
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.12)
+### Phase 5: Production Scale (COMPLETED - v1.8.13)
+- **Surface Polish & Runtime Hardening:** Hardened `VectorService` against missing RediSearch, surfaced `/rate-my-pussy`, `/groups/matching`, and `/gifts/history` in their respective hubs, and removed excluded links from Settings.
 - **Production Schema Repair:** Added a corrective migration to eliminate 500 errors caused by 'ghost' migrations; ensuring the production database actually holds the tables and columns required by the restored codebase.
 - **Rewind Shell Product-Map Consistency:** Locked in consistent domain-based organization across the dashboard and app shell so the restored branch reads as one coherent product map.
 - **Rewind Sidebar Domain Organization:** Reorganized the sidebar and mobile restored-surfaces navigation so the app shell mirrors the dashboard’s domain-based product map.

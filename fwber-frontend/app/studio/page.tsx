@@ -42,6 +42,13 @@ const studioSurfaces = [
     accent: 'from-amber-500 to-orange-500',
   },
   {
+    href: '/rate-my-pussy',
+    title: 'Rate My Pussy',
+    description: 'Browse the restored viral cat-rating surface and join the world’s most provocative cat leaderboard.',
+    icon: Heart,
+    accent: 'from-pink-500 to-purple-500',
+  },
+  {
     href: '/analytics',
     title: 'Creator Analytics',
     description: 'Review the branch’s broader content/behavior analytics and experimentation surfaces.',

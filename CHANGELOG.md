@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.13] - 2026-04-07 — Surface Polish & Runtime Hardening
+
+### Added
+- Surfaced `/rate-my-pussy` (Viral cat rating) in the `Studio` hub.
+- Surfaced `/groups/matching` in the `Matching` hub.
+- Surfaced `/gifts/history` in the `Economy` hub.
+
+### Changed
+- Hardened `VectorService` to detect RediSearch capability and degrade gracefully if missing, preventing job failures on standard Redis instances.
+- Removed excluded Federation and Journal-era links from the main settings page to maintain product focus.
+
+### Verified
+- Confirmed `v1.8.12` backend and frontend runs finished green.
+- Verified production schema is fully recovered and 500 errors from missing tables are eliminated.
+
 ## [1.8.12] - 2026-04-06 — Production Schema Repair
 
 ### Added

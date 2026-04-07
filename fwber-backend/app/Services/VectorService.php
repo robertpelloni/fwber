@@ -22,6 +22,10 @@ class VectorService
             return;
         }
 
+        if (! $this->hasRediSearch()) {
+            return;
+        }
+
         try {
             Redis::command('FT.INFO', [self::INDEX_NAME]);
         } catch (\Exception $e) {
@@ -50,7 +54,7 @@ class VectorService
      */
     public function storeProfile(UserProfile $profile)
     {
-        if (config('app.env') === 'testing') {
+        if (config('app.env') === 'testing' || ! $this->hasRediSearch()) {
             return;
         }
 
@@ -84,7 +88,7 @@ class VectorService
      */
     public function search(array $vector, int $limit = 10, array $filters = []): array
     {
-        if (config('app.env') === 'testing') {
+        if (config('app.env') === 'testing' || ! $this->hasRediSearch()) {
             return [];
         }
 
@@ -171,6 +175,9 @@ class VectorService
 
         // Let's assume standard behavior for now and refine via debugging if needed
         for ($i = 0; $i < count($result); $i += 2) {
+            if (! isset($result[$i]) || ! isset($result[$i + 1])) {
+                break;
+            }
             $key = $result[$i];
             $fields = $result[$i + 1]; // Array of field/values
 
@@ -187,5 +194,26 @@ class VectorService
         }
 
         return $hits;
+    }
+
+    /**
+     * Check if the current Redis instance supports RediSearch.
+     */
+    protected function hasRediSearch(): bool
+    {
+        return once(function () {
+            try {
+                $modules = Redis::command('MODULE', ['LIST']);
+                foreach ($modules as $module) {
+                    if (is_array($module) && isset($module[1]) && $module[1] === 'search') {
+                        return true;
+                    }
+                }
+            } catch (\Exception $e) {
+                // Command likely not supported
+            }
+
+            return false;
+        });
     }
 }

@@ -48,6 +48,13 @@ const matchingSurfaces = [
     icon: Compass,
     accent: 'from-sky-500 to-cyan-500',
   },
+  {
+    href: '/groups/matching',
+    title: 'Group Matching',
+    description: 'Bridge community discovery and one-to-one relationship formation through group-level matching.',
+    icon: Users,
+    accent: 'from-indigo-500 to-blue-500',
+  },
 ]
 
 export default function MatchingPage() {

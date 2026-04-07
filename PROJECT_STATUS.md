@@ -1,18 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.8.11 (Rewind Shell Product-Map Consistency)
+# PROJECT_STATUS.md - fwber v1.8.13 (Surface Polish & Runtime Hardening)
 
-**Date:** 2026-04-06
-**Version:** 1.8.11 "Rewind Shell Product-Map Consistency"
-**Status:** ✅ **DASHBOARD AND APP SHELL NOW PRESENT THE RESTORED BRANCH AS THE SAME DOMAIN-BASED PRODUCT MAP**
+**Date:** 2026-04-07
+**Version:** 1.8.13 "Surface Polish & Runtime Hardening"
+**Status:** ✅ **MAINLINE IS STABLE, HUB SURFACES ARE POLISHED, AND RUNTIME IS HARDENED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release followed the dashboard-domain and sidebar-domain work with a consistency pass that makes the signed-in shell and dashboard tell the same product story.
+This release focused on small but meaningful surface and runtime repairs following the mainline promotion.
 
 Delivered:
-- kept the grouped sidebar/mobile navigation structure and validated it in production mode
-- documented and preserved the global-constructor fix that prevented the grouped navigation helper from breaking `/wallet` prerendering
-- reinforced the branch’s product-map presentation across dashboard and shell instead of leaving one structured and the other incidental
+- hardened `VectorService` against missing RediSearch (prevents queue job failures)
+- surfaced missing leaf routes: `/rate-my-pussy`, `/groups/matching`, `/gifts/history`
+- removed excluded Federation/Journal links from Settings
+- verified `v1.8.12` green streak continues
 
 ## ✅ Why This Matters
-The rewind branch now has enough restored breadth that information architecture matters almost as much as route recovery. This release locks in a consistent shell-level mental model, making the restored branch easier to navigate, easier to demo, and easier for future agents to extend without drifting back into flat route sprawl.
+Now that the branch has been promoted to `main`, every small polish pass improves the actual live experience. Hardening the vector service ensures that background jobs don't fail silently on standard Redis instances, while surfacing the remaining leaf routes ensures the full breadth of the restored branch is accessible through the new hub-based product map.
