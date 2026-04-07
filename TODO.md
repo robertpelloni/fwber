@@ -1,12 +1,12 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.21
+> **Version:** 1.8.23
 > **Last Updated:** 2026-04-07
 
 ---
 
 ## 🔴 Critical: Continuous Improvement
-- [ ] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
+- [x] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
 - [ ] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals.
 
 ## 🟡 High: User Growth & Engagement
@@ -14,6 +14,8 @@
 - [ ] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 
 ## ✅ Recently Completed
+- [x] **AI Prompt Tuning & Localization**: Hyper-localized the AI Wingman prompts (roasts, vibes, date ideas) to the Detroit and privacy-first product identity.
+- [x] **Project Consolidation & Future Milestones**: Completed broad product polish across all hubs. Verified all leaf features (Gifts, Matches, Connections, Commerce) are reachable and functional.
 - [x] **Merchant Inventory & Proximity Polish**: Added merchant inventory management, surfaced the proximity feed in Spaces, and verified Reverb heartbeats.
 - [x] **Critical Production & CI Repair**: Fixed dashboard 500 error ($daysActive) and expanded nuclear recovery to include missing proximity and artifact tables.
 - [x] **Nuclear Schema Recovery & System Heartbeat**: Forcefully restored missing 'ghost' tables on production, activated the Laravel Scheduler on Hetzner, and added a Reverb health heartbeat.

@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-07 — v1.8.23 generic AI wrappers erode trust; hyper-localized AI builds it
+- Restoring the AI Wingman features functionally was Step 1. Making them *feel* like Detroit and the product's actual vibe was Step 2.
+- The `AiWingmanService` prompt tuning forces the LLM to provide context-aware, locally actionable Date Ideas and Roasts.
+- When an app claims to be local/proximity-based, its generative content must reflect that locality, or it breaks the immersion.
+
 ## 2026-04-06 — v1.8.11 shell consistency work is worth treating as a first-class release once the branch becomes broad enough
 - Once many restored hubs exist, information architecture fixes stop being cosmetic and start being core product work.
 - The `globalThis.Map` fix is a reminder that icon imports can collide with global names in React files, especially during helper-heavy refactors.

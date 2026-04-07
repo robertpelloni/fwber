@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.21 "Merchant Inventory & Proximity Polish"
+> **Current Version:** 1.8.23 "AI Prompt Tuning & Localization"
 > **Last Updated:** 2026-04-07
 
 ---
@@ -47,7 +47,7 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.21)
+### Phase 5: Production Scale (COMPLETED)
 - **Merchant Inventory & Proximity Polish:** Completed the local commerce loop by adding inventory management and surfacing the real-time proximity feed.
 - **Critical Production & CI Repair:** Fixed dashboard 500 error and expanded nuclear recovery to resolve production constraint failures.
 - **Nuclear Schema Recovery & System Heartbeat:** Forcefully restored missing 'ghost' tables on production and activated the Laravel Scheduler on Hetzner.
@@ -125,11 +125,13 @@ Explicitly still excluded from restoration:
 - **CI/CD Build Pipelines:** GitHub Actions implemented for automated PHPUnit testing, Vercel/Next.js deployments, and Mobile EAS Store distributions.
 - **Data Minimization:** Explicit object-storage wipe triggers automatically upon account deletion to prevent ghost files.
 
+### Phase 6: Polish & Hardening (ACTIVE - v1.8.23)
+- **AI Prompt Tuning & Localization:** Refined AI Wingman prompts across the board to deeply ground LLM instructions in Detroit's local geography and the platform's "privacy-first" identity.
+- **Project Consolidation & Future Milestones:** Completed broad product polish across all hubs and defined next-phase milestones for growth.
+
 ---
 
 ## 🎯 Next Immediate Milestones
-1. **Deploy v1.6.5 to Hetzner:** Pull the backend patch, run the corrective migration, and verify `api.fwber.me/` plus dashboard endpoints recover live.
-2. **Verify Live Reverb Contract:** Re-test `ws.fwber.me` with the real app key and determine whether the remaining failure is handshake/config drift or a true runtime outage.
-3. **Resolve Mercure Contract:** Either provision the intended Mercure service behind `mercure.fwber.me` or remove the dead route from the public production surface.
-4. **Deploy NodeInfo Guard + Re-run Frontend Build Under Node 24:** Confirm discovery routes stop 500ing and the frontend workflow goes green.
-5. **DreamHost Retirement:** Once Hetzner API cutover is stable, retire the old DreamHost fwber backend path and remove stale provider dependencies.
+1. **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
+2. **Performance Monitoring Pass:** Systematically optimize API latency across newly restored hub routes using live APM signals.
+3. **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.

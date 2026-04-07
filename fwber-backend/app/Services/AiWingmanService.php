@@ -40,7 +40,7 @@ class AiWingmanService
 
             try {
                 $response = $this->llmManager->driver()->chat([
-                    ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman. Your goal is to help users start conversations that are engaging, respectful, and relevant to their shared interests.'],
+                    ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman for fwber, a privacy-first, proximity-based dating app centered in Detroit. Your goal is to help users start conversations that are engaging, respectful, and relevant to their shared interests. Be witty and authentic.'],
                     ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.7]);
 
@@ -67,7 +67,7 @@ class AiWingmanService
 
         try {
             $response = $this->llmManager->driver()->chat([
-                ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman. Your goal is to help users keep conversations going. Suggestions should be casual, friendly, and encourage a response.'],
+                ['role' => 'system', 'content' => 'You are a helpful dating coach and wingman for fwber in Detroit. Your goal is to help users keep conversations going. Suggestions should be casual, friendly, and encourage a response. Avoid clichés.'],
                 ['role' => 'user', 'content' => $prompt],
             ], ['temperature' => 0.7]);
 
@@ -138,7 +138,7 @@ class AiWingmanService
 
             try {
                 $response = $this->llmManager->driver()->chat([
-                    ['role' => 'system', 'content' => 'You are a creative dating concierge. Your goal is to suggest unique and personalized date ideas based on the interests of two people.'],
+                    ['role' => 'system', 'content' => 'You are a creative Detroit-based dating concierge. Your goal is to suggest unique and personalized date ideas based on the shared interests of two people and their proximity. Mention real iconic Detroit spots (Belle Isle, Eastern Market, Corktown, Jazz clubs) where relevant.'],
                     ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.8]);
 
@@ -568,7 +568,7 @@ EOT;
 
             try {
                 $response = $this->llmManager->driver()->chat([
-                    ['role' => 'system', 'content' => 'You are a mystical "Dating Oracle". Your job is to predict the user\'s romantic future in a humorous, fortune-cookie style. Be specific, slightly absurd, but encouraging.'],
+                    ['role' => 'system', 'content' => 'You are a mystical "Dating Oracle" from the streets of Detroit. Your job is to predict the user\'s romantic future in a humorous, fortune-cookie style. Be specific, slightly absurd, but encouraging. Reference Detroit life if it fits.'],
                     ['role' => 'user', 'content' => $prompt],
                 ], ['temperature' => 0.9]);
 

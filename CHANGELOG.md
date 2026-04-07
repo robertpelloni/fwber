@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.23] - 2026-04-07 — AI Prompt Tuning & Localization
+
+### Changed
+- Refined AI Wingman prompts across the board (`roastGeneric`, `roastProfile`, `checkVibe`, `predictCosmicMatch`, `findNemesis`, `generateCompatibilityAudit`) to deeply ground the LLM instructions in Detroit's local geography and the platform's "privacy-first, proximity" identity.
+- Improved the "Date Ideas" prompt to explicitly reference iconic Detroit spots (Belle Isle, Eastern Market, Corktown, Jazz clubs) for more authentic, hyper-local suggestions.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully.
+- Confirmed `v1.8.22` deployment and tests ran green on `main`.
+
 ## [1.8.22] - 2026-04-07 — Project Consolidation & Future Milestones
 
 ### Added

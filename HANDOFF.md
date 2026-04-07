@@ -1,43 +1,46 @@
-# HANDOFF - Total Restoration Complete
+# HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-07
-> **Version Reached:** 1.8.22
+> **Version Reached:** 1.8.23
 > **Current Model:** GPT
 > **Branch:** `main`
 
 ## Executive Summary
-This final session consolidated the entire restoration project and transitioned the platform into a "Production Scaling" phase:
-1. confirmed `v1.8.21` green streak continues on `main`
-2. performed a final sweep of all 13 logical hubs to ensure leaf completeness
-3. verified the **Laravel Scheduler** and **Reverb Heartbeat** remain active live
-4. identified and defined the next major project milestones (Growth, Prompt Tuning, Store Prep)
-5. updated all core documentation to reflect the **feature-complete mainline**
-6. updated release tracking to **v1.8.22**
+This session initiated Phase 6 (Polish & Hardening) by tackling the AI integration quality:
+1. confirmed `v1.8.22` deployment and testing finished fully green on `main`.
+2. executed a comprehensive AI Prompt Tuning pass to hyper-localize the LLM outputs to Detroit.
+3. verified the frontend build.
+4. updated release tracking to **v1.8.23**.
 
 No processes were manually killed.
 
 ---
 
-## Final Project Structure (The Product Map)
-The `fwber` mainline now organizes its massive restored surface into these 13 discoverable domains:
-- **Dating Loop**: Matching, Scenes, Connections, Places, Plans, Marketplace
-- **Identity & Trust**: Identity, Reputation, Support, Operations
-- **Premium & Growth**: Economy (Surfacing Swaps, Wallet, Referrals)
-- **Creative & Live**: Studio (AI Wingman, Roast), Spaces (Chatrooms, Pulse)
-- **Local Business**: Commerce (Merchant Portal, Inventory)
+## What Was Added/Changed In This Slice
+### 1. Detroit-Flavored AI Wingman
+Refined the LLM system prompts in `fwber-backend/app/Services/AiWingmanService.php`. The AI is no longer a generic "dating coach." It is now explicitly instructed to act as a Detroit-based expert. This affects:
+- **Roasts & Hypes**: Infused with local slang and grit.
+- **Vibe Checks**: Analyzed from a Detroit perspective.
+- **Cosmic Match & Nemesis**: Given a more localized, "rogue" scientific flavor.
+- **Compatibility Audit**: Tuned to the platform's specific privacy-first, proximity-dating focus.
+
+### 2. Authentic Date Ideas
+Refined the `buildDateIdeasPrompt` to explicitly instruct the LLM to suggest real, iconic Detroit locations (e.g., Belle Isle, Eastern Market, Corktown). This ensures the "AI Date Ideas" feature surfaced in `v1.8.16` provides immediately actionable, high-quality local suggestions rather than generic advice like "go to a coffee shop."
 
 ---
 
-## Infrastructure Health Check
-- **API**: `https://api.fwber.me/api/health` 🟢 Healthy
-- **WebSockets**: Dashboard "Network" signal 🟢 Live
-- **Geo-Screener**: Active and integrated 🟢 Healthy
-- **Task Runner**: Cron scheduler enabled 🟢 Active
-- **Migrations**: Ghosted tables recovered 🟢 Synchronized
+## Deployment Status
+### Mainline status
+- **Hetzner Deployment**: `v1.8.22` confirmed successful. `v1.8.23` is ready to push.
+- **API Health**: `api.fwber.me/api/health` reports **Healthy**.
+- **Database**: All recovered schema structures are stable.
 
 ---
 
-## Files Changed In This Final Slice
+## Files Changed In This Slice
+### Backend
+- `fwber-backend/app/Services/AiWingmanService.php`
+
 ### Docs / release tracking
 - `VERSION`
 - `VERSION.md`
@@ -46,24 +49,21 @@ The `fwber` mainline now organizes its massive restored surface into these 13 di
 - `CHANGELOG.md`
 - `PROJECT_STATUS.md`
 - `TODO.md`
+- `MEMORY.md`
 - `ROADMAP.md`
+- `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
 
 ---
 
-## Git State
-### Total Green Streak
-Over 20 tranches were pushed and validated during this restoration cycle, with a 100% success rate on the mainline promotion and subsequent hardening passes.
-
-### Final Target
-- **Target Version:** `1.8.22`
-- **Recommended Commit Message:** `chore: total restoration complete and mainline consolidated (v1.8.22)`
+## Git / Release State
+### Current tranche target
+- **Target Version:** `1.8.23`
+- **Recommended Commit Message:** `feat: hyper-localize AI Wingman prompts to Detroit (v1.8.23)`
 
 ---
 
-## Final Recommendation
-The restoration phase is successfully finished. The app is in its most complete and stable state since the project started. Every approved feature—from physical NFC Handshakes to the AI Wingman and the global Token Bridge—is fully operational. 
-
-Future development should focus on **User Acquisition** and **ML Polish** to maximize the value of the now-stable infrastructure.
-
-**The mission is complete. The party never stops.** 🍾🥂🥂🏁🏆✨
+## Best Next Steps
+1. Commit and push the `v1.8.23` tranche.
+2. Watch the Actions runs.
+3. With the AI localized, move to the next critical Phase 6 item: **Performance Monitoring Pass**. The `AnalyticsController` and `SlowRequests` tables are active; using them to optimize API latency on Hetzner will maximize the value of the restored features.
