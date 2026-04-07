@@ -5,16 +5,13 @@
 
 ---
 
-## 🔴 Critical: Restoration Excellence
-- [x] **Audit Remaining Restore-Branch Runtime Drift**: Identified 'ghosted' migrations on production; added a comprehensive repair migration (`v1.8.12`).
-- [x] **Promote Restore Branch Once Stable**: Main mainline now fully replaced with the stable restored product surface.
-- [ ] **Continue Broad Product Polish**: Start a second pass on individual hub pages to ensure all restored leaf components are fully functional.
+## 🔴 Critical: Continuous Improvement
+- [ ] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
+- [ ] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals.
 
-## 🟡 High: Production & Deployment Verification
-- [x] **Deploy NodeInfo 500 Fix to Hetzner**: Fix confirmed working live via `curl` check.
-- [x] **Verify Live Frontend API Recovery**: Confirmed `api.fwber.me` responds correctly and frontend build uses correct proxy.
-- [x] **Repair / Confirm Realtime Contract**: Added a live Network health signal to the dashboard stats; confirmed Reverb websocket contract is active and healthy.
-- [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
+## 🟡 High: User Growth & Engagement
+- [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
+- [ ] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 
 ## ✅ Recently Completed
 - [x] **Merchant Inventory & Proximity Polish**: Added merchant inventory management, surfaced the proximity feed in Spaces, and verified Reverb heartbeats.

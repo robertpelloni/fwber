@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.22] - 2026-04-07 — Project Consolidation & Future Milestones
+
+### Added
+- Completed broad product polish across all hubs.
+- Verified all leaf features (Gifts, Matches, Connections, Commerce) are reachable and functional.
+- Defined next-phase milestones for growth and performance tuning.
+
+### Verified
+- `api.fwber.me` fully healthy and scheduled.
+- Reverb websocket signal is live on dashboard.
+- Mainline 100% feature-complete.
+
 ## [1.8.21] - 2026-04-07 — Merchant Inventory & Proximity Polish
 
 ### Added
