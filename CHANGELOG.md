@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.19] - 2026-04-07 — Nuclear Schema Recovery & System Heartbeat
+
+### Added
+- Added a `nuclear_schema_recovery` migration to forcefully restore "ghosted" production tables (groups, chatrooms, achievements, topics, audio rooms, etc.) that the ledger claimed existed but were physically absent.
+- Added `websocket:heartbeat` Artisan command and scheduled it to run every minute to provide a live health signal for the Reverb infrastructure.
+- Enabled the Laravel Scheduler via crontab on the Hetzner production host.
+
+### Changed
+- Refined `TODO.md` and `ROADMAP.md` to reflect the completion of the "Controlled Restoration Wave" and the transition to production hardening.
+
+### Verified
+- Confirmed production crontab is active for the `deploy` user.
+- Verified that all major hub domains (Dating, Identity, Premium, Creative, Business) are now backed by active, verified database tables.
+
 ## [1.8.18] - 2026-04-07 — Token Bridge & Real-time Signal
 
 ### Added

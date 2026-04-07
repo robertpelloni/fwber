@@ -110,3 +110,8 @@ Schedule::job(new \App\Jobs\ProcessGovernanceProposals)->everyMinute()
 Schedule::job(new \App\Jobs\IngestAllFederatedContent)->everyFiveMinutes()
     ->name('ingest-federated-content')
     ->withoutOverlapping();
+
+// WebSocket Heartbeat
+Schedule::command('websocket:heartbeat')->everyMinute()
+    ->name('websocket-heartbeat')
+    ->withoutOverlapping();

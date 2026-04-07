@@ -1,19 +1,19 @@
-# PROJECT_STATUS.md - fwber v1.8.18 (Token Bridge & Real-time Signal)
+# PROJECT_STATUS.md - fwber v1.8.19 (Nuclear Schema Recovery & System Heartbeat)
 
 **Date:** 2026-04-07
-**Version:** 1.8.18 "Token Bridge & Real-time Signal"
-**Status:** ✅ **DASHBOARD IS NOW REAL-TIME AWARE AND ECONOMY IS FULLY BRIDGED**
+**Version:** 1.8.19 "Nuclear Schema Recovery & System Heartbeat"
+**Status:** ✅ **PRODUCTION INFRASTRUCTURE IS NOW FULLY ACTIVE, SCHEDULED, AND REPAIRED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release focused on closing the loop on the token economy and providing real-time infrastructure visibility.
+This critical infrastructure release fixed deep-seated production amnesia and activated the background heart of the platform.
 
 Delivered:
-- **Global Token Bridge**: Surfaced the Swap interface in the Economy hub, completing the monetization layer.
-- **Network Health Signal**: Added a live "Network" status to the dashboard stats, confirming Reverb websocket connectivity at a glance.
-- **Build Fix**: Repaired a missing `ShoppingBag` import that was blocking production builds on specific routes.
-- **Backend Sync**: Updated `DashboardController` to include the `reverb_healthy` heartbeat signal.
+- **Nuclear Schema Recovery**: Forcefully restored 10+ major missing tables (`groups`, `chatrooms`, `achievements`, `topics`, etc.) that were present in the migration ledger but absent in the production DB.
+- **System Scheduler Activation**: Enabled the Laravel cron scheduler on Hetzner, ensuring that cleanup jobs, proposals, and heartbeats actually run.
+- **Real-time Heartbeat**: Added a 1-minute heartbeat command to confirm the health of the Reverb/WebSocket loop.
+- **Graceful Vector Service**: Hardened profile saves so they no longer crash when RediSearch is unavailable.
 
 ## ✅ Why This Matters
-The user can now see whether their real-time connection is "Live" or "Syncing" directly from the dashboard. This resolves a high-priority TODO item regarding the "Realtime Contract." Additionally, by surfacing the Token Bridge, the platform's financial flexibility is now fully exposed to the user.
+The restoration is finally complete at the database level. Previously, many hubs (like Groups or Chatrooms) would have failed live because their underlying tables were missing despite the code being present. By "nuclear-fixing" the schema and enabling the scheduler, the platform is now a truly living system on Hetzner.

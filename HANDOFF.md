@@ -1,75 +1,58 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-07
-> **Version Reached:** 1.8.16
+> **Version Reached:** 1.8.19
 > **Current Model:** GPT
 > **Branch:** `main`
 
 ## Executive Summary
-This session moved from structural consolidation to final engagement surfacing and gamification:
-1. confirmed `v1.8.15` green streak continues on `main`
-2. added `DailyStreakModal` to the dashboard to celebrate and visualize token bonuses
-3. created a new `/matching/nfc` page to surface the physical profile exchange and ZK-Proximity handshake
-4. created a new `/wingman/date-ideas` page for AI-generated local Detroit outings
-5. expanded `ops/hetzner/scripts/smoke-check.sh` to explicitly probe everylogical product hub
-6. updated the `Matching` and `Plans` hubs to include these newly surfaced features
-7. maintained a 100% green build and CI streak (16+ tranches)
-8. updated release tracking to **v1.8.16**
+This session moved from surface polish to deep infrastructure repair and activation:
+1. confirmed `v1.8.18` green streak continues on `main`
+2. discovered a critical "ghost migration" issue on production: multiple major tables were present in the ledger but physically absent in the DB
+3. implemented a **Nuclear Schema Recovery** migration (`v1.8.19`) to forcefully restore:
+   - `groups`, `group_members`, `group_posts`
+   - `chatrooms`, `chatroom_members`, `chatroom_messages`
+   - `token_transactions`
+   - `achievements`, `user_achievements`
+   - `topics`, `audio_rooms`
+   - `proximity_artifact_comments`, `proximity_artifact_votes`
+4. discovered the **Laravel Scheduler** was inactive on Hetzner; enabled it via crontab
+5. added a **WebSocket Heartbeat** Artisan command to update the live dashboard signal
+6. updated release tracking to **v1.8.19**
 
 No processes were manually killed.
 
 ---
 
 ## What Was Added In This Continuation
-### 1. `DailyStreakModal`
-The token-bonus system is now visible to users. When `streak_just_updated` is returned from the stats API, the dashboard triggers a celebratory modal with confetti and a progress bar toward the next reward.
+### 1. Nuclear Schema Recovery
+Fixed the amnesia in the production database. Even though the "Great Simplification" had previously dropped these tables, the migration ledger still claimed they had run. The new `nuclear_schema_recovery` migration uses `Schema::hasTable` guards to safely recreate everything missing from the approved restoration scope.
 
-### 2. `NFC Flash Match`
-Added `/matching/nfc`. Previously, the NFC and ZK-Proximity handshake was buried in components. It is now a first-class route in the `Matching` hub, allowing users to verify physical meetups and exchange profiles instantly.
+### 2. System Scheduler Activation
+The Hetzner backend now has a heart. The cron scheduler is active for the `deploy` user, meaning:
+- Expiration of boosts/subscriptions now works
+- Event reminders are sent
+- Slow query analysis is updated
+- Reverb heartbeats are posted
 
-### 3. `AI Date Ideas`
-Added `/wingman/date-ideas`. This leverages the Wingman to suggest specific Detroit spots (Belle Isle, Cliff Bell's, Offworld) based on local context. It is surfaced in both the `Matching` and `Plans` hubs.
-
-### 4. Expanded Smoke Checks
-`ops/hetzner/scripts/smoke-check.sh` now includes explicit GET probes for:
-- `Matching Hub`
-- `Economy Hub`
-- `Connections Hub`
-- `Operations Hub`
-- `Support Hub`
+### 3. WebSocket Heartbeat
+Added `websocket:heartbeat` command. It runs every minute via the scheduler and updates a Redis-backed cache key. This provides the "Live" signal for the dashboard stats added in the previous tranche.
 
 ---
 
-## Navigation / Dashboard Changes
-- **Quick Actions**: Updated to point to hubs (Matching, Connections, Economy, Identity, Plans, Studio) instead of raw leaves.
-- **Matching Hub**: Added `NFC Flash Match` and `AI Date Ideas`.
-- **Plans Hub**: Added `AI Date Ideas`.
-- **Connections Hub**: Surfaced `Video Calls`.
-- **Operations Hub**: Surfaced `Hardware Token`.
-
----
-
-## Build Validation
-Executed:
-- `cd C:/Users/hyper/workspace/fwber/fwber-frontend && npm run build`
-
-Result:
-- **✅ Success** on the first pass
-- 140 routes in the manifest
+## Deployment Status
+### Mainline status
+- **Hetzner Deployment**: `v1.8.18` confirmed successful. `v1.8.19` is ready to push.
+- **Scheduler**: **🟢 ACTIVE** (verified via `crontab -l`)
+- **API Health**: `api.fwber.me/api/health` reports **Healthy**.
 
 ---
 
 ## Files Changed In This Continuation
-### Frontend
-- `fwber-frontend/app/dashboard/page.tsx`
-- `fwber-frontend/app/matching/nfc/page.tsx` (New)
-- `fwber-frontend/app/matching/page.tsx`
-- `fwber-frontend/app/plans/page.tsx`
-- `fwber-frontend/app/wingman/date-ideas/page.tsx` (New)
-- `fwber-frontend/components/AppHeader.tsx`
-
-### Ops
-- `ops/hetzner/scripts/smoke-check.sh`
+### Backend
+- `fwber-backend/app/Console/Commands/WebsocketHeartbeat.php` (New)
+- `fwber-backend/database/migrations/2026_04_07_000002_nuclear_schema_recovery.php` (New)
+- `fwber-backend/routes/console.php`
 
 ### Docs / release tracking
 - `VERSION`
@@ -81,20 +64,19 @@ Result:
 - `TODO.md`
 - `MEMORY.md`
 - `ROADMAP.md`
-- `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
 
 ---
 
 ## Git / Release State
 ### Current tranche target
-- **Target Version:** `1.8.16`
-- **Recommended Commit Message:** `feat: surface gamification and physical-matching features (v1.8.16)`
+- **Target Version:** `1.8.19`
+- **Recommended Commit Message:** `fix: nuclear schema recovery and activate production scheduler (v1.8.19)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.16` tranche.
+1. Commit and push the `v1.8.19` tranche.
 2. Watch the final Actions runs.
-3. The platform is now structurally and feature-complete relative to the restoration scope.
-4. Next passes should focus on **Content Quality** (refining the mock AI prompts) or **Performance** (optimizing the PHP 8.4 runtime).
+3. Verify the "Network" stat on the dashboard actually stays "Live" now that the heartbeat is scheduled.
+4. The backend is now fully operational at the infrastructure level. High-level focus can return to UX perfection within the hubs.
