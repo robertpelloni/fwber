@@ -3,7 +3,7 @@
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import Link from 'next/link'
-import { Flame, Flag, Sparkles, Target, Wand2, Zap } from 'lucide-react'
+import { Flame, Flag, Sparkles, Target, Wand2, Zap, Heart } from 'lucide-react'
 
 const studioSurfaces = [
   {

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.14] - 2026-04-07 — Hub Completion & Leaf Recovery
+
+### Added
+- Surfaced `/ice-breakers` (Ice Breaker Cards) in the `Matching` hub.
+- Surfaced `/video` (Video Calls) in the `Connections` hub.
+- Surfaced `/settings/hardware` (Hardware Token) in the `Operations` hub.
+
+### Fixed
+- Repaired a missing `Heart` icon import in the `Studio` hub that was causing production build failures.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully.
+- Confirmed green streak continues on `main`.
+
 ## [1.8.13] - 2026-04-07 — Surface Polish & Runtime Hardening
 
 ### Added

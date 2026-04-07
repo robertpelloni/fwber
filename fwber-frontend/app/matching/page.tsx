@@ -3,7 +3,7 @@
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import Link from 'next/link'
-import { BarChart3, Compass, Eye, Heart, Sparkles, Users } from 'lucide-react'
+import { BarChart3, Compass, Eye, Heart, Sparkles, Users, MessageSquare } from 'lucide-react'
 
 const matchingSurfaces = [
   {
@@ -47,6 +47,13 @@ const matchingSurfaces = [
     description: 'Use proximity-aware discovery when the dating funnel needs real local context rather than only abstract ranking.',
     icon: Compass,
     accent: 'from-sky-500 to-cyan-500',
+  },
+  {
+    href: '/ice-breakers',
+    title: 'Ice Breaker Cards',
+    description: 'Open the restored ice-breaker surface to answer questions and reveal mutual match details.',
+    icon: MessageSquare,
+    accent: 'from-purple-500 to-indigo-500',
   },
   {
     href: '/groups/matching',

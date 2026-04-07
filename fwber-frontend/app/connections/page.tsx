@@ -3,7 +3,7 @@
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import Link from 'next/link'
-import { Bell, HeartHandshake, MessageCircle, Activity, Users, UserRoundCheck } from 'lucide-react'
+import { Bell, HeartHandshake, MessageCircle, Activity, Users, UserRoundCheck, Phone } from 'lucide-react'
 
 const connectionSurfaces = [
   {
@@ -47,6 +47,13 @@ const connectionSurfaces = [
     description: 'Use groups as the bridge between community discovery and one-to-one relationship formation.',
     icon: Users,
     accent: 'from-slate-500 to-slate-700',
+  },
+  {
+    href: '/video',
+    title: 'Video Calls',
+    description: 'Open the restored video call surface to start real-time face-to-face conversations with matches.',
+    icon: Phone,
+    accent: 'from-indigo-500 to-blue-500',
   },
 ]
 

@@ -4,7 +4,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import { BarChart3, Lock, Radio, Settings, Shield, Store, Gavel } from 'lucide-react'
+import { BarChart3, Lock, Radio, Settings, Shield, Store, Gavel, Bluetooth } from 'lucide-react'
 
 export default function OperationsPage() {
   const { user } = useAuth()
@@ -59,6 +59,13 @@ export default function OperationsPage() {
         : 'Control location-shifting behavior and travel-aware discovery from a dedicated settings route.',
       icon: isModerator ? Gavel : Radio,
       accent: isModerator ? 'from-fuchsia-500 to-pink-500' : 'from-cyan-500 to-sky-500',
+    },
+    {
+      href: '/settings/hardware',
+      title: 'Hardware Token',
+      description: 'Pair and manage your physical "Anti-App" bracelet or keychain for proximity alerts.',
+      icon: Bluetooth,
+      accent: 'from-blue-600 to-indigo-600',
     },
   ]
 

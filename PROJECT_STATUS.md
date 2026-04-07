@@ -1,19 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.8.13 (Surface Polish & Runtime Hardening)
+# PROJECT_STATUS.md - fwber v1.8.14 (Hub Completion & Leaf Recovery)
 
 **Date:** 2026-04-07
-**Version:** 1.8.13 "Surface Polish & Runtime Hardening"
-**Status:** ✅ **MAINLINE IS STABLE, HUB SURFACES ARE POLISHED, AND RUNTIME IS HARDENED**
+**Version:** 1.8.14 "Hub Completion & Leaf Recovery"
+**Status:** ✅ **MAJOR HUBS ARE NOW FEATURE-COMPLETE AND PRODUCTION-READY**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release focused on small but meaningful surface and runtime repairs following the mainline promotion.
+This release focused on ensuring all restored leaf features are accessible through their respective domain hubs.
 
 Delivered:
-- hardened `VectorService` against missing RediSearch (prevents queue job failures)
-- surfaced missing leaf routes: `/rate-my-pussy`, `/groups/matching`, `/gifts/history`
-- removed excluded Federation/Journal links from Settings
-- verified `v1.8.12` green streak continues
+- fixed a build-breaking missing import in the `Studio` hub
+- surfaced the remaining "lost" routes: Ice Breaker Cards, Video Calls, and Hardware Token
+- verified full build health
 
 ## ✅ Why This Matters
-Now that the branch has been promoted to `main`, every small polish pass improves the actual live experience. Hardening the vector service ensures that background jobs don't fail silently on standard Redis instances, while surfacing the remaining leaf routes ensures the full breadth of the restored branch is accessible through the new hub-based product map.
+With this tranche, every major feature that was part of the restoration scope is now not only "alive" in the codebase but "discoverable" in the UI. The app shell, dashboard, and hubs now provide a complete map of the product's capabilities.

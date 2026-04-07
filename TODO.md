@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.13
+> **Version:** 1.8.14
 > **Last Updated:** 2026-04-07
 
 ---
@@ -17,6 +17,7 @@
 - [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
 
 ## ✅ Recently Completed
+- [x] **Hub Completion & Leaf Recovery**: Fixed build-breaking imports and surfaced Ice Breaker Cards, Video Calls, and Hardware Token in their respective hubs.
 - [x] **Surface Polish & Runtime Hardening**: Hardened `VectorService` against missing RediSearch, surfaced `/rate-my-pussy`, `/groups/matching`, and `/gifts/history` in their respective hubs, and removed excluded links from Settings.
 - [x] **Production Schema Repair**: Added a corrective migration to eliminate 500 errors caused by 'ghost' migrations; ensuring the production database actually holds the tables and columns required by the restored codebase.
 - [x] **Rewind Sidebar Domain Organization**: Reorganized the sidebar and mobile restored-surfaces navigation into domain groups so the app shell now mirrors the dashboard’s product map instead of presenting a flat feature list.

@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.13 "Surface Polish & Runtime Hardening"
+> **Current Version:** 1.8.14 "Hub Completion & Leaf Recovery"
 > **Last Updated:** 2026-04-07
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.13)
+### Phase 5: Production Scale (COMPLETED - v1.8.14)
+- **Hub Completion & Leaf Recovery:** Surfaced the remaining restored features (Ice Breakers, Video Calls, Hardware Token) in their respective hubs and repaired building-breaking imports.
 - **Surface Polish & Runtime Hardening:** Hardened `VectorService` against missing RediSearch, surfaced `/rate-my-pussy`, `/groups/matching`, and `/gifts/history` in their respective hubs, and removed excluded links from Settings.
 - **Production Schema Repair:** Added a corrective migration to eliminate 500 errors caused by 'ghost' migrations; ensuring the production database actually holds the tables and columns required by the restored codebase.
 - **Rewind Shell Product-Map Consistency:** Locked in consistent domain-based organization across the dashboard and app shell so the restored branch reads as one coherent product map.
