@@ -55,6 +55,13 @@ const spaces = [
     icon: SmartphoneNfc,
     accent: 'from-cyan-500 to-teal-500',
   },
+  {
+    href: '/pulse',
+    title: 'Live Proximity Feed',
+    description: 'Open the dedicated real-time proximity feed to see what is happening in your immediate area.',
+    icon: Sparkles,
+    accent: 'from-orange-500 to-pink-500',
+  },
 ]
 
 export default function SpacesPage() {

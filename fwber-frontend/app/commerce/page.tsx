@@ -35,6 +35,13 @@ const commerceSurfaces = [
     accent: 'from-pink-500 to-rose-500',
   },
   {
+    href: isMerchant ? '/merchant/inventory' : '/merchant/register',
+    title: 'Inventory',
+    description: 'Manage your redeemable physical items, stock levels, and marketplace pricing.',
+    icon: ShoppingBag,
+    accent: 'from-orange-500 to-amber-600',
+  },
+  {
     href: isMerchant ? '/merchant/analytics' : '/merchant/register',
     title: 'Merchant Analytics',
     description: 'Open the business-side analytics surface for traction, visibility, and offer performance signals.',

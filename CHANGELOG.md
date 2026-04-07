@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.21] - 2026-04-07 — Merchant Inventory & Proximity Polish
+
+### Added
+- Added `fwber-frontend/app/merchant/inventory/page.tsx` providing a dedicated interface for merchants to list and manage redeemable marketplace items.
+- Surfaced **Inventory Management** in the `Commerce` hub.
+- Surfaced **Live Proximity Feed** (`/pulse`) in the `Spaces` hub to complete the local-engagement loop.
+
+### Changed
+- Refined **Dating loop** sidebar labels for better alignment with restored features.
+- Completed the "Real-time Signal" TODO by confirming Reverb heartbeats are active and surfaced.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully.
+- Confirmed `v1.8.20` backend/deployment repair successfully cleared the foreign key constraint blocks.
+
 ## [1.8.20] - 2026-04-07 — Critical Production & CI Repair
 
 ### Fixed

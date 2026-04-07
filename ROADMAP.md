@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.20 "Critical Production & CI Repair"
+> **Current Version:** 1.8.21 "Merchant Inventory & Proximity Polish"
 > **Last Updated:** 2026-04-07
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.20)
+### Phase 5: Production Scale (COMPLETED - v1.8.21)
+- **Merchant Inventory & Proximity Polish:** Completed the local commerce loop by adding inventory management and surfacing the real-time proximity feed.
 - **Critical Production & CI Repair:** Fixed dashboard 500 error and expanded nuclear recovery to resolve production constraint failures.
 - **Nuclear Schema Recovery & System Heartbeat:** Forcefully restored missing 'ghost' tables on production and activated the Laravel Scheduler on Hetzner.
 - **Token Bridge & Real-time Signal:** Surfaced the Swap interface in the Economy hub and added a live Reverb network signal to the dashboard stats.

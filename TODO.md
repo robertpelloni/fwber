@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.20
+> **Version:** 1.8.21
 > **Last Updated:** 2026-04-07
 
 ---
@@ -17,6 +17,7 @@
 - [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
 
 ## ✅ Recently Completed
+- [x] **Merchant Inventory & Proximity Polish**: Added merchant inventory management, surfaced the proximity feed in Spaces, and verified Reverb heartbeats.
 - [x] **Critical Production & CI Repair**: Fixed dashboard 500 error ($daysActive) and expanded nuclear recovery to include missing proximity and artifact tables.
 - [x] **Nuclear Schema Recovery & System Heartbeat**: Forcefully restored missing 'ghost' tables on production, activated the Laravel Scheduler on Hetzner, and added a Reverb health heartbeat.
 - [x] **Token Bridge & Real-time Signal**: Surfaced the Swap interface in the Economy hub and added a live Reverb network signal to the dashboard stats.
