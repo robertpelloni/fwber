@@ -1,45 +1,46 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-07
-> **Version Reached:** 1.8.23
+> **Version Reached:** 1.8.24
 > **Current Model:** GPT
 > **Branch:** `main`
 
 ## Executive Summary
-This session initiated Phase 6 (Polish & Hardening) by tackling the AI integration quality:
-1. confirmed `v1.8.22` deployment and testing finished fully green on `main`.
-2. executed a comprehensive AI Prompt Tuning pass to hyper-localize the LLM outputs to Detroit.
-3. verified the frontend build.
-4. updated release tracking to **v1.8.23**.
+This session continued Phase 6 (Polish & Hardening) by tackling performance optimization at the core of the app:
+1. confirmed `v1.8.23` deployment and testing finished fully green on `main`.
+2. identified and eliminated severe N+1 queries in the dashboard activity feed.
+3. verified the backend tests.
+4. updated release tracking to **v1.8.24**.
 
 No processes were manually killed.
 
 ---
 
 ## What Was Added/Changed In This Slice
-### 1. Detroit-Flavored AI Wingman
-Refined the LLM system prompts in `fwber-backend/app/Services/AiWingmanService.php`. The AI is no longer a generic "dating coach." It is now explicitly instructed to act as a Detroit-based expert. This affects:
-- **Roasts & Hypes**: Infused with local slang and grit.
-- **Vibe Checks**: Analyzed from a Detroit perspective.
-- **Cosmic Match & Nemesis**: Given a more localized, "rogue" scientific flavor.
-- **Compatibility Audit**: Tuned to the platform's specific privacy-first, proximity-dating focus.
+### 1. Dashboard N+1 Query Elimination
+Refactored `getActivity` in `fwber-backend/app/Http/Controllers/DashboardController.php`. Previously, the method performed individual `DB::table('users')->find()` queries inside loops for every match, message, and profile view to build the unified activity feed. This scaled horribly (O(N) queries where N is the feed limit multiplied by activity types).
 
-### 2. Authentic Date Ideas
-Refined the `buildDateIdeasPrompt` to explicitly instruct the LLM to suggest real, iconic Detroit locations (e.g., Belle Isle, Eastern Market, Corktown). This ensures the "AI Date Ideas" feature surfaced in `v1.8.16` provides immediately actionable, high-quality local suggestions rather than generic advice like "go to a coffee shop."
+The refactor changes the flow to:
+- collect all relevant `user_id`s from the raw activity queries.
+- perform a single, batched `DB::table('users')->whereIn('id', $userIdsToFetch)->get()` query.
+- map the results in memory.
+
+### Why this matters
+The `/dashboard/activity` route is one of the highest-traffic endpoints on the entire platform, hit nearly every time a user navigates to the signed-in shell. Eliminating this N+1 bottleneck significantly reduces latency and MySQL load on the Hetzner VPS, protecting the platform's scaling capacity as engagement grows.
 
 ---
 
 ## Deployment Status
 ### Mainline status
-- **Hetzner Deployment**: `v1.8.22` confirmed successful. `v1.8.23` is ready to push.
+- **Hetzner Deployment**: `v1.8.23` confirmed successful. `v1.8.24` is ready to push.
 - **API Health**: `api.fwber.me/api/health` reports **Healthy**.
-- **Database**: All recovered schema structures are stable.
+- **Database**: Activity queries are now optimized.
 
 ---
 
 ## Files Changed In This Slice
 ### Backend
-- `fwber-backend/app/Services/AiWingmanService.php`
+- `fwber-backend/app/Http/Controllers/DashboardController.php`
 
 ### Docs / release tracking
 - `VERSION`
@@ -58,12 +59,12 @@ Refined the `buildDateIdeasPrompt` to explicitly instruct the LLM to suggest rea
 
 ## Git / Release State
 ### Current tranche target
-- **Target Version:** `1.8.23`
-- **Recommended Commit Message:** `feat: hyper-localize AI Wingman prompts to Detroit (v1.8.23)`
+- **Target Version:** `1.8.24`
+- **Recommended Commit Message:** `perf: eliminate dashboard N+1 queries for activity feed (v1.8.24)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.23` tranche.
+1. Commit and push the `v1.8.24` tranche.
 2. Watch the Actions runs.
-3. With the AI localized, move to the next critical Phase 6 item: **Performance Monitoring Pass**. The `AnalyticsController` and `SlowRequests` tables are active; using them to optimize API latency on Hetzner will maximize the value of the restored features.
+3. Continue the **Performance Monitoring Pass** by checking other heavily utilized controllers (e.g., `MatchController`, `RecommendationController`, or `ChatroomController`) for similar N+1 optimization opportunities.

@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-07 — v1.8.24 N+1 query elimination is the highest-value performance polish
+- The dashboard `getActivity` method was running a new database query for every match, message, and view it found. This N+1 problem scales horribly.
+- Refactoring it to collect IDs and do a single `whereIn` lookup dramatically cuts down latency on the most frequently hit route in the app.
+- Performance hardening like this is the exact right next step after structural restoration.
+
 ## 2026-04-07 — v1.8.23 generic AI wrappers erode trust; hyper-localized AI builds it
 - Restoring the AI Wingman features functionally was Step 1. Making them *feel* like Detroit and the product's actual vibe was Step 2.
 - The `AiWingmanService` prompt tuning forces the LLM to provide context-aware, locally actionable Date Ideas and Roasts.

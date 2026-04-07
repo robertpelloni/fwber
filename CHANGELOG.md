@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.24] - 2026-04-07 — Performance Monitoring & N+1 Query Optimization
+
+### Changed
+- Optimized `DashboardController::getActivity` to eliminate N+1 queries. The recent activity feed now loads related users in a single optimized database query instead of executing a new `SELECT` statement for every single match, message, and profile view in the feed.
+
+### Verified
+- `v1.8.23` deployed successfully to Hetzner and the backend tests passed.
+- The `getActivity` payload structure remains fully backward compatible with the frontend expectations while significantly reducing database load.
+
 ## [1.8.23] - 2026-04-07 — AI Prompt Tuning & Localization
 
 ### Changed

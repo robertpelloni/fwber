@@ -180,6 +180,7 @@ class DashboardController extends Controller
         $limit = $request->input('limit', 10);
 
         $activities = [];
+        $userIdsToFetch = [];
 
         // Recent matches
         $matches = DB::table('matches')
@@ -194,9 +195,47 @@ class DashboardController extends Controller
 
         foreach ($matches as $match) {
             $otherUserId = $match->user1_id == $userId ? $match->user2_id : $match->user1_id;
-            $otherUser = DB::table('users')->find($otherUserId);
+            $userIdsToFetch[] = $otherUserId;
+        }
 
-            if ($otherUser) {
+        // Recent messages
+        $messages = DB::table('messages')
+            ->where('receiver_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+
+        foreach ($messages as $message) {
+            $userIdsToFetch[] = $message->sender_id;
+        }
+
+        // Recent profile views
+        $views = DB::table('profile_views')
+            ->where('viewed_user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+
+        foreach ($views as $view) {
+            if ($view->viewer_user_id) {
+                $userIdsToFetch[] = $view->viewer_user_id;
+            }
+        }
+
+        // Fetch all required users in one query
+        $userIdsToFetch = array_unique($userIdsToFetch);
+        $usersData = [];
+        if (!empty($userIdsToFetch)) {
+            $users = DB::table('users')->whereIn('id', $userIdsToFetch)->get(['id', 'name', 'avatar_url']);
+            foreach ($users as $u) {
+                $usersData[$u->id] = $u;
+            }
+        }
+
+        foreach ($matches as $match) {
+            $otherUserId = $match->user1_id == $userId ? $match->user2_id : $match->user1_id;
+            if (isset($usersData[$otherUserId])) {
+                $otherUser = $usersData[$otherUserId];
                 $activities[] = [
                     'type' => 'match',
                     'user' => [
@@ -210,17 +249,9 @@ class DashboardController extends Controller
             }
         }
 
-        // Recent messages
-        $messages = DB::table('messages')
-            ->where('receiver_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
-
         foreach ($messages as $message) {
-            $sender = DB::table('users')->find($message->sender_id);
-
-            if ($sender) {
+            if (isset($usersData[$message->sender_id])) {
+                $sender = $usersData[$message->sender_id];
                 $activities[] = [
                     'type' => 'message',
                     'user' => [
@@ -233,28 +264,18 @@ class DashboardController extends Controller
             }
         }
 
-        // Recent profile views
-        $views = DB::table('profile_views')
-            ->where('viewed_user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
-
         foreach ($views as $view) {
-            if ($view->viewer_user_id) {
-                $viewer = DB::table('users')->find($view->viewer_user_id);
-
-                if ($viewer) {
-                    $activities[] = [
-                        'type' => 'view',
-                        'user' => [
-                            'id' => $viewer->id,
-                            'name' => $viewer->name,
-                            'avatar_url' => $viewer->avatar_url ?? null,
-                        ],
-                        'timestamp' => $view->created_at,
-                    ];
-                }
+            if ($view->viewer_user_id && isset($usersData[$view->viewer_user_id])) {
+                $viewer = $usersData[$view->viewer_user_id];
+                $activities[] = [
+                    'type' => 'view',
+                    'user' => [
+                        'id' => $viewer->id,
+                        'name' => $viewer->name,
+                        'avatar_url' => $viewer->avatar_url ?? null,
+                    ],
+                    'timestamp' => $view->created_at,
+                ];
             }
         }
 

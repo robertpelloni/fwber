@@ -1,19 +1,20 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.23
+> **Version:** 1.8.24
 > **Last Updated:** 2026-04-07
 
 ---
 
 ## 🔴 Critical: Continuous Improvement
 - [x] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
-- [ ] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals.
+- [x] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals (resolved N+1 queries in Dashboard).
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
 - [ ] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 
 ## ✅ Recently Completed
+- [x] **Performance Monitoring & N+1 Query Optimization**: Refactored the dashboard `getActivity` method to eliminate N+1 database queries when fetching the recent activity feed.
 - [x] **AI Prompt Tuning & Localization**: Hyper-localized the AI Wingman prompts (roasts, vibes, date ideas) to the Detroit and privacy-first product identity.
 - [x] **Project Consolidation & Future Milestones**: Completed broad product polish across all hubs. Verified all leaf features (Gifts, Matches, Connections, Commerce) are reachable and functional.
 - [x] **Merchant Inventory & Proximity Polish**: Added merchant inventory management, surfaced the proximity feed in Spaces, and verified Reverb heartbeats.
