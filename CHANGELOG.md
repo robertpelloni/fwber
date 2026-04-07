@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.26] - 2026-04-07 — Advanced Proximity Performance Pass
+
+### Changed
+- Refactored `ProximityArtifactController::localPulse` and `getNearbyCompatibleCandidates` to eliminate a hidden N+1 query loop. Pre-fetched the recent artifact counts for all nearby match candidates using a single batched database query, drastically reducing query overhead on the Local Pulse and Spaces hubs.
+
+### Verified
+- Executed `php artisan test` locally and confirmed that the refactored endpoints maintain the same functionality without the performance penalty.
+
 ## [1.8.25] - 2026-04-07 — Extended Performance Monitoring Pass
 
 ### Changed

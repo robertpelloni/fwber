@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-07 — v1.8.26 another silent N+1 query found in proximity logic
+- `ProximityArtifactController::localPulse` was calling `getCompatibilityIndicators` in a loop, which fired off `ProximityArtifact::count()` per user to see if they were active locally.
+- Bulk fetching this count for all nearby match candidates at once preserves database capacity on the heavy local-pulse route.
+- The performance pass is revealing how many nested operations were written for isolated tests rather than loop execution.
+
 ## 2026-04-07 — v1.8.25 eliminating backend N+1 queries protects scalability on the restored core loops
 - The `MatchController` ran a separate query for every candidate to count their recent proximity artifacts (the "Proximity Saturation Penalty").
 - Grouping that count by user ID into a single query before the compatibility scoring map is run removes significant DB overhead per swipe session.

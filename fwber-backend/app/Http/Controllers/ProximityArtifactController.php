@@ -648,12 +648,28 @@ class ProximityArtifactController extends Controller
             })
             ->take($limit);
 
+        $candidateIds = $candidates->pluck('id')->toArray();
+        $recentArtifactCounts = [];
+        
+        if (!empty($candidateIds)) {
+            $counts = \Illuminate\Support\Facades\DB::table('proximity_artifacts')
+                ->whereIn('user_id', $candidateIds)
+                ->where('created_at', '>=', now()->subHours(24))
+                ->groupBy('user_id')
+                ->select('user_id', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+                ->get();
+                
+            foreach ($counts as $count) {
+                $recentArtifactCounts[$count->user_id] = $count->count;
+            }
+        }
+
         // Return lightweight previews (no full profiles, just teasers)
-        return $candidates->map(function (\App\Models\User $candidate) use ($profile) {
+        return $candidates->map(function (\App\Models\User $candidate) use ($profile, $recentArtifactCounts) {
             $candidateProfile = $candidate->profile;
 
             // Calculate simplified compatibility (just mutual wants indicators)
-            $compatibilityIndicators = $this->getCompatibilityIndicators($profile, $candidateProfile);
+            $compatibilityIndicators = $this->getCompatibilityIndicators($profile, $candidateProfile, $recentArtifactCounts[$candidate->id] ?? 0);
 
             return [
                 'user_id' => $candidate->id,
@@ -693,7 +709,7 @@ class ProximityArtifactController extends Controller
     /**
      * Get compatibility indicators showing mutual wants/preferences alignment
      */
-    private function getCompatibilityIndicators(\App\Models\UserProfile $userProfile, \App\Models\UserProfile $candidateProfile): array
+    private function getCompatibilityIndicators(\App\Models\UserProfile $userProfile, \App\Models\UserProfile $candidateProfile, int $recentProximityPosts = 0): array
     {
         $indicators = [];
 
@@ -714,9 +730,6 @@ class ProximityArtifactController extends Controller
             }
 
             // Proximity engagement indicator
-            $recentProximityPosts = \App\Models\ProximityArtifact::where('user_id', $candidateProfile->user_id)
-                ->where('created_at', '>=', now()->subHours(24))
-                ->count();
             if ($recentProximityPosts > 0) {
                 $indicators[] = 'active_locally';
             }
