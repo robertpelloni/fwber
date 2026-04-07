@@ -1,19 +1,18 @@
-# PROJECT_STATUS.md - fwber v1.8.19 (Nuclear Schema Recovery & System Heartbeat)
+# PROJECT_STATUS.md - fwber v1.8.20 (Critical Production & CI Repair)
 
 **Date:** 2026-04-07
-**Version:** 1.8.19 "Nuclear Schema Recovery & System Heartbeat"
-**Status:** ✅ **PRODUCTION INFRASTRUCTURE IS NOW FULLY ACTIVE, SCHEDULED, AND REPAIRED**
+**Version:** 1.8.20 "Critical Production & CI Repair"
+**Status:** ✅ **DASHBOARD 500 ERROR FIXED AND NUCLEAR RECOVERY EXPANDED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This critical infrastructure release fixed deep-seated production amnesia and activated the background heart of the platform.
+This immediate repair release fixed two critical issues introduced in the prior infrastructure pass.
 
 Delivered:
-- **Nuclear Schema Recovery**: Forcefully restored 10+ major missing tables (`groups`, `chatrooms`, `achievements`, `topics`, etc.) that were present in the migration ledger but absent in the production DB.
-- **System Scheduler Activation**: Enabled the Laravel cron scheduler on Hetzner, ensuring that cleanup jobs, proposals, and heartbeats actually run.
-- **Real-time Heartbeat**: Added a 1-minute heartbeat command to confirm the health of the Reverb/WebSocket loop.
-- **Graceful Vector Service**: Hardened profile saves so they no longer crash when RediSearch is unavailable.
+- **Dashboard Fix**: Restored the missing `$daysActive` variable in `DashboardController`, eliminating 500 errors on the main dashboard.
+- **Enhanced Nuclear Recovery**: Added `proximity_chatrooms`, `proximity_artifacts`, and their associated comments/votes/messages to the recovery list.
+- **Constraint Safety**: Ensured correct table creation order so foreign keys no longer block the recovery process.
 
 ## ✅ Why This Matters
-The restoration is finally complete at the database level. Previously, many hubs (like Groups or Chatrooms) would have failed live because their underlying tables were missing despite the code being present. By "nuclear-fixing" the schema and enabling the scheduler, the platform is now a truly living system on Hetzner.
+The previous release hit a "foreign key wall" because it tried to create comment tables for proximity artifacts that didn't exist yet in the DB. By adding the base proximity tables to the recovery ledger and fixing the dashboard variable, we've cleared the path for a fully successful Hetzner deployment.

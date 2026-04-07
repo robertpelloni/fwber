@@ -100,6 +100,9 @@ class DashboardController extends Controller
             ? round(($sentMessages / $receivedMessages) * 100)
             : 0;
 
+        // Days active
+        $daysActive = Carbon::parse($user->created_at)->diffInDays(Carbon::now());
+
         // approximate uptime
         $bootTime = \Illuminate\Support\Facades\Cache::remember('app_boot_time', 86400, fn () => now());
         $reverbHealthy = \Illuminate\Support\Facades\Cache::has('reverb_last_heartbeat') || app()->environment('local');

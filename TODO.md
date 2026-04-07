@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.19
+> **Version:** 1.8.20
 > **Last Updated:** 2026-04-07
 
 ---
@@ -17,6 +17,7 @@
 - [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
 
 ## ✅ Recently Completed
+- [x] **Critical Production & CI Repair**: Fixed dashboard 500 error ($daysActive) and expanded nuclear recovery to include missing proximity and artifact tables.
 - [x] **Nuclear Schema Recovery & System Heartbeat**: Forcefully restored missing 'ghost' tables on production, activated the Laravel Scheduler on Hetzner, and added a Reverb health heartbeat.
 - [x] **Token Bridge & Real-time Signal**: Surfaced the Swap interface in the Economy hub and added a live Reverb network signal to the dashboard stats.
 - [x] **Mobile Notification Bridge & Marketplace Surfacing**: Restored the native push bridge for the mobile shell and surfaced the physical item marketplace in the Commerce hub.

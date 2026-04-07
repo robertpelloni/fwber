@@ -150,19 +150,100 @@ return new class extends Migration
             });
         }
 
-        // --- 5. ACTIVITY REPAIR (Ensuring common columns exist) ---
-        if (Schema::hasTable('user_profiles')) {
-            Schema::table('user_profiles', function (Blueprint $table) {
-                if (! Schema::hasColumn('user_profiles', 'looking_for')) {
-                    $table->json('looking_for')->nullable()->after('relationship_style');
-                }
-                if (! Schema::hasColumn('user_profiles', 'interests')) {
-                    $table->json('interests')->nullable()->after('languages');
-                }
+        if (! Schema::hasTable('chatroom_message_reactions')) {
+            Schema::create('chatroom_message_reactions', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('chatroom_message_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->string('emoji');
+                $table->timestamps();
             });
         }
 
-        // --- 6. TOPICS & ENGAGEMENT ---
+        if (! Schema::hasTable('chatroom_message_mentions')) {
+            Schema::create('chatroom_message_mentions', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('chatroom_message_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
+
+        // --- 5. PROXIMITY CHATROOMS ---
+        if (! Schema::hasTable('proximity_chatrooms')) {
+            Schema::create('proximity_chatrooms', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->decimal('lat', 10, 7);
+                $table->decimal('lng', 10, 7);
+                $table->unsignedInteger('radius_m')->default(500);
+                $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('proximity_chatroom_members')) {
+            Schema::create('proximity_chatroom_members', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('proximity_chatroom_id')->constrained('proximity_chatrooms')->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->timestamp('joined_at')->useCurrent();
+                $table->timestamps();
+                $table->unique(['proximity_chatroom_id', 'user_id'], 'prox_room_user_unique');
+            });
+        }
+
+        if (! Schema::hasTable('proximity_chatroom_messages')) {
+            Schema::create('proximity_chatroom_messages', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('proximity_chatroom_id')->constrained('proximity_chatrooms')->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->text('content');
+                $table->timestamps();
+            });
+        }
+
+        // --- 6. PROXIMITY ARTIFACTS & LOCAL LOOP ---
+        if (! Schema::hasTable('proximity_artifacts')) {
+            Schema::create('proximity_artifacts', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+                $table->string('type')->index(); // chat, board_post, announce, token_drop, promotion
+                $table->text('content');
+                $table->decimal('location_lat', 10, 7)->index();
+                $table->decimal('location_lng', 10, 7)->index();
+                $table->unsignedInteger('visibility_radius_m')->default(1000);
+                $table->string('moderation_status')->default('clean')->index();
+                $table->json('meta')->nullable();
+                $table->timestamp('expires_at')->index();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('proximity_artifact_comments')) {
+            Schema::create('proximity_artifact_comments', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('proximity_artifact_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->text('content');
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('proximity_artifact_votes')) {
+            Schema::create('proximity_artifact_votes', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('proximity_artifact_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->integer('value')->default(1);
+                $table->timestamps();
+                $table->unique(['proximity_artifact_id', 'user_id']);
+            });
+        }
+
+        // --- 7. TOPICS & ENGAGEMENT ---
         if (! Schema::hasTable('topics')) {
             Schema::create('topics', function (Blueprint $table) {
                 $table->id();
@@ -187,24 +268,38 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('proximity_artifact_comments')) {
-            Schema::create('proximity_artifact_comments', function (Blueprint $table) {
+        if (! Schema::hasTable('audio_room_participants')) {
+            Schema::create('audio_room_participants', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('proximity_artifact_id')->constrained()->onDelete('cascade');
+                $table->foreignId('audio_room_id')->constrained()->onDelete('cascade');
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
-                $table->text('content');
+                $table->string('role')->default('listener');
+                $table->timestamp('joined_at')->useCurrent();
                 $table->timestamps();
             });
         }
 
-        if (! Schema::hasTable('proximity_artifact_votes')) {
-            Schema::create('proximity_artifact_votes', function (Blueprint $table) {
+        // --- 8. MISC GHOSTED TABLES ---
+        if (! Schema::hasTable('friend_requests')) {
+            Schema::create('friend_requests', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('proximity_artifact_id')->constrained()->onDelete('cascade');
                 $table->foreignId('user_id')->constrained()->onDelete('cascade');
-                $table->integer('value')->default(1);
+                $table->foreignId('friend_id')->constrained('users')->onDelete('cascade');
+                $table->string('status')->default('pending');
                 $table->timestamps();
-                $table->unique(['proximity_artifact_id', 'user_id']);
+                $table->unique(['user_id', 'friend_id']);
+            });
+        }
+
+        // --- 9. ACTIVITY REPAIR (Ensuring common columns exist) ---
+        if (Schema::hasTable('user_profiles')) {
+            Schema::table('user_profiles', function (Blueprint $table) {
+                if (! Schema::hasColumn('user_profiles', 'looking_for')) {
+                    $table->json('looking_for')->nullable()->after('relationship_style');
+                }
+                if (! Schema::hasColumn('user_profiles', 'interests')) {
+                    $table->json('interests')->nullable()->after('languages');
+                }
             });
         }
     }

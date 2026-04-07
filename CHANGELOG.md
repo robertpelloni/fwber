@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.20] - 2026-04-07 — Critical Production & CI Repair
+
+### Fixed
+- Fixed a 500 error in `DashboardController` caused by a missing `$daysActive` variable definition after the Reverb health signal refactor.
+- Expanded the `nuclear_schema_recovery` migration to include missing proximity chatroom and artifact tables (`proximity_chatrooms`, `proximity_artifact_comments`, etc.), resolving a foreign key constraint failure on production.
+- Repaired table dependency order in the recovery migration to ensure referenced tables exist before constraints are added.
+
+### Verified
+- Confirmed `v1.8.19` Backend CI and Deployment failures were limited to the missing variable and missing ghosted proximity tables.
+
 ## [1.8.19] - 2026-04-07 — Nuclear Schema Recovery & System Heartbeat
 
 ### Added

@@ -1,58 +1,52 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-07
-> **Version Reached:** 1.8.19
+> **Version Reached:** 1.8.20
 > **Current Model:** GPT
 > **Branch:** `main`
 
 ## Executive Summary
-This session moved from surface polish to deep infrastructure repair and activation:
-1. confirmed `v1.8.18` green streak continues on `main`
-2. discovered a critical "ghost migration" issue on production: multiple major tables were present in the ledger but physically absent in the DB
-3. implemented a **Nuclear Schema Recovery** migration (`v1.8.19`) to forcefully restore:
-   - `groups`, `group_members`, `group_posts`
-   - `chatrooms`, `chatroom_members`, `chatroom_messages`
-   - `token_transactions`
-   - `achievements`, `user_achievements`
-   - `topics`, `audio_rooms`
-   - `proximity_artifact_comments`, `proximity_artifact_votes`
-4. discovered the **Laravel Scheduler** was inactive on Hetzner; enabled it via crontab
-5. added a **WebSocket Heartbeat** Artisan command to update the live dashboard signal
-6. updated release tracking to **v1.8.19**
+This session was an immediate critical repair pass following the `v1.8.19` deployment failure:
+1. investigated `v1.8.19` Backend CI and Deployment failures
+2. identified a missing `$daysActive` variable in `DashboardController` causing 500 errors
+3. identified a foreign key constraint failure in the nuclear migration due to "ghosted" proximity tables
+4. expanded **Nuclear Schema Recovery** (`v1.8.20`) to restore:
+   - `proximity_chatrooms`, `proximity_chatroom_members`, `proximity_chatroom_messages`
+   - `proximity_artifacts`, `proximity_artifact_comments`, `proximity_artifact_votes`
+   - `friend_requests`
+5. ensured correct table creation order in the migration to respect foreign key dependencies
+6. updated release tracking to **v1.8.20**
 
 No processes were manually killed.
 
 ---
 
-## What Was Added In This Continuation
-### 1. Nuclear Schema Recovery
-Fixed the amnesia in the production database. Even though the "Great Simplification" had previously dropped these tables, the migration ledger still claimed they had run. The new `nuclear_schema_recovery` migration uses `Schema::hasTable` guards to safely recreate everything missing from the approved restoration scope.
+## What Was Repaired In This Slice
+### 1. Dashboard 500 Fix
+Restored the `$daysActive` calculation line in `App\Http\Controllers\DashboardController::getStats`. This was accidentally removed during the Reverb health signal addition, which caused the dashboard to crash in production.
 
-### 2. System Scheduler Activation
-The Hetzner backend now has a heart. The cron scheduler is active for the `deploy` user, meaning:
-- Expiration of boosts/subscriptions now works
-- Event reminders are sent
-- Slow query analysis is updated
-- Reverb heartbeats are posted
+### 2. Migration Dependency Repair
+The previous attempt to restore comment/vote tables for proximity artifacts failed because the base `proximity_artifacts` table was also a "ghost" (ledger said it existed, but the table was gone). 
 
-### 3. WebSocket Heartbeat
-Added `websocket:heartbeat` command. It runs every minute via the scheduler and updates a Redis-backed cache key. This provides the "Live" signal for the dashboard stats added in the previous tranche.
+The expanded recovery migration now restores the base tables first, then the dependent relationship tables.
+
+### 3. Broad Ghost Table Recovery
+Confirmed via live Tinker checks that almost every table created between Batch 2 and Batch 12 of the previous setup was "ghosted." The `nuclear_schema_recovery` has been made broad enough to catch all of them.
 
 ---
 
 ## Deployment Status
 ### Mainline status
-- **Hetzner Deployment**: `v1.8.18` confirmed successful. `v1.8.19` is ready to push.
-- **Scheduler**: **🟢 ACTIVE** (verified via `crontab -l`)
-- **API Health**: `api.fwber.me/api/health` reports **Healthy**.
+- **Hetzner Deployment**: `v1.8.19` failed. `v1.8.20` is ready to push.
+- **Scheduler**: **🟢 ACTIVE**
+- **API Health**: `api.fwber.me/api/health` reports **Healthy** (but dashboard route is currently 500ing on v1.8.19 live; this push fixes it).
 
 ---
 
-## Files Changed In This Continuation
+## Files Changed In This Slice
 ### Backend
-- `fwber-backend/app/Console/Commands/WebsocketHeartbeat.php` (New)
-- `fwber-backend/database/migrations/2026_04_07_000002_nuclear_schema_recovery.php` (New)
-- `fwber-backend/routes/console.php`
+- `fwber-backend/app/Http/Controllers/DashboardController.php`
+- `fwber-backend/database/migrations/2026_04_07_000002_nuclear_schema_recovery.php` (Expanded)
 
 ### Docs / release tracking
 - `VERSION`
@@ -64,19 +58,19 @@ Added `websocket:heartbeat` command. It runs every minute via the scheduler and 
 - `TODO.md`
 - `MEMORY.md`
 - `ROADMAP.md`
+- `docs/SUBMODULE_DASHBOARD.md`
 - `HANDOFF.md`
 
 ---
 
 ## Git / Release State
 ### Current tranche target
-- **Target Version:** `1.8.19`
-- **Recommended Commit Message:** `fix: nuclear schema recovery and activate production scheduler (v1.8.19)`
+- **Target Version:** `1.8.20`
+- **Recommended Commit Message:** `fix: dashboard 500 error and expand nuclear schema recovery (v1.8.20)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.19` tranche.
-2. Watch the final Actions runs.
-3. Verify the "Network" stat on the dashboard actually stays "Live" now that the heartbeat is scheduled.
-4. The backend is now fully operational at the infrastructure level. High-level focus can return to UX perfection within the hubs.
+1. Commit and push the `v1.8.20` repair tranche.
+2. Watch the Actions runs to ensure the foreign key issue is resolved.
+3. Once the dashboard recovers, the platform will be in its most stable state yet.
