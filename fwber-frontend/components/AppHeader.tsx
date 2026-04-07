@@ -31,6 +31,7 @@ import {
   Wallet,
   Flame,
   Store,
+  ShoppingBag,
   Sparkles,
   Gavel,
   Gift,

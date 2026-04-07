@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.17 "Mobile Notification Bridge & Marketplace Surfacing"
+> **Current Version:** 1.8.18 "Token Bridge & Real-time Signal"
 > **Last Updated:** 2026-04-07
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.17)
+### Phase 5: Production Scale (COMPLETED - v1.8.18)
+- **Token Bridge & Real-time Signal:** Surfaced the Swap interface in the Economy hub and added a live Reverb network signal to the dashboard stats.
 - **Mobile Notification Bridge & Marketplace Surfacing:** Restored the native push bridge for the mobile shell and surfaced the physical item marketplace in the Commerce hub.
 - **Gamification & Physical-Match Surfacing:** Surfaced NFC Flash Match, AI Date Ideas, and Daily Streak celebration so the branch feels alive and engaging.
 - **Sidebar Domain Organization & Exclusion Audit:** Reorganized sidebar/mobile navigation into domain groups and enforced strict exclusion of Icebreakers/Journals in the UI.

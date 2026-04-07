@@ -100,8 +100,9 @@ class DashboardController extends Controller
             ? round(($sentMessages / $receivedMessages) * 100)
             : 0;
 
-        // Days active
-        $daysActive = Carbon::parse($user->created_at)->diffInDays(Carbon::now());
+        // approximate uptime
+        $bootTime = \Illuminate\Support\Facades\Cache::remember('app_boot_time', 86400, fn () => now());
+        $reverbHealthy = \Illuminate\Support\Facades\Cache::has('reverb_last_heartbeat') || app()->environment('local');
 
         return response()->json([
             'total_matches' => (int) ($matchStats->total_matches ?? 0),
@@ -114,8 +115,9 @@ class DashboardController extends Controller
             'response_rate' => (int) $responseRate,
             'days_active' => (int) $daysActive,
             'current_streak' => (int) $user->current_streak,
-            'streak_just_updated' => (bool) $user->streakJustUpdated, // This relies on the transient property being set by StreakService
+            'streak_just_updated' => (bool) $user->streakJustUpdated,
             'last_login' => $user->updated_at->toISOString(),
+            'reverb_healthy' => (bool) $reverbHealthy,
         ]);
     }
 

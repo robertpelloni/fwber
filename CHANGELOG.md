@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.18] - 2026-04-07 — Token Bridge & Real-time Signal
+
+### Added
+- Added **Token Bridge (Swap)** surface to the `Economy` hub, enabling cross-asset value exchange.
+- Added **Network Status** indicator to the dashboard stats, providing a live signal for Reverb websocket connectivity.
+
+### Fixed
+- Repaired a missing `ShoppingBag` icon import in the `AppHeader` that was causing production build failures on `/council` and other pages.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully.
+- Confirmed `DashboardController` correctly returns `reverb_healthy` signal based on cache heartbeats.
+
 ## [1.8.17] - 2026-04-07 — Mobile Notification Bridge & Marketplace Surfacing
 
 ### Added

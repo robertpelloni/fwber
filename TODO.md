@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.17
+> **Version:** 1.8.18
 > **Last Updated:** 2026-04-07
 
 ---
@@ -13,10 +13,11 @@
 ## 🟡 High: Production & Deployment Verification
 - [x] **Deploy NodeInfo 500 Fix to Hetzner**: Fix confirmed working live via `curl` check.
 - [x] **Verify Live Frontend API Recovery**: Confirmed `api.fwber.me` responds correctly and frontend build uses correct proxy.
-- [ ] **Repair / Confirm Realtime Contract**: Re-check the live header connection badge and websocket/broadcast-auth behavior after the backend/public-route repair deploy.
+- [x] **Repair / Confirm Realtime Contract**: Added a live Network health signal to the dashboard stats; confirmed Reverb websocket contract is active and healthy.
 - [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
 
 ## ✅ Recently Completed
+- [x] **Token Bridge & Real-time Signal**: Surfaced the Swap interface in the Economy hub and added a live Reverb network signal to the dashboard stats.
 - [x] **Mobile Notification Bridge & Marketplace Surfacing**: Restored the native push bridge for the mobile shell and surfaced the physical item marketplace in the Commerce hub.
 - [x] **Gamification & Physical-Match Surfacing**: Surfaced NFC Flash Match, AI Date Ideas, and Daily Streak celebration; expanded smoke checks to cover all hubs.
 - [x] **Sidebar Domain Organization & Exclusion Audit**: Reorganized sidebar/mobile nav by domain, updated dashboard quick actions to use hubs, and removed excluded Icebreaker/Journal links.

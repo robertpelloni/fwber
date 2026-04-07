@@ -34,6 +34,7 @@ import {
   Compass,
   Wand2,
   HeartHandshake,
+  Wifi,
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -64,7 +65,7 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats'],
     enabled: isAuthenticated && !!token,
     queryFn: async () => {
-      const data = await api.get<DashboardStats & { current_streak: number; streak_just_updated: boolean }>('/dashboard/stats');
+      const data = await api.get<DashboardStats & { current_streak: number; streak_just_updated: boolean; reverb_healthy?: boolean }>('/dashboard/stats');
       if (data.streak_just_updated) {
         setIsStreakModalOpen(true);
       }
@@ -136,6 +137,14 @@ export default function DashboardPage() {
                   subtext="Average compatibility"
                   color="orange"
                   link="/matches"
+                />
+                <StatCard
+                  icon={<Wifi className="w-6 h-6" />}
+                  label="Network"
+                  value={stats?.reverb_healthy ? 'Live' : 'Syncing'}
+                  subtext={stats?.reverb_healthy ? 'Real-time active' : 'Connecting to hub...'}
+                  color={stats?.reverb_healthy ? 'green' : 'yellow'}
+                  link="/support"
                 />
               </div>
             )}

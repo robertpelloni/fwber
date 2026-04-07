@@ -3,7 +3,7 @@
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import Link from 'next/link'
-import { Crown, Gift, Lock, Rocket, Sparkles, Wallet } from 'lucide-react'
+import { Crown, Gift, Lock, Rocket, Sparkles, Wallet, ArrowDownCircle } from 'lucide-react'
 
 const economySurfaces = [
   {
@@ -54,6 +54,13 @@ const economySurfaces = [
     description: 'Reach the token-gated unlock and paywall-era surfaces that monetize access and reveals.',
     icon: Lock,
     accent: 'from-sky-500 to-cyan-500',
+  },
+  {
+    href: '/wallet?tab=bridge',
+    title: 'Token Bridge (Swap)',
+    description: 'Exchange FWB tokens for other assets or bridge value across the restored economy layer.',
+    icon: ArrowDownCircle,
+    accent: 'from-indigo-500 to-blue-600',
   },
 ]
 
