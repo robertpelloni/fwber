@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.15] - 2026-04-07 — Sidebar Domain Organization & Exclusion Audit
+
+### Changed
+- Reorganized the sidebar and mobile "Restored features" navigation into domain-based sections: Dating loop, Identity & trust, Premium & growth, Creative & live, and Local business.
+- Renamed "Restored surfaces" to "Product map" in the app shell to align with the new hub-based mental model.
+- Refined Dashboard Quick Actions to point to the main product hubs (Matching, Connections, Economy, Identity, Plans, Studio) for better structural consistency.
+- Strictly enforced restoration exclusions (#1, #2, #13) by removing UI links to Icebreakers and Journals from the hubs and main settings page.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully.
+- Confirmed sidebar refactor correctly uses `globalThis.Map` to avoid icon component shadowing.
+
 ## [1.8.14] - 2026-04-07 — Hub Completion & Leaf Recovery
 
 ### Added

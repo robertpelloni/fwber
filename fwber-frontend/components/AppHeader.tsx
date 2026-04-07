@@ -102,23 +102,9 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/support', label: 'Support', icon: CircleHelp },
     { href: '/operations', label: 'Operations', icon: Shield },
     { href: '/economy', label: 'Economy', icon: Wallet },
-    { href: '/premium', label: 'Gold', icon: Crown },
-    { href: '/wallet', label: 'Wallet', icon: Wallet },
-    { href: '/referrals', label: 'Referrals', icon: Sparkles },
-    { href: '/boosts', label: 'Boosts', icon: Rocket },
-    { href: '/gifts', label: 'Gifts', icon: Gift },
-    { href: '/unlocks', label: 'Unlocks', icon: Lock },
-    { href: '/share-unlock', label: 'Share Unlocks', icon: Sparkles },
     { href: '/studio', label: 'Studio', icon: Wand2 },
-    { href: '/roast', label: 'Roast', icon: Flame },
-    { href: '/video', label: 'Video', icon: Phone },
     { href: '/spaces', label: 'Spaces', icon: Radio },
     { href: '/commerce', label: 'Commerce', icon: Store },
-    {
-      href: user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register',
-      label: user?.role === 'merchant' ? 'Merchant' : 'Sell Local',
-      icon: Store,
-    },
   ]
 
   if (user?.is_moderator) {
@@ -132,7 +118,6 @@ function getExploreSections(user: { role?: string; is_moderator?: boolean } | nu
   const links = getExploreLinks(user)
 
   const hrefMap = new globalThis.Map(links.map((link) => [link.href, link]))
-  const merchantHref = user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'
 
   const sections: Array<{ id: string; label: string; hrefs: string[] }> = [
     {
@@ -146,19 +131,19 @@ function getExploreSections(user: { role?: string; is_moderator?: boolean } | nu
       hrefs: ['/identity', '/reputation', '/support', '/operations'],
     },
     {
-      id: 'premium',
+      id: 'growth',
       label: 'Premium & growth',
-      hrefs: ['/economy', '/premium', '/wallet', '/referrals', '/boosts', '/gifts', '/unlocks', '/share-unlock'],
+      hrefs: ['/economy'],
     },
     {
       id: 'creative',
       label: 'Creative & live',
-      hrefs: ['/studio', '/roast', '/video', '/spaces'],
+      hrefs: ['/studio', '/spaces'],
     },
     {
       id: 'local-business',
       label: 'Local business',
-      hrefs: ['/commerce', merchantHref, '/moderation'],
+      hrefs: ['/commerce', '/moderation'],
     },
   ]
 

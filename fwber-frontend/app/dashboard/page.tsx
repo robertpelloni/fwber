@@ -135,12 +135,12 @@ export default function DashboardPage() {
                     Quick Actions
                   </h3>
                   <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-                    <ActionButton href="/nearby" label="Discover Nearby" icon="📍" color="purple" />
-                    <ActionButton href="/messages" label="View Messages" icon="💬" color="blue" />
-                    <ActionButton href="/friends" label="Open Friends" icon="🤝" color="green" />
-                    <ActionButton href="/wallet" label="Open Wallet" icon="💸" color="orange" />
-                    <ActionButton href="/notifications" label="Open Notifications" icon="🔔" color="purple" />
-                    <ActionButton href="/profile" label="Manage Profile" icon="✏️" color="gray" />
+                    <ActionButton href="/matching" label="Start Matching" icon="❤️" color="purple" />
+                    <ActionButton href="/connections" label="Recent Activity" icon="🤝" color="blue" />
+                    <ActionButton href="/economy" label="Wallet & Gold" icon="💰" color="orange" />
+                    <ActionButton href="/identity" label="Manage Profile" icon="👤" color="green" />
+                    <ActionButton href="/plans" label="Date Planning" icon="🗓️" color="purple" />
+                    <ActionButton href="/studio" label="AI Wingman" icon="✨" color="gray" />
                   </div>
                 </div>
 
