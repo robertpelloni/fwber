@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.26
+> **Version:** 1.8.27
 > **Last Updated:** 2026-04-07
 
 ---
@@ -11,9 +11,10 @@
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
-- [ ] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
+- [x] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 
 ## ✅ Recently Completed
+- [x] **Mobile Store Prep**: Added missing `expo-notifications` dependency and native plugins to `app.json` to prepare the mobile shell for EAS builds and store distribution.
 - [x] **Advanced Proximity Performance Pass**: Pre-fetched artifact counts in `ProximityArtifactController` to remove N+1 queries during nearby candidate processing.
 - [x] **Extended Performance Monitoring Pass**: Optimized `MatchController` and `ProfileViewController` to eliminate N+1 queries, prefetching necessary related user data via `GROUP BY` and `whereIn`.
 - [x] **Performance Monitoring & N+1 Query Optimization**: Refactored the dashboard `getActivity` method to eliminate N+1 database queries when fetching the recent activity feed.

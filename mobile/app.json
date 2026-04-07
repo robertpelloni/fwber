@@ -39,6 +39,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow fwber to use your location."
+        }
+      ],
+      "expo-notifications"
+    ]
   }
 }

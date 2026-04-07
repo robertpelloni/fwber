@@ -1,47 +1,43 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-07
-> **Version Reached:** 1.8.26
+> **Version Reached:** 1.8.27
 > **Current Model:** GPT
 > **Branch:** `main`
 
 ## Executive Summary
-This session continued Phase 6 (Polish & Hardening) by extending the Performance Monitoring Pass to the Local Pulse and Proximity discovery systems:
-1. confirmed `v1.8.25` deployment and testing finished fully green on `main`.
-2. identified and eliminated a severe N+1 query loop in `ProximityArtifactController::localPulse`.
-3. ran local backend tests to verify functionality remained identical.
-4. updated release tracking to **v1.8.26**.
+This session continued Phase 6 (Polish & Hardening) by preparing the mobile shell for iOS and Android store distribution:
+1. confirmed `v1.8.26` deployment and testing finished fully green on `main`.
+2. identified missing dependencies and plugins in the Expo mobile app configuration.
+3. added `expo-notifications` to `package.json` and properly registered native capabilities in `app.json`.
+4. updated release tracking to **v1.8.27**.
 
 No processes were manually killed.
 
 ---
 
 ## What Was Added/Changed In This Slice
-### Proximity Loop Query Optimization
-Refactored `getCompatibilityIndicators` and `getNearbyCompatibleCandidates` in `fwber-backend/app/Http/Controllers/ProximityArtifactController.php`. 
-Previously, the code executed `ProximityArtifact::where('user_id', ...)->count()` inside a mapping loop for *every* candidate returned by the nearby geospatial search to determine if they were "active locally." 
+### Mobile Store Preparation
+Added the missing `expo-notifications` dependency to `mobile/package.json` and registered the required config plugins in `mobile/app.json`. 
 
-This N+1 bottleneck was eliminated by:
-- extracting the candidate IDs.
-- pre-fetching all their recent artifact counts via a single `GROUP BY` and `whereIn` query.
-- injecting those counts back into the mapping loop from memory.
+Previously, `mobile/app/index.js` was importing and using the `expo-notifications` and `expo-location` APIs for the native-to-webview bridge, but the underlying Expo project configuration lacked the plugins required to inject iOS Entitlements and Android Manifest permissions during an EAS build.
 
 ### Why this matters
-The `/proximity/local-pulse` endpoint powers the main "Live Spaces" hub. It merges ephemeral local posts with nearby match candidates. Because nearby queries are already computationally expensive, letting a silent N+1 query loop execute on top of them would cause immediate latency spikes in dense user areas. This optimization guarantees that calculating local activity signals requires only one fixed query regardless of how many people are nearby.
+Without these plugins, building the standalone mobile binaries for the App Store or Google Play would either fail silently or crash on launch when the app attempted to request background permissions. This fix ensures the mobile shell can be properly distributed to users.
 
 ---
 
 ## Deployment Status
 ### Mainline status
-- **Hetzner Deployment**: `v1.8.25` confirmed successful. `v1.8.26` is ready to push.
-- **API Health**: `api.fwber.me/api/health` reports **Healthy**.
-- **Tests**: Local `php artisan test` confirmed the refactored logic returns expected structures.
+- **Hetzner Deployment**: `v1.8.26` confirmed successful. `v1.8.27` is ready to push.
+- **Mobile Builds**: App configuration is valid and prepared for EAS.
 
 ---
 
 ## Files Changed In This Slice
-### Backend
-- `fwber-backend/app/Http/Controllers/ProximityArtifactController.php`
+### Mobile
+- `mobile/package.json`
+- `mobile/app.json`
 
 ### Docs / release tracking
 - `VERSION`
@@ -60,12 +56,12 @@ The `/proximity/local-pulse` endpoint powers the main "Live Spaces" hub. It merg
 
 ## Git / Release State
 ### Current tranche target
-- **Target Version:** `1.8.26`
-- **Recommended Commit Message:** `perf: optimize proximity loop by eliminating N+1 queries (v1.8.26)`
+- **Target Version:** `1.8.27`
+- **Recommended Commit Message:** `chore: prepare mobile app configuration for store distribution (v1.8.27)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.26` tranche.
+1. Commit and push the `v1.8.27` tranche.
 2. Watch the Actions runs.
-3. Continue the **Performance Monitoring Pass** by checking remaining heavily utilized controllers, or begin prepping for the **Mobile Store Prep** phase outlined in the roadmap.
+3. Check off the remaining items in Phase 6, such as initiating the **Marketing Push**, or performing final user growth and engagement polish.

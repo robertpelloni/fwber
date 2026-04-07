@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-07 — v1.8.27 native capabilities require explicit plugin configuration
+- React Native code relying on Expo modules like `expo-notifications` or `expo-location` won't work in standalone builds unless the corresponding plugins are added to `app.json`.
+- The native app store review process requires privacy descriptions (e.g. `locationAlwaysAndWhenInUsePermission`) for all requested capabilities.
+- Fixing this ensures the EAS build pipeline produces valid binaries that don't crash when asking for permissions.
+
 ## 2026-04-07 — v1.8.26 another silent N+1 query found in proximity logic
 - `ProximityArtifactController::localPulse` was calling `getCompatibilityIndicators` in a loop, which fired off `ProximityArtifact::count()` per user to see if they were active locally.
 - Bulk fetching this count for all nearby match candidates at once preserves database capacity on the heavy local-pulse route.

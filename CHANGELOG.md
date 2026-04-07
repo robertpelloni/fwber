@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.27] - 2026-04-07 — Mobile Store Prep
+
+### Added
+- Configured required Expo plugins (`expo-location`, `expo-notifications`) in `mobile/app.json` to properly bundle native iOS/Android capabilities for distribution.
+- Added `expo-notifications` dependency to `mobile/package.json` to resolve build errors and complete the mobile push bridge implementation.
+
+### Verified
+- Native configuration matches iOS/Android store guidelines for background permissions and capabilities.
+
 ## [1.8.26] - 2026-04-07 — Advanced Proximity Performance Pass
 
 ### Changed
