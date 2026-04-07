@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.11 "Rewind Shell Product-Map Consistency"
+> **Current Version:** 1.8.12 "Production Schema Repair"
 > **Last Updated:** 2026-04-05
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.11)
+### Phase 5: Production Scale (COMPLETED - v1.8.12)
+- **Production Schema Repair:** Added a corrective migration to eliminate 500 errors caused by 'ghost' migrations; ensuring the production database actually holds the tables and columns required by the restored codebase.
 - **Rewind Shell Product-Map Consistency:** Locked in consistent domain-based organization across the dashboard and app shell so the restored branch reads as one coherent product map.
 - **Rewind Sidebar Domain Organization:** Reorganized the sidebar and mobile restored-surfaces navigation so the app shell mirrors the dashboard’s domain-based product map.
 - **Rewind Dashboard Domain Organization:** Reorganized the signed-in dashboard so restored surfaces are grouped by product domain rather than presented as a flat recovery list.

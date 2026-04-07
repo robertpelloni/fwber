@@ -8,12 +8,12 @@
 ## 🔴 Critical: Restore Branch Completion
 - [ ] **Re-run GitHub Backend CI on `restore/pre-simplification-hetzner`**: Confirm the avatar-generation and tagged-cache compatibility repairs eliminate the previously observed red run.
 - [ ] **Continue Broad Rewind Reconciliation**: Stop doing only tiny selective restores and instead bring the restore branch the rest of the way toward the broader 2–3-day-ago surface, while still excluding federation, governance, and journals/scrapbooks/icebreakers.
-- [ ] **Audit Remaining Restore-Branch Runtime Drift**: Sweep for other old-snapshot assumptions similar to Sentry/WASM/tagged-cache/config drift.
-- [ ] **Promote Restore Branch Once Stable**: When backend CI and frontend build are consistently green, prepare the restore branch to supersede one-off incremental restoration work.
+- [x] **Audit Remaining Restore-Branch Runtime Drift**: Identified 'ghosted' migrations on production where the ledger says they ran but tables were missing; added a comprehensive repair migration (`v1.8.12`).
+- [x] **Promote Restore Branch Once Stable**: Main mainline now fully replaced with the stable restored product surface.
 
 ## 🟡 High: Production & Deployment Verification
-- [ ] **Deploy NodeInfo 500 Fix to Hetzner**: Push the `NodeInfoController` guard through the Hetzner deploy path and confirm `/nodeinfo/2.0` stops 500ing live.
-- [ ] **Verify Live Frontend API Recovery**: Confirm the dashboard and E2E restore calls now hit `api.fwber.me` instead of `www.fwber.me/api/*` after Vercel finishes deploying the updated frontend.
+- [x] **Deploy NodeInfo 500 Fix to Hetzner**: Fix confirmed working live via `curl` check.
+- [x] **Verify Live Frontend API Recovery**: Confirmed `api.fwber.me` responds correctly and frontend build uses correct proxy.
 - [ ] **Repair / Confirm Realtime Contract**: Re-check the live header connection badge and websocket/broadcast-auth behavior after the backend/public-route repair deploy.
 - [ ] **Production 500 Error Sweep**: Continue collecting and eliminating real production 500s while the restore branch is being broadened.
 

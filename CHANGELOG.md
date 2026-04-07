@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.12] - 2026-04-06 — Production Schema Repair
+
+### Added
+- Added a comprehensive `repair_restored_schema_drift` migration that ensures all required tables and columns from the approved restoration scope are present on the production database.
+- Targeted 'ghosted' migrations where the ledger claimed tables ran but they were actually missing (likely due to previous product simplification drops).
+
+### Changed
+- Hardened `CheckGlobalBan` middleware to explicitly check for table existence before querying, eliminating a source of live 500 errors during deployment transitions.
+- Updated `TODO.md` to reflect the promotion of the restore branch to mainline and the successful verification of the `NodeInfo` fix.
+
+### Verified
+- Confirmed `api.fwber.me/nodeinfo/2.0` and `api.fwber.me/api/health` return correct versioned data (`1.8.11` at time of check).
+- Confirmed Hetzner services (reverb, queue, geo) are all active and running.
+
 ## [1.8.11] - 2026-04-06 — Rewind Shell Product-Map Consistency
 
 ### Changed

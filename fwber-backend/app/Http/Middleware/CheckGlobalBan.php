@@ -6,6 +6,7 @@ use App\Models\GlobalBan;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckGlobalBan
@@ -19,13 +20,17 @@ class CheckGlobalBan
 
         if (Auth::check()) {
             $user = Auth::user();
-            if (GlobalBan::where('bannable_identifier', (string) $user->id)->where('type', 'user')->exists()) {
-                // Return a specific error code that the frontend can use to redirect to /appeals
-                return response()->json([
-                    'error' => 'Your account has been globally banned by the community council.',
-                    'code' => 'GLOBAL_BAN',
-                    'can_appeal' => true
-                ], 403);
+            
+            // Check if table exists to avoid 500 errors during deployment/migration drift
+            if (Schema::hasTable('global_bans')) {
+                if (GlobalBan::where('bannable_identifier', (string) $user->id)->where('type', 'user')->exists()) {
+                    // Return a specific error code that the frontend can use to redirect to /appeals
+                    return response()->json([
+                        'error' => 'Your account has been globally banned by the community council.',
+                        'code' => 'GLOBAL_BAN',
+                        'can_appeal' => true
+                    ], 403);
+                }
             }
         }
 
