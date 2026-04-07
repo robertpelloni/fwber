@@ -48,6 +48,13 @@ const planSurfaces = [
     icon: Store,
     accent: 'from-amber-500 to-yellow-500',
   },
+  {
+    href: '/wingman/date-ideas',
+    title: 'AI Date Ideas',
+    description: 'Use the Wingman to generate personalized outing ideas based on local venues and vibes.',
+    icon: Sparkles,
+    accent: 'from-rose-500 to-orange-500',
+  },
 ]
 
 export default function PlansPage() {

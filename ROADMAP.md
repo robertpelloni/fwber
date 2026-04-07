@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.15 "Sidebar Domain Organization & Exclusion Audit"
+> **Current Version:** 1.8.16 "Gamification & Physical-Match Surfacing"
 > **Last Updated:** 2026-04-07
 
 ---
@@ -47,7 +47,8 @@ Explicitly still excluded from restoration:
 - AR "Ghost" Navigation for finding matches in crowds.
 - NFC Physical Tap-to-Verify (Flash Matches).
 
-### Phase 5: Production Scale (COMPLETED - v1.8.15)
+### Phase 5: Production Scale (COMPLETED - v1.8.16)
+- **Gamification & Physical-Match Surfacing:** Surfaced NFC Flash Match, AI Date Ideas, and Daily Streak celebration so the branch feels alive and engaging.
 - **Sidebar Domain Organization & Exclusion Audit:** Reorganized sidebar/mobile navigation into domain groups and enforced strict exclusion of Icebreakers/Journals in the UI.
 - **Hub Completion & Leaf Recovery:** Surfaced the remaining restored features (Ice Breakers, Video Calls, Hardware Token) in their respective hubs and repaired building-breaking imports.
 - **Surface Polish & Runtime Hardening:** Hardened `VectorService` against missing RediSearch, surfaced `/rate-my-pussy`, `/groups/matching`, and `/gifts/history` in their respective hubs, and removed excluded links from Settings.

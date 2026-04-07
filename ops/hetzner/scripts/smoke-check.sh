@@ -752,6 +752,14 @@ main() {
   run_http_check 'API health endpoint' GET "${API_URL%/}/health" '200' '"status"[[:space:]]*:[[:space:]]*"healthy"'
   run_http_check 'API liveness endpoint' GET "${API_URL%/}/health/liveness" '200' '"status"[[:space:]]*:[[:space:]]*"alive"'
   run_http_check 'API readiness endpoint' GET "${API_URL%/}/health/readiness" '200' '"status"[[:space:]]*:[[:space:]]*"ready"'
+  
+  # Domain Hub Probes
+  run_http_check 'Matching Hub Probe' GET "${API_URL%/}/matches" '200' ''
+  run_http_check 'Economy Hub Probe' GET "${API_URL%/}/wallet" '200' ''
+  run_http_check 'Connections Hub Probe' GET "${API_URL%/}/notifications" '200' ''
+  run_http_check 'Operations Hub Probe' GET "${API_URL%/}/safety/contacts" '200' ''
+  run_http_check 'Support Hub Probe' GET "${API_URL%/}/health" '200' ''
+  
   run_http_check 'Invalid-login contract check' POST "${API_URL%/}/auth/login" '422' 'Invalid credentials' "$LOGIN_PAYLOAD"
   run_http_check 'Public roast preview check' POST "${API_URL%/}/public/roast" '200' '"is_preview"[[:space:]]*:[[:space:]]*true' "$ROAST_PAYLOAD"
   run_http_check 'Geo nearby endpoint' GET "$GEO_QUERY_URL" '200' '"users"'

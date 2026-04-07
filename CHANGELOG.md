@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.16] - 2026-04-07 — Gamification & Physical-Match Surfacing
+
+### Added
+- Added `DailyStreakModal` to the dashboard, providing immediate visual feedback and token-bonus awareness for daily logins.
+- Added `/matching/nfc` (NFC Flash Match) page, surfacing the previously hidden physical profile exchange and ZK-Proximity handshake.
+- Added `/wingman/date-ideas` page, surfacing AI-generated local outing suggestions in both the `Matching` and `Plans` hubs.
+- Surfaced `/video` (Video Calls) in the `Connections` hub.
+- Surfaced `/settings/hardware` (Hardware Token) in the `Operations` hub.
+
+### Changed
+- Expanded `ops/hetzner/scripts/smoke-check.sh` with probes for all major product hubs (Matching, Economy, Connections, Operations, Support).
+- Refined Dashboard Quick Actions to point to core product areas (Matching, Activity, Wallet, Profile, Plans, AI).
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully with 140 routes.
+- Confirmed NFC and ZK-Proximity bridge logic remains functional in the promoted mainline.
+
 ## [1.8.15] - 2026-04-07 — Sidebar Domain Organization & Exclusion Audit
 
 ### Changed

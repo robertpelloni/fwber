@@ -3,7 +3,7 @@
 import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import Link from 'next/link'
-import { BarChart3, Compass, Eye, Heart, Sparkles, Users } from 'lucide-react'
+import { BarChart3, Compass, Eye, Heart, Sparkles, Users, Smartphone } from 'lucide-react'
 
 const matchingSurfaces = [
   {
@@ -54,6 +54,20 @@ const matchingSurfaces = [
     description: 'Bridge community discovery and one-to-one relationship formation through group-level matching.',
     icon: Users,
     accent: 'from-indigo-500 to-blue-500',
+  },
+  {
+    href: '/matching/nfc',
+    title: 'NFC Flash Match',
+    description: 'Tap phones to verify a physical meetup and exchange profiles instantly using NFC and ZK-Proximity.',
+    icon: Smartphone,
+    accent: 'from-amber-500 to-orange-600',
+  },
+  {
+    href: '/wingman/date-ideas',
+    title: 'AI Date Ideas',
+    description: 'Get personalized local date suggestions based on mutual interests and proximity.',
+    icon: Sparkles,
+    accent: 'from-rose-500 to-pink-600',
   },
 ]
 

@@ -3,6 +3,7 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import {
   Heart,
   Users,
@@ -39,6 +40,7 @@ import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
 import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
+import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
 import { api } from '@/lib/api/client';
 
 interface DashboardStats {
@@ -56,17 +58,30 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const { user, token, isAuthenticated } = useAuth();
+  const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     enabled: isAuthenticated && !!token,
-    queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
+    queryFn: async () => {
+      const data = await api.get<DashboardStats & { current_streak: number; streak_just_updated: boolean }>('/dashboard/stats');
+      if (data.streak_just_updated) {
+        setIsStreakModalOpen(true);
+      }
+      return data;
+    },
   });
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader />
+
+        <DailyStreakModal
+          isOpen={isStreakModalOpen}
+          currentStreak={stats?.current_streak || 0}
+          onClose={() => setIsStreakModalOpen(false)}
+        />
 
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
