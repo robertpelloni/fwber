@@ -3,9 +3,19 @@ import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState } from 'react';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import NfcManager, { NfcTech, Ndef } from 'react-native-nfc-manager';
 
 const TARGET_DOMAIN = 'fwber.me';
+
+// Configure notification behavior
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -18,8 +28,14 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       // Location
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationGranted(status === 'granted');
+      const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
+      setLocationGranted(locStatus === 'granted');
+
+      // Notifications
+      const { status: pushStatus } = await Notifications.requestPermissionsAsync();
+      if (pushStatus === 'granted') {
+        // Forward token to webview if needed, or handle here
+      }
 
       // NFC
       try {
@@ -64,6 +80,21 @@ export default function Home() {
 
     // We can trigger this via a message from the WebView
   }, [nfcSupported]);
+
+  // 2.5 Notification Bridge (Foreground)
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      // Inject into WebView as a toast trigger
+      const js = `
+        if (window.handleNativeNotification) {
+          window.handleNativeNotification(${JSON.stringify(notification.request.content)});
+        }
+      `;
+      webViewRef.current?.injectJavaScript(js);
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   // 3. WebView -> Native Bridge
   const onMessage = async (event) => {

@@ -24,6 +24,9 @@ export const marketplaceApi = {
     purchaseItem: (itemId: number) => 
         api.post<PurchaseResponse>(`/marketplace/purchase/${itemId}`),
     
+    getNearbyItems: (params: { lat: number; lng: number; radius_m?: number }) =>
+        api.get<{ items: InventoryItem[] }>('/marketplace/nearby', { params }),
+
     // Merchant Actions
     getOwnedInventory: () => 
         api.get<{ items: InventoryItem[] }>(`/merchant-portal/inventory`),

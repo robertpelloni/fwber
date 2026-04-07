@@ -10,54 +10,61 @@ export default function CommercePage() {
   const { user } = useAuth()
   const isMerchant = user?.role === 'merchant'
 
-  const commerceSurfaces = [
-    {
-      href: isMerchant ? '/merchant/dashboard' : '/merchant/register',
-      title: isMerchant ? 'Merchant Dashboard' : 'Become a Merchant',
-      description: isMerchant
-        ? 'Open the restored merchant portal for live business operations, local intelligence, and promotion control.'
-        : 'Start the merchant onboarding flow that unlocks the local-business side of the platform.',
-      icon: Store,
-      accent: 'from-amber-500 to-orange-500',
-    },
-    {
-      href: isMerchant ? '/merchant/profile' : '/merchant/register',
-      title: 'Merchant Profile',
-      description: 'Manage the business identity and verification-facing merchant profile that powers local trust.',
-      icon: UserRoundCog,
-      accent: 'from-blue-500 to-cyan-500',
-    },
-    {
-      href: isMerchant ? '/merchant/promotions' : '/merchant/register',
-      title: 'Promotions',
-      description: 'Review and manage merchant promotions, discount surfaces, and customer-facing campaign entries.',
-      icon: Megaphone,
-      accent: 'from-pink-500 to-rose-500',
-    },
-    {
-      href: isMerchant ? '/merchant/analytics' : '/merchant/register',
-      title: 'Merchant Analytics',
-      description: 'Open the business-side analytics surface for traction, visibility, and offer performance signals.',
-      icon: BarChart3,
-      accent: 'from-emerald-500 to-green-500',
-    },
-    {
-      href: '/merchant/vibe',
-      title: 'Neighborhood Vibe',
-      description: 'Use the broadcast and local-intelligence layer that helps businesses speak to nearby users in real time.',
-      icon: Radio,
-      accent: 'from-violet-500 to-purple-500',
-    },
-    {
-      href: isMerchant ? '/operations' : '/settings',
-      title: isMerchant ? 'Merchant Operations' : 'Business-Ready Settings',
-      description: isMerchant
-        ? 'Jump back into broader trust, safety, and operational controls that support the merchant surface.'
-        : 'Review the account and operational settings that support business onboarding and trust-sensitive flows.',
-      icon: Settings2,
-      accent: 'from-slate-500 to-slate-700',
-    },
-  ]
+const commerceSurfaces = [
+  {
+    href: isMerchant ? '/merchant/dashboard' : '/merchant/register',
+    title: isMerchant ? 'Merchant Dashboard' : 'Become a Merchant',
+    description: isMerchant
+      ? 'Open the restored merchant portal for live business operations, local intelligence, and promotion control.'
+      : 'Start the merchant onboarding flow that unlocks the local-business side of the platform.',
+    icon: Store,
+    accent: 'from-amber-500 to-orange-500',
+  },
+  {
+    href: isMerchant ? '/merchant/profile' : '/merchant/register',
+    title: 'Merchant Profile',
+    description: 'Manage the business identity and verification-facing merchant profile that powers local trust.',
+    icon: UserRoundCog,
+    accent: 'from-blue-500 to-cyan-500',
+  },
+  {
+    href: isMerchant ? '/merchant/promotions' : '/merchant/register',
+    title: 'Promotions',
+    description: 'Review and manage merchant promotions, discount surfaces, and customer-facing campaign entries.',
+    icon: Megaphone,
+    accent: 'from-pink-500 to-rose-500',
+  },
+  {
+    href: isMerchant ? '/merchant/analytics' : '/merchant/register',
+    title: 'Merchant Analytics',
+    description: 'Open the business-side analytics surface for traction, visibility, and offer performance signals.',
+    icon: BarChart3,
+    accent: 'from-emerald-500 to-green-500',
+  },
+  {
+    href: '/merchant/vibe',
+    title: 'Neighborhood Vibe',
+    description: 'Use the broadcast and local-intelligence layer that helps businesses speak to nearby users in real time.',
+    icon: Radio,
+    accent: 'from-violet-500 to-purple-500',
+  },
+  {
+    href: '/marketplace',
+    title: 'Nearby Marketplace',
+    description: 'Browse and purchase physical items from local merchants using your FWB token balance.',
+    icon: ShoppingBag,
+    accent: 'from-amber-500 to-yellow-500',
+  },
+  {
+    href: isMerchant ? '/operations' : '/settings',
+    title: isMerchant ? 'Merchant Operations' : 'Business-Ready Settings',
+    description: isMerchant
+      ? 'Jump back into broader trust, safety, and operational controls that support the merchant surface.'
+      : 'Review the account and operational settings that support business onboarding and trust-sensitive flows.',
+    icon: Settings2,
+    accent: 'from-slate-500 to-slate-700',
+  },
+]
 
   return (
     <ProtectedRoute>

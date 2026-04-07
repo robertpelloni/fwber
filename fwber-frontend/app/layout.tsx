@@ -18,6 +18,7 @@ import AnalyticsProvider from '@/components/AnalyticsProvider'
 import SafeWalkTracker from '@/components/safety/SafeWalkTracker'
 import AssetRecovery from '@/components/AssetRecovery'
 import GlobalSubpageNav from '@/components/GlobalSubpageNav'
+import NativeForegroundNotificationBridge from '@/components/NativeForegroundNotificationBridge'
 
 const inter = Inter({
   variable: '--font-inter',
@@ -117,6 +118,7 @@ export default function RootLayout({
                   <AnalyticsProvider />
                 </Suspense>
                 <ToastProvider>
+                  <NativeForegroundNotificationBridge />
                   <NotificationListener />
                   <SafeWalkTracker />
                   <div className="relative flex min-h-screen flex-col">

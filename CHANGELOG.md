@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.17] - 2026-04-07 — Mobile Notification Bridge & Marketplace Surfacing
+
+### Added
+- Added `NativeForegroundNotificationBridge.tsx` to the frontend, restoring the ability to trigger in-app toasts from native mobile push notifications.
+- Added `Marketplace` to the `Dating loop` domain in the app shell and mobile menu.
+- Surfaced "Nearby Marketplace" in the `Commerce` hub, enabling the physical item purchase and redemption flow.
+
+### Changed
+- Refined `mobile/app/index.js` to include the native-to-webview notification listener and bridge.
+- Enabled push notification permissions request in the mobile app startup flow.
+
+### Verified
+- `npm run build --prefix fwber-frontend` completed successfully.
+- Verified `api.fwber.me/api/health` reports status "Healthy" on v1.8.16.
+
 ## [1.8.16] - 2026-04-07 — Gamification & Physical-Match Surfacing
 
 ### Added

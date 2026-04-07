@@ -26,7 +26,8 @@ return [
     'share_unlock' => env('FEATURE_SHARE_UNLOCK', true),
 
     // Experimental - disabled until verified in production
-    'face_reveal' => env('FEATURE_FACE_REVEAL', true),        // Needs face-api.js browser testing          'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', false), // Needs storage verification
-    'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', false),  // Needs ML model deployment
-    'video_chat' => env('FEATURE_VIDEO_CHAT', false),          // Needs WebRTC E2E testing
+    'face_reveal' => env('FEATURE_FACE_REVEAL', true),        // Needs face-api.js browser testing
+    'local_media_vault' => env('FEATURE_LOCAL_MEDIA_VAULT', true), // Needs storage verification
+    'media_analysis' => env('FEATURE_MEDIA_ANALYSIS', true),  // Needs ML model deployment
+    'video_chat' => env('FEATURE_VIDEO_CHAT', true),          // Needs WebRTC E2E testing
 ];

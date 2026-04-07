@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.16
+> **Version:** 1.8.17
 > **Last Updated:** 2026-04-07
 
 ---
@@ -17,6 +17,7 @@
 - [ ] **Production 500 Error Sweep**: Continuous monitoring of logs for potential edge case failures.
 
 ## ✅ Recently Completed
+- [x] **Mobile Notification Bridge & Marketplace Surfacing**: Restored the native push bridge for the mobile shell and surfaced the physical item marketplace in the Commerce hub.
 - [x] **Gamification & Physical-Match Surfacing**: Surfaced NFC Flash Match, AI Date Ideas, and Daily Streak celebration; expanded smoke checks to cover all hubs.
 - [x] **Sidebar Domain Organization & Exclusion Audit**: Reorganized sidebar/mobile nav by domain, updated dashboard quick actions to use hubs, and removed excluded Icebreaker/Journal links.
 - [x] **Hub Completion & Leaf Recovery**: Fixed build-breaking imports and surfaced Ice Breaker Cards, Video Calls, and Hardware Token in their respective hubs.

@@ -105,6 +105,7 @@ function getExploreLinks(user: { role?: string; is_moderator?: boolean } | null)
     { href: '/studio', label: 'Studio', icon: Wand2 },
     { href: '/spaces', label: 'Spaces', icon: Radio },
     { href: '/commerce', label: 'Commerce', icon: Store },
+    { href: '/marketplace', label: 'Marketplace', icon: ShoppingBag },
   ]
 
   if (user?.is_moderator) {
@@ -123,7 +124,7 @@ function getExploreSections(user: { role?: string; is_moderator?: boolean } | nu
     {
       id: 'dating',
       label: 'Dating loop',
-      hrefs: ['/matching', '/scenes', '/connections', '/places', '/plans'],
+      hrefs: ['/matching', '/scenes', '/connections', '/places', '/plans', '/marketplace'],
     },
     {
       id: 'trust',
