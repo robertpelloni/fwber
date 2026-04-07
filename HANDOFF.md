@@ -1,46 +1,49 @@
 # HANDOFF - End of GPT Session
 
 > **Timestamp:** 2026-04-07
-> **Version Reached:** 1.8.24
+> **Version Reached:** 1.8.25
 > **Current Model:** GPT
 > **Branch:** `main`
 
 ## Executive Summary
-This session continued Phase 6 (Polish & Hardening) by tackling performance optimization at the core of the app:
-1. confirmed `v1.8.23` deployment and testing finished fully green on `main`.
-2. identified and eliminated severe N+1 queries in the dashboard activity feed.
-3. verified the backend tests.
-4. updated release tracking to **v1.8.24**.
+This session continued Phase 6 (Polish & Hardening) by expanding the Performance Monitoring Pass:
+1. confirmed `v1.8.24` deployment and testing finished fully green on `main`.
+2. identified and eliminated N+1 query patterns in `MatchController` and `ProfileViewController`.
+3. ran local backend tests to verify functionality remained identical.
+4. updated release tracking to **v1.8.25**.
 
 No processes were manually killed.
 
 ---
 
 ## What Was Added/Changed In This Slice
-### 1. Dashboard N+1 Query Elimination
-Refactored `getActivity` in `fwber-backend/app/Http/Controllers/DashboardController.php`. Previously, the method performed individual `DB::table('users')->find()` queries inside loops for every match, message, and profile view to build the unified activity feed. This scaled horribly (O(N) queries where N is the feed limit multiplied by activity types).
+### 1. Match Loop Query Optimization
+Refactored `findMatches` in `fwber-backend/app/Http/Controllers/MatchController.php`. 
+Previously, the code invoked `ProximityArtifact::count()` inside a loop for *each* match candidate to calculate the "Proximity Saturation Penalty." 
+This N+1 issue was eliminated by bulk-fetching artifact counts for the discovered candidates using a single `GROUP BY` and `whereIn` query before the loop runs.
 
-The refactor changes the flow to:
-- collect all relevant `user_id`s from the raw activity queries.
-- perform a single, batched `DB::table('users')->whereIn('id', $userIdsToFetch)->get()` query.
-- map the results in memory.
+### 2. Profile Views Query Optimization
+Refactored `getViews` in `fwber-backend/app/Http/Controllers/ProfileViewController.php`. 
+Previously, it fetched the 50 most recent views and ran `DB::table('users')->find(...)` in a loop.
+This was refactored to gather all `viewer_user_id` values, execute a single `whereIn` lookup, and map the user details from memory.
 
 ### Why this matters
-The `/dashboard/activity` route is one of the highest-traffic endpoints on the entire platform, hit nearly every time a user navigates to the signed-in shell. Eliminating this N+1 bottleneck significantly reduces latency and MySQL load on the Hetzner VPS, protecting the platform's scaling capacity as engagement grows.
+The core dating loops (finding matches and seeing who checked you out) must be lightning fast. Pre-fetching relations in batches protects the Hetzner MySQL database from high CPU usage as the platform scales. These refactors ensure the restored features stay highly performant under real-world traffic.
 
 ---
 
 ## Deployment Status
 ### Mainline status
-- **Hetzner Deployment**: `v1.8.23` confirmed successful. `v1.8.24` is ready to push.
+- **Hetzner Deployment**: `v1.8.24` confirmed successful. `v1.8.25` is ready to push.
 - **API Health**: `api.fwber.me/api/health` reports **Healthy**.
-- **Database**: Activity queries are now optimized.
+- **Tests**: Local `php artisan test` confirmed the refactored logic returns expected structure.
 
 ---
 
 ## Files Changed In This Slice
 ### Backend
-- `fwber-backend/app/Http/Controllers/DashboardController.php`
+- `fwber-backend/app/Http/Controllers/MatchController.php`
+- `fwber-backend/app/Http/Controllers/ProfileViewController.php`
 
 ### Docs / release tracking
 - `VERSION`
@@ -59,12 +62,12 @@ The `/dashboard/activity` route is one of the highest-traffic endpoints on the e
 
 ## Git / Release State
 ### Current tranche target
-- **Target Version:** `1.8.24`
-- **Recommended Commit Message:** `perf: eliminate dashboard N+1 queries for activity feed (v1.8.24)`
+- **Target Version:** `1.8.25`
+- **Recommended Commit Message:** `perf: optimize match loop and profile views by eliminating N+1 queries (v1.8.25)`
 
 ---
 
 ## Best Next Steps
-1. Commit and push the `v1.8.24` tranche.
+1. Commit and push the `v1.8.25` tranche.
 2. Watch the Actions runs.
-3. Continue the **Performance Monitoring Pass** by checking other heavily utilized controllers (e.g., `MatchController`, `RecommendationController`, or `ChatroomController`) for similar N+1 optimization opportunities.
+3. Consider performing similar N+1 checks on `ChatroomMessageController` or `RecommendationController` as part of the ongoing Performance Monitoring Pass, or address remaining UI/UX polish items.

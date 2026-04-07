@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.24 "Performance Monitoring & N+1 Query Optimization"
+> **Current Version:** 1.8.25 "Extended Performance Monitoring Pass"
 > **Last Updated:** 2026-04-07
 
 ---
@@ -125,7 +125,8 @@ Explicitly still excluded from restoration:
 - **CI/CD Build Pipelines:** GitHub Actions implemented for automated PHPUnit testing, Vercel/Next.js deployments, and Mobile EAS Store distributions.
 - **Data Minimization:** Explicit object-storage wipe triggers automatically upon account deletion to prevent ghost files.
 
-### Phase 6: Polish & Hardening (ACTIVE - v1.8.24)
+### Phase 6: Polish & Hardening (ACTIVE - v1.8.25)
+- **Extended Performance Monitoring Pass:** Optimized `MatchController` and `ProfileViewController` to eliminate N+1 database queries on core dating loops, prefetching necessary related user counts and profiles in single lookups.
 - **Performance Monitoring & N+1 Query Optimization:** Refactored the dashboard `getActivity` method to batch related user lookups, completely eliminating N+1 queries from the most frequently hit route in the app.
 - **AI Prompt Tuning & Localization:** Refined AI Wingman prompts across the board to deeply ground LLM instructions in Detroit's local geography and the platform's "privacy-first" identity.
 - **Project Consolidation & Future Milestones:** Completed broad product polish across all hubs and defined next-phase milestones for growth.

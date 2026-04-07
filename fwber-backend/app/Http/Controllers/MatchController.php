@@ -535,11 +535,25 @@ class MatchController extends Controller
 
         $matches = $query->limit(20)->get();
 
+        $candidateIds = $matches->pluck('id')->toArray();
+        $saturationCounts = [];
+        if (!empty($candidateIds)) {
+            $counts = DB::table('proximity_artifacts')
+                ->whereIn('user_id', $candidateIds)
+                ->where('created_at', '>=', now()->subDay())
+                ->groupBy('user_id')
+                ->select('user_id', DB::raw('count(*) as count'))
+                ->get();
+            foreach ($counts as $count) {
+                $saturationCounts[$count->user_id] = $count->count;
+            }
+        }
+
         // Calculate compatibility scores and sort
-        return $matches->map(function (User $candidate) use ($profile) {
+        return $matches->map(function (User $candidate) use ($profile, $saturationCounts) {
             $candidate->setAttribute(
                 'compatibility_score',
-                $this->calculateCompatibilityScore($profile, $candidate->profile)
+                $this->calculateCompatibilityScore($profile, $candidate->profile, $saturationCounts[$candidate->id] ?? 0)
             );
             $candidate->setAttribute(
                 'distance',
@@ -550,7 +564,7 @@ class MatchController extends Controller
         })->sortByDesc('compatibility_score')->values();
     }
 
-    private function calculateCompatibilityScore(UserProfile $userProfile, UserProfile $candidateProfile): int
+    private function calculateCompatibilityScore(UserProfile $userProfile, UserProfile $candidateProfile, int $saturationCount = 0): int
     {
         $score = 0;
         $maxScore = 100;
@@ -581,7 +595,7 @@ class MatchController extends Controller
         $score += $this->calculateFreshnessBoost($candidateProfile->user);
 
         // Saturation penalty for heavy proximity posting (up to -5 points)
-        $score -= $this->calculateProximitySaturationPenalty($candidateProfile->user);
+        $score -= (int) min(5, floor($saturationCount / 10));
 
         return min($maxScore, max(0, $score));
     }
@@ -603,17 +617,6 @@ class MatchController extends Controller
         }
 
         return 0;
-    }
-
-    private function calculateProximitySaturationPenalty(User $candidate): int
-    {
-        // Count artifacts created by candidate in last 24 hours
-        $count = ProximityArtifact::where('user_id', $candidate->id)
-            ->where('created_at', '>=', now()->subDay())
-            ->count();
-
-        // Each 10 artifacts -> 1 point penalty, capped at 5
-        return (int) min(5, floor($count / 10));
     }
 
     private function calculateDistance(UserProfile $profile1, UserProfile $profile2): float

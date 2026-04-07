@@ -172,18 +172,31 @@ class ProfileViewController extends Controller
                 ->limit(50)
                 ->get();
 
+            $viewerIds = $views->pluck('viewer_user_id')->unique()->toArray();
+            $usersData = [];
+
+            if (!empty($viewerIds)) {
+                $users = DB::table('users')
+                    ->whereIn('id', $viewerIds)
+                    ->get(['id', 'name', 'avatar_url', 'age', 'city']);
+                
+                foreach ($users as $u) {
+                    $usersData[$u->id] = $u;
+                }
+            }
+
             $viewsWithUsers = [];
             foreach ($views as $view) {
-                $viewer = DB::table('users')->find($view->viewer_user_id);
-                if ($viewer) {
+                if (isset($usersData[$view->viewer_user_id])) {
+                    $viewer = $usersData[$view->viewer_user_id];
                     $viewsWithUsers[] = [
                         'id' => $view->id,
                         'viewer' => [
                             'id' => $viewer->id,
                             'name' => $viewer->name,
-                            'avatar_url' => $viewer->avatar_url,
-                            'age' => $viewer->age,
-                            'city' => $viewer->city,
+                            'avatar_url' => $viewer->avatar_url ?? null,
+                            'age' => $viewer->age ?? null,
+                            'city' => $viewer->city ?? null,
                         ],
                         'viewed_at' => $view->created_at,
                     ];

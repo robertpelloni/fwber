@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.25] - 2026-04-07 — Extended Performance Monitoring Pass
+
+### Changed
+- Refactored `MatchController::findMatches` to eliminate a severe N+1 query when calculating the "Proximity Saturation Penalty" for new match candidates.
+- Refactored `ProfileViewController::getViews` to eliminate an N+1 query that fetched user details individually inside a loop.
+- Grouped related entity lookups using `whereIn` to drastically reduce database overhead on the core matching and profile viewing paths.
+
+### Verified
+- Executed `php artisan test` locally and confirmed that the refactored endpoints maintain the same functionality without the performance penalty.
+
 ## [1.8.24] - 2026-04-07 — Performance Monitoring & N+1 Query Optimization
 
 ### Changed

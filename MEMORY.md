@@ -1,5 +1,10 @@
 # MEMORY.md
 
+## 2026-04-07 — v1.8.25 eliminating backend N+1 queries protects scalability on the restored core loops
+- The `MatchController` ran a separate query for every candidate to count their recent proximity artifacts (the "Proximity Saturation Penalty").
+- Grouping that count by user ID into a single query before the compatibility scoring map is run removes significant DB overhead per swipe session.
+- Similarly, `ProfileViewController` was looking up individual viewers one by one. Bulk fetching viewer profiles prevents this list view from stuttering.
+
 ## 2026-04-07 — v1.8.24 N+1 query elimination is the highest-value performance polish
 - The dashboard `getActivity` method was running a new database query for every match, message, and view it found. This N+1 problem scales horribly.
 - Refactoring it to collect IDs and do a single `whereIn` lookup dramatically cuts down latency on the most frequently hit route in the app.
