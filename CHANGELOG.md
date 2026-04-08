@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.36] - 2026-04-08 — Edge Cache, Pending Migrations Applied
+
+### Added
+- Edge cache headers on `config/features` (5min browser, 5min CDN) and `wingman/date-ideas/general` (5min browser, 10min CDN).
+
+### Fixed
+- Applied 3 pending idempotent schema repair migrations locally: `repair_restored_schema_drift`, `repair_token_and_achievement_drift`, `nuclear_schema_recovery`. These will also run on next Hetzner deploy.
+
+### Verified
+- Backend test suite: 426 passed, 7 skipped, 0 failures (1580 assertions).
+- Frontend production build succeeds cleanly.
+
 ## [1.8.35] - 2026-04-08 — SEO Foundation (robots.txt, sitemap.xml)
 
 ### Added

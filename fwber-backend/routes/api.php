@@ -79,7 +79,7 @@ Route::get('config/features', function () {
         'source' => 'runtime',
         'timestamp' => now()->toIso8601String(),
     ]);
-});
+})->middleware('edge.cache:300,60');
 
 // Public Debug Route (No Auth)
 if (! app()->isProduction()) {
@@ -640,7 +640,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ['title' => 'Eastern Market Morning', 'description' => 'Grab coffee and explore the historic market stalls together.', 'vibe' => 'Casual', 'estimated_cost' => '$'],
                 ['title' => 'Detroit Institute of Arts', 'description' => 'Wander through world-class galleries and find your favorite piece.', 'vibe' => 'Cultural', 'estimated_cost' => '$'],
                 ['title' => 'RiverWalk Stroll', 'description' => 'Walk the Detroit RiverWalk at golden hour for stunning views.', 'vibe' => 'Romantic', 'estimated_cost' => 'Free'],
-            ]]);
+            ]])->header('Cache-Control', 'public, max-age=300, s-maxage=600');
         });
         Route::get('wingman/date-ideas/{match}', [\App\Http\Controllers\WingmanController::class, 'generateDateIdeas']);
         Route::post('wingman/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastProfile']);
