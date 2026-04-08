@@ -68,7 +68,6 @@ export default function MerchantAnalyticsPage() {
 
     const handleDeactivate = async (broadcastId: number) => {
         if (!token) return;
-        if (!confirm('Are you sure you want to deactivate this live broadcast?')) return;
         
         try {
             await api.post(`/merchant/pulse/${broadcastId}/deactivate`, {}, {

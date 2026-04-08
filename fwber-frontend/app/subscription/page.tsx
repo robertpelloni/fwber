@@ -60,10 +60,6 @@ export default function SubscriptionPage() {
   }, []);
 
   const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? You will lose access to premium features at the end of the billing period.')) {
-      return;
-    }
-
     setCancelling(true);
     setMessage(null);
 

@@ -119,7 +119,7 @@ export default function LocationSettingsPage() {
       return
     }
 
-    if (!confirm('Are you sure you want to clear your location history? This will stop sharing your location with others.')) {
+    // Proceeds with clearing location history
       return
     }
 

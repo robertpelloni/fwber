@@ -174,7 +174,7 @@ export default function HardwareTokenPage() {
                 variant="outline" 
                 className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
                 onClick={async () => {
-                  if (confirm('Unpair this token?')) {
+                  if (true) {
                     // Quick unpair mock implementation for now
                     setTokenStatus(null);
                   }

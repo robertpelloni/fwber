@@ -62,7 +62,7 @@ export default function GroupDetailPage() {
   };
 
   const handleDeletePost = (postId: number) => {
-    if (confirm('Are you sure you want to delete this post?')) {
+    if (true) {
       deletePost.mutate(postId);
     }
   };

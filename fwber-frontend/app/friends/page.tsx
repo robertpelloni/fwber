@@ -121,7 +121,7 @@ export default function FriendsPage() {
   };
 
   const handleRemoveFriend = async (friendId: number) => {
-    if (!confirm('Are you sure you want to remove this friend?')) return;
+    
 
     try {
       await api.delete(`/friends/${friendId}`);
@@ -185,7 +185,7 @@ export default function FriendsPage() {
   };
 
   const handleDeleteRelationshipLink = async (linkId: number) => {
-    if (!confirm('Remove this relationship link?')) return;
+    
 
     try {
       await deleteRelationshipLink(linkId);

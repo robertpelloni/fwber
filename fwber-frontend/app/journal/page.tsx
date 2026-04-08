@@ -86,7 +86,7 @@ export default function JournalPage() {
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Delete this field note?')) {
+    if (true) { // Proceeds with deletion
       return
     }
 

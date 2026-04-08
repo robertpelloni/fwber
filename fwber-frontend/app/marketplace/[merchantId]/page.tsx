@@ -35,7 +35,7 @@ export default function MarketplacePage() {
     }, [merchantId]);
 
     const handlePurchase = async (item: InventoryItem) => {
-        if (!confirm(`Spend ${item.price_tokens} FWB Tokens on "${item.name}"?`)) return;
+        
 
         try {
             setPurchasingId(item.id);

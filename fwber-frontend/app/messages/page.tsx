@@ -19,11 +19,13 @@ import RealTimeChat from '@/components/RealTimeChat'
 import { DateFeedbackModal } from '@/components/matches/DateFeedbackModal'
 import MatchARView from '@/components/ar/MatchARView'
 import AppHeader from '@/components/AppHeader'
+import { useConfirmDialog } from '@/components/ConfirmDialog'
 
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
   const { showError } = useToast()
   const { videoSignals } = useWebSocket()
+  const { confirmAction, ConfirmDialog } = useConfirmDialog()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -67,15 +69,24 @@ export default function MessagesPage() {
 
   const handleBlock = async () => {
     const otherUser = selectedConversation?.other_user
-    if (!token || !otherUser || !confirm('Are you sure you want to block this user? You will no longer see their messages or profile.')) return
+    if (!token || !otherUser) return
 
-    try {
-      await blockUser(token, otherUser.id)
-      setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
-      setSelectedConversation(null)
-    } catch (err) {
-      showError('Failed to block user')
-    }
+    // Use inline confirmation instead of native confirm()
+    confirmAction({
+      title: 'Block User',
+      message: `Are you sure you want to block ${otherUser.name}? You will no longer see their messages or profile.`,
+      confirmLabel: 'Block',
+      variant: 'destructive',
+      onConfirm: async () => {
+        try {
+          await blockUser(token, otherUser.id)
+          setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
+          setSelectedConversation(null)
+        } catch (err) {
+          showError('Failed to block user')
+        }
+      },
+    })
   }
 
   const handleReport = async (reason: string, details: string) => {
@@ -85,15 +96,22 @@ export default function MessagesPage() {
     try {
       await reportUser(token, otherUser.id, reason, details)
 
-      if (confirm('Report submitted. Do you want to block this user as well?')) {
-        try {
-          await blockUser(token, otherUser.id)
-          setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
-          setSelectedConversation(null)
-        } catch (err) {
-          console.error('Failed to block after report', err)
-        }
-      }
+      // Offer to block after report
+      confirmAction({
+        title: 'Report Submitted',
+        message: 'Do you want to block this user as well?',
+        confirmLabel: 'Block User',
+        variant: 'destructive',
+        onConfirm: async () => {
+          try {
+            await blockUser(token, otherUser.id)
+            setConversations(prev => prev.filter(c => c.id !== selectedConversation!.id))
+            setSelectedConversation(null)
+          } catch (err) {
+            console.error('Failed to block after report', err)
+          }
+        },
+      })
     } catch (err) {
       showError('Failed to submit report', err instanceof Error ? err.message : 'Unknown error')
     }
@@ -149,6 +167,7 @@ export default function MessagesPage() {
 
   return (
     <ProtectedRoute>
+      {ConfirmDialog}
       <div className="min-h-screen bg-gray-50">
         <AppHeader />
 

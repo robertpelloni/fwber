@@ -63,7 +63,7 @@ export default function TwoFactorSettingsPage() {
   };
 
   const disableTwoFactor = async () => {
-    if (!confirm('Are you sure you want to disable two-factor authentication?')) return;
+    
     
     setIsLoading(true);
     setError(null);

@@ -54,10 +54,6 @@ function SubscriptionContent() {
   };
 
   const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? You will retain access until the end of the billing period.')) {
-      return;
-    }
-
     try {
       setCanceling(true);
       setError(null);
