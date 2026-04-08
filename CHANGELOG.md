@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.44] - 2026-04-08 — Security & Transparency Files
+
+### Added
+- `/.well-known/security.txt` — Responsible vulnerability disclosure policy.
+- `/humans.txt` — Project attribution and technology stack.
+
 ## [1.8.43] - 2026-04-08 — Auth Data Normalization & Verification UX
 
 ### Added
