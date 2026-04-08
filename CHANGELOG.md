@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.46] - 2026-04-08 — Session Expired UX & Login Feedback
+
+### Added
+- **Session expired message** on the login page: Shows an amber "Your session has expired. Please log in again." message when the user is redirected from a 401 response via `?reason=session_expired`.
+
+### Impact
+- Users who are automatically logged out due to token expiration now see a clear explanation instead of just the login form.
+
 ## [1.8.45] - 2026-04-08 — Solana Network Fix & Mail Config
 
 ### Fixed

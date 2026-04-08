@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useWallet } from '@solana/wallet-adapter-react'
@@ -12,6 +12,8 @@ import { Globe } from 'lucide-react'
 import bs58 from 'bs58'
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
+  const sessionExpired = searchParams.get('reason') === 'session_expired'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [twoFactorCode, setTwoFactorCode] = useState('')
@@ -180,6 +182,12 @@ export default function LoginPage() {
                 </div>
               )}
             </div>
+
+            {sessionExpired && (
+              <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 p-4">
+                <div className="text-sm text-amber-700 dark:text-amber-400">Your session has expired. Please log in again.</div>
+              </div>
+            )}
 
             {error && (
               <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
