@@ -53,6 +53,34 @@ Route::post('auth/two-factor-challenge', [\App\Http\Controllers\TwoFactorChallen
 Route::post('telemetry/client-events', [\App\Http\Controllers\TelemetryController::class, 'storeClientEvents']);
 Route::post('analytics/events', [\App\Http\Controllers\AnalyticsController::class, 'store']);
 
+// Public Feature Flags (No Auth)
+Route::get('config/features', function () {
+    $featureFlagService = app(\App\Services\FeatureFlagService::class);
+
+    return response()->json([
+        'features' => [
+            'groups' => $featureFlagService->isEnabled('groups'),
+            'photos' => $featureFlagService->isEnabled('photos'),
+            'proximity_artifacts' => $featureFlagService->isEnabled('proximity_artifacts'),
+            'chatrooms' => $featureFlagService->isEnabled('chatrooms'),
+            'proximity_chatrooms' => $featureFlagService->isEnabled('proximity_chatrooms'),
+            'face_reveal' => $featureFlagService->isEnabled('face_reveal'),
+            'local_media_vault' => $featureFlagService->isEnabled('local_media_vault'),
+            'moderation' => $featureFlagService->isEnabled('moderation'),
+            'recommendations' => $featureFlagService->isEnabled('recommendations'),
+            'websocket' => true,
+            'content_generation' => $featureFlagService->isEnabled('content_generation'),
+            'rate_limits' => true,
+            'analytics' => true,
+            'video_chat' => $featureFlagService->isEnabled('video_chat'),
+            'ai_wingman' => $featureFlagService->isEnabled('ai_wingman'),
+            'media_analysis' => $featureFlagService->isEnabled('media_analysis'),
+        ],
+        'source' => 'runtime',
+        'timestamp' => now()->toIso8601String(),
+    ]);
+});
+
 // Public Debug Route (No Auth)
 if (! app()->isProduction()) {
     Route::get('debug/public', function () {
@@ -691,33 +719,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('users/{userId}', [\App\Http\Controllers\ModerationController::class, 'userProfile']);
     });
 
-    // Feature Flags / Config
-    Route::get('config/features', function (\Illuminate\Http\Request $request) {
-        $featureFlagService = app(\App\Services\FeatureFlagService::class);
-
-        return response()->json([
-            'features' => [
-                'groups' => $featureFlagService->isEnabled('groups'),
-                'photos' => $featureFlagService->isEnabled('photos'),
-                'proximity_artifacts' => $featureFlagService->isEnabled('proximity_artifacts'),
-                'chatrooms' => $featureFlagService->isEnabled('chatrooms'),
-                'proximity_chatrooms' => $featureFlagService->isEnabled('proximity_chatrooms'),
-                'face_reveal' => $featureFlagService->isEnabled('face_reveal'),
-                'local_media_vault' => $featureFlagService->isEnabled('local_media_vault'),
-                'moderation' => $featureFlagService->isEnabled('moderation'),
-                'recommendations' => $featureFlagService->isEnabled('recommendations'),
-                'websocket' => true,
-                'content_generation' => $featureFlagService->isEnabled('content_generation'),
-                'rate_limits' => true,
-                'analytics' => true,
-                'video_chat' => $featureFlagService->isEnabled('video_chat'),
-                'ai_wingman' => $featureFlagService->isEnabled('ai_wingman'),
-                'media_analysis' => $featureFlagService->isEnabled('media_analysis'),
-            ],
-            'source' => 'runtime',
-            'timestamp' => now()->toIso8601String(),
-        ]);
-    });
+    // Feature Flags / Config (moved to public routes)
 
     // Wingman Status
     Route::get('wingman/status', function (\Illuminate\Http\Request $request) {
