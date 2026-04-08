@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.50] - 2026-04-08 — Password Reset Custom Notification & Reset Page
+
+### Added
+- **`ResetPasswordNotification`** custom notification: Sends branded password reset emails with fwber styling and frontend URL (`/reset-password?token=...&email=...`).
+- **`/reset-password` page**: Complete frontend reset password form with password visibility toggle, confirmation, validation, and success screen with "Sign In Now" CTA.
+- **User model override**: `sendPasswordResetNotification()` now dispatches custom notification instead of Laravel default.
+
+### Impact
+- Full password reset flow: Login → Forgot Password → Email → Reset Password → Sign In.
+- Custom branded emails with fwber frontend URLs instead of backend API URLs.
+
 ## [1.8.49] - 2026-04-08 — Password Reset Flow
 
 ### Added

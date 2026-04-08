@@ -389,4 +389,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(GovernanceVote::class);
     }
+
+    /**
+     * Send the password reset notification.
+     * Uses our custom notification with frontend URL.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
