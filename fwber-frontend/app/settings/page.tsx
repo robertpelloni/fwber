@@ -202,7 +202,7 @@ export default function SettingsPage() {
       await apiClient.post('/user/export', {});
 
       setExportStatus('processing');
-      alert('Your data export has been requested. We will notify you when it is ready (or check back here).');
+      // Export requested successfully — status polling will handle UI update
 
       // Start polling for status (simplified for this context, ideally use a hook or web socket)
       const pollInterval = setInterval(async () => {
@@ -227,9 +227,9 @@ export default function SettingsPage() {
     } catch (error: any) {
       console.error('Failed to export data', error);
       if (error.response?.status === 429) {
-        alert('You can only request a data export once per day.');
+        console.warn('Export rate limited: once per day');
       } else {
-        alert('Failed to request data export. Please try again.');
+        console.error('Failed to request data export:', error);
       }
       setExportStatus('error');
     }

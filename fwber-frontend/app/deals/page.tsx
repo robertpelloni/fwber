@@ -147,7 +147,7 @@ function DealCard({ deal }: { deal: Deal }) {
   const handleRedeem = (e: MouseEvent) => {
     e.stopPropagation()
     trackInteraction('redemption')
-    alert(`Redeemed! Code: ${deal.promo_code || 'APPLIED'}`)
+    console.log('Deal redeemed:', deal.promo_code || 'APPLIED')
   }
 
   return (

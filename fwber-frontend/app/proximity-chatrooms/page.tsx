@@ -78,7 +78,7 @@ export default function ProximityChatroomsPage() {
     token_entry_fee?: number | string;
   }) => {
     if (!location.latitude || !location.longitude) {
-      alert('Location is required to create a proximity chatroom');
+      console.warn('Location required');
       return;
     }
 

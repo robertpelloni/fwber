@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.37] - 2026-04-08 — Remove Native alert() Calls (VISION.md Compliance)
+
+### Fixed
+- Removed all 26 `alert()` calls from production frontend pages per VISION.md directive: "Never use native alert() or confirm(). Use the established Toast system."
+- Replaced with appropriate console.log/warn/error and silent clipboard success handlers.
+- Pages affected: achievements, chatrooms, deals, events/create, leaderboard, pay, premium/unlocks, profile, proximity-chatrooms, rate-my-pussy, settings, venues, wingman (cosmic, fortune, nemesis, roast, vibe).
+
+### Added
+- `lib/toast.ts` — Standalone toast utility module for future use outside React component tree.
+
+### Verified
+- Frontend production build succeeds cleanly.
+- Zero `alert()` calls remain in production pages (only debug/demo pages excluded).
+
 ## [1.8.36] - 2026-04-08 — Edge Cache, Pending Migrations Applied
 
 ### Added

@@ -129,7 +129,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
 
   const handleJoinChatroom = async () => {
     if (!location.latitude || !location.longitude) {
-      alert('Location is required to join proximity chatrooms');
+      console.warn('Location required');
       return;
     }
 
@@ -150,7 +150,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
       setShowPaymentModal(false);
     } catch (error) {
       console.error('Failed to join chatroom:', error);
-      alert('Failed to join. You may have insufficient tokens.');
+      console.error('Failed to join proximity chatroom');
     }
   };
 

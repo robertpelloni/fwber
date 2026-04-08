@@ -50,7 +50,7 @@ export default function RateMyPussyPage() {
       fetchCats()
     } catch (err) {
       console.error('Failed to rate cat:', err)
-      alert('Please login to rate pussies!')
+      console.warn('Login required')
     }
   }
 
@@ -73,7 +73,7 @@ export default function RateMyPussyPage() {
       fetchCats()
     } catch (err) {
       console.error('Upload failed:', err)
-      alert('Upload failed. Are you logged in?')
+      console.error('Upload failed')
     } finally {
       setUploading(false)
     }

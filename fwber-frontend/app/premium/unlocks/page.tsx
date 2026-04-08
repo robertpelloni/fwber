@@ -90,7 +90,7 @@ export default function ContentUnlocksPage() {
 
   const handleUnlock = async (matchId: number, tokenCost: number) => {
     if (tokenBalance < tokenCost) {
-      alert('Insufficient tokens. Please purchase more tokens to unlock this content.')
+      console.warn('Insufficient tokens for unlock')
       return
     }
 
@@ -100,7 +100,6 @@ export default function ContentUnlocksPage() {
       await fetchUnlocks()
     } catch (error) {
       console.error('Failed to unlock content:', error)
-      alert('Failed to unlock content. Please try again.')
     } finally {
       setUnlocking(null)
     }

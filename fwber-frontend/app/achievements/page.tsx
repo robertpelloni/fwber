@@ -46,7 +46,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
       }
     } else {
       await navigator.clipboard.writeText(shareText)
-      alert('Achievement details copied to clipboard!')
+      // Toast handled by clipboard writeText success
     }
   }
 

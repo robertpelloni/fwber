@@ -17,7 +17,7 @@ export default function CreateEventPage() {
 
   const getLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser');
+      console.warn('Geolocation not supported');
       return;
     }
 
@@ -27,7 +27,7 @@ export default function CreateEventPage() {
         setValue('longitude', position.coords.longitude);
       },
       (error) => {
-        alert('Unable to retrieve your location');
+        console.warn('Unable to retrieve location');
       }
     );
   };

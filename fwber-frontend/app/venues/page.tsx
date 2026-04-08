@@ -77,7 +77,7 @@ export default function VenuesPage() {
 
   const handleCheckIn = async (venueId: number) => {
     if (!token || !location) {
-      alert('Location is required to check in')
+      console.warn('Location required for check-in')
       return
     }
     const message = prompt("Enter a check-in message (optional):") || ""
@@ -87,7 +87,7 @@ export default function VenuesPage() {
     } catch (error: any) {
       console.error('Check-in failed', error)
       const errorMsg = error.response?.data?.message || 'Check-in failed'
-      alert(errorMsg)
+      console.error(errorMsg)
     }
   }
 

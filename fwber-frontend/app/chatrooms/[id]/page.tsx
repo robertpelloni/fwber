@@ -127,7 +127,7 @@ export default function ChatroomPage() {
       // which should return is_member=true and preview_mode=false
     } catch (error) {
       console.error('Failed to join chatroom:', error);
-      alert('Failed to join chatroom. You may not have enough tokens.');
+      // Error shown via mutation onError handler
     }
   };
 

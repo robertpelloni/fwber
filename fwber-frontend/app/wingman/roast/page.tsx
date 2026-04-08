@@ -56,7 +56,7 @@ export default function RoastPage() {
       }
     } else {
       await navigator.clipboard.writeText(shareText)
-      alert('Result copied to clipboard!')
+      // Clipboard copy succeeded
     }
   }
 

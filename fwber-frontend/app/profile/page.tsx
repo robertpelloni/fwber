@@ -525,7 +525,7 @@ export default function ProfilePage() {
                     } catch (err) { console.error(err) }
                   } else {
                     await navigator.clipboard.writeText(shareText)
-                    alert('Profile link copied!')
+                    // Clipboard write succeeded
                   }
                 }}
                 className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-black rounded-full transition shadow-md whitespace-nowrap"

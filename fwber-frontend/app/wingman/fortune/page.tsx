@@ -54,7 +54,7 @@ export default function FortunePage() {
       }
     } else {
       await navigator.clipboard.writeText(shareText)
-      alert('Fortune copied to clipboard!')
+      // Clipboard copy succeeded
     }
   }
 

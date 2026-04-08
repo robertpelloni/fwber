@@ -41,7 +41,7 @@ export default function LeaderboardPage() {
       }
     } else {
       await navigator.clipboard.writeText(shareText)
-      alert('Leaderboard link copied!')
+      // Clipboard write succeeded
     }
   }
 
