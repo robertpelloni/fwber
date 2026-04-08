@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.33 "Mobile Store Prep"
+> **Current Version:** 1.8.47 "Production Hardening"
 > **Last Updated:** 2026-04-08
 
 ---
