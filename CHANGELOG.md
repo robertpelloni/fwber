@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.40] - 2026-04-08 — Dynamic OG Images & SEO Optimization
+
+### Added
+- **Dynamic Open Graph images** for viral share pages (`/share/[id]/opengraph-image.tsx`) — generates contextual OG images based on content type (roast 🔥, hype ✨, fortune 🔮, nemesis 🧬, vibe 🚩).
+- **Roast page OG image** (`/roast/opengraph-image.tsx`) — branded acquisition funnel image with "Try It Free" CTA.
+- **Roast page SEO metadata** (`/roast/layout.tsx`) — full OpenGraph and Twitter card metadata for the primary acquisition funnel page.
+
+### Changed
+- Improved `manifest.json` encoding for PWA app name (fixed em-dash rendering).
+- External link safety: Added `rel="noopener noreferrer"` to `target="_blank"` links.
+
+### Impact
+- Social sharing of roast/hype/vibe results now shows rich preview cards on Twitter, Discord, iMessage, etc.
+- `/roast` landing page now has proper SEO metadata for search engine indexing.
+
 ## [1.8.39] - 2026-04-08 — APM Monitoring Activation & Manifest Fix
 
 ### Changed
