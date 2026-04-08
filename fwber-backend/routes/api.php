@@ -354,6 +354,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Matches
     Route::get('matches', [\App\Http\Controllers\MatchController::class, 'index']);
     Route::get('matches/established', [\App\Http\Controllers\MatchController::class, 'establishedMatches']);
+    Route::get('matches/history', [\App\Http\Controllers\MatchController::class, 'index']); // alias for frontend
     Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
     Route::post('matches/{id}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
@@ -543,6 +544,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('photos/{id}/unlock', [\App\Http\Controllers\PhotoController::class, 'unlock']);
     Route::get('photos/{id}/original', [\App\Http\Controllers\PhotoController::class, 'original']);
     Route::get('photos', [\App\Http\Controllers\PhotoController::class, 'index']);
+    Route::get('photos/settings', function () {
+        return response()->json([
+            'max_photos' => 6,
+            'max_file_size' => 5 * 1024 * 1024,
+            'allowed_formats' => ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+            'compression_quality' => 85,
+        ]);
+    });
     Route::get('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'show']);
     Route::put('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'update']);
     Route::delete('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'destroy']);

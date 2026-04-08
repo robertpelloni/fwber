@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.31] - 2026-04-08 — Feature Flags, CORS Fix, Route Gap Closure
+
+### Added
+- Created `config/feature_flags.php` with all feature flags defaulting to `true`, overridable via `FEATURE_*` env vars.
+- Added `GET api/matches/history` alias (maps to `MatchController@index`) for frontend compatibility.
+- Added `GET api/photos/settings` endpoint returning upload constraints (max photos, formats, quality).
+
+### Fixed
+- **CORS credentials+wildcard mismatch**: Changed `allowed_origins` from `*` to explicit origin list (`fwber.me`, `www.fwber.me`, `localhost:3000`) so `supports_credentials: true` works correctly in browsers.
+- Added `PATCH` to CORS `allowed_methods` for routes like `scrapbook/{id}/pin`.
+- Fixed stale "DreamHost" reference in frontend API client comment and Next.js config header comment.
+
+### Verified
+- Backend routes now at 433 (up from 431).
+- Frontend production build succeeds cleanly.
+
 ## [1.8.30] - 2026-04-08 — Content Generation Routes & API Method Fix
 
 ### Added

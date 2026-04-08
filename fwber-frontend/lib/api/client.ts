@@ -19,7 +19,7 @@ const getBaseUrl = () => {
     // In the browser, ALWAYS use the local Next.js proxy to bypass CORS
     return '/api';
   }
-  // On the server (SSR), we need the absolute URL to hit DreamHost directly
+  // On the server (SSR), we need the absolute URL to hit the backend directly
   const url = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
   return url.replace(/\/$/, '') + '/api';
 };
