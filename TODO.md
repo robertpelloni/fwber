@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.33
+> **Version:** 1.8.44
 > **Last Updated:** 2026-04-08
 
 ---
@@ -12,11 +12,19 @@
 - [x] **Frontend-Backend Route Audit**: Complete cross-reference of all 436 backend routes against every frontend API call. Fixed all HTTP method mismatches and missing endpoints.
 - [x] **Feature Flag Activation**: Created `config/feature_flags.php` with all 15 flags enabled, activated `useBackendFeatureFlags` hook in frontend.
 - [x] **CORS Fix**: Fixed `credentials: true` + `*` origin mismatch that blocked authenticated cross-origin requests.
+- [x] **Native alert() Removal**: Removed all 26 `alert()` calls from production pages per VISION.md directive.
+- [x] **Broadcasting Default Fix**: Changed default broadcast driver from `null` to `reverb` so WebSocket events reach connected clients.
+- [x] **Reverb WebSocket Origin Restriction**: Changed `allowed_origins` from `*` to explicit origin list matching CORS config.
+- [x] **APM Monitoring Activation**: Enabled APM by default with 500ms slow request threshold.
+- [x] **Auth Data Normalization**: Added `normalizeUser()` to map backend snake_case to frontend camelCase at all auth dispatch points.
+- [x] **Email Verification Flow**: Added `MustVerifyEmail` to User model, verification routes, and resend functionality.
+- [x] **SEO & Meta Optimization**: Dynamic OG images for share pages, roast page SEO metadata with layout.
+- [x] **Security & Transparency**: Added `security.txt` and `humans.txt` for responsible disclosure.
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
 - [x] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
-- [ ] **SEO & Meta Optimization**: Add dynamic Open Graph meta tags for share pages (roast results, profiles, events).
+- [x] **SEO & Meta Optimization**: Dynamic OG images for share pages, roast page SEO metadata.
 - [ ] **Landing Page Conversion**: A/B test the public `/roast` page as the primary acquisition funnel.
 
 ## ✅ Recently Completed
