@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /settings/
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /matches
+Disallow: /wallet
+Disallow: /notifications
+Disallow: /moderation
+Disallow: /onboarding
+Disallow: /sentry-test
+Disallow: /api-test
+Disallow: /test-auth
+Disallow: /dev-auth
+
+Sitemap: https://fwber.me/sitemap.xml
