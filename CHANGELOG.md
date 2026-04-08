@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.33] - 2026-04-08 — Feature Flag Activation & Data Route Completion
+
+### Added
+- `GET api/photos/reveals` endpoint for listing photo reveal requests with pagination.
+- `GET api/matches/insights/unlocked` endpoint for listing unlocked match insights via `ContentUnlock` model.
+- `GET api/wingman/date-ideas/general` endpoint for general Detroit date ideas (no match required).
+
+### Fixed
+- **Frontend roast page HTTP method**: `wingman/roast/page.tsx` was using `apiClient.get` but backend requires `POST`. Fixed to `apiClient.post`.
+- **Feature flag hook activation**: `useBackendFeatureFlags` was set to `enabled: false` by default. Now defaults to `true` since the `config/features` endpoint exists and returns live data.
+- Added `media_analysis` to the `BackendFeatureFlags` TypeScript interface.
+
+### Changed
+- Stale "DreamHost" references cleaned from `lib/api/client.ts` and `next.config.js`.
+
+### Verified
+- Frontend production build succeeds cleanly.
+- All 436 backend routes verified against frontend API calls — no remaining 404/405 gaps.
+
 ## [1.8.32] - 2026-04-08 — Frontend Route Gap Closure & Roast Method Fix
 
 ### Added

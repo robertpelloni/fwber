@@ -148,14 +148,14 @@ interface BackendFeatureFlags {
   analytics: boolean;
   video_chat: boolean; // Added
   ai_wingman: boolean; // Added
+  media_analysis: boolean; // Added
 }
 
 /**
  * Hook to fetch feature flags from backend
  * Useful for admin panels or when runtime flag changes are needed
  *
- * Note: This is optional and requires a backend endpoint to be implemented
- * The backend would need to expose GET /api/config/features
+ * Note: Backend endpoint GET /api/config/features now exists and returns runtime flags.
  */
 export function useBackendFeatureFlags(options?: { enabled?: boolean }) {
   return useQuery<BackendFeatureFlags>({
@@ -165,7 +165,7 @@ export function useBackendFeatureFlags(options?: { enabled?: boolean }) {
       // For now, return static defaults based on what we know
       return api.get<BackendFeatureFlags>('/config/features');
     },
-    enabled: options?.enabled ?? false, // Disabled by default, enable when endpoint exists
+    enabled: options?.enabled ?? true, // Now enabled by default since backend endpoint exists
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     retry: 1,
