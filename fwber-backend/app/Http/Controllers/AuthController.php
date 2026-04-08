@@ -32,6 +32,13 @@ class AuthController extends Controller
             'referral_code' => $tokenService->generateReferralCode(),
         ]);
 
+        // Send email verification
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to send verification email: ' . $e->getMessage());
+        }
+
         // Process tokens
         $tokenService->processSignupBonus($user, $validated['referral_code'] ?? null);
 

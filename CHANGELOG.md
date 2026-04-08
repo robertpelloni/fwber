@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.41] - 2026-04-08 — Email Verification Flow
+
+### Added
+- **Email verification system**: User model now implements `MustVerifyEmail` interface.
+- **Verification email sent on registration**: New users receive a verification email with a signed link.
+- **`GET api/email/verify/{id}/{hash}`**: Signed URL verification endpoint — verifies email and redirects to `/settings?verified=success`.
+- **`POST api/email/verification-notification`**: Resend verification email (rate-limited to 5/min).
+- **`frontend_url` config**: Added `config('app.frontend_url')` for redirecting verification links to the correct frontend URL.
+
+### Changed
+- `AuthController::register()` now dispatches email verification notification after user creation (with error handling so registration never fails due to mail issues).
+
+### Impact
+- Reduces spam signups and improves email deliverability.
+- Users see `email_verified_at` in their profile data.
+- Frontend can show a "Verify your email" banner for unverified users.
+
 ## [1.8.40] - 2026-04-08 — Dynamic OG Images & SEO Optimization
 
 ### Added

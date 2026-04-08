@@ -185,6 +185,33 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
     Route::get('auth/me', [\App\Http\Controllers\AuthController::class, 'me']);
 
+    // Email Verification
+    Route::get('email/verify/{id}/{hash}', function (\Illuminate\Http\Request $request, $id, $hash) {
+        $user = \App\Models\User::findOrFail($id);
+
+        if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            return response()->json(['message' => 'Invalid verification link'], 403);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect(config('app.frontend_url', 'https://www.fwber.me') . '/settings?verified=already');
+        }
+
+        $user->markEmailAsVerified();
+
+        return redirect(config('app.frontend_url', 'https://www.fwber.me') . '/settings?verified=success');
+    })->middleware('signed.relative')->name('verification.verify');
+
+    Route::post('email/verification-notification', function (\Illuminate\Http\Request $request) {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json(['message' => 'Email already verified'], 400);
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json(['message' => 'Verification email sent']);
+    })->middleware('throttle:auth')->name('verification.send');
+
     // Two Factor Authentication
     Route::post('user/two-factor-authentication', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'store']);
     Route::post('user/confirmed-two-factor-authentication', [\App\Http\Controllers\TwoFactorAuthenticationController::class, 'confirm']);
