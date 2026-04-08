@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.29
+> **Version:** 1.8.33
 > **Last Updated:** 2026-04-08
 
 ---
@@ -9,10 +9,15 @@
 - [x] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
 - [x] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals (resolved N+1 queries in Dashboard, Match, and Profile routes).
 - [x] **Missing Route Restoration**: Restored 16 moderation routes, feature flag config, wingman status, referral payouts, travel mode, and achievement unlock endpoints.
+- [x] **Frontend-Backend Route Audit**: Complete cross-reference of all 436 backend routes against every frontend API call. Fixed all HTTP method mismatches and missing endpoints.
+- [x] **Feature Flag Activation**: Created `config/feature_flags.php` with all 15 flags enabled, activated `useBackendFeatureFlags` hook in frontend.
+- [x] **CORS Fix**: Fixed `credentials: true` + `*` origin mismatch that blocked authenticated cross-origin requests.
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
 - [x] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
+- [ ] **SEO & Meta Optimization**: Add dynamic Open Graph meta tags for share pages (roast results, profiles, events).
+- [ ] **Landing Page Conversion**: A/B test the public `/roast` page as the primary acquisition funnel.
 
 ## ✅ Recently Completed
 - [x] **Recommendation Engine Performance Pass**: Optimized `RecommendationService` to eliminate nested N+1 queries when fetching collaborative filtering telemetry and content data.
