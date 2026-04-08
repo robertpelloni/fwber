@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.47] - 2026-04-08 — CORS Preflight Cache & Header Fix
+
+### Changed
+- **CORS `max_age` increased from 0 to 86400** (24 hours) — Browsers will cache preflight responses, eliminating redundant OPTIONS requests for every API call.
+- **Added `Accept` to `allowed_headers`** — The frontend API client sends `Accept: application/json` on every request; this is now properly declared in CORS.
+
+### Impact
+- Approximately 50% reduction in HTTP requests for CORS-enabled browsers (one OPTIONS per endpoint per day instead of per API call).
+- Eliminates potential CORS errors from the `Accept` header not being declared.
+
 ## [1.8.46] - 2026-04-08 — Session Expired UX & Login Feedback
 
 ### Added

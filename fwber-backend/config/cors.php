@@ -24,11 +24,11 @@ return [
     'allowed_origins_patterns' => [],
 
     // Restrict allowed headers for security
-    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID', 'X-Pusher-Socket-ID', 'X-Diagnostics-Secret'],
+    'allowed_headers' => ['Content-Type', 'Accept', 'X-Requested-With', 'Authorization', 'X-XSRF-TOKEN', 'X-Socket-ID', 'X-Pusher-Socket-ID', 'X-Diagnostics-Secret'],
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 86400,
 
     'supports_credentials' => true,
 
