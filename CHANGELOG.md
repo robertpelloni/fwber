@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.30] - 2026-04-08 — Content Generation Routes & API Method Fix
+
+### Added
+- Registered 6 `content-generation/*` routes that had controller methods but no route registrations: `optimize`, `stats`, `optimization-stats`, `feedback`, `history`, `content/{id}` (DELETE).
+- Fixed `content/generate-bio` route to point to the correct `generateProfileContent` method.
+
+### Fixed
+- Frontend `wingman.ts` was using `POST` for `vibe-check`, `fortune`, and `cosmic-match` but backend routes are `GET`. Updated frontend to use `api.get()` to eliminate 405 Method Not Allowed errors in production.
+- Moved `config/features` from auth-protected to public route so unauthenticated clients can read feature flags.
+
+### Verified
+- Backend route list now at 431 routes (up from 426).
+- Frontend production build succeeds cleanly.
+
 ## [1.8.29] - 2026-04-08 — Missing Route Restoration
 
 ### Added

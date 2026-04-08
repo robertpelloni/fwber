@@ -519,9 +519,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // AI Content Generation (rate limited)
     Route::middleware('throttle:content_generation')->group(function () {
-        Route::post('content/generate-bio', [\App\Http\Controllers\ContentGenerationController::class, 'generateProfileBio']);
+        Route::post('content/generate-bio', [\App\Http\Controllers\ContentGenerationController::class, 'generateProfileContent']);
         Route::post('content/generate-posts/{boardId}', [\App\Http\Controllers\ContentGenerationController::class, 'generatePostSuggestions']);
         Route::post('content/generate-starters', [\App\Http\Controllers\ContentGenerationController::class, 'generateConversationStarters']);
+    });
+
+    // Content Generation (full suite)
+    Route::prefix('content-generation')->group(function () {
+        Route::post('optimize', [\App\Http\Controllers\ContentGenerationController::class, 'optimizeContent']);
+        Route::get('stats', [\App\Http\Controllers\ContentGenerationController::class, 'getGenerationStats']);
+        Route::get('optimization-stats', [\App\Http\Controllers\ContentGenerationController::class, 'getOptimizationStats']);
+        Route::post('feedback', [\App\Http\Controllers\ContentGenerationController::class, 'submitContentFeedback']);
+        Route::get('history', [\App\Http\Controllers\ContentGenerationController::class, 'getGenerationHistory']);
+        Route::delete('content/{contentId}', [\App\Http\Controllers\ContentGenerationController::class, 'deleteGeneratedContent']);
     });
 
     // Photos (upload rate limited)

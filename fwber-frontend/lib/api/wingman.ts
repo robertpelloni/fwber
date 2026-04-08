@@ -58,21 +58,21 @@ export const wingmanApi = {
    * Generate Red/Green flags analysis
    */
   checkVibe: () => {
-    return api.post<VibeCheckResponse>('/wingman/vibe-check');
+    return api.get<VibeCheckResponse>('/wingman/vibe-check');
   },
 
   /**
    * Generate a dating fortune
    */
   predictFortune: () => {
-    return api.post<FortuneResponse>('/wingman/fortune');
+    return api.get<FortuneResponse>('/wingman/fortune');
   },
 
   /**
    * Get cosmic match prediction
    */
   getCosmicMatch: () => {
-    return api.post<CosmicMatchResponse>('/wingman/cosmic-match');
+    return api.get<CosmicMatchResponse>('/wingman/cosmic-match');
   },
   
   /**
