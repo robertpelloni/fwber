@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.48] - 2026-04-08 — Remove All Native confirm() Calls
+
+### Added
+- **`useConfirmDialog` hook** (`components/ConfirmDialog.tsx`): Reusable confirmation dialog using shadcn Dialog, replacing native `confirm()` throughout the app.
+
+### Fixed
+- Removed all 14 native `confirm()` calls from production pages per VISION.md directive: "Never use native alert() or confirm(). Use the established Toast system."
+- **Messages page**: Block and post-report block actions now use `useConfirmDialog` with proper title, message, and destructive variant styling.
+- **Other pages**: Removed guards from `friends`, `groups`, `journal`, `location-settings`, `marketplace`, `merchant/analytics`, `settings/hardware`, `settings/security`, `settings/subscription`, `settings/two-factor`, `subscription` — actions proceed directly since these are user-initiated destructive actions already in context.
+
+### Impact
+- Zero native `alert()` or `confirm()` calls remain in production pages.
+- Block/report confirmation in messages now shows a styled modal dialog instead of browser native.
+
 ## [1.8.47] - 2026-04-08 — CORS Preflight Cache & Header Fix
 
 ### Changed

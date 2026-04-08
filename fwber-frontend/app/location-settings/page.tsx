@@ -119,10 +119,6 @@ export default function LocationSettingsPage() {
       return
     }
 
-    // Proceeds with clearing location history
-      return
-    }
-
     try {
       setIsUpdating(true)
       await clearLocationHistory(token)

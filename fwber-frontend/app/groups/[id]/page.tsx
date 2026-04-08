@@ -62,9 +62,7 @@ export default function GroupDetailPage() {
   };
 
   const handleDeletePost = (postId: number) => {
-    if (true) {
-      deletePost.mutate(postId);
-    }
+    deletePost.mutate(postId);
   };
 
   if (isLoadingGroup) return <div className="p-8 text-center">Loading group...</div>;
