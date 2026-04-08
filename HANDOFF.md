@@ -1,7 +1,8 @@
 # HANDOFF - End of Session
 
 > **Timestamp:** 2026-04-08
-> **Version Reached:** 1.8.33
+> **Version Reached:** 1.8.35
+> **Version Started:** 1.8.28
 > **Current Model:** Claude (Antigravity)
 > **Branch:** `main`
 
@@ -41,12 +42,14 @@ This session performed a comprehensive frontend-backend route audit and restored
 - Verified all 436 backend routes against every frontend API call — zero remaining gaps.
 
 ## Deployment Status
-- **Hetzner Backend**: v1.8.33 confirmed healthy ✅
-- **Vercel Frontend**: v1.8.33 deployed and serving ✅
+- **Hetzner Backend**: v1.8.35 confirmed healthy ✅
+- **Vercel Frontend**: v1.8.35 deployed and serving ✅
 - **Frontend→Backend proxy**: `www.fwber.me/api/*` → `api.fwber.me/api/*` working ✅
 - **CORS**: `Access-Control-Allow-Origin: https://fwber.me` with `credentials: true` ✅
-- **Feature flags**: All 15 features enabled on production ✅
-- **GitHub Actions**: All CI checks passing ✅
+- **Feature flags**: All 16 features enabled on production ✅
+- **GitHub Actions**: All CI checks passing (Backend Tests, Repository Hygiene, Hetzner Deploy, Vercel Deploy) ✅
+- **SEO**: robots.txt + dynamic sitemap.xml serving ✅
+- **Error handling**: Error boundaries at page and global level ✅
 
 ## Verified Working Endpoints
 - `GET /api/health` → version 1.8.33, all checks OK
@@ -56,7 +59,8 @@ This session performed a comprehensive frontend-backend route audit and restored
 
 ## Best Next Steps
 1. **Marketing Push**: The referral system and viral roast page are fully functional — ready for acquisition campaigns.
-2. **SEO & Open Graph**: Add dynamic meta tags for share pages (roast results, events, profiles).
+2. **SEO & Open Graph**: robots.txt and sitemap are in place. Add dynamic OG meta tags for share pages.
 3. **Landing Page Optimization**: The public `/roast` page is the primary acquisition funnel — consider A/B testing.
-4. **Monitoring**: Enable the `useBackendFeatureFlags` hook across more pages for runtime feature control.
-5. **Mobile Store Submission**: The Expo config is ready — next step is EAS build and store submission.
+4. **Mobile Store Submission**: The Expo config is ready — next step is EAS build and store submission.
+5. **Performance APM**: Enable slow query logging and real-time monitoring dashboards.
+6. **Email Verification Flow**: Add email verification for new signups to improve deliverability.
