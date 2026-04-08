@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.43] - 2026-04-08 — Auth Data Normalization & Verification UX
+
+### Added
+- **`normalizeUser()` function** in `auth-context.tsx`: Maps backend snake_case fields to frontend camelCase (`email_verified_at` → `emailVerifiedAt`, etc.). Applied at all auth success dispatch points: login, register, wallet login, token verification, and session restore.
+- **Email verification success banner** on Settings page: Shows green success message when user arrives from `?verified=success` redirect.
+
+### Fixed
+- Auth data mapping: `emailVerifiedAt` was always `undefined` because the backend returns `email_verified_at` (snake_case). Now properly normalized.
+- Email verification banner now correctly detects unverified users.
+
+### Impact
+- All user profile fields (including `is_verified`, `is_incognito`, `is_federated`) are now properly accessible in camelCase throughout the frontend.
+- Email verification UX flow is complete: register → receive email → click link → backend verifies → redirect to settings → success banner.
+
 ## [1.8.42] - 2026-04-08 — Email Verification Banner in Settings
 
 ### Added

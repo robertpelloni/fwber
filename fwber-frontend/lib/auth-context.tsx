@@ -122,6 +122,47 @@ function clearStoredAuth(): void {
   localStorage.removeItem('fwber_user')
 }
 
+/** Normalize backend snake_case user to frontend camelCase */
+function normalizeUser(raw: any): User {
+  return {
+    id: raw.id,
+    email: raw.email,
+    role: raw.role,
+    name: raw.name,
+    emailVerifiedAt: raw.email_verified_at ?? raw.emailVerifiedAt ?? null,
+    createdAt: raw.created_at ?? raw.createdAt,
+    updatedAt: raw.updated_at ?? raw.updatedAt,
+    two_factor_enabled: raw.two_factor_enabled,
+    referral_code: raw.referral_code,
+    referrals_count: raw.referrals_count,
+    vouches_count: raw.vouches_count,
+    golden_tickets_remaining: raw.golden_tickets_remaining,
+    token_balance: raw.token_balance,
+    onboarding_completed_at: raw.onboarding_completed_at ?? raw.onboarding_completed_at,
+    profile: raw.profile ? {
+      displayName: raw.profile.display_name ?? raw.profile.displayName,
+      dateOfBirth: raw.profile.date_of_birth ?? raw.profile.dateOfBirth,
+      gender: raw.profile.gender,
+      pronouns: raw.profile.pronouns,
+      sexualOrientation: raw.profile.sexual_orientation ?? raw.profile.sexualOrientation,
+      relationshipStyle: raw.profile.relationship_style ?? raw.profile.relationshipStyle,
+      bio: raw.profile.bio,
+      locationLatitude: raw.profile.location_latitude ?? raw.profile.locationLatitude,
+      locationLongitude: raw.profile.location_longitude ?? raw.profile.locationLongitude,
+      locationDescription: raw.profile.location_description ?? raw.profile.locationDescription,
+      stiStatus: raw.profile.sti_status ?? raw.profile.stiStatus,
+      preferences: raw.profile.preferences,
+      avatarUrl: raw.profile.avatar_url ?? raw.profile.avatarUrl,
+      is_federated: raw.profile.is_federated,
+      is_confessional_mode: raw.profile.is_confessional_mode,
+      is_incognito: raw.profile.is_incognito,
+      is_verified: raw.profile.is_verified,
+      createdAt: raw.profile.created_at ?? raw.profile.createdAt,
+      updatedAt: raw.profile.updated_at ?? raw.profile.updatedAt,
+    } : raw.profile,
+  };
+}
+
 function persistStoredAuth(user: User, token: string): void {
   if (typeof window === 'undefined') {
     return
@@ -333,7 +374,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return
           }
 
-          const verifiedUser = await response.json()
+          const verifiedUser = normalizeUser(await response.json())
 
           if (!cancelled) {
             setApiClientAuthToken(token)
@@ -437,12 +478,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       logAuth.login(email, true)
-      setUserContext(data.user)
-      persistStoredAuth(data.user, data.access_token || data.token)
+      setUserContext(normalizeUser(data.user))
+      persistStoredAuth(normalizeUser(data.user), data.access_token || data.token)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
-          user: data.user, 
+          user: normalizeUser(data.user), 
           token: data.access_token || data.token 
         } 
       })
@@ -477,12 +518,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       logAuth.login(walletAddress, true)
-      setUserContext(data.user)
-      persistStoredAuth(data.user, data.access_token || data.token)
+      setUserContext(normalizeUser(data.user))
+      persistStoredAuth(normalizeUser(data.user), data.access_token || data.token)
       dispatch({
         type: 'AUTH_SUCCESS',
         payload: {
-          user: data.user,
+          user: normalizeUser(data.user),
           token: data.access_token || data.token
         }
       })
@@ -519,12 +560,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Assuming the challenge endpoint returns the same structure as login on success
-      setUserContext(data.user)
-      persistStoredAuth(data.user, data.access_token || data.token)
+      setUserContext(normalizeUser(data.user))
+      persistStoredAuth(normalizeUser(data.user), data.access_token || data.token)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
-          user: data.user, 
+          user: normalizeUser(data.user), 
           token: data.access_token || data.token 
         } 
       })
@@ -581,12 +622,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       logAuth.register(email, true)
-      setUserContext(data.user)
-      persistStoredAuth(data.user, data.access_token || data.token)
+      setUserContext(normalizeUser(data.user))
+      persistStoredAuth(normalizeUser(data.user), data.access_token || data.token)
       dispatch({ 
         type: 'AUTH_SUCCESS', 
         payload: { 
-          user: data.user, 
+          user: normalizeUser(data.user), 
           token: data.access_token || data.token 
         } 
       })

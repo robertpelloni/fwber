@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useFeatureFlag } from '@/lib/hooks/use-feature-flags';
 import { useAuth } from '@/lib/auth-context';
@@ -148,8 +149,17 @@ function SettingsButton({ onClick, icon, title, description, disabled }: Setting
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const searchParams = useSearchParams();
   const { isEnabled: vaultEnabled } = useFeatureFlag('local_media_vault');
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal');
+
+  // Handle email verification redirect
+  const [verifiedMessage, setVerifiedMessage] = useState<string | null>(null);
+  useEffect(() => {
+    const verified = searchParams.get('verified');
+    if (verified === 'success') setVerifiedMessage('Email verified successfully!');
+    else if (verified === 'already') setVerifiedMessage('Email was already verified.');
+  }, [searchParams]);
 
   const [isIncognito, setIsIncognito] = useState(user?.profile?.is_incognito || false);
   const [updatingIncognito, setUpdatingIncognito] = useState(false);
@@ -275,8 +285,17 @@ export default function SettingsPage() {
 
         <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Account Section */}
+          {/* Email Verification Success Banner */}
+          {verifiedMessage && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+              <p className="text-sm font-medium text-green-800">{verifiedMessage}</p>
+              <button onClick={() => setVerifiedMessage(null)} className="ml-auto text-green-600 hover:text-green-800">✕</button>
+            </div>
+          )}
+
           {/* Email Verification Banner */}
-          {user && !user.emailVerifiedAt && (
+          {(user && !(user as any).email_verified_at && !user.emailVerifiedAt) && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
               <div className="flex-1">
