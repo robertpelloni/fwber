@@ -275,6 +275,30 @@ export default function SettingsPage() {
 
         <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Account Section */}
+          {/* Email Verification Banner */}
+          {user && !user.emailVerifiedAt && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-amber-800">Verify your email address</p>
+                <p className="text-xs text-amber-600">Check your inbox for a verification link.</p>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    await apiClient.post('/email/verification-notification');
+                    // Verification email sent
+                  } catch (err: any) {
+                    console.error('Failed to resend verification', err);
+                  }
+                }}
+                className="text-xs font-medium text-amber-700 hover:text-amber-900 underline whitespace-nowrap"
+              >
+                Resend
+              </button>
+            </div>
+          )}
+
           <section className="mb-8">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
               Account

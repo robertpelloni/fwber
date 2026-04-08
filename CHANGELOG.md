@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.42] - 2026-04-08 — Email Verification Banner in Settings
+
+### Added
+- **Email verification banner** on the Settings page: Shows an amber "Verify your email address" banner for unverified users with a "Resend" button to trigger `POST /email/verification-notification`.
+
+### Fixed
+- Banner uses `user.emailVerifiedAt` (correct camelCase) to match the `User` interface in `auth-context.tsx`.
+
 ## [1.8.41] - 2026-04-08 — Email Verification Flow
 
 ### Added
