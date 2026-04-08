@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.45] - 2026-04-08 — Solana Network Fix & Mail Config
+
+### Fixed
+- **Critical: Solana wallet network hardcoded to Devnet** — Now uses Mainnet in production (`process.env.NODE_ENV === 'production'`) and Devnet in development. Supports `NEXT_PUBLIC_SOLANA_NETWORK` env var override.
+- **Custom RPC endpoint support**: Added `NEXT_PUBLIC_SOLANA_RPC_URL` env var for using a dedicated RPC provider (e.g., Helius, QuickNode) instead of the rate-limited public endpoint.
+
+### Changed
+- Updated `.env.example` `MAIL_FROM_ADDRESS` from `hello@example.com` to `noreply@fwber.me`.
+
+### Impact
+- Solana wallet operations (login, payments, token transfers) will now work on Mainnet in production instead of silently connecting to Devnet.
+
 ## [1.8.44] - 2026-04-08 — Security & Transparency Files
 
 ### Added
