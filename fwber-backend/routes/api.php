@@ -357,6 +357,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('matches/history', [\App\Http\Controllers\MatchController::class, 'index']); // alias for frontend
     Route::get('matches/{id}/insights', [\App\Http\Controllers\MatchInsightsController::class, 'show']);
     Route::post('matches/{id}/insights/unlock', [\App\Http\Controllers\MatchInsightsController::class, 'unlock']);
+    Route::get('matches/insights/unlocked', function () {
+        // Return list of match insights the user has unlocked
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $unlocked = \App\Models\ContentUnlock::where('user_id', $user->id)
+            ->where('content_type', 'match_insight')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        return response()->json(['data' => $unlocked->items()]);
+    });
     Route::post('matches/action', [\App\Http\Controllers\MatchController::class, 'action'])->middleware('throttle:matching');
     Route::post('matches/nfc-exchange', [\App\Http\Controllers\MatchController::class, 'nfcExchange']);
 
@@ -552,6 +561,22 @@ Route::middleware('auth:sanctum')->group(function () {
             'compression_quality' => 85,
         ]);
     });
+    Route::get('photos/reveals', function () {
+        // Returns list of photo reveal requests for the authenticated user
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $reveals = \App\Models\PhotoReveal::where('target_user_id', $user->id)
+            ->with(['photo', 'requester'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+        return response()->json([
+            'data' => $reveals->items(),
+            'meta' => [
+                'current_page' => $reveals->currentPage(),
+                'total' => $reveals->total(),
+                'has_more' => $reveals->hasMorePages(),
+            ],
+        ]);
+    });
     Route::get('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'show']);
     Route::put('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'update']);
     Route::delete('photos/{id}', [\App\Http\Controllers\PhotoController::class, 'destroy']);
@@ -605,6 +630,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('wingman/replies/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'getReplySuggestions']);
         Route::post('wingman/message-feedback/{matchId}', [\App\Http\Controllers\AiWingmanController::class, 'analyzeDraft']);
         Route::get('wingman/profile-analysis', [\App\Http\Controllers\AiWingmanController::class, 'getProfileAnalysis']);
+        Route::get('wingman/date-ideas/general', function (\Illuminate\Http\Request $request) {
+            // General date ideas that don't require a specific match
+            // Returns static Detroit-curated ideas; AI generation requires a match context
+            return response()->json(['ideas' => [
+                ['title' => 'Sunset at Belle Isle', 'description' => 'Pack a blanket and watch the skyline from the island.', 'vibe' => 'Romantic', 'estimated_cost' => 'Free'],
+                ['title' => 'Jazz at Cliff Bell\'s', 'description' => 'Classic Detroit atmosphere with live world-class jazz.', 'vibe' => 'Sophisticated', 'estimated_cost' => '$$'],
+                ['title' => 'Arcade Night at Offworld', 'description' => 'Retro games and pizza in a high-energy setting.', 'vibe' => 'Playful', 'estimated_cost' => '$'],
+                ['title' => 'Eastern Market Morning', 'description' => 'Grab coffee and explore the historic market stalls together.', 'vibe' => 'Casual', 'estimated_cost' => '$'],
+                ['title' => 'Detroit Institute of Arts', 'description' => 'Wander through world-class galleries and find your favorite piece.', 'vibe' => 'Cultural', 'estimated_cost' => '$'],
+                ['title' => 'RiverWalk Stroll', 'description' => 'Walk the Detroit RiverWalk at golden hour for stunning views.', 'vibe' => 'Romantic', 'estimated_cost' => 'Free'],
+            ]]);
+        });
         Route::get('wingman/date-ideas/{match}', [\App\Http\Controllers\WingmanController::class, 'generateDateIdeas']);
         Route::post('wingman/roast', [\App\Http\Controllers\AiWingmanController::class, 'roastProfile']);
         Route::get('wingman/vibe-check', [\App\Http\Controllers\AiWingmanController::class, 'checkVibe']);

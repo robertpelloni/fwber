@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.32] - 2026-04-08 — Frontend Route Gap Closure & Roast Method Fix
+
+### Added
+- Added `GET api/wingman/date-ideas/general` endpoint returning curated Detroit date ideas (no match ID required).
+- Added `GET api/photos/reveals` endpoint listing the authenticated user's photo reveal requests.
+- Added `GET api/matches/insights/unlocked` endpoint listing the user's unlocked match insights.
+- Added `GET api/matches/history` alias for `MatchController@index`.
+
+### Fixed
+- **Wingman roast page HTTP method**: Frontend `wingman/roast/page.tsx` was using `GET` but backend route is `POST`. Fixed to use `apiClient.post`.
+
+### Verified
+- Backend route list now at 436 routes (up from 433).
+- Frontend production build succeeds cleanly.
+
 ## [1.8.31] - 2026-04-08 — Feature Flags, CORS Fix, Route Gap Closure
 
 ### Added

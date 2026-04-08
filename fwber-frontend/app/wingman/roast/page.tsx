@@ -28,7 +28,7 @@ export default function RoastPage() {
     setRevealed(false)
 
     try {
-      const response = await apiClient.get<RoastResponse>(`/wingman/roast?mode=${mode}`)
+      const response = await apiClient.post<RoastResponse>('/wingman/roast', { mode })
       setResult(response.data)
       setTimeout(() => setRevealed(true), 500)
     } catch (err) {
