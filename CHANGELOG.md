@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.49] - 2026-04-08 — Password Reset Flow
+
+### Added
+- **`POST /api/auth/forgot-password`**: Sends a password reset link to the user's email. Always returns success to prevent email enumeration. Rate-limited to 5/min.
+- **`POST /api/auth/reset-password`**: Resets password using token from email link. Validates token, email, and password confirmation.
+- **`/forgot-password` page**: Complete frontend UX with email form, loading state, and success confirmation screen.
+- **"Forgot password?" link** added to the login page password field.
+
+### Impact
+- Users who forget their password can now self-service reset instead of being locked out.
+- Anti-enumeration protection ensures attackers can't discover registered emails.
+
 ## [1.8.48] - 2026-04-08 — Remove All Native confirm() Calls
 
 ### Added

@@ -44,6 +44,43 @@ Route::get('auth/login', function () {
     return response()->json(['message' => 'Unauthenticated. Please login.'], 401);
 })->name('login');
 Route::get('auth/referral/{code}', [\App\Http\Controllers\AuthController::class, 'checkReferralCode']);
+
+// Password Reset Flow
+Route::post('auth/forgot-password', function (\Illuminate\Http\Request $request) {
+    $request->validate(['email' => 'required|email']);
+
+    $status = \Illuminate\Support\Facades\Password::sendResetLink(
+        $request->only('email')
+    );
+
+    // Always return success to prevent email enumeration
+    return response()->json(['message' => 'If an account with that email exists, we have sent a password reset link.']);
+})->middleware('throttle:auth')->name('password.email');
+
+Route::post('auth/reset-password', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|string|confirmed|min:8',
+    ]);
+
+    $status = \Illuminate\Support\Facades\Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill([
+                'password' => \Illuminate\Support\Facades\Hash::make($password),
+            ])->setRememberToken(\Illuminate\Support\Str::random(60));
+            $user->save();
+        }
+    );
+
+    if ($status === \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+        return response()->json(['message' => 'Password reset successfully.']);
+    }
+
+    return response()->json(['message' => 'Invalid or expired reset token.'], 400);
+})->middleware('throttle:auth')->name('password.update');
+
 Route::post('public/vouch', [\App\Http\Controllers\VouchController::class, 'store'])->middleware('rate_limit_advanced:api_call');
 Route::post('vouch/generate-link', [\App\Http\Controllers\VouchController::class, 'generateLink'])->middleware('auth:sanctum');
 
