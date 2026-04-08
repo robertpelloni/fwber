@@ -1,17 +1,17 @@
-# PROJECT_STATUS.md - fwber v1.8.27 (Mobile Store Prep)
+# PROJECT_STATUS.md - fwber v1.8.28 (Recommendation Engine Performance Pass)
 
 **Date:** 2026-04-07
-**Version:** 1.8.27 "Mobile Store Prep"
-**Status:** ✅ **MOBILE SHELL IS CONFIGURED FOR IOS/ANDROID APP STORE DISTRIBUTION**
+**Version:** 1.8.28 "Recommendation Engine Performance Pass"
+**Status:** ✅ **MAINLINE PERFORMANCE TUNING: RECOMMENDATION ENGINE N+1 QUERIES ELIMINATED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release closed the gap on the mobile app's native capabilities to prepare for EAS builds and store distribution.
+This release continued the "Performance Monitoring Pass" by targeting the complex recommendation algorithms that generate the personalized discovery feed.
 
 Delivered:
-- **Native Push configuration**: Added the `expo-notifications` package and config plugin to ensure native apps can properly request background push permission.
-- **Location capabilities**: Added the `expo-location` config plugin to `app.json` with the required privacy string for App Store review.
+- **Collaborative Filtering Optimization:** The `RecommendationService` previously used nested loops to look up individual telemetry events (`hasUserSeenContent`) and behavior patterns (`getUserContent`, `getUserLikedContent`) for every single candidate user. 
+- **Bulk Data Loading:** These loops have been replaced with bulk `whereIn` queries that pre-fetch all necessary telemetry and bulletin message data in a single pass before evaluating candidate similarities in memory.
 
 ## ✅ Why This Matters
-While the WebView bridge was fully coded in React Native in previous tranches, the underlying Expo plugins were missing from the configuration. Without them, the EAS build process would silently fail to wire up the necessary iOS Entitlements and Android Manifest permissions, preventing push notifications and location from working in the standalone app.
+Recommendation engines are notoriously heavy on database IO because they cross-reference multiple users' behavior histories. By eliminating these nested N+1 queries, the personalized `/recommendations/feed` endpoint can now respond quickly even as the community and the volume of generated content grows on Hetzner.

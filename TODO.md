@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.27
+> **Version:** 1.8.28
 > **Last Updated:** 2026-04-07
 
 ---
@@ -14,6 +14,7 @@
 - [x] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 
 ## ✅ Recently Completed
+- [x] **Recommendation Engine Performance Pass**: Optimized `RecommendationService` to eliminate nested N+1 queries when fetching collaborative filtering telemetry and content data.
 - [x] **Mobile Store Prep**: Added missing `expo-notifications` dependency and native plugins to `app.json` to prepare the mobile shell for EAS builds and store distribution.
 - [x] **Advanced Proximity Performance Pass**: Pre-fetched artifact counts in `ProximityArtifactController` to remove N+1 queries during nearby candidate processing.
 - [x] **Extended Performance Monitoring Pass**: Optimized `MatchController` and `ProfileViewController` to eliminate N+1 queries, prefetching necessary related user data via `GROUP BY` and `whereIn`.

@@ -212,12 +212,54 @@ class RecommendationService
 
         // Find users with similar behavior patterns
         $similarUsers = $this->findUsersWithSimilarBehavior($userBehavior);
+        if (empty($similarUsers)) {
+            return [];
+        }
+
+        $similarUserIds = array_column($similarUsers, 'id');
+        
+        // Bulk fetch content created by similar users
+        $allContent = BulletinMessage::whereIn('user_id', $similarUserIds)
+            ->with('bulletinBoard')
+            ->get()
+            ->groupBy('user_id');
+
+        // Pre-fetch seen content IDs for the current user to avoid N+1 queries
+        $contentIds = $allContent->flatten()->pluck('id')->unique()->toArray();
+        $seenContentIds = [];
+        
+        if (!empty($contentIds)) {
+            $seenEvents = TelemetryEvent::where('user_id', $user->id)
+                ->where('event', 'view_content')
+                ->whereIn('payload->content_id', $contentIds)
+                ->get();
+                
+            foreach ($seenEvents as $event) {
+                if (isset($event->payload['content_id'])) {
+                    $seenContentIds[] = $event->payload['content_id'];
+                }
+            }
+        }
 
         // Get content from similar users that current user hasn't seen
         foreach ($similarUsers as $similarUser) {
-            $userContent = $this->getUserContent($similarUser['id']);
+            $userId = $similarUser['id'];
+            $messages = $allContent->get($userId) ?? collect();
+            
+            $userContent = $messages->map(function (BulletinMessage $message) {
+                return [
+                    'id' => $message->id,
+                    'title' => $message->bulletinBoard?->name ?? 'Community update',
+                    'description' => $message->content,
+                    'content' => $message->content,
+                    'created_at' => $message->created_at?->toISOString(),
+                    'creator_id' => $message->user_id,
+                    'bulletin_board_id' => $message->bulletin_board_id,
+                ];
+            })->all();
+
             foreach ($userContent as $content) {
-                if (! $this->hasUserSeenContent($user->id, $content['id'])) {
+                if (! in_array($content['id'], $seenContentIds)) {
                     $recommendations[] = [
                         'type' => 'collaborative',
                         'content' => $content,
@@ -790,7 +832,6 @@ class RecommendationService
         $interests = $userProfile['interests'] ?? [];
 
         // Find users with overlapping interests
-        // This is a simplified implementation. In production, use a dedicated search engine or vector database.
         $candidates = UserProfile::with('user')
             ->where('user_id', '!=', $userId)
             ->whereNotNull('interests')
@@ -798,23 +839,55 @@ class RecommendationService
             ->get();
 
         $similarUsers = [];
+        $validCandidates = [];
 
         foreach ($candidates as $candidate) {
             $candidateInterests = $candidate->interests ?? [];
             $similarity = $this->calculateJaccardSimilarity($interests, $candidateInterests);
 
-            if ($similarity > 0.1) { // Threshold
-                // Get candidate's liked content
-                $user = $candidate->user;
-                if ($user) {
-                    $likedContent = $this->getUserLikedContent($user);
-                    if (! empty($likedContent)) {
-                        $similarUsers[] = [
-                            'id' => $user->id,
-                            'similarity' => $similarity,
-                            'liked_content' => $likedContent,
+            if ($similarity > 0.1 && $candidate->user) {
+                $validCandidates[] = [
+                    'user' => $candidate->user,
+                    'similarity' => $similarity,
+                ];
+            }
+        }
+
+        if (!empty($validCandidates)) {
+            $candidateIds = array_map(fn($c) => $c['user']->id, $validCandidates);
+            
+            $likedEvents = TelemetryEvent::whereIn('user_id', $candidateIds)
+                ->where('event', 'like_content')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->groupBy('user_id');
+
+            foreach ($validCandidates as $c) {
+                $user = $c['user'];
+                $content = [];
+                $userEvents = $likedEvents->get($user->id) ? $likedEvents->get($user->id)->take(10) : collect();
+                
+                foreach ($userEvents as $event) {
+                    if (isset($event->payload['content_id'], $event->payload['content_type'])) {
+                        $content[] = [
+                            'id' => $event->payload['content_id'],
+                            'type' => $event->payload['content_type'],
+                            'title' => $event->payload['title'] ?? 'Untitled',
+                            'description' => $event->payload['description'] ?? '',
+                            'created_at' => $event->created_at?->toISOString(),
+                            'creator_id' => isset($event->payload['creator_id']) && is_numeric($event->payload['creator_id'])
+                                ? (int) $event->payload['creator_id']
+                                : null,
                         ];
                     }
+                }
+
+                if (!empty($content)) {
+                    $similarUsers[] = [
+                        'id' => $user->id,
+                        'similarity' => $c['similarity'],
+                        'liked_content' => $content,
+                    ];
                 }
             }
         }
@@ -882,18 +955,6 @@ class RecommendationService
         // In a real system, this would use collaborative filtering matrix factorization
         // Here we use a simplified "shared activity" approach
 
-        // We don't have direct access to the user object here, but we can infer from context or pass it
-        // For now, let's assume we can't easily get the user ID from $userBehavior alone if it's just arrays
-        // But looking at call site: $this->getCollaborativeRecommendations($user, $userBehavior)
-        // We should update the signature or use the data we have.
-        // Let's stick to the signature but maybe we need to refactor slightly to pass User ID if needed,
-        // but wait, getCollaborativeRecommendations passes $user.
-
-        // Actually, let's look at how it's called:
-        // $similarUsers = $this->findUsersWithSimilarBehavior($userBehavior);
-        // It seems I can't easily get the current user ID inside this method unless I pass it.
-        // However, $userBehavior contains 'viewed_boards', 'liked_content'.
-
         // Let's find users who viewed the same boards
         $viewedBoards = $userBehavior['viewed_boards'] ?? [];
         if (empty($viewedBoards)) {
@@ -913,15 +974,39 @@ class RecommendationService
             ->toArray();
 
         $users = [];
-        foreach ($similarUserIds as $uid) {
-            // Skip current user (we don't have ID here easily, but we can filter later or pass it)
-            // Let's fetch the user
-            $u = User::find($uid);
-            if ($u) {
+        if (!empty($similarUserIds)) {
+            $userModels = User::whereIn('id', $similarUserIds)->get();
+            
+            // Pre-fetch all liked events for these users to avoid N+1 inside getUserLikedContent
+            $likedEvents = TelemetryEvent::whereIn('user_id', $similarUserIds)
+                ->where('event', 'like_content')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->groupBy('user_id');
+
+            foreach ($userModels as $u) {
+                $content = [];
+                $userEvents = $likedEvents->get($u->id) ? $likedEvents->get($u->id)->take(10) : collect();
+                
+                foreach ($userEvents as $event) {
+                    if (isset($event->payload['content_id'], $event->payload['content_type'])) {
+                        $content[] = [
+                            'id' => $event->payload['content_id'],
+                            'type' => $event->payload['content_type'],
+                            'title' => $event->payload['title'] ?? 'Untitled',
+                            'description' => $event->payload['description'] ?? '',
+                            'created_at' => $event->created_at?->toISOString(),
+                            'creator_id' => isset($event->payload['creator_id']) && is_numeric($event->payload['creator_id'])
+                                ? (int) $event->payload['creator_id']
+                                : null,
+                        ];
+                    }
+                }
+
                 $users[] = [
                     'id' => $u->id,
                     'similarity' => 0.5, // Placeholder score
-                    'liked_content' => $this->getUserLikedContent($u),
+                    'liked_content' => $content,
                 ];
             }
         }

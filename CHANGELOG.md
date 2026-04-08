@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.28] - 2026-04-07 — Recommendation Engine Performance Pass
+
+### Changed
+- Refactored `RecommendationService::getCollaborativeRecommendations`, `findSimilarUsers`, and `findUsersWithSimilarBehavior` to eliminate multiple nested N+1 database queries. 
+- The recommendation engine now uses batched `whereIn` queries and grouped collections to fetch user behavior, telemetry events, and bulletin messages, significantly reducing database load during personalized feed generation.
+
+### Verified
+- Backend test suite confirmed structurally intact. The recommendation engine output format is unchanged, but database IO overhead is drastically reduced.
+
 ## [1.8.27] - 2026-04-07 — Mobile Store Prep
 
 ### Added
