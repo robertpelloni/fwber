@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.29] - 2026-04-08 — Missing Route Restoration
+
+### Added
+- Restored **16 moderation API routes** (`api/moderation/*`) that were backed by the existing `ModerationController` but never registered in the route file: dashboard, flagged-content, flag review, spoof-detections, spoof review, throttles, throttle removal, action history, and user moderation profile.
+- Added `GET api/config/features` endpoint returning runtime feature flag state for the frontend feature-flags hook.
+- Added `GET api/wingman/status` endpoint returning wingman assist count and available feature flags.
+- Added `GET api/referrals/payouts` endpoint for paginated referral commission history.
+- Added `GET api/referrals/link` alias for the referral summary.
+- Added `POST api/location/travel-mode` endpoint for toggling travel mode with optional coordinates.
+- Added `GET api/achievements/progress` alias and `POST api/achievements/{id}/unlock` endpoint.
+
+### Changed
+- Total API routes restored from 410 to 426.
+
+### Verified
+- Backend test suite passing with no regressions.
+- Frontend production build succeeds cleanly.
+
 ## [1.8.28] - 2026-04-07 — Recommendation Engine Performance Pass
 
 ### Changed

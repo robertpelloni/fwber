@@ -1,13 +1,14 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.28
-> **Last Updated:** 2026-04-07
+> **Version:** 1.8.29
+> **Last Updated:** 2026-04-08
 
 ---
 
 ## 🔴 Critical: Continuous Improvement
 - [x] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
 - [x] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals (resolved N+1 queries in Dashboard, Match, and Profile routes).
+- [x] **Missing Route Restoration**: Restored 16 moderation routes, feature flag config, wingman status, referral payouts, travel mode, and achievement unlock endpoints.
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.

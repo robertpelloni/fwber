@@ -677,4 +677,118 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('ping', [\App\Http\Controllers\HardwareTokenController::class, 'ping']);
         Route::get('status', [\App\Http\Controllers\HardwareTokenController::class, 'status']);
     });
+
+    // Moderation (admin/moderator)
+    Route::prefix('moderation')->group(function () {
+        Route::get('dashboard', [\App\Http\Controllers\ModerationController::class, 'dashboard']);
+        Route::get('flagged-content', [\App\Http\Controllers\ModerationController::class, 'flaggedContent']);
+        Route::post('flags/{artifactId}/review', [\App\Http\Controllers\ModerationController::class, 'reviewFlag']);
+        Route::get('spoof-detections', [\App\Http\Controllers\ModerationController::class, 'spoofDetections']);
+        Route::post('spoofs/{detectionId}/review', [\App\Http\Controllers\ModerationController::class, 'reviewSpoof']);
+        Route::get('throttles', [\App\Http\Controllers\ModerationController::class, 'activeThrottles']);
+        Route::delete('throttles/{throttleId}', [\App\Http\Controllers\ModerationController::class, 'removeThrottle']);
+        Route::get('actions', [\App\Http\Controllers\ModerationController::class, 'actionHistory']);
+        Route::get('users/{userId}', [\App\Http\Controllers\ModerationController::class, 'userProfile']);
+    });
+
+    // Feature Flags / Config
+    Route::get('config/features', function (\Illuminate\Http\Request $request) {
+        $featureFlagService = app(\App\Services\FeatureFlagService::class);
+
+        return response()->json([
+            'features' => [
+                'groups' => $featureFlagService->isEnabled('groups'),
+                'photos' => $featureFlagService->isEnabled('photos'),
+                'proximity_artifacts' => $featureFlagService->isEnabled('proximity_artifacts'),
+                'chatrooms' => $featureFlagService->isEnabled('chatrooms'),
+                'proximity_chatrooms' => $featureFlagService->isEnabled('proximity_chatrooms'),
+                'face_reveal' => $featureFlagService->isEnabled('face_reveal'),
+                'local_media_vault' => $featureFlagService->isEnabled('local_media_vault'),
+                'moderation' => $featureFlagService->isEnabled('moderation'),
+                'recommendations' => $featureFlagService->isEnabled('recommendations'),
+                'websocket' => true,
+                'content_generation' => $featureFlagService->isEnabled('content_generation'),
+                'rate_limits' => true,
+                'analytics' => true,
+                'video_chat' => $featureFlagService->isEnabled('video_chat'),
+                'ai_wingman' => $featureFlagService->isEnabled('ai_wingman'),
+                'media_analysis' => $featureFlagService->isEnabled('media_analysis'),
+            ],
+            'source' => 'runtime',
+            'timestamp' => now()->toIso8601String(),
+        ]);
+    });
+
+    // Wingman Status
+    Route::get('wingman/status', function (\Illuminate\Http\Request $request) {
+        $user = $request->user();
+        $assistCount = \App\Models\MatchAssist::where('matchmaker_id', $user->id)->count();
+
+        return response()->json([
+            'active' => true,
+            'assists_count' => $assistCount,
+            'earned_tokens' => $assistCount * 10,
+            'features' => [
+                'ice_breakers' => true,
+                'reply_suggestions' => true,
+                'profile_analysis' => true,
+                'date_ideas' => true,
+                'roast' => true,
+                'vibe_check' => true,
+                'fortune' => true,
+                'cosmic_match' => true,
+                'nemesis' => true,
+            ],
+        ]);
+    });
+
+    // Referral System (extended)
+    Route::get('referrals/link', [\App\Http\Controllers\ReferralController::class, 'summary']);
+    Route::get('referrals/payouts', function (\Illuminate\Http\Request $request) {
+        $commissions = \App\Models\ReferralCommission::where('beneficiary_user_id', $request->user()->id)
+            ->with('purchaser')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return response()->json($commissions);
+    });
+
+    // Travel Mode
+    Route::post('location/travel-mode', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'enabled' => 'required|boolean',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'location_name' => 'nullable|string|max:255',
+        ]);
+
+        $user = $request->user();
+        $profile = $user->profile;
+
+        if ($profile) {
+            $profile->update([
+                'is_travel_mode' => $validated['enabled'],
+                'travel_latitude' => $validated['latitude'] ?? null,
+                'travel_longitude' => $validated['longitude'] ?? null,
+                'travel_location_name' => $validated['location_name'] ?? null,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Travel mode updated',
+            'travel_mode' => (bool) ($validated['enabled']),
+            'location_name' => $validated['location_name'] ?? null,
+        ]);
+    });
+
+    // Achievements (extended)
+    Route::get('achievements/progress', [\App\Http\Controllers\AchievementController::class, 'index']);
+    Route::post('achievements/{achievementId}/unlock', function (\Illuminate\Http\Request $request, $achievementId) {
+        $user = $request->user();
+        $user->achievements()->syncWithoutDetaching([
+            $achievementId => ['unlocked_at' => now()],
+        ]);
+
+        return response()->json(['message' => 'Achievement unlocked']);
+    });
 });
