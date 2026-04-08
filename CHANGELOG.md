@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.34] - 2026-04-08 — Error Boundaries & Loading States
+
+### Added
+- `app/error.tsx` — React error boundary for all pages. Catches runtime errors and displays a friendly UI with retry/dashboard navigation.
+- `app/global-error.tsx` — Root-level error boundary that catches critical crashes (including layout errors).
+- `app/loading.tsx` — App-level loading state with a clean spinner component.
+
+### Impact
+- Users no longer see white-screen crashes. All errors are caught with actionable recovery options.
+- Suspense boundaries now have a consistent loading animation across the app.
+
+### Verified
+- Frontend production build succeeds cleanly.
+
 ## [1.8.33] - 2026-04-08 — Feature Flag Activation & Data Route Completion
 
 ### Added
