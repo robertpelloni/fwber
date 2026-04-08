@@ -1,12 +1,12 @@
 <?php
 
 return [
-    'enabled' => env('APM_ENABLED', false),
+    'enabled' => env('APM_ENABLED', true),
     'service_name' => env('APM_SERVICE_NAME', 'fwber-backend'),
     'environment' => env('APP_ENV', 'production'),
 
     // Threshold in milliseconds to log slow requests
-    'slow_request_threshold' => env('APM_SLOW_REQUEST_THRESHOLD', 1000),
+    'slow_request_threshold' => env('APM_SLOW_REQUEST_THRESHOLD', 500),
 
     // Alerting Configuration
     'alert_threshold_ms' => env('APM_ALERT_THRESHOLD_MS', 2000), // Alert if average duration exceeds this

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.39] - 2026-04-08 — APM Monitoring Activation & Manifest Fix
+
+### Changed
+- **APM monitoring enabled by default** (`APM_ENABLED` now defaults to `true` instead of `false`). Slow request detection, query analysis, and Redis request/error counters are now active on production.
+- **Slow request threshold lowered from 1000ms to 500ms** for more granular performance visibility.
+
+### Fixed
+- Fixed `manifest.json` em-dash encoding issue in the PWA app name.
+
 ## [1.8.38] - 2026-04-08 — Broadcasting Default Fix & Reverb Security
 
 ### Fixed
