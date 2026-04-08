@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.38] - 2026-04-08 — Broadcasting Default Fix & Reverb Security
+
+### Fixed
+- **Critical: Broadcasting driver default changed from `null` to `reverb`** — Previously, if `BROADCAST_DRIVER` was not set in production `.env`, all 19 `ShouldBroadcast` events (messages, matches, notifications, audio rooms, etc.) were silently discarded instead of being sent to connected WebSocket clients.
+- **Reverb WebSocket origin restriction** — Changed `allowed_origins` from `*` to explicit origin list (`fwber.me`, `www.fwber.me`, `localhost:3000`), matching the CORS configuration.
+
+### Changed
+- External link safety: Added `rel="noopener noreferrer"` to all `target="_blank"` links.
+
+### Impact
+- Real-time features (chat, typing indicators, match notifications, audio room signals) will now work correctly on production when config is cached.
+- WebSocket connections restricted to known origins prevents CSRF over WebSocket.
+
 ## [1.8.37] - 2026-04-08 — Remove Native alert() Calls (VISION.md Compliance)
 
 ### Fixed
