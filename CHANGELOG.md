@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.53] - 2026-04-08 — WebSocket Production Default Fix
+
+### Fixed
+- **Critical: WebSocket fallback for production**: When `NEXT_PUBLIC_REVERB_*` env vars are not explicitly set in production, the echo client no longer returns `null` (disabled). Instead it falls back to `api.fwber.me:8080` with TLS — the correct production Reverb server.
+- This fixes the case where Vercel environment variables are missing but the WebSocket server is still running.
+
+### Impact
+- WebSocket (Reverb) now always attempts to connect in production, even without explicit env vars.
+- Prevents silent WebSocket failure in deployed environments.
+
 ## [1.8.52] - 2026-04-08 — Security Hardening: CSP, Image Origins, DNS Prefetch
 
 ### Fixed

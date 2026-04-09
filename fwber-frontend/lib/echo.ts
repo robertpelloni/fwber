@@ -36,7 +36,11 @@ export const initEcho = (token?: string) => {
     );
 
     if (!isDev && !hasExplicitRealtimeConfig) {
-        return null;
+        // Production fallback: assume Reverb on API host if no explicit config
+        options.wsHost = 'api.fwber.me';
+        options.wsPort = 8080;
+        options.wssPort = 8080;
+        options.forceTLS = true;
     }
 
     const options: any = {
