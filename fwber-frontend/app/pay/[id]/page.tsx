@@ -40,7 +40,7 @@ export default function CheckoutPage() {
       if (data.success && data.redirect_url) {
           window.location.href = data.redirect_url;
       } else {
-          console.log('Payment successful');
+          // Payment successful
           router.push('/wallet');
       }
     } catch (e: any) {

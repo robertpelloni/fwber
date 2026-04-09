@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/auth-context';
 import { apiClient } from '@/lib/api/client';
-import { ArrowLeft, Mail, Lock, Trash2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Trash2, AlertTriangle, Download, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AccountSettingsPage() {
@@ -25,6 +25,10 @@ export default function AccountSettingsPage() {
   // Delete Account State
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
+
+  // Data Export State
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState<'idle' | 'processing' | 'ready'>('idle');
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +79,19 @@ export default function AccountSettingsPage() {
     } catch (error: any) {
       setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to delete account' });
       setIsLoading(false);
+    }
+  };
+
+  const handleDataExport = async () => {
+    setIsExporting(true);
+    try {
+      const res = await apiClient.post<{ message: string }>('/user/export', {});
+      setMessage({ type: 'success', text: res.data?.message || 'Data export requested. You will receive a download link via email when ready.' });
+      setExportStatus('processing');
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.response?.data?.message || 'Failed to request data export' });
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -187,7 +204,52 @@ export default function AccountSettingsPage() {
             </div>
           </section>
 
-          {/* Delete Account Section */}
+          {/* Data Export Section (GDPR) */}
+          <section className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+                  <Download className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Export Your Data</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Download a copy of all your data including profile, messages, matches, and photos. We&apos;ll email you when your export is ready.
+              </p>
+              <button
+                onClick={handleDataExport}
+                disabled={isExporting || exportStatus === 'processing'}
+                className="px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isExporting ? 'Requesting...' : exportStatus === 'processing' ? 'Export Processing...' : 'Request Data Export'}
+              </button>
+            </div>
+          </section>
+
+          {/* Privacy & Security Info */}
+          <section className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-green-100 rounded-lg text-green-600">
+                  <Shield className="w-5 h-5" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">Your Privacy Rights</h2>
+              </div>
+              <ul className="text-gray-600 text-sm space-y-2">
+                <li>&bull; <strong>Right to Access:</strong> Export all your personal data above.</li>
+                <li>&bull; <strong>Right to Erasure:</strong> Delete your account below to remove all data.</li>
+                <li>&bull; <strong>Right to Rectification:</strong> Update your profile information anytime.</li>
+                <li>&bull; <strong>Data Portability:</strong> Your export is provided in machine-readable format.</li>
+              </ul>
+              <div className="mt-4">
+                <Link href="/privacy" className="text-sm text-orange-600 hover:text-orange-500">
+                  Read our full Privacy Policy →
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* Delete Account Section */}}
           <section className="bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">

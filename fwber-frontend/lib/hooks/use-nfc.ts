@@ -17,7 +17,7 @@ export function useNfc() {
 
         // Setup the global callback for the native bridge
         (window as any).handleNativeNFC = (data: string) => {
-            console.log('NFC: Received from Native Bridge', data);
+            // NFC: Received from Native Bridge
             try {
                 const parsed = JSON.parse(data);
                 setLastScan(parsed);

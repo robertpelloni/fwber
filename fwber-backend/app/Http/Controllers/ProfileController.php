@@ -751,6 +751,24 @@ class ProfileController extends Controller
                 return response()->json(['message' => 'Unauthenticated'], 401);
             }
 
+            // Validate password confirmation for security
+            $request->validate(['password' => 'required|string']);
+
+            if (! \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+                return response()->json(['message' => 'Invalid password. Please try again.'], 422);
+            }
+
+            // Revoke all tokens (logout from all devices)
+            $user->tokens()->delete();
+
+            // Anonymize user data for GDPR compliance before deletion
+            $user->update([
+                'name' => 'Deleted User',
+                'email' => 'deleted_' . $user->id . '_' . time() . '@anonymized.invalid',
+                'bio' => null,
+                'avatar_url' => null,
+            ]);
+
             // Delete user (cascades to profile, photos, matches, etc. via DB constraints)
             // Note: S3 file cleanup should be handled by Model Observers or a cleanup job
             $user->delete();

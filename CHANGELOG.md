@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.51] - 2026-04-08 — Account Security & GDPR Data Export
+
+### Added
+- **Password confirmation for account deletion**: `ProfileController@destroy` now validates the user's password before allowing account deletion. Returns 422 if invalid.
+- **Token revocation on deletion**: All Sanctum tokens are revoked when the account is deleted, logging out all devices.
+- **Data anonymization**: User data (name, email, bio, avatar) is anonymized before the database record is deleted for GDPR compliance.
+- **Data export UI** in `/settings/account`: "Export Your Data" button triggers `POST /api/user/export` with processing state feedback.
+- **Privacy rights section** in account settings: Displays GDPR rights (access, erasure, rectification, portability) with link to privacy policy.
+- **Forgot-password added to sitemap.xml**.
+
+### Fixed
+- Removed last 3 `console.log()` calls from production pages (`deals`, `pay`, `use-nfc`) per VISION.md.
+
+### Impact
+- Account deletion is now properly secured with password verification.
+- GDPR compliance: users can export and delete their data through self-service UI.
+
 ## [1.8.50] - 2026-04-08 — Password Reset Custom Notification & Reset Page
 
 ### Added
