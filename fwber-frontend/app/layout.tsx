@@ -32,7 +32,10 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#f97316',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f97316' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
 }
 
 export const metadata: Metadata = {
@@ -77,6 +80,8 @@ export const metadata: Metadata = {
   // Performance optimizations
   other: {
     'X-DNS-Prefetch-Control': 'on',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
 }
 

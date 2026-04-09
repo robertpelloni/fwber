@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.62] - 2026-04-09 — PWA Meta & Theme-Color Improvements
+
+### Added
+- **Dynamic `theme-color`**: Now responds to dark mode — orange (#f97316) in light mode, dark slate (#0f172a) in dark mode. Mobile browser URL bar adapts to user preference.
+- **iOS PWA meta tags**: `apple-mobile-web-app-capable: yes` and `apple-mobile-web-app-status-bar-style: black-translucent` for fullscreen iOS home screen experience.
+
 ## [1.8.61] - 2026-04-09 — Safety API: Raw fetch → apiClient Migration
 
 ### Changed
