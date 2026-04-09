@@ -8,10 +8,51 @@
 
 ## Executive Summary
 
-This session performed comprehensive security hardening, GDPR compliance improvements, CSP fixes, password reset flow implementation, account deletion security, profile view tracking restoration, and WebSocket production fixes. The project moved from v1.8.48 → v1.8.57 across 10 deployments, all successfully deployed to both Hetzner (backend) and Vercel (frontend).
+This session performed comprehensive security hardening, GDPR compliance, CSP fixes, password reset flow, account deletion security, profile view tracking restoration, notification listener expansion, and WebSocket production fixes. The project moved from v1.8.48 → v1.8.59 across 12 deployments, all successfully deployed to both Hetzner (backend) and Vercel (frontend).
 
-**Total route count: 454** (including forgot-password, reset-password, profile view tracking, and rate-limit status).
+**Total route count: 445** (including forgot-password, reset-password, profile view tracking, and rate-limit status).
 **Total tests: 432 passing, 0 failures** (was 431 with 1 failure).
+
+### What Was Done
+
+#### v1.8.48 — Native confirm() Removal
+- Removed all 14 native `confirm()` calls from 12 production pages
+- Added `useConfirmDialog` hook using shadcn Dialog for the messages page block/report flow
+
+#### v1.8.49-50 — Password Reset Flow
+- `POST /auth/forgot-password` + `POST /auth/reset-password` API routes
+- Custom `ResetPasswordNotification` with branded emails linking to frontend
+- `/forgot-password` and `/reset-password` frontend pages
+
+#### v1.8.51 — Account Security & GDPR
+- Password verification for account deletion, token revocation, data anonymization
+- Data export UI + privacy rights section in account settings
+- Removed last `console.log()` calls from production
+
+#### v1.8.52-54 — CSP Hardening
+- Fixed Google Fonts, blob workers, and Pusher WebSocket CSP violations
+- Tightened image remote patterns from wildcard to explicit domains
+- DNS prefetch fixed from localhost to api.fwber.me
+
+#### v1.8.56-57 — Profile View Tracking
+- Restored 3 unrouted `ProfileViewController` endpoints (record, list, stats)
+- Frontend fires `POST /profile/{userId}/view` on profile load
+- Schema migration for `viewer_ip` and `user_agent` columns
+
+#### v1.8.58 — Notification Expansion
+- NotificationListener expanded from 1 to 14 notification types
+- Each type has contextual title, message, and CTA action button
+- Deduplication prevents repeated toasts
+
+#### v1.8.59 — Settings Dark Mode
+- Dark mode classes added to main `/settings` page
+
+### Verified Working
+- All 445 API routes confirmed matching frontend API calls (zero gaps)
+- All backend controllers have registered routes (only ActivityPub excluded per ROADMAP)
+- All 17 notification types have backend classes, 14 handled in frontend listener
+- CSP confirmed deployed and correct (browser cache may show stale errors)
+- All 4 CI pipelines consistently green across all 12 deployments
 
 ## What Was Done
 
