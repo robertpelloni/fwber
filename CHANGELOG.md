@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.52] - 2026-04-08 — Security Hardening: CSP, Image Origins, DNS Prefetch
+
+### Fixed
+- **CSP header tightened**: Replaced permissive `frame-ancestors *` with full Content Security Policy restricting script, style, image, font, connect, frame, and media sources to known-good origins.
+- **Image remote patterns**: Replaced wildcard `hostname: '**'` with explicit list of allowed image sources (fwber.me, AWS S3, CloudFront, DALL-E, Google APIs).
+- **DNS prefetch**: Changed from `localhost` to `api.fwber.me` in root layout for production performance.
+
+### Impact
+- Reduced XSS/CSRF attack surface through proper CSP.
+- Images only load from known-good domains.
+- Faster API connection establishment via proper DNS prefetch.
+
 ## [1.8.51] - 2026-04-08 — Account Security & GDPR Data Export
 
 ### Added

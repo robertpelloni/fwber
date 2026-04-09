@@ -89,11 +89,8 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         {/* DNS prefetch for better performance */}
-        <link rel="dns-prefetch" href="//localhost" />
-        <link rel="preconnect" href="http://localhost:8001" />
-
-        {/* Preload critical resources */}
-        {/* <link rel="preload" href="/_next/static/css/app/layout.css" as="style" /> */}
+        <link rel="dns-prefetch" href="//api.fwber.me" />
+        <link rel="preconnect" href="https://api.fwber.me" />
       </head>
 
       <body

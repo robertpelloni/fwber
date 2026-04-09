@@ -72,7 +72,13 @@ const nextConfig = {
   // Image optimization
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '**' },
+      { protocol: 'https', hostname: 'api.fwber.me' },
+      { protocol: 'https', hostname: 'fwber.me' },
+      { protocol: 'https', hostname: 'www.fwber.me' },
+      { protocol: 'https', hostname: '**.amazonaws.com' },
+      { protocol: 'https', hostname: '**.cloudfront.net' },
+      { protocol: 'https', hostname: 'oaidalleapiprodscus.blob.core.windows.net' },
+      { protocol: 'https', hostname: '**.googleapis.com' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8002', pathname: '/files/**' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8002', pathname: '/storage/**' },
       { protocol: 'http', hostname: 'localhost', port: '8002', pathname: '/files/**' },
@@ -116,7 +122,7 @@ const nextConfig = {
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-          { key: 'Content-Security-Policy', value: "frame-ancestors *" },
+          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.fwber.me https://*.amazonaws.com https://*.cloudfront.net; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.fwber.me wss://api.fwber.me:8080 https://*.sentry.io; frame-ancestors 'self' https://fwber.me https://www.fwber.me; media-src 'self' blob:;" },
           { key: 'X-Content-Type-Options', value: '' }, // Neutralize legacy block
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
