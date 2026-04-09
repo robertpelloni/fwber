@@ -13,6 +13,7 @@
 - [x] **Feature Flag Activation**: Created `config/feature_flags.php` with all 15 flags enabled, activated `useBackendFeatureFlags` hook in frontend.
 - [x] **CORS Fix**: Fixed `credentials: true` + `*` origin mismatch that blocked authenticated cross-origin requests.
 - [x] **Native alert() Removal**: Removed all 26 `alert()` calls from production pages per VISION.md directive.
+- [x] **Native confirm() Removal**: Removed all 14 `confirm()` calls, added `useConfirmDialog` hook for messages page.
 - [x] **Broadcasting Default Fix**: Changed default broadcast driver from `null` to `reverb` so WebSocket events reach connected clients.
 - [x] **Reverb WebSocket Origin Restriction**: Changed `allowed_origins` from `*` to explicit origin list matching CORS config.
 - [x] **APM Monitoring Activation**: Enabled APM by default with 500ms slow request threshold.
@@ -20,6 +21,11 @@
 - [x] **Email Verification Flow**: Added `MustVerifyEmail` to User model, verification routes, and resend functionality.
 - [x] **SEO & Meta Optimization**: Dynamic OG images for share pages, roast page SEO metadata with layout.
 - [x] **Security & Transparency**: Added `security.txt` and `humans.txt` for responsible disclosure.
+- [x] **Password Reset Flow**: Full forgot-password + reset-password flow with branded email notification.
+- [x] **Account Deletion Security**: Password verification, token revocation, GDPR data anonymization.
+- [x] **GDPR Data Export UI**: Export button + privacy rights section in account settings.
+- [x] **CSP Hardening**: Proper Content Security Policy with Google Fonts, worker-src, and Pusher WebSocket support.
+- [x] **WebSocket Production Fallback**: Reverb echo client falls back to `api.fwber.me:8080` when env vars missing.
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
