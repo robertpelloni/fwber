@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.61] - 2026-04-09 — Safety API: Raw fetch → apiClient Migration
+
+### Changed
+- Converted `blockUser`, `unblockUser`, and `reportUser` in `lib/api/safety.ts` from raw `fetch` to `apiClient` proxy.
+- Removed unused `API_BASE_URL` constant from safety module.
+- All 3 legacy safety functions now benefit from automatic retry, proper error handling, and consistent auth injection.
+
+### Impact
+- Core safety operations (block, unblock, report) now have retry resilience for transient network failures.
+- Auth token injection is consistent with the rest of the platform.
+
 ## [1.8.60] - 2026-04-09 — API Client Migration (axios → apiClient)
 
 ### Changed

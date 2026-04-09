@@ -8,9 +8,7 @@
 
 import { apiClient } from './client';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-
-/* ── Legacy Types & Functions (Restored for Build Compatibility) ──────────────── */
+/* ── Types ──────────────────────────────────────────────────────────── */
 
 export interface BlockResponse {
   data: {
@@ -40,49 +38,26 @@ export interface ReportResponse {
  * Block a user (Legacy signature using fetch)
  */
 export async function blockUser(token: string, blockedId: number): Promise<BlockResponse> {
-  const response = await fetch(`${API_BASE_URL}/blocks`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({
-      blocked_id: blockedId,
-    }),
+  const res = await apiClient.post<BlockResponse>('/blocks', {
+    blocked_id: blockedId,
+  }, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to block user' }));
-    throw new Error(error.message || 'Failed to block user');
-  }
-
-  return response.json();
+  return res.data;
 }
 
 /**
- * Unblock a user (Legacy signature using fetch)
+ * Unblock a user
  */
 export async function unblockUser(token: string, blockedId: number): Promise<{ ok: boolean }> {
-  const response = await fetch(`${API_BASE_URL}/blocks/${blockedId}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
+  const res = await apiClient.delete<{ ok: boolean }>(`/blocks/${blockedId}`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to unblock user' }));
-    throw new Error(error.message || 'Failed to unblock user');
-  }
-
-  return response.json();
+  return res.data;
 }
 
 /**
- * Report a user (Legacy signature using fetch)
+ * Report a user
  */
 export async function reportUser(
   token: string,
@@ -91,27 +66,15 @@ export async function reportUser(
   details?: string,
   messageId?: number
 ): Promise<ReportResponse> {
-  const response = await fetch(`${API_BASE_URL}/reports`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({
-      accused_id: accusedId,
-      reason: reason,
-      details: details,
-      message_id: messageId,
-    }),
+  const res = await apiClient.post<ReportResponse>('/reports', {
+    accused_id: accusedId,
+    reason,
+    details,
+    message_id: messageId,
+  }, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to report user' }));
-    throw new Error(error.message || 'Failed to report user');
-  }
-
-  return response.json();
+  return res.data;
 }
 
 /* ── New Safety Features (v1.0.5 - Panic Button & Safe Walk) ──────────────────── */
