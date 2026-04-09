@@ -122,7 +122,7 @@ const nextConfig = {
         headers: [
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.fwber.me https://*.amazonaws.com https://*.cloudfront.net; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.fwber.me wss://api.fwber.me:8080 https://*.sentry.io; frame-ancestors 'self' https://fwber.me https://www.fwber.me; media-src 'self' blob:;" },
+          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob:; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://api.fwber.me https://*.amazonaws.com https://*.cloudfront.net https://oaidalleapiprodscus.blob.core.windows.net https://*.googleapis.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://api.fwber.me wss://api.fwber.me:8080 wss://ws-*.pusher.com https://*.sentry.io https://www.fwber.me; frame-ancestors 'self' https://fwber.me https://www.fwber.me; media-src 'self' blob:;" },
           { key: 'X-Content-Type-Options', value: '' }, // Neutralize legacy block
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },

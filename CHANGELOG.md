@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.54] - 2026-04-08 — Fix CSP Violations + ProfileDeletion Test Fix
+
+### Fixed
+- **CSP: Google Fonts** added `https://fonts.googleapis.com` to `style-src` and `font-src`.
+- **CSP: Blob workers** added `worker-src 'self' blob:` and `blob:` to `script-src` for Next.js chunk loading.
+- **CSP: Pusher WebSocket** added `wss://ws-*.pusher.com` to `connect-src` for realtime notifications.
+- **ProfileDeletion test**: Added `avatar_url` to User `$fillable`, fixed validation exception handling, added tests for wrong password and missing password (4 tests, 11 assertions).
+- **Backend CI green**: All 432 tests passing.
+
+### Impact
+- All browser console CSP violations resolved.
+- WebSocket/realtime connections no longer blocked.
+- Account deletion tests fully pass with proper password verification.
+
 ## [1.8.53] - 2026-04-08 — WebSocket Production Default Fix
 
 ### Fixed

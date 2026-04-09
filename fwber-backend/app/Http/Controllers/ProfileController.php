@@ -744,20 +744,20 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): JsonResponse
     {
+        $user = auth()->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        // Validate password confirmation for security
+        $request->validate(['password' => 'required|string']);
+
+        if (! \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid password. Please try again.'], 422);
+        }
+
         try {
-            $user = auth()->user();
-
-            if (! $user) {
-                return response()->json(['message' => 'Unauthenticated'], 401);
-            }
-
-            // Validate password confirmation for security
-            $request->validate(['password' => 'required|string']);
-
-            if (! \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
-                return response()->json(['message' => 'Invalid password. Please try again.'], 422);
-            }
-
             // Revoke all tokens (logout from all devices)
             $user->tokens()->delete();
 
@@ -765,21 +765,13 @@ class ProfileController extends Controller
             $user->update([
                 'name' => 'Deleted User',
                 'email' => 'deleted_' . $user->id . '_' . time() . '@anonymized.invalid',
-                'bio' => null,
                 'avatar_url' => null,
             ]);
 
             // Delete user (cascades to profile, photos, matches, etc. via DB constraints)
-            // Note: S3 file cleanup should be handled by Model Observers or a cleanup job
             $user->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Account deleted successfully',
-            ]);
-
         } catch (\Exception $e) {
-            Log::error('Account deletion error', [
+            \Illuminate\Support\Facades\Log::error('Account deletion error', [
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
             ]);
@@ -789,6 +781,11 @@ class ProfileController extends Controller
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
             ], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account deleted successfully',
+        ]);
     }
 
     /**

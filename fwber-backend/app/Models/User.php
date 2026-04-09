@@ -183,6 +183,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'decoy_password',
         'decoy_user_id',
         'is_decoy',
+        'avatar_url',
     ];
 
     protected $hidden = [
