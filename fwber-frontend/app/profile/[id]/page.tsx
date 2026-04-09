@@ -72,6 +72,15 @@ export default function PublicProfilePage() {
     }
   }, [token, id, loadProfile]);
 
+  // Record profile view (fire and forget, with deduplication on backend)
+  useEffect(() => {
+    if (token && numericId && user && numericId !== user.id) {
+      api.post(`/profile/${numericId}/view`).catch(() => {
+        // Silently fail — view tracking should never block UX
+      });
+    }
+  }, [token, numericId, user?.id]);
+
   useEffect(() => {
     // Record Wingman Assist if present
     if (token && wingmanId && id && !actionPerformed) {

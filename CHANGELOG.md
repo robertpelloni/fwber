@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.56] - 2026-04-09 — Profile View Tracking Restored
+
+### Added
+- **`POST /api/profile/{userId}/view`**: Record a profile view with 24-hour deduplication. Self-views blocked. Cache-backed for performance.
+- **`GET /api/profile/{userId}/views`**: Get list of profile viewers (last 50, authenticated only). Users can only see their own.
+- **`GET /api/profile/{userId}/view-stats`**: Aggregated view stats (total, today, week, month, unique viewers) with 5-minute cache.
+- **`GET /api/rate-limits/status/{action}`**: Rate limit status endpoint for users to check their remaining quota.
+- **Frontend profile view tracking**: `app/profile/[id]/page.tsx` now fires `POST /profile/{userId}/view` on load (fire-and-forget, non-blocking).
+
+### Fixed
+- `ProfileViewController` had no routes registered — 3 endpoints were unreachable. Now routed under `auth:sanctum` middleware.
+- `RateLimitController` had no route registered — now accessible.
+
+### Impact
+- Users can now see who viewed their profile — key engagement driver for dating apps.
+- Dashboard `profile_views` count now increments from real traffic.
+- Rate limit transparency for API consumers.
+
 ## [1.8.55] - 2026-04-08 — Dark Mode Support for Account Settings
 
 ### Added

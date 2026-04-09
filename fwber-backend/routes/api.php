@@ -274,6 +274,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('profile/completeness', [\App\Http\Controllers\ProfileController::class, 'completeness']);
     Route::get('profile/export', [\App\Http\Controllers\ProfileController::class, 'export']);
 
+    // Profile View Tracking
+    Route::post('profile/{userId}/view', [\App\Http\Controllers\ProfileViewController::class, 'recordView']);
+    Route::get('profile/{userId}/views', [\App\Http\Controllers\ProfileViewController::class, 'getViews']);
+    Route::get('profile/{userId}/view-stats', [\App\Http\Controllers\ProfileViewController::class, 'getStats']);
+
     // Security & Decoy Profile
     Route::prefix('settings')->group(function () {
         Route::post('decoy-profile', [\App\Http\Controllers\DecoyProfileController::class, 'setup']);
@@ -316,6 +321,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('broadcasting/auth', function (Request $request) {
         return Broadcast::auth($request);
     });
+
+    // Rate Limit Status
+    Route::get('rate-limits/status/{action?}', [\App\Http\Controllers\RateLimitController::class, 'status']);
 
     // Video Chat
     Route::middleware('feature:video_chat')->group(function () {
