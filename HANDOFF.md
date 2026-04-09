@@ -52,7 +52,9 @@ This session performed comprehensive security hardening, GDPR compliance, CSP fi
 - All backend controllers have registered routes (only ActivityPub excluded per ROADMAP)
 - All 17 notification types have backend classes, 14 handled in frontend listener
 - CSP confirmed deployed and correct (browser cache may show stale errors)
-- All 4 CI pipelines consistently green across all 12 deployments
+- All 4 CI pipelines consistently green across all deployments
+- **API client consolidation**: 6 modules migrated from raw axios/fetch to apiClient proxy for retry, auth, and error handling consistency
+- **1700+ OpenAPI/Swagger annotations** across backend controllers
 
 ## What Was Done
 
