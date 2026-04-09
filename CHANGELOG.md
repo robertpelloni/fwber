@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.55] - 2026-04-08 — Dark Mode Support for Account Settings
+
+### Added
+- Dark mode classes added to `/settings/account` page: background, text, borders, inputs, cards, and buttons all respond to system/theme preference.
+- Covers email change, password change, data export, privacy rights, and delete account sections.
+
+### Fixed
+- Documentation updated: TODO.md and HANDOFF.md reflect all v1.8.48-1.8.54 changes.
+
 ## [1.8.54] - 2026-04-08 — Fix CSP Violations + ProfileDeletion Test Fix
 
 ### Fixed
