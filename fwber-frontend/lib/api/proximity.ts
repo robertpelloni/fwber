@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { apiClient } from './client';
 import type {
   LocalPulseResponse,
   ProximityArtifact,
@@ -7,7 +7,6 @@ import type {
   ProximityChatroom,
 } from '@/types/proximity';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export const proximityApi = {
   /**
@@ -15,8 +14,8 @@ export const proximityApi = {
    */
   getLocalPulse: async (params: LocalPulseParams, token: string): Promise<LocalPulseResponse> => {
     const { lat, lng, radius = 1000, topic_slug } = params;
-    const response = await axios.get<LocalPulseResponse>(
-      `${API_BASE_URL}/proximity/local-pulse`,
+    const response = await apiClient.get<LocalPulseResponse>(
+      `proximity/local-pulse`,
       {
         params: { lat, lng, radius, topic_slug },
         headers: { Authorization: `Bearer ${token}` },
@@ -36,7 +35,7 @@ export const proximityApi = {
     topic_slug?: string,
     token?: string
   ): Promise<{ artifacts: ProximityArtifact[] }> => {
-    const response = await axios.get(`${API_BASE_URL}/proximity/feed`, {
+    const response = await axios.get(`proximity/feed`, {
       params: { lat, lng, radius, type, topic_slug },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
@@ -48,7 +47,7 @@ export const proximityApi = {
    */
   createArtifact: async (data: CreateArtifactRequest, token: string): Promise<{ artifact: ProximityArtifact }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity/artifacts`,
+      `proximity/artifacts`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -61,7 +60,7 @@ export const proximityApi = {
    * Get single artifact by ID
    */
   getArtifact: async (id: number, token?: string): Promise<{ artifact: ProximityArtifact }> => {
-    const response = await axios.get(`${API_BASE_URL}/proximity/artifacts/${id}`, {
+    const response = await axios.get(`proximity/artifacts/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     return response.data;
@@ -72,7 +71,7 @@ export const proximityApi = {
    */
   flagArtifact: async (id: number, token: string): Promise<{ message: string }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity/artifacts/${id}/flag`,
+      `proximity/artifacts/${id}/flag`,
       {},
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -85,7 +84,7 @@ export const proximityApi = {
    * Delete (remove) an artifact (owner only)
    */
   deleteArtifact: async (id: number, token: string): Promise<{ message: string }> => {
-    const response = await axios.delete(`${API_BASE_URL}/proximity/artifacts/${id}`, {
+    const response = await axios.delete(`proximity/artifacts/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -100,7 +99,7 @@ export const proximityApi = {
     radius: number = 1000,
     token: string
   ): Promise<{ chatrooms: ProximityChatroom[] }> => {
-    const response = await axios.get(`${API_BASE_URL}/proximity-chatrooms/nearby`, {
+    const response = await axios.get(`proximity-chatrooms/nearby`, {
       params: { lat, lng, radius },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -112,7 +111,7 @@ export const proximityApi = {
    */
   joinChatroom: async (id: number, lat: number, lng: number, token: string): Promise<{ message: string }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity-chatrooms/${id}/join`,
+      `proximity-chatrooms/${id}/join`,
       { latitude: lat, longitude: lng },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -126,7 +125,7 @@ export const proximityApi = {
    */
   leaveChatroom: async (id: number, token: string): Promise<{ message: string }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity-chatrooms/${id}/leave`,
+      `proximity-chatrooms/${id}/leave`,
       {},
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -140,7 +139,7 @@ export const proximityApi = {
    */
   commentArtifact: async (id: number, content: string, parent_id?: string, token?: string): Promise<{ message: string; comment: any }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity/artifacts/${id}/comments`,
+      `proximity/artifacts/${id}/comments`,
       { content, parent_id },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -154,7 +153,7 @@ export const proximityApi = {
    */
   getComments: async (id: number, token?: string): Promise<{ data: any[] }> => {
     const response = await axios.get(
-      `${API_BASE_URL}/proximity/artifacts/${id}/comments`,
+      `proximity/artifacts/${id}/comments`,
       {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       }
@@ -167,7 +166,7 @@ export const proximityApi = {
    */
   voteArtifact: async (id: number, value: number, token: string): Promise<{ message: string; vote: any }> => {
     const response = await axios.post(
-      `${API_BASE_URL}/proximity/artifacts/${id}/vote`,
+      `proximity/artifacts/${id}/vote`,
       { value },
       {
         headers: { Authorization: `Bearer ${token}` },

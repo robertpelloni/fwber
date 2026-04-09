@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.60] - 2026-04-09 — API Client Migration (axios → apiClient)
+
+### Changed
+- Migrated 5 client-side API modules from raw `axios` to the centralized `apiClient` proxy:
+  - `lib/api/moderation.ts` — Full rewrite to use `apiClient`
+  - `lib/api/physical-profile.ts` — Full rewrite to use `apiClient`
+  - `lib/api/proximity.ts` — Converted all calls
+  - `lib/api/video.ts` — Converted all calls
+  - `app/vouch/[code]/vouch-client.tsx` — Converted public vouch calls
+
+### Impact
+- All client-side API calls now benefit from: automatic retry with exponential backoff, proper error handling (ApiError/RateLimitError/NetworkError), and consistent auth token injection.
+- Only `lib/auth.ts` (server-side NextAuth config) still uses `axios` directly — correct since it runs server-side.
+- Reduces client bundle size by eliminating direct `axios` imports from client pages (tree-shaking).
+
 ## [1.8.59] - 2026-04-09 — Settings Page Dark Mode
 
 ### Added

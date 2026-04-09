@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import { apiClient } from '@/lib/api/client'
 import Link from 'next/link'
 import { Shield, Flame, PartyPopper, CheckCircle2, User, ArrowRight, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -29,7 +29,7 @@ export function VouchClient({ code }: VouchClientProps) {
     if (code) {
       const checkCode = async () => {
         try {
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/referral/${code}`)
+          const res = await apiClient.get(`/auth/referral/${code}`)
           if (res.data.valid) {
              setReferrer({
                name: res.data.referrer_name,
@@ -56,7 +56,7 @@ export function VouchClient({ code }: VouchClientProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/public/vouch`, {
+      await apiClient.post(`/public/vouch`, {
         referral_code: code,
         type: selectedType,
         relationship_type: relationshipType,

@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { apiClient } from './client';
 
 export type PhysicalProfile = {
   height_cm?: number;
@@ -21,21 +19,21 @@ export type PhysicalProfile = {
 
 export const physicalProfileApi = {
   get: async (token: string): Promise<{ data: PhysicalProfile }> => {
-    const res = await axios.get(`${API_BASE_URL}/physical-profile`, {
+    const res = await apiClient.get('/physical-profile', {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   },
 
   upsert: async (token: string, data: PhysicalProfile): Promise<{ data: PhysicalProfile }> => {
-    const res = await axios.put(`${API_BASE_URL}/physical-profile`, data, {
+    const res = await apiClient.put('/physical-profile', data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   },
 
   requestAvatar: async (token: string, style: string): Promise<{ data: PhysicalProfile }> => {
-    const res = await axios.post(`${API_BASE_URL}/physical-profile/avatar/request`, { style }, {
+    const res = await apiClient.post('/physical-profile/avatar/request', { style }, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;

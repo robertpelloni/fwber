@@ -1,6 +1,5 @@
-import axios from 'axios';
+import { apiClient } from './client';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export interface VideoCallLog {
   id: number;
@@ -25,7 +24,7 @@ export interface VideoCallLog {
 
 export const initiateCall = async (token: string, recipientId: string): Promise<VideoCallLog> => {
   const response = await axios.post(
-    `${API_URL}/video/initiate`,
+    `video/initiate`,
     { recipient_id: recipientId },
     {
       headers: {
@@ -43,7 +42,7 @@ export const updateCallStatus = async (
   duration?: number
 ): Promise<VideoCallLog> => {
   const response = await axios.put(
-    `${API_URL}/video/${callId}/status`,
+    `video/${callId}/status`,
     { status, duration },
     {
       headers: {
@@ -55,7 +54,7 @@ export const updateCallStatus = async (
 };
 
 export const getCallHistory = async (token: string): Promise<VideoCallLog[]> => {
-  const response = await axios.get(`${API_URL}/video/history`, {
+  const response = await axios.get(`video/history`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
