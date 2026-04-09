@@ -8,9 +8,9 @@
 
 ## Executive Summary
 
-This session performed comprehensive security hardening, GDPR compliance improvements, CSP fixes, password reset flow implementation, account deletion security, and WebSocket production fixes. The project moved from v1.8.48 → v1.8.54 across 7 deployments, all successfully deployed to both Hetzner (backend) and Vercel (frontend).
+This session performed comprehensive security hardening, GDPR compliance improvements, CSP fixes, password reset flow implementation, account deletion security, profile view tracking restoration, and WebSocket production fixes. The project moved from v1.8.48 → v1.8.57 across 10 deployments, all successfully deployed to both Hetzner (backend) and Vercel (frontend).
 
-**Total route count: 448** (including forgot-password and reset-password).
+**Total route count: 454** (including forgot-password, reset-password, profile view tracking, and rate-limit status).
 **Total tests: 432 passing, 0 failures** (was 431 with 1 failure).
 
 ## What Was Done
@@ -43,8 +43,8 @@ This session performed comprehensive security hardening, GDPR compliance improve
 - Verified all 436 backend routes against every frontend API call — zero remaining gaps.
 
 ## Deployment Status
-- **Hetzner Backend**: v1.8.44 confirmed healthy ✅
-- **Vercel Frontend**: v1.8.44 deployed and serving ✅
+- **Hetzner Backend**: v1.8.57 confirmed healthy ✅
+- **Vercel Frontend**: v1.8.57 deployed and serving ✅
 - **Frontend→Backend proxy**: `www.fwber.me/api/*` → `api.fwber.me/api/*` working ✅
 - **CORS**: `Access-Control-Allow-Origin: https://fwber.me` with `credentials: true` ✅
 - **Feature flags**: All 16 features enabled on production ✅
@@ -58,6 +58,9 @@ This session performed comprehensive security hardening, GDPR compliance improve
 - **OG images**: Dynamic for share pages and roast page ✅
 - **Auth normalization**: snake_case → camelCase at all auth dispatch points ✅
 - **Security**: security.txt and humans.txt for responsible disclosure ✅
+- **Profile view tracking**: 3 endpoints + frontend call + migration ✅
+- **CSP**: Full Content Security Policy with Google Fonts, worker-src, Pusher WebSocket ✅
+- **GDPR**: Data export UI, account deletion with password verification, privacy rights ✅
 
 ## Verified Working Endpoints
 - `GET /api/health` → version 1.8.44, all checks OK
