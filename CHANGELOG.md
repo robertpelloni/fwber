@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.58] - 2026-04-09 — Notification Listener Expansion
+
+### Added
+- **NotificationListener** now handles 14 notification types instead of just 1 (gift_received).
+- New handlers: new_match, new_message, group_match_request, event_invitation, federated_follow, relationship_tier_upgraded, photo_unlocked, achievement_unlocked, streak_updated, payment_failed, subscription_expired, data_export_completed, event_reminder.
+- Each handler provides a contextual title, message, and CTA action button (e.g., "View Match" → `/messages`, "Renew" → `/premium`).
+- Deduplication by notification ID prevents repeated toasts.
+- Generic fallback for untyped notifications.
+
+### Impact
+- Users now see real-time toast notifications for all major platform events, not just gifts.
+- Each toast has a relevant CTA button that navigates to the correct page.
+
 ## [1.8.57] - 2026-04-09 — Profile Views Schema Fix + Sitemap Update
 
 ### Added
