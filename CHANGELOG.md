@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.57] - 2026-04-09 — Profile Views Schema Fix + Sitemap Update
+
+### Added
+- Migration to add `viewer_ip` and `user_agent` columns to `profile_views` table (idempotent, checks before adding).
+- `rate-my-pussy` added to `sitemap.xml` as high-priority acquisition page.
+
+### Fixed
+- `ProfileViewController::recordView` was inserting `viewer_ip` and `user_agent` into columns that didn't exist in the database — would cause a 500 error on every profile view. Now fixed with the migration.
+
 ## [1.8.56] - 2026-04-09 — Profile View Tracking Restored
 
 ### Added
