@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.59] - 2026-04-09 — Settings Page Dark Mode
+
+### Added
+- Dark mode classes added to `/settings` page: background, header, section cards, text, borders, and disabled states all respond to system/theme preference.
+
+### Note
+- CSP fixes from v1.8.54 are confirmed deployed. The console errors are from browser-cached pages — hard refresh (`Ctrl+Shift+R`) resolves them.
+
 ## [1.8.58] - 2026-04-09 — Notification Listener Expansion
 
 ### Added

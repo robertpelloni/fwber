@@ -55,7 +55,7 @@ function SettingsLink({ href, icon, title, description, badge, disabled }: Setti
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-400">{description}</p>
+          <p className="dark:text-gray-300 text-sm text-gray-400">{description}</p>
         </div>
       </div>
     );
@@ -65,7 +65,7 @@ function SettingsLink({ href, icon, title, description, badge, disabled }: Setti
     <Link
       href={href}
       prefetch={false}
-      className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all group"
+      className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-300 hover:shadow-sm transition-all group"
     >
       <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition-colors">
         {icon}
@@ -79,7 +79,7 @@ function SettingsLink({ href, icon, title, description, badge, disabled }: Setti
             </span>
           )}
         </div>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="dark:text-gray-300 text-sm text-gray-500">{description}</p>
       </div>
       <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
     </Link>
@@ -98,7 +98,7 @@ interface SettingsToggleProps {
 
 function SettingsToggle({ icon, title, description, checked, onChange, disabled, badge }: SettingsToggleProps) {
   return (
-    <div className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all group">
+    <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-300 hover:shadow-sm transition-all group">
       <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition-colors">
         {icon}
       </div>
@@ -111,7 +111,7 @@ function SettingsToggle({ icon, title, description, checked, onChange, disabled,
             </span>
           )}
         </div>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="dark:text-gray-300 text-sm text-gray-500">{description}</p>
       </div>
       <Switch checked={checked} onCheckedChange={onChange} disabled={disabled} />
     </div>
@@ -131,7 +131,7 @@ function SettingsButton({ onClick, icon, title, description, disabled }: Setting
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-sm transition-all group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-purple-300 hover:shadow-sm transition-all group text-left disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:bg-purple-200 transition-colors">
         {icon}
@@ -140,7 +140,7 @@ function SettingsButton({ onClick, icon, title, description, disabled }: Setting
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-medium text-gray-900">{title}</h3>
         </div>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="dark:text-gray-300 text-sm text-gray-500">{description}</p>
       </div>
       <Download className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
     </button>
@@ -258,16 +258,16 @@ export default function SettingsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         {/* Header */}
-        <header className="bg-white shadow-sm">
+        <header className="bg-white dark:bg-gray-900 shadow-sm">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Settings className="h-8 w-8 text-gray-600" />
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                  <p className="text-sm text-gray-500">Manage your account and preferences</p>
+                  <p className="dark:text-gray-300 text-sm text-gray-500">Manage your account and preferences</p>
                 </div>
               </div>
               <Link
@@ -289,7 +289,7 @@ export default function SettingsPage() {
           {verifiedMessage && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              <p className="text-sm font-medium text-green-800">{verifiedMessage}</p>
+              <p className="dark:text-gray-300 text-sm font-medium text-green-800">{verifiedMessage}</p>
               <button onClick={() => setVerifiedMessage(null)} className="ml-auto text-green-600 hover:text-green-800">✕</button>
             </div>
           )}
@@ -299,8 +299,8 @@ export default function SettingsPage() {
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-amber-800">Verify your email address</p>
-                <p className="text-xs text-amber-600">Check your inbox for a verification link.</p>
+                <p className="dark:text-gray-300 text-sm font-medium text-amber-800">Verify your email address</p>
+                <p className="dark:text-gray-300 text-xs text-amber-600">Check your inbox for a verification link.</p>
               </div>
               <button
                 onClick={async () => {
@@ -460,13 +460,13 @@ export default function SettingsPage() {
               Appearance
             </h2>
             <div className="space-y-3">
-              <div className="flex items-center gap-4 p-4 bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600">
                   <Palette className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-medium text-gray-900">Theme</h3>
-                  <p className="text-sm text-gray-500">Choose your preferred color scheme</p>
+                  <p className="dark:text-gray-300 text-sm text-gray-500">Choose your preferred color scheme</p>
                 </div>
                 <select
                   aria-label="Theme selection"
