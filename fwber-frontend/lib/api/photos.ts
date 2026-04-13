@@ -1,5 +1,4 @@
-'use client'
-
+import { apiClient } from './client'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 
@@ -40,59 +39,11 @@ export interface PhotoReorderRequest {
 }
 
 class PhotoAPI {
-  private baseUrl: string
-
-  constructor() {
-    this.baseUrl = typeof window !== 'undefined' 
-      ? '/api' 
-      : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me').replace(/\/$/, '') + '/api'
-  }
-
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`
-    
-    const defaultHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    }
-
-    // Add authorization header if token exists
-    const token = localStorage.getItem('fwber_token')
-    if (token) {
-      defaultHeaders['Authorization'] = `Bearer ${token}`
-    }
-
-    const config: RequestInit = {
-      ...options,
-      headers: {
-        ...defaultHeaders,
-        ...options.headers,
-      },
-    }
-
-    try {
-      const response = await fetch(url, config)
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error(`API request failed for ${endpoint}:`, error)
-      throw error
-    }
-  }
-
   // Get all photos for the current user
   async getPhotos(): Promise<Photo[]> {
-    const response = await this.request<{ success: boolean; data: Photo[]; count: number }>('/photos')
+    const response = await apiClient.get<{ success: boolean; data: Photo[]; count: number }>('/photos')
     // Backend returns { success, data, count } format
-    return response.data || []
+    return response.data.data || []
   }
 
   // Upload new photos (uploads one at a time since backend expects single 'photo' field)
@@ -122,9 +73,6 @@ class PhotoAPI {
         formData.append('face_blur_metadata', JSON.stringify(fileWithMetadata.faceBlurMetadata))
       }
       
-      const url = `${this.baseUrl}/photos`
-      const token = localStorage.getItem('fwber_token')
-      
       try {
         // Simulate progress for better UX
         if (onProgress) {
@@ -145,25 +93,15 @@ class PhotoAPI {
             }
           }, 200)
           
-          const response = await fetch(url, {
-            method: 'POST',
+          const response = await apiClient.post<{ success: boolean; data: any }>('/photos', formData, {
             headers: {
-              'Accept': 'application/json',
-              ...(token && { 'Authorization': `Bearer ${token}` }),
+              'Content-Type': 'multipart/form-data',
             },
-            body: formData,
           })
           
           clearInterval(progressInterval)
           
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}))
-            console.error('Upload error details:', { status: response.status, data: errorData })
-            if (onProgress) onProgress(i, 0, file.name) // Reset progress on error
-            throw new Error(errorData.message || `Upload failed with status ${response.status}`)
-          }
-          
-          const result = await response.json()
+          const result = response.data
           
           // Progress to 100% on success
           if (onProgress) onProgress(i, 100, file.name)
@@ -182,21 +120,13 @@ class PhotoAPI {
           }
         } else {
           // No progress callback - simple upload
-          const response = await fetch(url, {
-            method: 'POST',
+          const response = await apiClient.post<{ success: boolean; data: any }>('/photos', formData, {
             headers: {
-              'Accept': 'application/json',
-              ...(token && { 'Authorization': `Bearer ${token}` }),
+              'Content-Type': 'multipart/form-data',
             },
-            body: formData,
           })
           
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}))
-            throw new Error(errorData.message || `Upload failed for ${file.name}: ${response.status}`)
-          }
-          
-          const result = await response.json()
+          const result = response.data
           if (result.success && result.data) {
             uploadedPhotos.push({
               id: String(result.data.id),
@@ -224,19 +154,14 @@ class PhotoAPI {
 
   // Update photo details
   async updatePhoto(photoId: string, updates: Partial<Photo>): Promise<Photo> {
-    return this.request<Photo>(`/photos/${photoId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates),
-    })
+    const response = await apiClient.put<Photo>(`/photos/${photoId}`, updates)
+    return response.data
   }
 
   // Set primary photo
   async setPrimaryPhoto(photoId: string): Promise<Photo[]> {
     // Backend doesn't have /primary endpoint, use PUT with is_primary=true
-    const response = await this.request<{ success: boolean; data: Photo }>(`/photos/${photoId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ is_primary: true }),
-    })
+    await apiClient.put<{ success: boolean; data: Photo }>(`/photos/${photoId}`, { is_primary: true })
     // Return updated photos list by fetching all photos
     return this.getPhotos()
   }
@@ -245,9 +170,8 @@ class PhotoAPI {
   async reorderPhotos(photoIds: string[]): Promise<Photo[]> {
     // Backend returns { success: true, message: ... }, not Photo[]
     // So we make the reorder request and then fetch updated photos
-    await this.request<{ success: boolean; message?: string }>('/photos/reorder', {
-      method: 'POST',
-      body: JSON.stringify({ photo_ids: photoIds.map(id => parseInt(id, 10)) }), // Convert to integers for backend
+    await apiClient.post<{ success: boolean; message?: string }>('/photos/reorder', {
+      photo_ids: photoIds.map(id => parseInt(id, 10)), // Convert to integers for backend
     })
     // Refetch photos to get updated order
     return this.getPhotos()
@@ -255,9 +179,8 @@ class PhotoAPI {
 
   // Delete photo
   async deletePhoto(photoId: string): Promise<{ success: boolean; message?: string }> {
-    return this.request<{ success: boolean; message?: string }>(`/photos/${photoId}`, {
-      method: 'DELETE',
-    })
+    const response = await apiClient.delete<{ success: boolean; message?: string }>(`/photos/${photoId}`)
+    return response.data
   }
 
   // Get photo upload limits and settings
@@ -268,59 +191,45 @@ class PhotoAPI {
     compression_quality: number
   }> {
     try {
-      return await this.request<{
+      const response = await apiClient.get<{
         max_photos: number
         max_file_size: number
         allowed_formats: string[]
         compression_quality: number
-      }>('/photos/settings', {
-        method: 'GET',
-      })
+      }>('/photos/settings')
+      return response.data
     } catch (error) {
       // If endpoint doesn't exist (405 or 404), return defaults
-      if (error instanceof Error && (error.message.includes('405') || error.message.includes('404'))) {
-        return {
-          max_photos: 6,
-          max_file_size: 5 * 1024 * 1024, // 5MB
-          allowed_formats: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-          compression_quality: 85,
-        }
+      return {
+        max_photos: 6,
+        max_file_size: 5 * 1024 * 1024, // 5MB
+        allowed_formats: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+        compression_quality: 85,
       }
-      throw error
     }
   }
 
   // Reveal photo to a match
   async revealPhoto(photoId: string, matchId: string): Promise<{ success: boolean; status: string }> {
-    return this.request<{ success: boolean; status: string }>(`/photos/${photoId}/reveal`, {
-      method: 'POST',
-      body: JSON.stringify({ match_id: matchId }),
+    const response = await apiClient.post<{ success: boolean; status: string }>(`/photos/${photoId}/reveal`, {
+      match_id: matchId,
     })
+    return response.data
   }
 
   // Unlock photo with tokens
   async unlockPhoto(photoId: string): Promise<{ success: boolean; message: string; balance: number }> {
-    return this.request<{ success: boolean; message: string; balance: number }>(`/photos/${photoId}/unlock`, {
-      method: 'POST',
-    })
+    const response = await apiClient.post<{ success: boolean; message: string; balance: number }>(`/photos/${photoId}/unlock`)
+    return response.data
   }
 
   // Get original photo blob
   async getOriginalPhoto(photoId: string): Promise<Blob> {
-    const url = `${this.baseUrl}/photos/${photoId}/original`
-    const token = localStorage.getItem('fwber_token')
-    
-    const response = await fetch(url, {
-      headers: {
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-      },
+    const response = await apiClient.get(`/photos/${photoId}/original`, {
+      responseType: 'blob',
     })
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch original photo: ${response.status}`)
-    }
-
-    return await response.blob()
+    return response.data
   }
 }
 

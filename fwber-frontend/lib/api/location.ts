@@ -8,7 +8,7 @@
  * Created: 2025-01-19
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { apiClient } from './client';
 
 export interface LocationData {
   id: number;
@@ -79,22 +79,13 @@ export interface NearbyUsersResponse {
  * Get current user's location
  */
 export async function getCurrentLocation(token: string): Promise<LocationData> {
-  const response = await fetch(`${API_BASE_URL}/location`, {
-    method: 'GET',
+  const response = await apiClient.get<{ data: LocationData }>('/location', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch location' }));
-    throw new Error(error.message || 'Failed to fetch location');
-  }
-
-  const data = await response.json();
-  return data.data;
+  return response.data.data;
 }
 
 /**
@@ -112,23 +103,13 @@ export async function updateLocation(
     privacy_level?: 'public' | 'friends' | 'private';
   }
 ): Promise<LocationData> {
-  const response = await fetch(`${API_BASE_URL}/location`, {
-    method: 'POST',
+  const response = await apiClient.post<{ data: LocationData }>('/location', locationData, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
-    body: JSON.stringify(locationData),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update location' }));
-    throw new Error(error.message || 'Failed to update location');
-  }
-
-  const data = await response.json();
-  return data.data;
+  return response.data.data;
 }
 
 /**
@@ -144,29 +125,14 @@ export async function getNearbyUsers(
     ranking_strategy?: 'distance' | 'trust-aware';
   }
 ): Promise<NearbyUsersResponse> {
-  const searchParams = new URLSearchParams({
-    latitude: params.latitude.toString(),
-    longitude: params.longitude.toString(),
-    ...(params.radius && { radius: params.radius.toString() }),
-    ...(params.limit && { limit: params.limit.toString() }),
-    ...(params.ranking_strategy && { ranking_strategy: params.ranking_strategy }),
-  });
-
-  const response = await fetch(`${API_BASE_URL}/location/nearby?${searchParams}`, {
-    method: 'GET',
+  const response = await apiClient.get<NearbyUsersResponse>('/location/nearby', {
+    params,
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch nearby users' }));
-    throw new Error(error.message || 'Failed to fetch nearby users');
-  }
-
-  return await response.json();
+  return response.data;
 }
 
 /**
@@ -176,42 +142,24 @@ export async function updateLocationPrivacy(
   token: string,
   privacyLevel: 'public' | 'friends' | 'private'
 ): Promise<{ privacy_level: string; privacy_level_display: string }> {
-  const response = await fetch(`${API_BASE_URL}/location/privacy`, {
-    method: 'PUT',
+  const response = await apiClient.put<{ data: { privacy_level: string; privacy_level_display: string } }>('/location/privacy', { privacy_level: privacyLevel }, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
-    body: JSON.stringify({ privacy_level: privacyLevel }),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update privacy settings' }));
-    throw new Error(error.message || 'Failed to update privacy settings');
-  }
-
-  const data = await response.json();
-  return data.data;
+  return response.data.data;
 }
 
 /**
  * Clear location history
  */
 export async function clearLocationHistory(token: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/location`, {
-    method: 'DELETE',
+  await apiClient.delete('/location', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to clear location history' }));
-    throw new Error(error.message || 'Failed to clear location history');
-  }
 }
 
 /**

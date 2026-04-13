@@ -1,8 +1,7 @@
+import { apiClient } from './client';
 import { useAuth } from '../auth-context';
 import { storeOfflineMessage } from '../offline-store';
 import { v4 as uuidv4 } from 'uuid';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 
 export interface BulletinBoard {
   id: number;
@@ -84,23 +83,19 @@ export class BulletinBoardAPI {
     this.token = token;
   }
 
-  private async request(endpoint: string, options: RequestInit = {}) {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const response = await fetch(url, {
-      ...options,
+  private async request(endpoint: string, options: any = {}) {
+    const response = await apiClient({
+      url: endpoint,
+      method: options.method || 'GET',
+      data: options.body ? JSON.parse(options.body) : undefined,
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${this.token}`,
         ...options.headers,
       },
+      params: options.params,
     });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Request failed' }));
-      throw new Error(error.message || `HTTP ${response.status}`);
-    }
-
-    return response.json();
+    return response.data;
   }
 
   /**
@@ -115,14 +110,14 @@ export class BulletinBoardAPI {
       ranking_strategy?: BulletinBoardRankingStrategy;
     };
   }> {
-    const params = new URLSearchParams({
-      lat: filters.lat.toString(),
-      lng: filters.lng.toString(),
-      ...(filters.radius && { radius: filters.radius.toString() }),
-      ...(filters.ranking_strategy && { ranking_strategy: filters.ranking_strategy }),
-    });
+    const params = {
+      lat: filters.lat,
+      lng: filters.lng,
+      radius: filters.radius,
+      ranking_strategy: filters.ranking_strategy,
+    };
 
-    return this.request(`/bulletin-boards?${params}`);
+    return this.request('/bulletin-boards', { params });
   }
 
   /**
@@ -133,13 +128,13 @@ export class BulletinBoardAPI {
     messages: BulletinMessage[];
   }> {
     const params = location 
-      ? new URLSearchParams({
-          lat: location.lat.toString(),
-          lng: location.lng.toString(),
-        })
-      : '';
+      ? {
+          lat: location.lat,
+          lng: location.lng,
+        }
+      : undefined;
 
-    return this.request(`/bulletin-boards/${id}?${params}`);
+    return this.request(`/bulletin-boards/${id}`, { params });
   }
 
   /**
@@ -248,11 +243,12 @@ export class BulletinBoardAPI {
     };
     board: BulletinBoard;
   }> {
-    const params = new URLSearchParams();
-    if (options.per_page) params.append('per_page', options.per_page.toString());
-    if (options.since) params.append('since', options.since);
+    const params = {
+      per_page: options.per_page,
+      since: options.since,
+    };
 
-    return this.request(`/bulletin-boards/${boardId}/messages?${params}`);
+    return this.request(`/bulletin-boards/${boardId}/messages`, { params });
   }
 
 

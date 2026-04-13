@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.63] - 2026-04-09 — API Client Consolidation & Backend 404 Fallback
+
+### Added
+- **Backend API 404 Fallback**: Implemented `Route::fallback` in `routes/api.php` to return JSON 404s for missing endpoints instead of HTML.
+
+### Changed
+- **Frontend API Migration (100% Complete)**: Migrated all remaining API modules (`friends.ts`, `location.ts`, `merchant.ts`, `photos.ts`, `bulletin-boards.ts`, `profile.ts`, `verification.ts`) from raw `fetch` to the centralized `apiClient`.
+- **Axios Interceptor Adoption**: All API calls now benefit from automatic retries, standardized error handling, and consistent authorization token injection.
+- **Improved Multipart Uploads**: Converted photo and verification uploads to use `apiClient` with `multipart/form-data` support.
+
+### Impact
+- Standardized error handling across the entire frontend.
+- Eliminated redundant `API_BASE_URL` constants in multiple modules.
+- Frontend now handles missing backend routes with proper JSON error messages.
+
 ## [1.8.62] - 2026-04-09 — PWA Meta & Theme-Color Improvements
 
 ### Added

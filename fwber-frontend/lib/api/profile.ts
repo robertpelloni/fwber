@@ -8,7 +8,7 @@
  * Created: 2025-10-18
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { apiClient } from './client';
 
 interface ProfileInterestTopic {
   id: number;
@@ -339,44 +339,26 @@ function sanitizeProfileUpdatePayload<T>(value: T): T | undefined {
  * Fetch a public user profile by ID
  */
 export async function getPublicProfile(token: string, userId: number): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
-    method: 'GET',
+  const response = await apiClient.get<UserProfile>(`/users/${userId}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch profile' }));
-    throw new Error(error.message || 'Failed to fetch profile');
-  }
-
-  const data = await response.json();
-  return data.data || data;
+  return response.data;
 }
 
 /**
  * Fetch authenticated user's profile
  */
 export async function getUserProfile(token: string): Promise<UserProfile> {
-  const response = await fetch(`${API_BASE_URL}/profile`, {
-    method: 'GET',
+  const response = await apiClient.get<UserProfile>('/profile', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch profile' }));
-    throw new Error(error.message || 'Failed to fetch profile');
-  }
-
-  const data = await response.json();
-  return data.data || data;
+  return response.data;
 }
 
 /**
@@ -396,10 +378,9 @@ export async function updateUserProfile(
 
   const sanitizedPayload = sanitizeProfileUpdatePayload(payload) ?? {};
 
-  let body: BodyInit;
-  let headers: Record<string, string> = {
+  let response;
+  const headers: Record<string, string> = {
     'Authorization': `Bearer ${token}`,
-    'Accept': 'application/json',
   };
 
   if (updates.voice_intro) {
@@ -413,67 +394,47 @@ export async function updateUserProfile(
     });
     // Add spoof _method to handle PUT with multipart
     formData.append('_method', 'PUT');
-    body = formData;
+    
+    response = await apiClient.post('/profile', formData, {
+      headers: {
+        ...headers,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   } else {
-    headers['Content-Type'] = 'application/json';
-    body = JSON.stringify(sanitizedPayload);
+    response = await apiClient.put('/profile', sanitizedPayload, {
+      headers,
+    });
   }
 
-  const response = await fetch(`${API_BASE_URL}/profile`, {
-    method: updates.voice_intro ? 'POST' : 'PUT',
-    headers: headers,
-    body: body,
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update profile' }));
-    console.error('Profile update failed:', error);
-    throw new Error(error.message || error.error || 'Failed to update profile');
-  }
-
-  const data = await response.json();
-  return data.data || data;
+  return response.data;
 }
 
 /**
  * Get profile completeness status
  */
 export async function getProfileCompleteness(token: string): Promise<ProfileCompletenessResponse> {
-  const response = await fetch(`${API_BASE_URL}/profile/completeness`, {
-    method: 'GET',
+  const response = await apiClient.get<ProfileCompletenessResponse>('/profile/completeness', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to check profile completeness');
-  }
-
-  return response.json();
+  return response.data;
 }
 
 /**
  * Search for users by name or email
  */
 export async function searchUsers(token: string, searchTerm: string): Promise<UserProfile[]> {
-  const response = await fetch(`${API_BASE_URL}/users/search?q=${searchTerm}`, {
-    method: 'GET',
+  const response = await apiClient.get<UserProfile[]>('/users/search', {
+    params: { q: searchTerm },
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to search for users');
-  }
-
-  const data = await response.json();
-  return data.data || data;
+  return response.data;
 }
 
 export interface OnboardingStatus {
@@ -482,33 +443,19 @@ export interface OnboardingStatus {
 }
 
 export async function getOnboardingStatus(token: string): Promise<OnboardingStatus> {
-  const response = await fetch(`${API_BASE_URL}/onboarding/status`, {
-    method: 'GET',
+  const response = await apiClient.get<OnboardingStatus>('/onboarding/status', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    throw new Error('Failed to get onboarding status');
-  }
-
-  return response.json();
+  return response.data;
 }
 
 export async function completeOnboarding(token: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/onboarding/complete`, {
-    method: 'POST',
+  await apiClient.post('/onboarding/complete', {}, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
-
-  if (!response.ok) {
-    throw new Error('Failed to complete onboarding');
-  }
 }

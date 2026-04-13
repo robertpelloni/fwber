@@ -1,47 +1,36 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { apiClient } from './client';
 
 export async function getFriends(token: string) {
-  const response = await fetch(`${API_BASE_URL}/friends`, {
+  const response = await apiClient.get('/friends', {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return response.json();
+  return response.data;
 }
 
 export async function getFriendRequests(token: string) {
-  const response = await fetch(`${API_BASE_URL}/friends/requests`, {
+  const response = await apiClient.get('/friends/requests', {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return response.json();
+  return response.data;
 }
 
 export async function sendFriendRequest(token: string, friend_id: number) {
-  const response = await fetch(`${API_BASE_URL}/friends/requests`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ friend_id }),
+  const response = await apiClient.post('/friends/requests', { friend_id }, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  return response.json();
+  return response.data;
 }
 
 export async function respondToFriendRequest(token: string, userId: number, status: 'accepted' | 'declined') {
-  const response = await fetch(`${API_BASE_URL}/friends/requests/${userId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ status }),
+  const response = await apiClient.post(`/friends/requests/${userId}`, { status }, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  return response.json();
+  return response.data;
 }
 
 export async function removeFriend(token: string, friendId: number) {
-  const response = await fetch(`${API_BASE_URL}/friends/${friendId}`, {
-    method: 'DELETE',
+  const response = await apiClient.delete(`/friends/${friendId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return response.json();
+  return response.data;
 }

@@ -1,0 +1,41 @@
+{
+  "nextId": 4,
+  "tasks": [
+    {
+      "id": "1",
+      "subject": "Analyze Backend Port to TypeScript",
+      "description": "Determine if porting the entire Laravel backend to TypeScript is feasible within the current constraints and explore alternatives like Bun/Elysia or NestJS, while acknowledging that a full port is a massive undertaking.",
+      "status": "in_progress",
+      "activeForm": "Analyzing porting feasibility",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776116126400,
+      "updatedAt": 1776116136691
+    },
+    {
+      "id": "2",
+      "subject": "Implement Backend API 404 Fallback",
+      "description": "Implement a fallback route in Laravel to return JSON 404s instead of HTML, ensuring the frontend handles missing API endpoints gracefully.",
+      "status": "completed",
+      "activeForm": "Implementing API 404 Fallback",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776116126405,
+      "updatedAt": 1776116134571
+    },
+    {
+      "id": "3",
+      "subject": "Complete Frontend API Migration",
+      "description": "Finish migrating the remaining 5 frontend API modules (bulletin-boards.ts, friends.ts, location.ts, merchant.ts, photos.ts) from raw fetch/axios to the centralized apiClient.",
+      "status": "completed",
+      "activeForm": "Migrating remaining API modules",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776116126411,
+      "updatedAt": 1776116389848
+    }
+  ]
+}

@@ -28,21 +28,13 @@ export const verificationApi = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Use fetch directly to avoid JSON.stringify in apiClient
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-    const url = baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
-    
-    const response = await fetch(`${url}/verification/verify`, {
-      method: 'POST',
-      headers,
-      body: formData,
+    const response = await apiClient.post<VerificationResult>('/verification/verify', formData, {
+      headers: {
+        ...headers,
+        'Content-Type': 'multipart/form-data',
+      },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw { response: { data: errorData } }; // Mimic axios/apiClient error structure for the UI
-    }
-
-    return response.json();
+    return response.data;
   },
 };

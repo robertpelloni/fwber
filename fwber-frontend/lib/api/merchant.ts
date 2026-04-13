@@ -1,5 +1,4 @@
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+import { apiClient } from './client';
 
 export type MerchantVerificationStatus = 'pending' | 'verified' | 'rejected';
 
@@ -83,22 +82,13 @@ export interface UpdatePromotionData {
  * Register the current user as a merchant
  */
 export async function registerMerchant(token: string, data: MerchantRegistrationData): Promise<MerchantProfile> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/register`, {
-    method: 'POST',
+  const response = await apiClient.post('/merchant-portal/register', data, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
-    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to register merchant' }));
-    throw new Error(error.message || 'Failed to register merchant');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.user?.merchant_profile || result.user?.merchantProfile || result.profile || result.data || result;
 }
 
@@ -106,21 +96,13 @@ export async function registerMerchant(token: string, data: MerchantRegistration
  * Get current merchant profile
  */
 export async function getMerchantProfile(token: string): Promise<MerchantProfile> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/profile`, {
-    method: 'GET',
+  const response = await apiClient.get('/merchant-portal/profile', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch merchant profile' }));
-    throw new Error(error.message || 'Failed to fetch merchant profile');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.profile || result.data || result;
 }
 
@@ -128,22 +110,13 @@ export async function getMerchantProfile(token: string): Promise<MerchantProfile
  * Update merchant profile
  */
 export async function updateMerchantProfile(token: string, data: Partial<MerchantRegistrationData>): Promise<MerchantProfile> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/profile`, {
-    method: 'PUT',
+  const response = await apiClient.put('/merchant-portal/profile', data, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
-    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update merchant profile' }));
-    throw new Error(error.message || 'Failed to update merchant profile');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.profile || result.data || result;
 }
 
@@ -151,21 +124,13 @@ export async function updateMerchantProfile(token: string, data: Partial<Merchan
  * Get active promotions
  */
 export async function getPromotions(token: string): Promise<Promotion[]> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions`, {
-    method: 'GET',
+  const response = await apiClient.get('/merchant-portal/promotions', {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch promotions' }));
-    throw new Error(error.message || 'Failed to fetch promotions');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.data || result; // Assuming Laravel Resource returns { data: [...] }
 }
 
@@ -173,41 +138,24 @@ export async function getPromotions(token: string): Promise<Promotion[]> {
  * Create a new promotion
  */
 export async function createPromotion(token: string, data: CreatePromotionData): Promise<Promotion> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions`, {
-    method: 'POST',
+  const response = await apiClient.post('/merchant-portal/promotions', data, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
-    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to create promotion' }));
-    throw new Error(error.message || 'Failed to create promotion');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.promotion || result.data || result;
 }
 
 export async function getPromotionDetail(token: string, promotionId: number | string): Promise<PromotionDetailResponse> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
-    method: 'GET',
+  const response = await apiClient.get(`/merchant-portal/promotions/${promotionId}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to fetch promotion details' }));
-    throw new Error(error.message || 'Failed to fetch promotion details');
-  }
-
-  const result = await response.json();
+  const result = response.data;
 
   return {
     promotion: result.promotion || result.data || result,
@@ -221,40 +169,23 @@ export async function getPromotionDetail(token: string, promotionId: number | st
 }
 
 export async function updatePromotion(token: string, promotionId: number | string, data: UpdatePromotionData): Promise<Promotion> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
-    method: 'PUT',
+  const response = await apiClient.put(`/merchant-portal/promotions/${promotionId}`, data, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
-    body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to update promotion' }));
-    throw new Error(error.message || 'Failed to update promotion');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.promotion || result.data || result;
 }
 
 export async function deletePromotion(token: string, promotionId: number | string): Promise<Promotion> {
-  const response = await fetch(`${API_BASE_URL}/merchant-portal/promotions/${promotionId}`, {
-    method: 'DELETE',
+  const response = await apiClient.delete(`/merchant-portal/promotions/${promotionId}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Failed to deactivate promotion' }));
-    throw new Error(error.message || 'Failed to deactivate promotion');
-  }
-
-  const result = await response.json();
+  const result = response.data;
   return result.promotion || result.data || result;
 }

@@ -921,4 +921,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         return response()->json(['message' => 'Achievement unlocked']);
     });
+
+    // Fallback for missing API routes
+    Route::fallback(function () {
+        return response()->json([
+            'message' => 'API endpoint not found. Please check the documentation.',
+            'status' => 404
+        ], 404);
+    });
 });
