@@ -128,17 +128,17 @@ export async function getFederationOutbox(
   userId: number,
   params?: { limit?: number }
 ): Promise<FederationOutboxPage> {
-  const response = await fetch(buildFederationOutboxHref(userId, params?.limit ?? 20), {
+  const response = await api.get<FederationOutboxPage>(`/federation/users/${userId}/outbox`, {
+    params: {
+      page: 'true',
+      limit: params?.limit ?? 20,
+    },
     headers: {
       Accept: 'application/activity+json',
     },
   })
 
-  if (!response.ok) {
-    throw new Error(`Failed to load federation outbox (${response.status})`)
-  }
-
-  const data = (await response.json()) as Partial<FederationOutboxPage>
+  const data = response as Partial<FederationOutboxPage>
 
   return {
     id: data.id || buildFederationOutboxHref(userId, params?.limit ?? 20),

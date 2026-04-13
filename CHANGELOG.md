@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.64] - 2026-04-09 — Final API Client Consolidation
+
+### Changed
+- **Zero Raw Fetch/Axios**: Replaced remaining instances of raw `fetch` and `axios` in `proximity.ts`, `video.ts`, and `activitypub.ts` with the centralized `apiClient`.
+- **Axios Dependency Removed**: All frontend API logic now exclusively uses `apiClient` (axios instance) or the `api` wrapper.
+- **Consistent Headers**: Standardized ActivityPub `Accept` headers within the `apiClient` flow.
+
+### Impact
+- 100% unified API layer.
+- Improved reliability and observability of all network requests.
+- Simplified maintenance: one place to change base URL, auth logic, or retry policies.
+
 ## [1.8.63] - 2026-04-09 — API Client Consolidation & Backend 404 Fallback
 
 ### Added
