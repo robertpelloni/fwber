@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.65] - 2026-04-09 — Chatrooms Dark Mode Support
+
+### Added
+- **Dark Mode for `/chatrooms`**: Comprehensive dark mode support for the chatrooms discovery page, including headers, tabs, search/filters, popular chatroom cards, and the main chatroom list.
+- Improved accessibility with better contrast in dark mode.
+
 ## [1.8.64] - 2026-04-09 — Final API Client Consolidation
 
 ### Changed
