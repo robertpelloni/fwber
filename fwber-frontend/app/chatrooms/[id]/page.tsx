@@ -216,10 +216,10 @@ export default function ChatroomPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading chatroom...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading chatroom...</p>
         </div>
       </div>
     );
@@ -227,13 +227,13 @@ export default function ChatroomPage() {
 
   if (!chatroom) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Chatroom not found</h1>
-          <p className="text-gray-600 mb-4">The chatroom you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Chatroom not found</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">The chatroom you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.</p>
           <button
             onClick={() => router.push('/chatrooms')}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors"
           >
             Back to Chatrooms
           </button>
@@ -243,28 +243,28 @@ export default function ChatroomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Chatroom Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-start justify-between">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-6">
+          <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-2xl font-bold text-gray-900">{chatroom.display_name || (chatroom as any).name}</h1>
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{chatroom.display_name || (chatroom as any).name}</h1>
                 <ConnectionStatusBadge />
                 {isProximity && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-800">
                     Proximity
                   </span>
                 )}
               </div>
               {chatroom.description && (
-                <p className="text-gray-600 mb-4">{chatroom.description}</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{chatroom.description}</p>
               )}
-              <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500 flex-wrap">
                 <button
                   onClick={() => setShowOnlineUsers(!showOnlineUsers)}
-                  className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                  className="flex items-center gap-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 >
                   👥 {chatroom.member_count || (chatroom as any).current_members} members
                 </button>
@@ -275,16 +275,16 @@ export default function ChatroomPage() {
 
               {/* Online Users Panel */}
               {showOnlineUsers && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <OnlineUsersList userIds={memberIds} maxDisplay={8} />
                 </div>
               )}
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500 mb-1">
+            <div className="text-right hidden sm:block">
+              <div className="text-sm text-gray-500 dark:text-gray-500 mb-1">
                 Created by {chatroom.creator?.name}
               </div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-gray-400 dark:text-gray-600">
                 {new Date((chatroom as any).created_at || Date.now()).toLocaleDateString()}
               </div>
             </div>
@@ -292,17 +292,17 @@ export default function ChatroomPage() {
         </div>
 
         {/* Chat Interface */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[600px]">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 flex flex-col h-[600px] relative">
 
           {/* Preview Mode Overlay */}
           {(standardChatroomData?.preview_mode && !isProximity) && (
-            <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
-              <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 max-w-md w-full text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="absolute inset-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 max-w-md w-full text-center">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">🔒</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Join to Chat</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Join to Chat</h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
                   {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0
                     ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.`
                     : "You need to join this chatroom to view messages and participate."}
@@ -310,7 +310,7 @@ export default function ChatroomPage() {
                 <button
                   onClick={handleJoin}
                   disabled={joinChatroomMutation.isPending}
-                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded-lg shadow-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {joinChatroomMutation.isPending ? (
                     <>
@@ -331,14 +331,14 @@ export default function ChatroomPage() {
           <div className={`flex-1 overflow-y-auto p-6 space-y-4 ${(standardChatroomData?.preview_mode && !isProximity) ? 'filter blur-sm select-none overflow-hidden' : ''}`}>
             {messagesLoading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Loading messages...</p>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400 mx-auto"></div>
+                <p className="mt-2 text-gray-600 dark:text-gray-400">Loading messages...</p>
               </div>
             ) : messages.length > 0 ? (
               messages.map((message: any) => (
                 <div key={message.id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0 relative">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    <div className="w-8 h-8 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                       {message.user?.name?.charAt(0).toUpperCase() || '?'}
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5">
@@ -347,17 +347,17 @@ export default function ChatroomPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {message.display_user}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-500">
                         {formatTime(message.created_at)}
                       </span>
                       {message.is_edited && (
-                        <span className="text-xs text-gray-400">(edited)</span>
+                        <span className="text-xs text-gray-400 dark:text-gray-600">(edited)</span>
                       )}
                     </div>
-                    <p className="text-gray-900 whitespace-pre-wrap">{message.display_content}</p>
+                    <p className="text-gray-900 dark:text-gray-200 whitespace-pre-wrap">{message.display_content}</p>
 
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
@@ -366,7 +366,7 @@ export default function ChatroomPage() {
                           <button
                             key={emoji}
                             onClick={() => handleReaction(message.id, emoji)}
-                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-full transition-colors border border-gray-200 dark:border-gray-700"
                           >
                             <span className="mr-1">{emoji}</span>
                             <span>{count as number}</span>
@@ -379,20 +379,20 @@ export default function ChatroomPage() {
               ))
             ) : (
               <div className="text-center py-8">
-                <div className="text-gray-400 mb-4">
+                <div className="text-gray-400 dark:text-gray-600 mb-4">
                   <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
-                <p className="text-gray-600">Start the conversation by sending the first message!</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No messages yet</h3>
+                <p className="text-gray-600 dark:text-gray-400">Start the conversation by sending the first message!</p>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
           {/* Message Input */}
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
             <form onSubmit={handleSendMessage} className="flex space-x-3">
               <div className="flex-1">
                 <textarea
@@ -403,14 +403,14 @@ export default function ChatroomPage() {
                   }}
                   placeholder="Type your message..."
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                   disabled={isSending}
                 />
               </div>
               <button
                 type="submit"
                 disabled={!newMessage.trim() || isSending}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSending ? 'Sending...' : 'Send'}
               </button>
@@ -419,7 +419,7 @@ export default function ChatroomPage() {
             {/* Typing Indicator - Real-time from WebSocket or local state */}
             <TypingIndicator contextId={String(chatroomId)} contextType={isProximity ? "proximity_chatroom" : "chatroom"} className="mt-2" />
             {isTyping && (
-              <div className="mt-2 text-sm text-gray-500">
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-500">
                 <span className="animate-pulse">You are typing...</span>
               </div>
             )}
@@ -427,24 +427,26 @@ export default function ChatroomPage() {
         </div>
 
         {/* Quick Reactions */}
-        <div className="mt-4 flex items-center space-x-2">
-          <span className="text-sm text-gray-500">Quick reactions:</span>
-          {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
-            <button
-              key={emoji}
-              onClick={() => {
-                const lastMessage = messages[messages.length - 1];
-                if (lastMessage) {
-                  handleReaction(lastMessage.id, emoji);
-                }
-              }}
-              className="text-lg hover:scale-110 transition-transform disabled:opacity-50"
-              disabled={messages.length === 0}
-              title={messages.length > 0 ? `React to latest message with ${emoji}` : 'No messages to react to'}
-            >
-              {emoji}
-            </button>
-          ))}
+        <div className="mt-4 flex items-center space-x-2 flex-wrap gap-y-2">
+          <span className="text-sm text-gray-500 dark:text-gray-500">Quick reactions:</span>
+          <div className="flex items-center space-x-2">
+            {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
+              <button
+                key={emoji}
+                onClick={() => {
+                  const lastMessage = messages[messages.length - 1];
+                  if (lastMessage) {
+                    handleReaction(lastMessage.id, emoji);
+                  }
+                }}
+                className="text-lg hover:scale-110 transition-transform disabled:opacity-50"
+                disabled={messages.length === 0}
+                title={messages.length > 0 ? `React to latest message with ${emoji}` : 'No messages to react to'}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

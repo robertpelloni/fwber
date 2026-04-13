@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.67] - 2026-04-09 — Chatroom Detail Dark Mode Support
+
+### Added
+- **Dark Mode for Chatroom Detail**: Fully implemented dark mode for standard and proximity chatrooms.
+- **Join Overlay Support**: Updated the "Join to Chat" overlay with dark mode styles and backdrop blur.
+- **Real-time Status Styling**: Connection badges, presence indicators, and typing indicators now adapt to dark mode.
+- **Message & Reaction Styling**: Improved message bubbles and reaction buttons for dark mode visibility.
+
 ## [1.8.66] - 2026-04-09 — Bulletin Boards Dark Mode Support
 
 ### Added
