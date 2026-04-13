@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.66] - 2026-04-09 — Bulletin Boards Dark Mode Support
+
+### Added
+- **Dark Mode for Bulletin Boards**: Implemented dark mode support for the bulletin boards page, including board lists, message threads, AI post suggestions, and loading/error states.
+- Enhanced UI consistency across location-based social features.
+
 ## [1.8.65] - 2026-04-09 — Chatrooms Dark Mode Support
 
 ### Added
