@@ -12,6 +12,9 @@ interface AuthenticatedSocket extends Socket {
 
 export function setupSocketIO(httpServer: any) {
   const io = new Server(httpServer, {
+    path: '/socket.io/',
+    addTrailingSlash: true,
+    transports: ['websocket', 'polling'],
     cors: {
       origin: process.env.FRONTEND_URL || '*',
       methods: ['GET', 'POST'],
