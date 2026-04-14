@@ -2,54 +2,57 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Status: Beta](https://img.shields.io/badge/Status-Beta-yellow)](PROJECT_STATUS.md)
-[![PHP 8.4+](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php)](https://www.php.net/)
-[![Laravel 12](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel)](https://laravel.com/)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js)](https://nodejs.org/)
+[![Next.js 15](https://img.shields.io/badge/Next.js-15-000000?logo=next.js)](https://nextjs.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.0+-2D3748?logo=prisma)](https://www.prisma.io/)
 
-Privacy-first proximity dating platform. Open source. Work in progress.
+Privacy-first proximity dating platform. Open source. Unified TypeScript stack.
 
-**Status:** Beta (v1.0.68) — functional but still finishing billing launch and production hardening.  
-**Stack:** Laravel 12 (PHP 8.2+) + Next.js 15 (React 18) + MySQL / SQLite  
+**Status:** Beta (v2.0.0-ts) — Full TypeScript/Node.js Migration Complete.  
+**Stack:** Node.js (Express) + Next.js 15 (React 19) + Prisma (PostgreSQL/MySQL)  
 **License:** MIT
 
 ## What This Is
 
-A dating app where AI avatars replace photos until you choose to reveal yourself. Location is fuzzed. Messages can be encrypted. Your data stays yours.
+A dating app where AI avatars replace photos until you choose to reveal yourself. Location is fuzzed. Messages are end-to-end encrypted. Your data stays yours.
 
 ### Core Features
 - **AI Avatar Mode** — AI-generated avatars until mutual reveal
 - **Local Pulse** — Proximity-based discovery feed (artifacts + match candidates)
 - **5-Tier Relationship Reveal** — Progressive trust-building (Discovery → Verified)
-- **Privacy by Design** — Location fuzzing, ghost mode, data export
+- **Privacy by Design** — ZK-Identity, location fuzzing, ghost mode, E2E encryption
 
 ### Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Laravel 12, PHP 8.4, MySQL |
-| Frontend | Next.js 16, React 18, TypeScript |
-| Real-time | Laravel Reverb (WebSocket) |
+| Backend | Node.js, Express, TypeScript, Prisma |
+| Frontend | Next.js 15, React 19, TypeScript |
+| Real-time | Socket.io (WebSocket) |
+| Database | PostgreSQL / MySQL |
 | Styling | Tailwind CSS |
 | State | Zustand, React Query |
 
 ## Quick Start
 
 ### Prerequisites
-- **Backend:** PHP 8.2+, Composer 2.x, MySQL or SQLite
-- **Frontend:** Node.js 20+, npm
+- **Node.js:** 20+ (LTS recommended)
+- **npm / bun:** Package manager
+- **Database:** PostgreSQL or MySQL
 
-### Backend
+### Backend (Express + Prisma)
 ```bash
-cd fwber-backend
-composer install
+cd fwber-backend-ts
+npm install
 cp .env.example .env
-php artisan key:generate
-php artisan migrate
-php artisan serve
-# API at http://localhost:8000
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+# API at http://localhost:4000
 ```
 
-### Frontend
+### Frontend (Next.js)
 ```bash
 cd fwber-frontend
 npm install
@@ -60,8 +63,8 @@ npm run dev
 
 ### Docker
 ```bash
-docker compose -f docker-compose.dev.yml up -d
-docker compose -f docker-compose.dev.yml exec laravel php artisan migrate
+docker compose up -d
+docker compose exec backend npx prisma migrate deploy
 ```
 
 ## Documentation
