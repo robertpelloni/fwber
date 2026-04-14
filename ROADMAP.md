@@ -1,11 +1,21 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 1.8.47 "Production Hardening"
-> **Last Updated:** 2026-04-08
+> **Current Version:** 2.0.0-ts "TypeScript Unified Stack"
+> **Last Updated:** 2026-04-13
 
 ---
 
 ## 🗺️ High-Level Trajectory
+
+### The Great Migration: TypeScript & Node.js (COMPLETED - v2.0.0-ts)
+The project has successfully transitioned from its legacy PHP/Laravel roots to a unified, modern TypeScript architecture. This massive architectural pivot ensures long-term maintainability, high performance, and a shared developer experience across the entire stack.
+
+**Migration Highlights:**
+- **Unified Language**: 100% TypeScript across Frontend and Backend.
+- **Modern ORM**: Prisma replaces Eloquent for superior type-safety and developer productivity.
+- **Express + Zod**: High-performance API routing with strict schema validation.
+- **Socket.io**: Native real-time engine replacing Pusher/Reverb dependencies.
+- **Hetzner + Vercel**: Optimized production deployment on high-performance VPS and edge infrastructure.
 
 ### The Pivot: Laser Focus on Core (COMPLETED)
 The `fwber` platform underwent a major simplification during v1.2.x to remove unstable sprawl and recover a coherent, production-usable center.

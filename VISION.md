@@ -24,12 +24,12 @@ fwber facilitates **intentional, real-world connections** through technology tha
 
 fwber is a bleeding-edge, high-performance platform capable of handling extreme concurrency in dense urban environments (festivals, conferences, downtowns).
 
-### The Current Stack (Gold Pre-release v0.99.1)
-*   **Backend**: Laravel 12.x (PHP 8.4) focusing on elegant REST APIs, deep FormRequest validation, unified Event Sourcing, and queued jobs. Hosted on DreamHost with MySQL.
-*   **Frontend**: Next.js 16.1 (React 19) utilizing Server Components, PWA capabilities, and TailwindCSS for the "Cyber-Noir" aesthetic. Hosted on Vercel Edge.
-*   **Mobile**: React Native / Expo 55 for native iOS and Android experiences.
-*   **Real-time**: Laravel Reverb WebSockets for instant chat, typing indicators, and the "Live Vibe" Pulse.
-*   **Database**: MySQL/PostgreSQL with spatio-temporal queries.
+### The Modern Stack (v2.0.0-ts)
+*   **Backend**: Node.js (ESM) / Express.js / TypeScript. High-concurrency API layer with strict Zod validation and Prisma ORM.
+*   **Real-time**: Socket.io for bidirectional communication (Chat, Typing, Nudges, Pulse).
+*   **Database**: PostgreSQL/MySQL with Prisma-driven migrations.
+*   **Frontend**: Next.js 15.x (React 19) utilizing Server Components, PWA capabilities, and TailwindCSS.
+*   **Mobile**: React Native / Expo for native iOS and Android.
 
 ### The Distributed Next-Gen Phase
 *   **Rust Geo-Screener Microservice**: A high-density Rust microservice utilizing H3 or S2 spatial indexing (`fwber-geo`). Calculates the Local Pulse in sub-millisecond time.

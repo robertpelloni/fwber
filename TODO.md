@@ -1,31 +1,18 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 1.8.44
-> **Last Updated:** 2026-04-08
+> **Version:** 2.0.0-ts
+> **Last Updated:** 2026-04-13
 
 ---
 
-## 🔴 Critical: Continuous Improvement
-- [x] **AI Prompt Tuning Pass**: Refine Wingman and Date Idea prompts for more diverse Detroit-specific results.
-- [x] **Performance Monitoring Pass**: Systematically optimize API latency across newly restored hub routes using live APM signals (resolved N+1 queries in Dashboard, Match, and Profile routes).
-- [x] **Missing Route Restoration**: Restored 16 moderation routes, feature flag config, wingman status, referral payouts, travel mode, and achievement unlock endpoints.
-- [x] **Frontend-Backend Route Audit**: Complete cross-reference of all 436 backend routes against every frontend API call. Fixed all HTTP method mismatches and missing endpoints.
-- [x] **Feature Flag Activation**: Created `config/feature_flags.php` with all 15 flags enabled, activated `useBackendFeatureFlags` hook in frontend.
-- [x] **CORS Fix**: Fixed `credentials: true` + `*` origin mismatch that blocked authenticated cross-origin requests.
-- [x] **Native alert() Removal**: Removed all 26 `alert()` calls from production pages per VISION.md directive.
-- [x] **Native confirm() Removal**: Removed all 14 `confirm()` calls, added `useConfirmDialog` hook for messages page.
-- [x] **Broadcasting Default Fix**: Changed default broadcast driver from `null` to `reverb` so WebSocket events reach connected clients.
-- [x] **Reverb WebSocket Origin Restriction**: Changed `allowed_origins` from `*` to explicit origin list matching CORS config.
-- [x] **APM Monitoring Activation**: Enabled APM by default with 500ms slow request threshold.
-- [x] **Auth Data Normalization**: Added `normalizeUser()` to map backend snake_case to frontend camelCase at all auth dispatch points.
-- [x] **Email Verification Flow**: Added `MustVerifyEmail` to User model, verification routes, and resend functionality.
-- [x] **SEO & Meta Optimization**: Dynamic OG images for share pages, roast page SEO metadata with layout.
-- [x] **Security & Transparency**: Added `security.txt` and `humans.txt` for responsible disclosure.
-- [x] **Password Reset Flow**: Full forgot-password + reset-password flow with branded email notification.
-- [x] **Account Deletion Security**: Password verification, token revocation, GDPR data anonymization.
-- [x] **GDPR Data Export UI**: Export button + privacy rights section in account settings.
-- [x] **CSP Hardening**: Proper Content Security Policy with Google Fonts, worker-src, and Pusher WebSocket support.
-- [x] **WebSocket Production Fallback**: Reverb echo client falls back to `api.fwber.me:8080` when env vars missing.
+## 🔴 Critical: TypeScript Ecosystem Stability
+- [x] **Backend Porting**: Port all 70+ Laravel models, controllers, and services to Express/Prisma.
+- [x] **Frontend Integration**: Update `apiClient` and `AuthProvider` to sync with the new Node.js backend.
+- [x] **Real-time Migration**: Replace Laravel Echo/Pusher with `socket.io-client` and a dedicated `useSocketLogic` hook.
+- [x] **Deployment Automation**: Create Hetzner and Vercel deployment configurations for the TypeScript stack.
+- [ ] **Service Layer Hardening**: Expand unit tests for `MatchMakerService` and `GeoScreenerService` in the new Node environment.
+- [ ] **Production Monitoring**: Set up Winston/Morgan logging and integrate with Sentry for the new Express backend.
+- [ ] **Data Migration Validation**: Verify that the production MySQL/PostgreSQL data remains consistent after the Prisma cutover.
 
 ## 🟡 High: User Growth & Engagement
 - [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
