@@ -1,0 +1,144 @@
+import type { Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { PrismaClient, UserRole, Tier } from '@prisma/client';
+import { z } from 'zod';
+import prisma from '../lib/prisma.js';
+
+const registerSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(8),
+  referral_code: z.string().optional(),
+});
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export class AuthController {
+  private generateToken(user: any) {
+    return jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '30d' }
+    );
+  }
+
+  private async hydrateUser(user: any) {
+    const referralsCount = await prisma.user.count({
+      where: { referrer_id: user.id }
+    });
+    
+    // We'll add more counts later as needed
+    return {
+      ...user,
+      referrals_count: referralsCount,
+      vouches_count: 0, // Placeholder
+    };
+  }
+
+  register = async (req: Request, res: Response) => {
+    try {
+      const validated = registerSchema.parse(req.body);
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email: validated.email }
+      });
+
+      if (existingUser) {
+        return res.status(400).json({ message: 'User already exists' });
+      }
+
+      const hashedPassword = await bcrypt.hash(validated.password, 10);
+      
+      const user = await prisma.user.create({
+        data: {
+          name: validated.name,
+          email: validated.email,
+          password: hashedPassword,
+          role: UserRole.USER,
+          tier: Tier.FREE,
+          referral_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        },
+        include: {
+          profile: true
+        }
+      });
+
+      // Initialize profile
+      await prisma.userProfile.create({
+        data: {
+          user_id: user.id,
+          display_name: user.name,
+        }
+      });
+
+      const token = this.generateToken(user);
+
+      res.status(201).json({
+        access_token: token,
+        token_type: 'Bearer',
+        user: await this.hydrateUser(user),
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.issues });
+      }
+      res.status(500).json({ message: (error as any).message });
+    }
+  };
+
+  login = async (req: Request, res: Response) => {
+    try {
+      const { email, password } = loginSchema.parse(req.body);
+
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: { profile: true }
+      });
+
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      
+      // Porting Decoy Logic
+      const isDecoyAuth = !isPasswordValid && user.decoy_password && await bcrypt.compare(password, user.decoy_password);
+
+      if (!isPasswordValid && !isDecoyAuth) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      let finalUser = user;
+      if (isDecoyAuth && user.decoy_user_id) {
+        const decoyUser = await prisma.user.findUnique({
+          where: { id: user.decoy_user_id },
+          include: { profile: true }
+        });
+        if (decoyUser) {
+          finalUser = decoyUser;
+        }
+      }
+
+      const token = this.generateToken(finalUser);
+
+      res.json({
+        access_token: token,
+        token_type: 'Bearer',
+        user: await this.hydrateUser(finalUser),
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ errors: error.issues });
+      }
+      res.status(500).json({ message: (error as any).message });
+    }
+  };
+
+  me = async (req: any, res: Response) => {
+    res.json(await this.hydrateUser(req.user));
+  };
+}

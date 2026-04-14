@@ -3,19 +3,28 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import * as dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import { createServer } from 'http';
+import authRoutes from './routes/auth.js';
+import prisma from './lib/prisma.js';
+import { setupSocketIO } from './socket.js';
 
 dotenv.config();
 
 const app = express();
-const prisma = new PrismaClient();
 const port = process.env.PORT || 4000;
+const httpServer = createServer(app);
+
+// Initialize Socket.io
+setupSocketIO(httpServer);
 
 // Middleware
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
@@ -32,7 +41,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'FWBER TypeScript Backend API v2.0' });
 });
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 

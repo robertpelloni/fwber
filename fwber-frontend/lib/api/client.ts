@@ -20,7 +20,7 @@ const getBaseUrl = () => {
     return '/api';
   }
   // On the server (SSR), we need the absolute URL to hit the backend directly
-  const url = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   return url.replace(/\/$/, '') + '/api';
 };
 

@@ -20,9 +20,11 @@ import { DateFeedbackModal } from '@/components/matches/DateFeedbackModal'
 import MatchARView from '@/components/ar/MatchARView'
 import AppHeader from '@/components/AppHeader'
 import { useConfirmDialog } from '@/components/ConfirmDialog'
+import { useSocketLogic } from '@/lib/hooks/use-socket-logic'
 
 export default function MessagesPage() {
   const { token, isAuthenticated } = useAuth()
+  const { connected } = useSocketLogic({ autoConnect: true })
   const { showError } = useToast()
   const { videoSignals } = useWebSocket()
   const { confirmAction, ConfirmDialog } = useConfirmDialog()

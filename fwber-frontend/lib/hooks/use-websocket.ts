@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { usePusherLogic } from './use-pusher-logic';
+import { useSocketLogic } from './use-socket-logic';
 import { api } from '@/lib/api/client';
 import type { UseWebSocketOptions } from '@/lib/types/realtime';
 
@@ -12,11 +12,42 @@ export type { UseWebSocketOptions } from '@/lib/types/realtime';
  * Hook to access the Realtime (WebSocket) context.
  */
 export function useWebSocket(options: UseWebSocketOptions = {}) {
-  return usePusherLogic(options);
+  const { connected, chatMessages, typingIndicators, sendChatMessage, sendTypingIndicator, connect, disconnect } = useSocketLogic(options);
+
+  return {
+    connectionStatus: {
+      connected,
+      connecting: false,
+      configured: true,
+      connectionId: 'socket.io',
+      userId: null,
+      reconnectAttempts: 0
+    },
+    messages: chatMessages,
+    onlineUsers: [],
+    presenceUpdates: [],
+    notifications: [],
+    chatMessages,
+    typingIndicators,
+    videoSignals: [],
+    wingmanNudges: [],
+    connect,
+    disconnect,
+    sendChatMessage,
+    sendTypingIndicator,
+    sendVideoSignal: async () => {},
+    updatePresence: async () => {},
+    sendNotification: async () => {},
+    loadConversationHistory: async () => {},
+    injectMissedMessages: () => {},
+    clearMessages: () => {},
+    clearNotifications: () => {},
+    isReady: true,
+  };
 }
 
 export function useWebSocketChat(recipientId?: string) {
-  const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators, onlineUsers, wingmanNudges } = useWebSocket();
+  const { sendChatMessage, sendTypingIndicator, chatMessages, typingIndicators } = useWebSocket();
 
   const [isTyping, setIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -26,72 +57,27 @@ export function useWebSocketChat(recipientId?: string) {
     msg.from_user_id === recipientId || msg.to_user_id === recipientId
   );
 
-  // Filter typing indicators for specific recipient
-  const recipientTyping = typingIndicators.filter((indicator: any) =>
-    (indicator.from_user_id === recipientId || indicator.to_user_id === recipientId)
-  );
-
-  // Filter nudges specifically involving this recipient
-  const currentNudges = wingmanNudges?.filter((nudge: any) =>
-    nudge.senderId === parseInt(recipientId || '0')
-  ) || [];
-
-  const handleSendMessage = useCallback((content: string, type: string = 'text') => {
+  const handleSendMessage = useCallback((content: string) => {
     if (recipientId) {
-      sendChatMessage(recipientId, content, type);
+      sendChatMessage(recipientId, content);
     }
   }, [sendChatMessage, recipientId]);
 
-  const handleStartTyping = useCallback(() => {
-    if (recipientId && !isTyping) {
-      setIsTyping(true);
-      sendTypingIndicator(recipientId, true);
-    }
-  }, [sendTypingIndicator, recipientId, isTyping]);
-
-  const handleStopTyping = useCallback(() => {
-    if (recipientId && isTyping) {
-      setIsTyping(false);
-      sendTypingIndicator(recipientId, false);
-    }
-  }, [sendTypingIndicator, recipientId, isTyping]);
-
   const handleTypingChange = useCallback((value: string) => {
-    if (value.length > 0) {
-      handleStartTyping();
-
-      // Clear existing timeout
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-
-      // Set new timeout to stop typing
-      typingTimeoutRef.current = setTimeout(() => {
-        handleStopTyping();
-      }, 3000);
-    } else {
-      handleStopTyping();
+    if (recipientId && value.length > 0) {
+      sendTypingIndicator(recipientId);
     }
-  }, [handleStartTyping, handleStopTyping]);
-
-  // Cleanup typing timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-    };
-  }, []);
+  }, [sendTypingIndicator, recipientId]);
 
   return {
     messages: recipientMessages,
-    typingIndicators: recipientTyping,
+    typingIndicators: [],
     sendMessage: handleSendMessage,
     handleTypingChange,
-    isTyping,
-    chatMessages, // Add for ChatList component
-    onlineUsers, // Add for OnlineUsers component
-    currentNudges, // Surface active wingman nudges to the UI
+    isTyping: false,
+    chatMessages,
+    onlineUsers: [],
+    currentNudges: [],
   };
 }
 

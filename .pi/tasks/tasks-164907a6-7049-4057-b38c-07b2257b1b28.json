@@ -1,5 +1,5 @@
 {
-  "nextId": 5,
+  "nextId": 7,
   "tasks": [
     {
       "id": "4",
@@ -12,6 +12,30 @@
       "blockedBy": [],
       "createdAt": 1776119300460,
       "updatedAt": 1776119302369
+    },
+    {
+      "id": "5",
+      "subject": "Finalize Backend Port & Prepare Frontend Integration",
+      "description": "Finalize the TypeScript backend port by ensuring all services are fully integrated, documentation is updated, and a clear path for frontend integration is established. This includes a final audit of the ported services and providing a summary for the next agent.",
+      "status": "completed",
+      "activeForm": "Finalizing backend port and preparing for frontend integration...",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776130471158,
+      "updatedAt": 1776130484253
+    },
+    {
+      "id": "6",
+      "subject": "Integrate Next.js Frontend with TS Backend",
+      "description": "Integrate the Next.js frontend with the newly created TypeScript backend. This involves updating API endpoints, switching to socket.io-client, and ensuring data consistency across the stack.",
+      "status": "in_progress",
+      "activeForm": "Analyzing frontend integration strategy...",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776130726202,
+      "updatedAt": 1776130727978
     }
   ]
 }
