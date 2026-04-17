@@ -1,5 +1,4 @@
-import type { User, MatchBounty, MatchAssist } from '@prisma/client';
-import { PrismaClient } from '@prisma/client';
+import type { match_bounties, match_assists } from '@prisma/client';
 import prisma from '../lib/prisma.js';
 import { TokenDistributionService } from './TokenDistributionService.js';
 
@@ -11,7 +10,7 @@ export class MatchMakerService {
     this.tokenService = new TokenDistributionService();
   }
 
-  async createBounty(userId: number, tokenReward: number): Promise<MatchBounty> {
+  async createBounty(userId: bigint, tokenReward: number): Promise<match_bounties> {
     return await prisma.$transaction(async (tx) => {
       // 1. Escrow tokens
       await this.tokenService.spendTokens(
@@ -25,14 +24,14 @@ export class MatchMakerService {
       let exists = true;
       while (exists) {
         slug = Math.random().toString(36).substring(2, 10);
-        const bounty = await tx.matchBounty.findUnique({ where: { slug } });
+        const bounty = await tx.match_bounties.findUnique({ where: { slug } });
         if (!bounty) exists = false;
       }
 
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
-      return await tx.matchBounty.create({
+      return await tx.match_bounties.create({
         data: {
           user_id: userId,
           slug,
@@ -44,16 +43,15 @@ export class MatchMakerService {
     });
   }
 
-  async suggestCandidate(bountySlug: string, matchmakerId: number, candidateId: number): Promise<MatchAssist> {
-    const bounty = await prisma.matchBounty.findUnique({
+  async suggestCandidate(bountySlug: string, matchmakerId: bigint, candidateId: bigint): Promise<match_assists> {
+    const bounty = await prisma.match_bounties.findUnique({
       where: { slug: bountySlug },
-      include: { user: true }
     });
 
     if (!bounty) throw new Error('Bounty not found');
     if (candidateId === bounty.user_id) throw new Error('Cannot suggest the bounty creator to themselves.');
 
-    const existing = await prisma.matchAssist.findUnique({
+    const existing = await prisma.match_assists.findUnique({
       where: {
         matchmaker_id_subject_id_target_id: {
           matchmaker_id: matchmakerId,
@@ -65,7 +63,7 @@ export class MatchMakerService {
 
     if (existing) return existing;
 
-    return await prisma.matchAssist.create({
+    return await prisma.match_assists.create({
       data: {
         match_bounty_id: bounty.id,
         matchmaker_id: matchmakerId,
@@ -76,8 +74,8 @@ export class MatchMakerService {
     });
   }
 
-  async processMatch(user1Id: number, user2Id: number): Promise<void> {
-    const assists = await prisma.matchAssist.findMany({
+  async processMatch(user1Id: bigint, user2Id: bigint): Promise<void> {
+    const assists = await prisma.match_assists.findMany({
       where: {
         OR: [
           { subject_id: user1Id, target_id: user2Id },
@@ -85,7 +83,7 @@ export class MatchMakerService {
         ],
         status: { not: 'matched' }
       },
-      include: { bounty: true }
+      include: { match_bounties: true }
     });
 
     for (const assist of assists) {
@@ -93,23 +91,23 @@ export class MatchMakerService {
     }
   }
 
-  private async rewardWingman(assistId: number): Promise<void> {
+  private async rewardWingman(assistId: bigint): Promise<void> {
     await prisma.$transaction(async (tx) => {
-      const assist = await tx.matchAssist.update({
+      const assist = await tx.match_assists.update({
         where: { id: assistId },
         data: { status: 'matched' },
-        include: { bounty: true }
+        include: { match_bounties: true }
       });
 
       let rewardAmount = MatchMakerService.MATCHMAKER_BONUS;
       let memo = `Wingman Bonus: You successfully matched User ${assist.subject_id} and User ${assist.target_id}!`;
 
-      if (assist.bounty) {
-        rewardAmount = assist.bounty.token_reward;
-        memo = `Bounty Claimed! You matched User ${assist.subject_id} for their '${assist.bounty.slug}' bounty.`;
+      if (assist.match_bounties) {
+        rewardAmount = assist.match_bounties.token_reward;
+        memo = `Bounty Claimed! You matched User ${assist.subject_id} for their '${assist.match_bounties.slug}' bounty.`;
 
-        await tx.matchBounty.update({
-          where: { id: assist.bounty.id },
+        await tx.match_bounties.update({
+          where: { id: assist.match_bounties.id },
           data: { status: 'fulfilled' }
         });
       }

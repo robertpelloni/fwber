@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, UserRole, Tier } from '@prisma/client';
 import { z } from 'zod';
 import prisma from '../lib/prisma.js';
 
@@ -18,24 +17,24 @@ const loginSchema = z.object({
 });
 
 export class AuthController {
-  private generateToken(user: any) {
+  private generateToken(user: { id: bigint; email: string; role: string }) {
     return jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: Number(user.id), email: user.email, role: user.role },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '30d' }
     );
   }
 
   private async hydrateUser(user: any) {
-    const referralsCount = await prisma.user.count({
+    const referralsCount = await prisma.users.count({
       where: { referrer_id: user.id }
     });
-    
-    // We'll add more counts later as needed
+
     return {
       ...user,
+      id: Number(user.id),
       referrals_count: referralsCount,
-      vouches_count: 0, // Placeholder
+      vouches_count: 0,
     };
   }
 
@@ -43,7 +42,7 @@ export class AuthController {
     try {
       const validated = registerSchema.parse(req.body);
 
-      const existingUser = await prisma.user.findUnique({
+      const existingUser = await prisma.users.findUnique({
         where: { email: validated.email }
       });
 
@@ -52,23 +51,20 @@ export class AuthController {
       }
 
       const hashedPassword = await bcrypt.hash(validated.password, 10);
-      
-      const user = await prisma.user.create({
+
+      const user = await prisma.users.create({
         data: {
           name: validated.name,
           email: validated.email,
           password: hashedPassword,
-          role: UserRole.USER,
-          tier: Tier.FREE,
+          role: 'user',
+          tier: 'free',
           referral_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
         },
-        include: {
-          profile: true
-        }
       });
 
       // Initialize profile
-      await prisma.userProfile.create({
+      await prisma.user_profiles.create({
         data: {
           user_id: user.id,
           display_name: user.name,
@@ -76,17 +72,19 @@ export class AuthController {
       });
 
       const token = this.generateToken(user);
+      const hydrated = await this.hydrateUser(user);
 
       res.status(201).json({
         access_token: token,
         token_type: 'Bearer',
-        user: await this.hydrateUser(user),
+        user: hydrated,
       });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ errors: error.issues });
       }
-      res.status(500).json({ message: (error as any).message });
+      console.error('[Auth] Registration error:', error.message);
+      res.status(500).json({ message: error.message });
     }
   };
 
@@ -94,9 +92,9 @@ export class AuthController {
     try {
       const { email, password } = loginSchema.parse(req.body);
 
-      const user = await prisma.user.findUnique({
+      const user = await prisma.users.findUnique({
         where: { email },
-        include: { profile: true }
+        include: { user_profiles: true }
       });
 
       if (!user) {
@@ -104,9 +102,12 @@ export class AuthController {
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
-      
-      // Porting Decoy Logic
-      const isDecoyAuth = !isPasswordValid && user.decoy_password && await bcrypt.compare(password, user.decoy_password);
+
+      // Decoy password logic
+      const isDecoyAuth =
+        !isPasswordValid &&
+        user.decoy_password !== null &&
+        await bcrypt.compare(password, user.decoy_password!);
 
       if (!isPasswordValid && !isDecoyAuth) {
         return res.status(401).json({ message: 'Invalid credentials' });
@@ -114,9 +115,9 @@ export class AuthController {
 
       let finalUser = user;
       if (isDecoyAuth && user.decoy_user_id) {
-        const decoyUser = await prisma.user.findUnique({
+        const decoyUser = await prisma.users.findUnique({
           where: { id: user.decoy_user_id },
-          include: { profile: true }
+          include: { user_profiles: true }
         });
         if (decoyUser) {
           finalUser = decoyUser;
@@ -124,21 +125,24 @@ export class AuthController {
       }
 
       const token = this.generateToken(finalUser);
+      const hydrated = await this.hydrateUser(finalUser);
 
       res.json({
         access_token: token,
         token_type: 'Bearer',
-        user: await this.hydrateUser(finalUser),
+        user: hydrated,
       });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ errors: error.issues });
       }
-      res.status(500).json({ message: (error as any).message });
+      console.error('[Auth] Login error:', error.message);
+      res.status(500).json({ message: error.message });
     }
   };
 
   me = async (req: any, res: Response) => {
-    res.json(await this.hydrateUser(req.user));
+    const hydrated = await this.hydrateUser(req.user);
+    res.json(hydrated);
   };
 }

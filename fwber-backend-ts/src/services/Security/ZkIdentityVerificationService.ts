@@ -1,4 +1,3 @@
-import type { User } from '@prisma/client';
 import prisma from '../../lib/prisma.js';
 import crypto from 'crypto';
 
@@ -31,7 +30,7 @@ export class ZkIdentityVerificationService {
     console.log(`[ZK-ID] Verifying ZK-ID Proof for User ${userId} from Issuer: ${issuer}`);
 
     // 2. Cryptographic Proof Validation
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await prisma.users.findUnique({ where: { id: BigInt(userId) } });
     if (!user) return false;
 
     const userHash = crypto.createHash('sha256').update(`${user.id}${user.email}${this.appKey}`).digest('hex');
@@ -43,16 +42,12 @@ export class ZkIdentityVerificationService {
     const isValidSignature = crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
 
     if (isValidProof && isValidSignature) {
-      await prisma.userProfile.update({
-        where: { user_id: userId },
+      await prisma.user_profiles.updateMany({
+        where: { user_id: BigInt(userId) },
         data: {
           is_id_verified: true,
           zk_id_issuer: issuer,
           id_verified_at: new Date(),
-          id_verification_metadata: {
-            proof_hash: crypto.createHash('sha256').update(proof).digest('hex'),
-            method: 'zk-snark-v2',
-          },
         },
       });
 

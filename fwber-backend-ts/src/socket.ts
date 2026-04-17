@@ -32,8 +32,8 @@ export function setupSocketIO(httpServer: any) {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
+      const user = await prisma.users.findUnique({
+        where: { id: BigInt(decoded.id) },
         select: { id: true, name: true },
       });
 
@@ -41,7 +41,7 @@ export function setupSocketIO(httpServer: any) {
         return next(new Error('Authentication error: User not found'));
       }
 
-      socket.user = user;
+      socket.user = { id: Number(user.id), name: user.name };
       next();
     } catch (err) {
       next(new Error('Authentication error: Invalid token'));
@@ -61,24 +61,25 @@ export function setupSocketIO(httpServer: any) {
       if (!socket.user) return;
 
       try {
-        const message = await prisma.message.create({
+        const message = await prisma.messages.create({
           data: {
-            sender_id: socket.user.id,
-            receiver_id: data.receiverId,
+            sender_id: BigInt(socket.user.id),
+            receiver_id: BigInt(data.receiverId),
             content: data.content,
+            sent_at: new Date(),
           },
         });
 
         // Emit to receiver's private room
         io.to(`user:${data.receiverId}`).emit('new_message', {
-          id: message.id,
+          id: Number(message.id),
           senderId: socket.user.id,
           content: message.content,
           createdAt: message.created_at,
         });
 
         // Ack to sender
-        socket.emit('message_sent', { id: message.id });
+        socket.emit('message_sent', { id: Number(message.id) });
       } catch (err) {
         socket.emit('error', { message: 'Failed to send message' });
       }

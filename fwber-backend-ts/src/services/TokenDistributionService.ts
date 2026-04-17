@@ -1,5 +1,3 @@
-import { PrismaClient, Tier } from '@prisma/client';
-import type { User } from '@prisma/client';
 import prisma from '../lib/prisma.js';
 import { Decimal } from '@prisma/client/runtime/library';
 
@@ -11,36 +9,38 @@ export class TokenDistributionService {
   async generateReferralCode(): Promise<string> {
     let code: string;
     let exists = true;
-    
+
     while (exists) {
       code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      const user = await prisma.user.findUnique({ where: { referral_code: code } });
+      const user = await prisma.users.findUnique({ where: { referral_code: code } });
       if (!user) return code;
     }
     return ''; // Should not reach
   }
 
-  async ensureReferralCode(user: User): Promise<string> {
+  async ensureReferralCode(userId: bigint): Promise<string> {
+    const user = await prisma.users.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
     if (user.referral_code) return user.referral_code;
 
     const code = await this.generateReferralCode();
-    await prisma.user.update({
-      where: { id: user.id },
+    await prisma.users.update({
+      where: { id: userId },
       data: { referral_code: code }
     });
 
     return code;
   }
 
-  async processSignupBonus(userId: number, referrerCode?: string): Promise<void> {
+  async processSignupBonus(userId: bigint, referrerCode?: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: userId } });
+      const user = await tx.users.findUnique({ where: { id: userId } });
       if (!user) return;
 
-      await this.ensureReferralCode(user);
+      await this.ensureReferralCode(user.id);
 
       // 1. Calculate Early Adopter Bonus
-      const userCount = await tx.user.count();
+      const userCount = await tx.users.count();
       const multiplier = 1 / (1 + (userCount * TokenDistributionService.EARLY_ADOPTER_MULTIPLIER_DECAY));
       const amount = Number((TokenDistributionService.SIGNUP_BONUS_BASE * multiplier).toFixed(2));
 
@@ -48,16 +48,16 @@ export class TokenDistributionService {
 
       // 2. Process Referral
       if (referrerCode) {
-        const referrer = await tx.user.findUnique({ where: { referral_code: referrerCode } });
+        const referrer = await tx.users.findUnique({ where: { referral_code: referrerCode } });
         if (referrer) {
-          await tx.user.update({
+          await tx.users.update({
             where: { id: userId },
             data: { referrer_id: referrer.id }
           });
 
           // Check for Golden Ticket
           if (referrer.golden_tickets_remaining > 0) {
-            await tx.user.update({
+            await tx.users.update({
               where: { id: referrer.id },
               data: { golden_tickets_remaining: { decrement: 1 } }
             });
@@ -65,11 +65,11 @@ export class TokenDistributionService {
             // Grant 3 Days of Premium (Gold Tier)
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 3);
-            
-            await tx.user.update({
+
+            await tx.users.update({
               where: { id: userId },
-              data: { 
-                tier: Tier.GOLD,
+              data: {
+                tier: 'gold',
                 tier_expires_at: expiresAt
               }
             });
@@ -85,15 +85,15 @@ export class TokenDistributionService {
     });
   }
 
-  async awardTokens(userId: number, amount: number, type: string, description: string, metadata: any = {}, tx?: any): Promise<void> {
+  async awardTokens(userId: bigint, amount: number, type: string, description: string, metadata: any = {}, tx?: any): Promise<void> {
     const client = tx || prisma;
 
-    await client.user.update({
+    await client.users.update({
       where: { id: userId },
       data: { token_balance: { increment: amount } }
     });
 
-    await client.tokenTransaction.create({
+    await client.token_transactions.create({
       data: {
         user_id: userId,
         amount: new Decimal(amount),
@@ -103,23 +103,22 @@ export class TokenDistributionService {
       }
     });
 
-    // TODO: Implement Push Notification Service (PushMessage equivalent)
     console.log(`[TokenService] Awarded ${amount} tokens to user ${userId}: ${description}`);
   }
 
-  async spendTokens(userId: number, amount: number, description: string): Promise<void> {
+  async spendTokens(userId: bigint, amount: number, description: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: userId } });
+      const user = await tx.users.findUnique({ where: { id: userId } });
       if (!user || Number(user.token_balance) < amount) {
         throw new Error('Insufficient token balance.');
       }
 
-      await tx.user.update({
+      await tx.users.update({
         where: { id: userId },
         data: { token_balance: { decrement: amount } }
       });
 
-      await tx.tokenTransaction.create({
+      await tx.token_transactions.create({
         data: {
           user_id: userId,
           amount: new Decimal(-amount),

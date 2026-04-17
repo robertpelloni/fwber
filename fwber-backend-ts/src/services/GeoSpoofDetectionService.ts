@@ -1,5 +1,5 @@
 import prisma from '../lib/prisma.js';
-import type { GeoSpoofDetection } from '@prisma/client';
+import type { geo_spoof_detections } from '@prisma/client';
 
 export interface IpIntelligenceData {
   latitude: number;
@@ -12,7 +12,7 @@ export class GeoSpoofDetectionService {
   /**
    * Detect potential geolocation spoofing.
    */
-  async detectSpoof(userId: number, latitude: number, longitude: number, ipAddress: string, ipData?: IpIntelligenceData): Promise<GeoSpoofDetection | null> {
+  async detectSpoof(userId: number, latitude: number, longitude: number, ipAddress: string, ipData?: IpIntelligenceData): Promise<geo_spoof_detections | null> {
     const detectionFlags: string[] = [];
     let suspicionScore = 0;
     let distanceKm = 0;
@@ -42,7 +42,7 @@ export class GeoSpoofDetectionService {
     }
 
     // Check for impossible velocity (teleportation)
-    const lastDetection = await prisma.geoSpoofDetection.findFirst({
+    const lastDetection = await prisma.geo_spoof_detections.findFirst({
       where: { user_id: userId },
       orderBy: { id: 'desc' }
     });
@@ -51,10 +51,10 @@ export class GeoSpoofDetectionService {
     if (lastDetection) {
       const diffSeconds = (new Date().getTime() - new Date(lastDetection.detected_at).getTime()) / 1000;
       const hours = Math.max(diffSeconds, 1) / 3600.0;
-      const travelDistance = this.calculateDistance(lastDetection.latitude, lastDetection.longitude, latitude, longitude);
-      
+      const travelDistance = this.calculateDistance(Number(lastDetection.latitude), Number(lastDetection.longitude), latitude, longitude);
+
       velocityKmh = Math.round(travelDistance / hours);
-      
+
       if (velocityKmh > 1000) {
         detectionFlags.push('impossible_velocity');
         suspicionScore += 50;
@@ -69,7 +69,7 @@ export class GeoSpoofDetectionService {
 
     // Heuristic fallback: large coordinate jump
     if (velocityKmh === null && lastDetection) {
-      const coordJumpKm = this.calculateDistance(lastDetection.latitude, lastDetection.longitude, latitude, longitude);
+      const coordJumpKm = this.calculateDistance(Number(lastDetection.latitude), Number(lastDetection.longitude), latitude, longitude);
       if (coordJumpKm > 3000) {
         velocityKmh = Math.round(coordJumpKm);
         detectionFlags.push('impossible_velocity');
@@ -88,7 +88,7 @@ export class GeoSpoofDetectionService {
     }
 
     // Frequent changes
-    const recentCount = await prisma.geoSpoofDetection.count({
+    const recentCount = await prisma.geo_spoof_detections.count({
       where: {
         user_id: userId,
         detected_at: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
@@ -104,7 +104,7 @@ export class GeoSpoofDetectionService {
     }
 
     if (suspicionScore >= 25) {
-      return await prisma.geoSpoofDetection.create({
+      return await prisma.geo_spoof_detections.create({
         data: {
           user_id: userId,
           ip_address: ipAddress,
@@ -129,9 +129,9 @@ export class GeoSpoofDetectionService {
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
+    const a =
       Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
