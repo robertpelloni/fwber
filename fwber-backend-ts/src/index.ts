@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import authRoutes from './routes/auth.js';
+import analyticsRoutes from './routes/analytics.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -25,6 +26,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
