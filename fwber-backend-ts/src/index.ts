@@ -13,6 +13,7 @@ import dashboardRoutes from './routes/dashboard.js';
 import profileRoutes from './routes/profile.js';
 import notificationRoutes from './routes/notifications.js';
 import safetyRoutes from './routes/safety.js';
+import matchesRoutes from './routes/matches.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -38,6 +39,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/safety', safetyRoutes);
+app.use('/api/matches', matchesRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
