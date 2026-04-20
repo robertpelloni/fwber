@@ -127,7 +127,7 @@ export default function IntimateStep({ formData, setFormData }: IntimateStepProp
           <div className="grid grid-cols-2 gap-2">
             {STI_STATUSES.map(status => {
               const val = status.toLowerCase().replace(/ /g, '_');
-              const isSelected = (formData.sti_status || []).includes(val);
+              const isSelected = Array.isArray(formData.sti_status) && formData.sti_status.includes(val);
               return (
                 <button
                   key={status}

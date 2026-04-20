@@ -13,13 +13,14 @@ import type {
   PaginatedResponse,
 } from './types';
 
-// Ensure BASE_URL hits the Next.js proxy in browser, and absolute URL on server
+// Ensure BASE_URL hits the backend API directly
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    // In the browser, ALWAYS use the local Next.js proxy to bypass CORS
-    return '/api';
+    // In the browser, hit the backend API directly at api.fwber.me
+    // (Next.js /api rewrites don't work on Vercel when app/api routes exist)
+    return 'https://api.fwber.me/api';
   }
-  // On the server (SSR), we need the absolute URL to hit the backend directly
+  // On the server (SSR), use env var or direct URL
   const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   return url.replace(/\/$/, '') + '/api';
 };

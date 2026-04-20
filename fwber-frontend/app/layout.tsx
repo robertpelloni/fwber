@@ -80,7 +80,7 @@ export const metadata: Metadata = {
   // Performance optimizations
   other: {
     'X-DNS-Prefetch-Control': 'on',
-    'apple-mobile-web-app-capable': 'yes',
+    'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
   },
 }

@@ -72,7 +72,7 @@ interface AuthContextType extends AuthState {
   updateUser: (user: User) => void
 }
 
-const BROWSER_API_BASE_URL = '/api'
+const BROWSER_API_BASE_URL = 'https://api.fwber.me/api'
 
 function isTransientAuthResponse(status: number): boolean {
   return status >= 500 || status === 429
