@@ -9,6 +9,10 @@ import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
+import dashboardRoutes from './routes/dashboard.js';
+import profileRoutes from './routes/profile.js';
+import notificationRoutes from './routes/notifications.js';
+import safetyRoutes from './routes/safety.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -30,6 +34,10 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/safety', safetyRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
