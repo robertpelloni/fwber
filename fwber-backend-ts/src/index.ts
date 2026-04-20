@@ -1,3 +1,6 @@
+// Global BigInt JSON serializer — converts all BigInt to Number for API responses
+(BigInt.prototype as any).toJSON = function () { return Number(this); };
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

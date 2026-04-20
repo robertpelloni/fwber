@@ -25,17 +25,32 @@ export class AuthController {
     );
   }
 
+  /** Recursively convert all BigInt values to Number in an object */
+  private serialize(obj: any): any {
+    if (obj === null || obj === undefined) return obj;
+    if (typeof obj === 'bigint') return Number(obj);
+    if (obj instanceof Date) return obj;
+    if (Array.isArray(obj)) return obj.map((v: any) => this.serialize(v));
+    if (typeof obj === 'object') {
+      const out: any = {};
+      for (const key of Object.keys(obj)) {
+        out[key] = this.serialize(obj[key]);
+      }
+      return out;
+    }
+    return obj;
+  }
+
   private async hydrateUser(user: any) {
     const referralsCount = await prisma.users.count({
       where: { referrer_id: user.id }
     });
 
-    return {
+    return this.serialize({
       ...user,
-      id: Number(user.id),
       referrals_count: referralsCount,
       vouches_count: 0,
-    };
+    });
   }
 
   register = async (req: Request, res: Response) => {
@@ -142,7 +157,6 @@ export class AuthController {
   };
 
   me = async (req: any, res: Response) => {
-    const hydrated = await this.hydrateUser(req.user);
-    res.json(hydrated);
+    res.json(this.serialize(req.user));
   };
 }
