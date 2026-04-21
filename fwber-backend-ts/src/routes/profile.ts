@@ -40,7 +40,31 @@ router.post('/', authenticate, async (req: any, res) => {
 router.put('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const data = req.body;
+    const raw = req.body;
+
+    // Map nested objects to flat DB columns
+    const data: any = {};
+    for (const [key, val] of Object.entries(raw)) {
+      if (val === undefined || val === null) continue;
+      if (key === 'location') {
+        const loc = val as any;
+        if (loc.latitude != null) data.location_latitude = loc.latitude;
+        if (loc.longitude != null) data.location_longitude = loc.longitude;
+        if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
+      } else if (key === 'preferences' || key === 'looking_for' || key === 'interests' || key === 'languages' || key === 'social_media' || key === 'sti_status') {
+        // Store as JSON strings for Prisma Json fields
+        data[key] = typeof val === 'string' ? val : JSON.stringify(val);
+      } else {
+        data[key] = val;
+      }
+    }
+
+    // Remove fields that don't exist in user_profiles table
+    delete data.id;
+    delete data.user_id;
+    delete data.created_at;
+    delete data.updated_at;
+
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
       const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
