@@ -30,7 +30,8 @@ export function VouchLinkCard() {
       // Let's call the API to be safe and consistent with backend logic
       try {
         setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/vouch/generate-link`, {
+        const apiUrl = typeof window !== 'undefined' ? 'https://api.fwber.me/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000') + '/api';
+        const response = await fetch(`${apiUrl}/vouch/generate-link`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

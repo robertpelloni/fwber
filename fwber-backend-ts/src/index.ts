@@ -29,6 +29,7 @@ import marketplaceRoutes from './routes/marketplace.js';
 import giftsRoutes from './routes/gifts.js';
 import dealsRoutes from './routes/deals.js';
 import leaderboardRoutes from './routes/leaderboard.js';
+import identityRoutes from './routes/identity.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -70,6 +71,7 @@ app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/gifts', giftsRoutes);
 app.use('/api/deals', dealsRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/identity', identityRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
