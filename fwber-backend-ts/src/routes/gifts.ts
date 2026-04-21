@@ -3,6 +3,11 @@ import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
+// GET /api/gifts - Get all gifts (summary)
+router.get('/', authenticate, async (req: any, res) => {
+  res.json({ received: [], sent: [], available: [] });
+});
+
 // GET /api/gifts/received - Get received gifts
 router.get('/received', authenticate, async (req: any, res) => {
   res.json([]);
