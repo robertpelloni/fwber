@@ -31,6 +31,11 @@ import dealsRoutes from './routes/deals.js';
 import leaderboardRoutes from './routes/leaderboard.js';
 import identityRoutes from './routes/identity.js';
 import groupsRoutes from './routes/groups.js';
+import walletRoutes from './routes/wallet.js';
+import venuesRoutes from './routes/venues.js';
+import premiumRoutes from './routes/premium.js';
+import userRoutes from './routes/user.js';
+import proximityRoutes from './routes/proximity.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -74,6 +79,11 @@ app.use('/api/deals', dealsRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/identity', identityRoutes);
 app.use('/api/groups', groupsRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/venues', venuesRoutes);
+app.use('/api/premium', premiumRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/proximity', proximityRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
