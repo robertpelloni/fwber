@@ -53,19 +53,32 @@ router.put('/', authenticate, async (req: any, res) => {
   }
 });
 
-// DELETE /api/profile - Delete current user's profile
+// DELETE /api/profile - Delete current user's account (GDPR)
 router.delete('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
-    if (existing) {
-      await prisma.user_profiles.delete({ where: { id: existing.id } });
-      res.json({ message: 'Profile deleted successfully' });
-    } else {
-      res.json({ message: 'No profile to delete' });
-    }
+
+    // Delete related records in order (respecting foreign keys)
+    await prisma.$transaction([
+      prisma.photos.deleteMany({ where: { user_id: userId } }),
+      prisma.user_profiles.deleteMany({ where: { user_id: userId } }),
+      prisma.matches.deleteMany({ where: { user1_id: userId } }),
+      prisma.matches.deleteMany({ where: { user2_id: userId } }),
+      prisma.messages.deleteMany({ where: { sender_id: userId } }),
+      prisma.blocks.deleteMany({ where: { blocker_id: userId } }),
+      prisma.blocks.deleteMany({ where: { blocked_id: userId } }),
+      prisma.reports.deleteMany({ where: { reporter_id: userId } }),
+      // likes model doesn't exist in schema
+      prisma.api_tokens.deleteMany({ where: { user_id: userId } }),
+    ]);
+
+    // Delete the user account itself
+    await prisma.users.delete({ where: { id: userId } });
+
+    res.json({ message: 'Account deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ message: 'Failed to delete profile' });
+    console.error('[DELETE /api/profile]', error);
+    res.status(500).json({ message: error.message || 'Failed to delete account' });
   }
 });
 
