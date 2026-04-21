@@ -40,16 +40,18 @@ router.post('/', authenticate, async (req: any, res) => {
 router.put('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
+    const data = req.body;
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
-      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
+      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
       res.json(updated);
     } else {
-      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
+      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
       res.json(created);
     }
   } catch (error: any) {
-    res.status(500).json({ message: 'Failed to update profile' });
+    console.error('[PUT /api/profile]', error.message);
+    res.status(500).json({ message: error.message || 'Failed to update profile' });
   }
 });
 
