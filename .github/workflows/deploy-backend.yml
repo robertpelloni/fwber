@@ -30,7 +30,7 @@ jobs:
             set -euo pipefail
             REPO_ROOT="${HETZNER_PROJECT_PATH:-/var/www/fwber/repo}"
             cd "$REPO_ROOT"
-            chown -R $(whoami) fwber-backend-ts/ 2>/dev/null || true
+            sudo chown -R $(whoami):$(whoami) . 2>/dev/null || true
             git checkout -- . 2>/dev/null || true
             git clean -fd 2>/dev/null || true
             git fetch origin main
@@ -40,5 +40,5 @@ jobs:
             npx prisma generate
             npm run build
             pm2 restart fwber-backend-ts || pm2 start dist/index.js --name "fwber-backend-ts"
-            systemctl reload nginx || true
+            sudo systemctl reload nginx || true
             echo "Deploy complete"
