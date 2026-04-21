@@ -249,7 +249,7 @@ export default function AccountSettingsPage() {
             </div>
           </section>
 
-          {/* Delete Account Section */}}
+          {/* Delete Account Section */}
           <section className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-red-200 overflow-hidden">
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
