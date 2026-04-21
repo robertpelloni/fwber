@@ -4,35 +4,68 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 
+// GET /api/profile - Get current user's profile
+router.get('/', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    const photos = await prisma.photos.findMany({
+      where: { user_id: userId, is_private: false },
+      orderBy: { is_primary: 'desc' },
+    });
+    res.json({ ...profile, photos });
+  } catch (error: any) {
+    res.json({});
+  }
+});
+
+// POST /api/profile - Create/update profile
+router.post('/', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    if (existing) {
+      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
+      res.json(updated);
+    } else {
+      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
+      res.json(created);
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+});
+
+// PUT /api/profile - Update profile
+router.put('/', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    if (existing) {
+      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
+      res.json(updated);
+    } else {
+      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
+      res.json(created);
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+});
+
 // GET /api/profile/completeness
 router.get('/completeness', authenticate, async (req: any, res) => {
   try {
-    const profile = await prisma.user_profiles.findFirst({
-      where: { user_id: BigInt(req.user.id) },
-    });
-
-    if (!profile) {
-      return res.json({ completeness: 10, missing: ['profile'] });
-    }
-
+    const profile = await prisma.user_profiles.findFirst({ where: { user_id: BigInt(req.user.id) } });
+    if (!profile) return res.json({ completeness: 10, missing: ['profile'] });
     const fields: Record<string, boolean> = {
-      display_name: !!profile.display_name,
-      bio: !!profile.bio,
-      avatar_url: !!profile.avatar_url,
-      date_of_birth: !!profile.date_of_birth,
-      gender: !!profile.gender,
-      interests: !!profile.interests,
+      display_name: !!profile.display_name, bio: !!profile.bio,
+      avatar_url: !!profile.avatar_url, date_of_birth: !!profile.date_of_birth,
+      gender: !!profile.gender, interests: !!profile.interests,
     };
-
     const filled = Object.values(fields).filter(Boolean).length;
-    const total = Object.keys(fields).length;
-    const completeness = Math.round((filled / total) * 100);
-    const missing = Object.entries(fields).filter(([, v]) => !v).map(([k]) => k);
-
-    res.json({ completeness, missing });
-  } catch (error: any) {
-    res.json({ completeness: 10, missing: ['profile'] });
-  }
+    res.json({ completeness: Math.round((filled / Object.keys(fields).length) * 100), missing: Object.entries(fields).filter(([, v]) => !v).map(([k]) => k) });
+  } catch { res.json({ completeness: 10, missing: ['profile'] }); }
 });
 
 export default router;
