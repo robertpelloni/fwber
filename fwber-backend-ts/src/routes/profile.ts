@@ -59,6 +59,14 @@ router.put('/', authenticate, async (req: any, res) => {
       }
     }
 
+    // Convert date-only strings to full ISO DateTime for Prisma
+    if (data.birthdate && typeof data.birthdate === 'string' && data.birthdate.length === 10) {
+      data.birthdate = new Date(data.birthdate + 'T00:00:00.000Z');
+    }
+    if (data.date_of_birth && typeof data.date_of_birth === 'string' && data.date_of_birth.length === 10) {
+      data.date_of_birth = new Date(data.date_of_birth + 'T00:00:00.000Z');
+    }
+
     // Remove fields that don't exist in user_profiles table
     delete data.id;
     delete data.user_id;
