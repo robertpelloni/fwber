@@ -27,6 +27,7 @@ import wingmanRoutes from './routes/wingman.js';
 import recommendationsRoutes from './routes/recommendations.js';
 import marketplaceRoutes from './routes/marketplace.js';
 import giftsRoutes from './routes/gifts.js';
+import dealsRoutes from './routes/deals.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -66,6 +67,7 @@ app.use('/api/wingman', wingmanRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
 app.use('/api/marketplace', marketplaceRoutes);
 app.use('/api/gifts', giftsRoutes);
+app.use('/api/deals', dealsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
