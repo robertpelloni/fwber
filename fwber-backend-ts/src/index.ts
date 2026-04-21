@@ -30,6 +30,7 @@ import giftsRoutes from './routes/gifts.js';
 import dealsRoutes from './routes/deals.js';
 import leaderboardRoutes from './routes/leaderboard.js';
 import identityRoutes from './routes/identity.js';
+import groupsRoutes from './routes/groups.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -72,6 +73,7 @@ app.use('/api/gifts', giftsRoutes);
 app.use('/api/deals', dealsRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/identity', identityRoutes);
+app.use('/api/groups', groupsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
