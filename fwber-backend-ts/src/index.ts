@@ -21,6 +21,7 @@ import physicalProfileRoutes from './routes/physical-profile.js';
 import friendsRoutes from './routes/friends.js';
 import relationshipLinksRoutes from './routes/relationship-links.js';
 import vouchRoutes from './routes/vouch.js';
+import eventsRoutes from './routes/events.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -54,6 +55,7 @@ app.use('/api/physical-profile', physicalProfileRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/relationship-links', relationshipLinksRoutes);
 app.use('/api/vouch', vouchRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
