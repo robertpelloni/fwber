@@ -1,5 +1,5 @@
 {
-  "nextId": 7,
+  "nextId": 10,
   "tasks": [
     {
       "id": "4",
@@ -36,6 +36,39 @@
       "blockedBy": [],
       "createdAt": 1776130726202,
       "updatedAt": 1776130727978
+    },
+    {
+      "id": "7",
+      "subject": "Fix frontend API base URL to use api.fwber.me directly",
+      "description": "The Next.js /api rewrite doesn't work on Vercel because /api is reserved for Next.js API routes (app/api/auth, app/api/oembed exist). Change the browser-side base URL from '/api' to 'https://api.fwber.me/api' in lib/api/client.ts. Also check auth-context.tsx line 447 for similar issue.",
+      "status": "completed",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776689666316,
+      "updatedAt": 1776689846417
+    },
+    {
+      "id": "8",
+      "subject": "Fix sti_status TypeError on profile page",
+      "description": "TypeError: (t.sti_status || []).includes is not a function - the sti_status field is not an array. Need to find where this is used in the profile page and ensure it's wrapped with Array.isArray() check.",
+      "status": "completed",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776689666321,
+      "updatedAt": 1776689971304
+    },
+    {
+      "id": "9",
+      "subject": "Fix deprecated apple-mobile-web-app-capable meta tag",
+      "description": "Replace apple-mobile-web-app-capable with mobile-web-app-capable in the layout or meta configuration.",
+      "status": "completed",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776689666324,
+      "updatedAt": 1776690025754
     }
   ]
 }

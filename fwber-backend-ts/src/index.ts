@@ -23,6 +23,8 @@ import relationshipLinksRoutes from './routes/relationship-links.js';
 import vouchRoutes from './routes/vouch.js';
 import eventsRoutes from './routes/events.js';
 import locationRoutes from './routes/location.js';
+import wingmanRoutes from './routes/wingman.js';
+import recommendationsRoutes from './routes/recommendations.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -58,6 +60,8 @@ app.use('/api/relationship-links', relationshipLinksRoutes);
 app.use('/api/vouch', vouchRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/location', locationRoutes);
+app.use('/api/wingman', wingmanRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
