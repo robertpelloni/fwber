@@ -24,7 +24,7 @@ export interface VideoCallLog {
 
 export const initiateCall = async (token: string, recipientId: string): Promise<VideoCallLog> => {
   const response = await apiClient.post(
-    `video/initiate`,
+    `/video/initiate`,
     { recipient_id: recipientId },
     {
       headers: {
@@ -42,7 +42,7 @@ export const updateCallStatus = async (
   duration?: number
 ): Promise<VideoCallLog> => {
   const response = await apiClient.put(
-    `video/${callId}/status`,
+    `/video/${callId}/status`,
     { status, duration },
     {
       headers: {
@@ -54,7 +54,7 @@ export const updateCallStatus = async (
 };
 
 export const getCallHistory = async (token: string): Promise<VideoCallLog[]> => {
-  const response = await apiClient.get(`video/history`, {
+  const response = await apiClient.get(`/video/history`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
