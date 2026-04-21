@@ -22,6 +22,7 @@ import friendsRoutes from './routes/friends.js';
 import relationshipLinksRoutes from './routes/relationship-links.js';
 import vouchRoutes from './routes/vouch.js';
 import eventsRoutes from './routes/events.js';
+import locationRoutes from './routes/location.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -56,6 +57,7 @@ app.use('/api/friends', friendsRoutes);
 app.use('/api/relationship-links', relationshipLinksRoutes);
 app.use('/api/vouch', vouchRoutes);
 app.use('/api/events', eventsRoutes);
+app.use('/api/location', locationRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {

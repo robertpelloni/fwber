@@ -12,7 +12,10 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 cd "$REPO_ROOT"
-git pull origin main
+git stash --include-untracked 2>/dev/null || true
+git checkout -- . 2>/dev/null || true
+git fetch origin main
+git reset --hard origin/main
 
 cd "$BACKEND_DIR"
 npm install --production
