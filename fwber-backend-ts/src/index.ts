@@ -25,6 +25,8 @@ import eventsRoutes from './routes/events.js';
 import locationRoutes from './routes/location.js';
 import wingmanRoutes from './routes/wingman.js';
 import recommendationsRoutes from './routes/recommendations.js';
+import marketplaceRoutes from './routes/marketplace.js';
+import giftsRoutes from './routes/gifts.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -62,6 +64,8 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/wingman', wingmanRoutes);
 app.use('/api/recommendations', recommendationsRoutes);
+app.use('/api/marketplace', marketplaceRoutes);
+app.use('/api/gifts', giftsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
