@@ -38,6 +38,10 @@ import userRoutes from './routes/user.js';
 import proximityRoutes from './routes/proximity.js';
 import onboardingRoutes from './routes/onboarding.js';
 import videoRoutes from './routes/video.js';
+import referralsRoutes from './routes/referrals.js';
+import boostsRoutes from './routes/boosts.js';
+import contentGenerationRoutes from './routes/content-generation.js';
+import catsRoutes from './routes/cats.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -88,6 +92,10 @@ app.use('/api/user', userRoutes);
 app.use('/api/proximity', proximityRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/video', videoRoutes);
+app.use('/api/referrals', referralsRoutes);
+app.use('/api/boosts', boostsRoutes);
+app.use('/api/content-generation', contentGenerationRoutes);
+app.use('/api/cats', catsRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
