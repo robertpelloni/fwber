@@ -53,6 +53,22 @@ router.put('/', authenticate, async (req: any, res) => {
   }
 });
 
+// DELETE /api/profile - Delete current user's profile
+router.delete('/', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    if (existing) {
+      await prisma.user_profiles.delete({ where: { id: existing.id } });
+      res.json({ message: 'Profile deleted successfully' });
+    } else {
+      res.json({ message: 'No profile to delete' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ message: 'Failed to delete profile' });
+  }
+});
+
 // GET /api/profile/completeness
 router.get('/completeness', authenticate, async (req: any, res) => {
   try {
