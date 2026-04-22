@@ -169,10 +169,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Restored sections</h3>
-                  <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                    These are the user-approved restored surfaces that should feel first-class again in the rewind branch, without re-elevating excluded federation, governance, or journal-era branches.
-                  </p>
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Features</h3>
                   <div className="space-y-6">
                     <div>
                       <div className="mb-3 flex items-center gap-2">

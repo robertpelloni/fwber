@@ -462,9 +462,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
                   <p className="truncate text-xs text-gray-500 dark:text-gray-400">{user?.email || 'Signed in'}</p>
                 </div>
               </div>
-              <p className="text-xs leading-5 text-gray-500 dark:text-gray-400">
-                The left rail now presents the restored, user-approved product map instead of drifting into excluded federation or journal-era branches.
-              </p>
+
             </div>
 
             <nav className="space-y-1" aria-label="Primary navigation">
