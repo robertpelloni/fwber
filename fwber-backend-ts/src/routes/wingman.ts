@@ -23,6 +23,15 @@ router.get('/nemesis', (_req, res) => {
   });
 });
 
+// GET /api/wingman/fortune
+router.get('/fortune', (_req, res) => {
+  res.json({
+    fortune: 'The stars are aligned in your favor today.',
+    luck_score: 7,
+    message: 'Fortune reading not yet available',
+  });
+});
+
 // GET /api/wingman/vibe-check
 router.get('/vibe-check', (_req, res) => {
   res.json({
