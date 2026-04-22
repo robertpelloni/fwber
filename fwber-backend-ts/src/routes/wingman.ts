@@ -1,29 +1,35 @@
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
-// GET /api/wingman/date-ideas/general
-router.get('/date-ideas/general', (_req: Request, res: Response) => {
+router.use(authenticate);
+
+// GET /api/wingman/cosmic-match
+router.get('/cosmic-match', (_req, res) => {
   res.json({
-    ideas: [
-      { id: 1, title: 'Coffee & Conversation', category: 'casual', description: 'A relaxed coffee date at a local café.' },
-      { id: 2, title: 'Park Walk', category: 'outdoor', description: 'A scenic walk through a nearby park.' },
-      { id: 3, title: 'Museum Visit', category: 'culture', description: 'Explore a local museum together.' },
-      { id: 4, title: 'Cooking Class', category: 'activity', description: 'Learn to cook a new dish together.' },
-      { id: 5, title: 'Live Music', category: 'entertainment', description: 'Check out a local live music venue.' },
-    ]
+    match: null,
+    compatibility_score: 0,
+    message: 'Cosmic match analysis not yet available',
   });
 });
 
-// GET /api/wingman/date-ideas/personalized
-router.get('/date-ideas/personalized', (_req: Request, res: Response) => {
-  res.json({ ideas: [] });
+// GET /api/wingman/nemesis
+router.get('/nemesis', (_req, res) => {
+  res.json({
+    nemesis: null,
+    rivalry_score: 0,
+    message: 'Nemesis analysis not yet available',
+  });
 });
 
-// POST /api/wingman/chat
-router.post('/chat', (_req: Request, res: Response) => {
-  res.json({ reply: 'Hey there! I\'m your wingman. How can I help you today?' });
+// GET /api/wingman/vibe-check
+router.get('/vibe-check', (_req, res) => {
+  res.json({
+    vibe: 'neutral',
+    score: 0.5,
+    message: 'Vibe check not yet available',
+  });
 });
 
 export default router;

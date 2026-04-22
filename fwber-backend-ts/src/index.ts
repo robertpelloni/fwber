@@ -48,6 +48,7 @@ import subscriptionsRoutes from './routes/subscriptions.js';
 import notificationPreferencesRoutes from './routes/notification-preferences.js';
 import hardwareTokensRoutes from './routes/hardware-tokens.js';
 import merchantRoutes from './routes/merchant.js';
+import bountiesRoutes from './routes/bounties.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -108,6 +109,7 @@ app.use('/api/subscriptions', subscriptionsRoutes);
 app.use('/api/notification-preferences', notificationPreferencesRoutes);
 app.use('/api/hardware-tokens', hardwareTokensRoutes);
 app.use('/api/merchant', merchantRoutes);
+app.use('/api/bounties', bountiesRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
