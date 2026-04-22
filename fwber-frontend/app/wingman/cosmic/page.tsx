@@ -35,7 +35,8 @@ const zodiacEmojis: Record<string, string> = {
   pisces: '♓',
 }
 
-function getZodiacEmoji(sign: string): string {
+function getZodiacEmoji(sign: string | undefined | null): string {
+  if (!sign) return '⭐'
   const normalized = sign.toLowerCase().trim()
   return zodiacEmojis[normalized] || '⭐'
 }

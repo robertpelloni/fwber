@@ -42,8 +42,8 @@ export default function VibeCheckPage() {
   async function handleShare() {
     if (!result) return
 
-    const greenList = result.green_flags.slice(0, 2).join(', ')
-    const redList = result.red_flags.slice(0, 2).join(', ')
+    const greenList = (result.green_flags || []).slice(0, 2).join(', ')
+    const redList = (result.red_flags || []).slice(0, 2).join(', ')
     const shareText = `My Vibe Check: Green flags - ${greenList}. Red flags - ${redList}. Get yours at fwber!`
 
     if (navigator.share) {
@@ -133,7 +133,7 @@ export default function VibeCheckPage() {
                           <span className="text-green-300 font-semibold">Green Flags</span>
                         </div>
                         <ul className="space-y-3 text-left">
-                          {result.green_flags.map((flag, index) => (
+                          {(result.green_flags || []).map((flag, index) => (
                             <li key={index} className="flex items-start gap-2">
                               <span className="text-green-400 mt-0.5">✓</span>
                               <span className="text-sm text-gray-200">{flag}</span>
@@ -148,7 +148,7 @@ export default function VibeCheckPage() {
                           <span className="text-red-300 font-semibold">Red Flags</span>
                         </div>
                         <ul className="space-y-3 text-left">
-                          {result.red_flags.map((flag, index) => (
+                          {(result.red_flags || []).map((flag, index) => (
                             <li key={index} className="flex items-start gap-2">
                               <span className="text-red-400 mt-0.5">⚠</span>
                               <span className="text-sm text-gray-200">{flag}</span>
