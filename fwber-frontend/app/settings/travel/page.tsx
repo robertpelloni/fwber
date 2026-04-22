@@ -34,14 +34,14 @@ export default function TravelModePage() {
     try {
       setLoading(true);
       const data = await getUserProfile(token!);
-      const profile = data.profile; // Access the nested profile object
+      const profile = data.profile || data;
       
-      setIsTravelMode(profile.is_travel_mode || false);
-      setLocationName(profile.travel_location_name || '');
-      setLatitude(profile.travel_latitude || null);
-      setLongitude(profile.travel_longitude || null);
+      setIsTravelMode(profile?.is_travel_mode || false);
+      setLocationName(profile?.travel_location_name || '');
+      setLatitude(profile?.travel_latitude || null);
+      setLongitude(profile?.travel_longitude || null);
       
-      if (profile.travel_location_name) {
+      if (profile?.travel_location_name) {
         setSearchQuery(profile.travel_location_name);
       }
     } catch (err) {

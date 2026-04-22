@@ -43,6 +43,9 @@ import boostsRoutes from './routes/boosts.js';
 import contentGenerationRoutes from './routes/content-generation.js';
 import catsRoutes from './routes/cats.js';
 import securityRoutes from './routes/security.js';
+import blocksRoutes from './routes/blocks.js';
+import subscriptionsRoutes from './routes/subscriptions.js';
+import notificationPreferencesRoutes from './routes/notification-preferences.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -98,6 +101,9 @@ app.use('/api/boosts', boostsRoutes);
 app.use('/api/content-generation', contentGenerationRoutes);
 app.use('/api/cats', catsRoutes);
 app.use('/api/security', securityRoutes);
+app.use('/api/blocks', blocksRoutes);
+app.use('/api/subscriptions', subscriptionsRoutes);
+app.use('/api/notification-preferences', notificationPreferencesRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {

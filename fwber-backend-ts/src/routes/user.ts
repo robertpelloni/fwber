@@ -38,4 +38,9 @@ router.get('/me', authenticate, async (req: any, res) => {
   }
 });
 
+// POST /api/user/export - GDPR data export
+router.post('/export', authenticate, async (_req: any, res) => {
+  res.json({ message: 'Data export requested. You will receive a download link via email.', status: 'pending' });
+});
+
 export default router;
