@@ -42,6 +42,7 @@ import referralsRoutes from './routes/referrals.js';
 import boostsRoutes from './routes/boosts.js';
 import contentGenerationRoutes from './routes/content-generation.js';
 import catsRoutes from './routes/cats.js';
+import securityRoutes from './routes/security.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -96,6 +97,7 @@ app.use('/api/referrals', referralsRoutes);
 app.use('/api/boosts', boostsRoutes);
 app.use('/api/content-generation', contentGenerationRoutes);
 app.use('/api/cats', catsRoutes);
+app.use('/api/security', securityRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {
