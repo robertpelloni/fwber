@@ -20,7 +20,7 @@ import Link from 'next/link'
 // Dynamically import map component to avoid SSR issues with Leaflet
 const LocationPicker = dynamic(() => import('@/components/LocationPicker'), {
   ssr: false,
-  loading: () => <div className="h-[300px] w-full bg-gray-100 animate-pulse rounded-md flex items-center justify-center text-gray-400">Loading Map...</div>
+  loading: () => <div className="h-[300px] w-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-md flex items-center justify-center text-gray-400">Loading Map...</div>
 })
 
 const formSchema = z.object({
@@ -113,7 +113,7 @@ export default function NewPromotionPage() {
       <div className="mb-6">
         <Link 
           href="/merchant/dashboard" 
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-300 mb-4"
+          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-white dark:hover:text-gray-300 mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
           Back to Dashboard

@@ -42,7 +42,7 @@ interface SettingsLinkProps {
 function SettingsLink({ href, icon, title, description, badge, disabled }: SettingsLinkProps) {
   if (disabled) {
     return (
-      <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg opacity-50 cursor-not-allowed">
+      <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg opacity-50 cursor-not-allowed">
         <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
           {icon}
         </div>
@@ -72,7 +72,7 @@ function SettingsLink({ href, icon, title, description, badge, disabled }: Setti
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white">{title}</h3>
           {badge && (
             <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
               {badge}
@@ -104,7 +104,7 @@ function SettingsToggle({ icon, title, description, checked, onChange, disabled,
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white">{title}</h3>
           {badge && (
             <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
               {badge}
@@ -138,7 +138,7 @@ function SettingsButton({ onClick, icon, title, description, disabled }: Setting
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white">{title}</h3>
         </div>
         <p className="dark:text-gray-300 text-sm text-gray-500">{description}</p>
       </div>
@@ -266,13 +266,13 @@ export default function SettingsPage() {
               <div className="flex items-center gap-3">
                 <Settings className="h-8 w-8 text-gray-600" />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
                   <p className="dark:text-gray-300 text-sm text-gray-500">Manage your account and preferences</p>
                 </div>
               </div>
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-purple-300 hover:text-purple-600"
+                className="inline-flex items-center gap-2 rounded-full border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:border-purple-300 hover:text-purple-600"
               >
                 <ArrowLeft className="h-4 w-4" />
                 <div>
@@ -465,12 +465,12 @@ export default function SettingsPage() {
                   <Palette className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-gray-900">Theme</h3>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Theme</h3>
                   <p className="dark:text-gray-300 text-sm text-gray-500">Choose your preferred color scheme</p>
                 </div>
                 <select
                   aria-label="Theme selection"
-                  className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="system">System</option>
                   <option value="light">Light</option>

@@ -576,7 +576,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
           <div className="flex justify-between items-center mb-4">

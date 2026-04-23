@@ -100,7 +100,7 @@ export default function RateMyPussyPage() {
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           <button
             onClick={() => setShowUpload(!showUpload)}
-            className="flex items-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition active:scale-95 shadow-xl shadow-white/10"
+            className="flex items-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 text-black font-bold rounded-full hover:scale-105 transition active:scale-95 shadow-xl shadow-white/10"
           >
             <Upload className="w-5 h-5" />
             Upload Your Pussy

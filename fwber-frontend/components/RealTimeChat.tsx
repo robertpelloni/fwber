@@ -489,7 +489,7 @@ export default function RealTimeChat({
               <MoreVertical className="w-5 h-5" />
             </button>
             {showSafetyMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-600">
+              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 dark:bg-gray-700 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700 dark:border-gray-600">
                 <div className="py-1">
                   {onReport && (
                     <button
@@ -497,7 +497,7 @@ export default function RealTimeChat({
                         onReport();
                         setShowSafetyMenu(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-600"
                     >
                       Report User
                     </button>
@@ -508,7 +508,7 @@ export default function RealTimeChat({
                         onBlock();
                         setShowSafetyMenu(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-600"
                     >
                       Block User
                     </button>

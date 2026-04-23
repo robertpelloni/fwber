@@ -23,13 +23,13 @@ export default function Location({ formData, handleLocationChange }: LocationPro
             id="city"
             value={formData.location.city}
             onChange={(e) => handleLocationChange('city', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Enter your city"
           />
         </div>
 
         <div>
-          <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             State
           </label>
           <input
@@ -37,7 +37,7 @@ export default function Location({ formData, handleLocationChange }: LocationPro
             id="state"
             value={formData.location.state}
             onChange={(e) => handleLocationChange('state', e.target.value)}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             placeholder="Enter your state"
           />
         </div>

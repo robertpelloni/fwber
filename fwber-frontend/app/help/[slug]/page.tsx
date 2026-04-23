@@ -374,7 +374,7 @@ export default function HelpArticlePage() {
       <div className="mb-6">
         <Link
           href="/help"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-white dark:text-gray-400 dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Help Center

@@ -487,7 +487,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -594,7 +594,7 @@ export default function ProfilePage() {
               <p className="text-orange-100/80 mb-4">
                 Ready to get humbled? Let our AI roast your profile choices. Or switch to &quot;Hype Mode&quot; for an ego boost.
               </p>
-              <a href="/roast" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-orange-900 hover:bg-orange-100 h-10 px-4 py-2 w-full">
+              <a href="/roast" className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white dark:bg-gray-800 text-orange-900 hover:bg-orange-100 h-10 px-4 py-2 w-full">
                 Go to Roast Page
               </a>
             </CardContent>
@@ -608,7 +608,7 @@ export default function ProfilePage() {
 
 
         {/* Profile Form */}
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <ProfileTabs
               formData={formData}
@@ -664,10 +664,10 @@ export default function ProfilePage() {
 
             {/* Basic Information */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Basic Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="display_name" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="display_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Display Name
                   </label>
                   <input
@@ -675,18 +675,18 @@ export default function ProfilePage() {
                     id="display_name"
                     value={formData.display_name}
                     onChange={(e) => handleInputChange('display_name', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="How would you like to be called?"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Date of Birth
                   </label>
                   <div className="grid grid-cols-3 gap-2 mt-1">
                     <select
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       value={formData.date_of_birth ? formData.date_of_birth.split('-')[1] : ''}
                       onChange={(e) => {
                         const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
@@ -699,7 +699,7 @@ export default function ProfilePage() {
                       ))}
                     </select>
                     <select
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       value={formData.date_of_birth ? formData.date_of_birth.split('-')[2] : ''}
                       onChange={(e) => {
                         const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
@@ -713,7 +713,7 @@ export default function ProfilePage() {
                       })}
                     </select>
                     <select
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       value={formData.date_of_birth ? formData.date_of_birth.split('-')[0] : ''}
                       onChange={(e) => {
                         const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
@@ -730,14 +730,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Gender
                   </label>
                   <select
                     id="gender"
                     value={formData.gender}
                     onChange={(e) => handleInputChange('gender', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -751,14 +751,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="pronouns" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Pronouns
                   </label>
                   <select
                     id="pronouns"
                     value={formData.pronouns}
                     onChange={(e) => handleInputChange('pronouns', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select pronouns</option>
                     <option value="he/him">He/Him</option>
@@ -772,14 +772,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="sexual_orientation" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="sexual_orientation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Sexual Orientation
                   </label>
                   <select
                     id="sexual_orientation"
                     value={formData.sexual_orientation}
                     onChange={(e) => handleInputChange('sexual_orientation', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select orientation</option>
                     <option value="straight">Straight</option>
@@ -797,14 +797,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="relationship_style" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="relationship_style" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Relationship Style
                   </label>
                   <select
                     id="relationship_style"
                     value={formData.relationship_style}
                     onChange={(e) => handleInputChange('relationship_style', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select relationship style</option>
                     <option value="monogamous">Monogamous</option>
@@ -818,7 +818,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="max_distance" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="max_distance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Maximum Distance (miles)
                   </label>
                   <input
@@ -828,7 +828,7 @@ export default function ProfilePage() {
                     max="100"
                     value={formData.location.max_distance}
                     onChange={(e) => handleLocationChange('max_distance', parseInt(e.target.value))}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
               </div>
@@ -836,7 +836,7 @@ export default function ProfilePage() {
 
             {/* Bio */}
             <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 About You
               </label>
               <textarea
@@ -844,14 +844,14 @@ export default function ProfilePage() {
                 rows={4}
                 value={formData.bio}
                 onChange={(e) => handleInputChange('bio', e.target.value)}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Tell others about yourself, your interests, and what you&apos;re looking for..."
               />
             </div>
 
             {/* Looking For */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Looking For
               </label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -871,7 +871,7 @@ export default function ProfilePage() {
 
             {/* Location */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Location</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Location</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -882,13 +882,13 @@ export default function ProfilePage() {
                     id="city"
                     value={formData.location.city}
                     onChange={(e) => handleLocationChange('city', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Enter your city"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="state" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     State
                   </label>
                   <input
@@ -896,7 +896,7 @@ export default function ProfilePage() {
                     id="state"
                     value={formData.location.state}
                     onChange={(e) => handleLocationChange('state', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Enter your state"
                   />
                 </div>
@@ -905,7 +905,7 @@ export default function ProfilePage() {
 
             {/* Lifestyle Preferences */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Lifestyle Preferences</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Lifestyle Preferences</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -916,7 +916,7 @@ export default function ProfilePage() {
                     id="occupation"
                     value={formData.preferences.occupation}
                     onChange={(e) => handlePreferenceChange('occupation', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="Your job or profession"
                   />
                 </div>
@@ -929,7 +929,7 @@ export default function ProfilePage() {
                     id="smoking"
                     value={formData.preferences.smoking}
                     onChange={(e) => handlePreferenceChange('smoking', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="non-smoker">Non-smoker</option>
@@ -948,7 +948,7 @@ export default function ProfilePage() {
                     id="drinking"
                     value={formData.preferences.drinking}
                     onChange={(e) => handlePreferenceChange('drinking', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="non-drinker">Non-drinker</option>
@@ -960,14 +960,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="exercise" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="exercise" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Exercise
                   </label>
                   <select
                     id="exercise"
                     value={formData.preferences.exercise}
                     onChange={(e) => handlePreferenceChange('exercise', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="daily">Daily</option>
@@ -980,14 +980,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="diet" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="diet" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Diet
                   </label>
                   <select
                     id="diet"
                     value={formData.preferences.diet}
                     onChange={(e) => handlePreferenceChange('diet', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="omnivore">Omnivore</option>
@@ -1002,14 +1002,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="pets" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="pets" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Pets
                   </label>
                   <select
                     id="pets"
                     value={formData.preferences.pets}
                     onChange={(e) => handlePreferenceChange('pets', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="love-pets">Love pets</option>
@@ -1021,14 +1021,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="children" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="children" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Children
                   </label>
                   <select
                     id="children"
                     value={formData.preferences.children}
                     onChange={(e) => handlePreferenceChange('children', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="have-children">Have children</option>
@@ -1043,7 +1043,7 @@ export default function ProfilePage() {
 
             {/* Dating Preferences */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Dating Preferences</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Dating Preferences</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1054,7 +1054,7 @@ export default function ProfilePage() {
                     id="height_min"
                     value={formData.preferences.height_min}
                     onChange={(e) => handlePreferenceChange('height_min', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     placeholder="e.g., 5&apos;10&quot; or 178cm"
                   />
                 </div>
@@ -1070,12 +1070,12 @@ export default function ProfilePage() {
                     max="99"
                     value={formData.preferences.age_range_min}
                     onChange={(e) => handlePreferenceChange('age_range_min', parseInt(e.target.value))}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="age_range_max" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="age_range_max" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Maximum Age
                   </label>
                   <input
@@ -1085,19 +1085,19 @@ export default function ProfilePage() {
                     max="99"
                     value={formData.preferences.age_range_max}
                     onChange={(e) => handlePreferenceChange('age_range_max', parseInt(e.target.value))}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="pref_body_type" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="pref_body_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Body Type Preference
                   </label>
                   <select
                     id="pref_body_type"
                     value={formData.preferences.body_type}
                     onChange={(e) => handlePreferenceChange('body_type', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">No preference</option>
                     <option value="slim">Slim</option>
@@ -1117,7 +1117,7 @@ export default function ProfilePage() {
                     id="religion"
                     value={formData.preferences.religion}
                     onChange={(e) => handlePreferenceChange('religion', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">No preference</option>
                     <option value="christian">Christian</option>
@@ -1141,7 +1141,7 @@ export default function ProfilePage() {
                     id="politics"
                     value={formData.preferences.politics}
                     onChange={(e) => handlePreferenceChange('politics', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">No preference</option>
                     <option value="liberal">Liberal</option>
@@ -1160,7 +1160,7 @@ export default function ProfilePage() {
                     id="education"
                     value={formData.preferences.education}
                     onChange={(e) => handlePreferenceChange('education', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select education</option>
                     <option value="high-school">High School</option>
@@ -1177,10 +1177,10 @@ export default function ProfilePage() {
 
             {/* Interests */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Interests & Hobbies</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Interests & Hobbies</h2>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Topic graph
                   </label>
                   <p className="text-sm text-gray-500 mb-3">
@@ -1227,16 +1227,16 @@ export default function ProfilePage() {
                           type="checkbox"
                           checked={Array.isArray(formData.preferences.hobbies) ? formData.preferences.hobbies.includes(hobby) : false}
                           onChange={(e) => handleArrayPreferenceChange('hobbies', hobby, e.target.checked)}
-                          className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
-                        <span className="ml-2 text-sm text-gray-700 capitalize">{hobby}</span>
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">{hobby}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Music Genres
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -1246,16 +1246,16 @@ export default function ProfilePage() {
                           type="checkbox"
                           checked={Array.isArray(formData.preferences.music) ? formData.preferences.music.includes(genre) : false}
                           onChange={(e) => handleArrayPreferenceChange('music', genre, e.target.checked)}
-                          className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
-                        <span className="ml-2 text-sm text-gray-700 capitalize">{genre}</span>
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">{genre}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Sports
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -1265,9 +1265,9 @@ export default function ProfilePage() {
                           type="checkbox"
                           checked={Array.isArray(formData.preferences.sports) ? formData.preferences.sports.includes(sport) : false}
                           onChange={(e) => handleArrayPreferenceChange('sports', sport, e.target.checked)}
-                          className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                          className="rounded border-gray-300 dark:border-gray-600 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                         />
-                        <span className="ml-2 text-sm text-gray-700 capitalize">{sport.replace('-', ' ')}</span>
+                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">{sport.replace('-', ' ')}</span>
                       </label>
                     ))}
                   </div>
@@ -1277,17 +1277,17 @@ export default function ProfilePage() {
 
             {/* Communication Preferences */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Communication Preferences</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Communication Preferences</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label htmlFor="communication_style" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="communication_style" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Communication Style
                   </label>
                   <select
                     id="communication_style"
                     value={formData.preferences.communication_style}
                     onChange={(e) => handlePreferenceChange('communication_style', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select style</option>
                     <option value="direct">Direct</option>
@@ -1300,14 +1300,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="response_time" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="response_time" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Response Time
                   </label>
                   <select
                     id="response_time"
                     value={formData.preferences.response_time}
                     onChange={(e) => handlePreferenceChange('response_time', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="immediate">Immediate</option>
@@ -1319,14 +1319,14 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label htmlFor="meeting_preference" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="meeting_preference" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Meeting Preference
                   </label>
                   <select
                     id="meeting_preference"
                     value={formData.preferences.meeting_preference}
                     onChange={(e) => handlePreferenceChange('meeting_preference', e.target.value)}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select preference</option>
                     <option value="public-places">Public places</option>

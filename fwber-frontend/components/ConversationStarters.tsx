@@ -42,15 +42,15 @@ export default function ConversationStarters() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2 text-gray-700">Conversation Type</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Conversation Type</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as any)}
                 data-testid="conversation-type"
                 aria-label="Conversation Type"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="casual">Casual</option>
                 <option value="romantic">Romantic</option>
@@ -60,25 +60,25 @@ export default function ConversationStarters() {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-2 text-gray-700">Target Interests (comma separated)</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Target Interests (comma separated)</label>
               <input
                 type="text"
                 value={interests}
                 onChange={(e) => setInterests(e.target.value)}
                 data-testid="target-interests"
                 placeholder="e.g. travel, music, food"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-2 text-gray-700">Context Hints</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Context Hints</label>
               <textarea
                 value={hints}
                 onChange={(e) => setHints(e.target.value)}
                 data-testid="conversation-hints"
                 placeholder="Any specific context or shared experiences..."
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
                 rows={3}
               />
             </div>
@@ -111,8 +111,8 @@ export default function ConversationStarters() {
           )}
 
           {data?.data?.suggestions?.map((suggestion: any, index: number) => (
-            <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200" data-testid="conversation-starter">
-              <p className="text-gray-800 mb-3" data-testid="starter-content">{suggestion.content}</p>
+            <div key={index} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" data-testid="conversation-starter">
+              <p className="text-gray-800 dark:text-gray-100 mb-3" data-testid="starter-content">{suggestion.content}</p>
               
               <div className="flex justify-between items-center">
                 <div className="flex space-x-3 text-sm text-gray-500">

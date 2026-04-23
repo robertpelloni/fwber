@@ -114,11 +114,11 @@ export default function FailedJobsTable() {
 
   if (loading && jobs.length === 0) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">⚠️ Failed Jobs</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">⚠️ Failed Jobs</h2>
         <div className="mt-4 space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded bg-gray-100" />
+            <div key={i} className="h-12 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
           ))}
         </div>
       </div>
@@ -127,14 +127,14 @@ export default function FailedJobsTable() {
 
   if (jobs.length === 0) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">⚠️ Failed Jobs</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">⚠️ Failed Jobs</h2>
           <button onClick={fetchJobs} className="text-sm text-blue-600 hover:underline">Refresh</button>
         </div>
         <div className="mt-4 flex flex-col items-center justify-center py-8 text-center">
           <CheckCircle className="h-12 w-12 text-green-500 mb-3" />
-          <p className="text-gray-900 font-medium">All systems operational</p>
+          <p className="text-gray-900 dark:text-white font-medium">All systems operational</p>
           <p className="text-sm text-gray-500">No failed jobs detected.</p>
         </div>
       </div>
@@ -142,10 +142,10 @@ export default function FailedJobsTable() {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">⚠️ Failed Jobs</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">⚠️ Failed Jobs</h2>
           <p className="text-sm text-gray-500">{jobs.length} jobs require attention</p>
         </div>
         <div className="flex gap-2">
@@ -184,7 +184,7 @@ export default function FailedJobsTable() {
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job / Queue</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Failed At</th>
@@ -192,7 +192,7 @@ export default function FailedJobsTable() {
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
             {jobs.map((job) => {
               // Parse payload to get job name if possible
               let jobName = 'Unknown Job';
@@ -202,9 +202,9 @@ export default function FailedJobsTable() {
               } catch (e) {}
 
               return (
-                <tr key={job.uuid} className="hover:bg-gray-50">
+                <tr key={job.uuid} className="hover:bg-gray-50 dark:bg-gray-900">
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={jobName}>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs" title={jobName}>
                       {jobName}
                     </div>
                     <div className="text-xs text-gray-500">{job.queue}</div>

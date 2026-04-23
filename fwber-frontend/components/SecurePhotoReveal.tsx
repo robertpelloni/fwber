@@ -81,7 +81,7 @@ export default function SecurePhotoReveal({
           <button
             onClick={handleReveal}
             disabled={isLoading}
-            className="group flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-white text-gray-900 rounded-full shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800/90 hover:bg-white text-gray-900 dark:text-white rounded-full shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />

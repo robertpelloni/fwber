@@ -580,7 +580,7 @@ export default function PhotoUpload({
                 type="checkbox"
                 checked={uploadAsPrivate}
                 onChange={(e) => setUploadAsPrivate(e.target.checked)}
-                className="rounded border-gray-300 text-primary focus:ring-primary"
+                className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary"
               />
               <span className="flex items-center gap-1">
                 {uploadAsPrivate ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
@@ -836,7 +836,7 @@ export default function PhotoUpload({
                               setComparisonPreviewId(preview.id)
                               setComparisonSliderValue(50)
                             }}
-                            className="p-2 bg-white/80 text-gray-900 rounded-full hover:bg-white transition-colors"
+                            className="p-2 bg-white dark:bg-gray-800/80 text-gray-900 dark:text-white rounded-full hover:bg-white transition-colors"
                             title="Compare blur"
                           >
                             <Eye className="w-4 h-4" />
@@ -959,8 +959,8 @@ export default function PhotoUpload({
                     className="pointer-events-none absolute inset-y-0"
                     style={{ left: `calc(${comparisonSliderValue}% - 1px)` }}
                   >
-                    <div className="relative h-full w-px bg-white/70">
-                      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-xs font-medium text-gray-900">
+                    <div className="relative h-full w-px bg-white dark:bg-gray-800/70">
+                      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full bg-white dark:bg-gray-800/90 px-2 py-1 text-xs font-medium text-gray-900 dark:text-white">
                         <ChevronLeft className="h-4 w-4" />
                         <span>Drag</span>
                         <ChevronRight className="h-4 w-4" />

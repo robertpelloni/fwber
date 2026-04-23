@@ -346,7 +346,7 @@ export default function AvatarGenerationFlow({
     <div className="max-w-2xl mx-auto p-6">
       {/* View Toggle */}
       <div className="flex justify-center mb-6">
-        <div className="bg-gray-100 p-1 rounded-lg flex">
+        <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex">
             <button
                 onClick={() => setView('generate')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
@@ -368,14 +368,14 @@ export default function AvatarGenerationFlow({
 
       {view === 'gallery' ? (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">My AI Avatars</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">My AI Avatars</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {galleryQuery.isLoading ? (
                     <div className="col-span-full flex justify-center py-12">
                         <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
                     </div>
                 ) : galleryQuery.data?.length === 0 ? (
-                    <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg">
+                    <div className="col-span-full text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
                         <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                         <p className="text-gray-500">No AI avatars generated yet.</p>
                         <button 
@@ -387,7 +387,7 @@ export default function AvatarGenerationFlow({
                     </div>
                 ) : (
                     galleryQuery.data?.map((photo) => (
-                        <div key={photo.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                        <div key={photo.id} className="relative group aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
                             <Image 
                                 src={photo.url || photo.thumbnail_url || ''} 
                                 alt="AI Avatar" 
@@ -402,7 +402,7 @@ export default function AvatarGenerationFlow({
                                         setStep('preview');
                                         setView('generate');
                                     }}
-                                    className="bg-white text-purple-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-purple-50"
+                                    className="bg-white dark:bg-gray-800 text-purple-600 px-3 py-1 rounded-full text-xs font-bold hover:bg-purple-50"
                                 >
                                     Preview
                                 </button>
@@ -457,7 +457,7 @@ export default function AvatarGenerationFlow({
       {step === 'profile' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Your Sexy Avatar</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Create Your Sexy Avatar</h2>
             <p className="text-gray-600">
               Generate an attractive, stylized version of yourself from your saved physical traits or an uploaded photo.
             </p>
@@ -507,25 +507,25 @@ export default function AvatarGenerationFlow({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Age</label>
                   <input
                     type="number"
                     min="18"
                     max="100"
                     value={profile.age || ''}
                     onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="25"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gender</label>
                   <select
                     aria-label="Select gender"
                     value={profile.gender || ''}
                     onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -536,12 +536,12 @@ export default function AvatarGenerationFlow({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Ethnicity</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ethnicity</label>
                   <select
                     aria-label="Select ethnicity"
                     value={profile.ethnicity || ''}
                     onChange={(e) => setProfile({ ...profile, ethnicity: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select ethnicity</option>
                     <option value="asian">Asian</option>
@@ -555,12 +555,12 @@ export default function AvatarGenerationFlow({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Body Type</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Body Type</label>
                   <select
                     aria-label="Select body type"
                     value={profile.body_type || ''}
                     onChange={(e) => setProfile({ ...profile, body_type: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select body type</option>
                     <option value="slim">Slim</option>
@@ -572,12 +572,12 @@ export default function AvatarGenerationFlow({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Hair Color</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hair Color</label>
                   <select
                     aria-label="Select hair color"
                     value={profile.hair_color || ''}
                     onChange={(e) => setProfile({ ...profile, hair_color: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select hair color</option>
                     <option value="black">Black</option>
@@ -591,12 +591,12 @@ export default function AvatarGenerationFlow({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Eye Color</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Eye Color</label>
                   <select
                     aria-label="Select eye color"
                     value={profile.eye_color || ''}
                     onChange={(e) => setProfile({ ...profile, eye_color: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select eye color</option>
                     <option value="brown">Brown</option>
@@ -609,25 +609,25 @@ export default function AvatarGenerationFlow({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Height (cm)</label>
                   <input
                     type="number"
                     min="140"
                     max="220"
                     value={profile.height_cm || ''}
                     onChange={(e) => setProfile({ ...profile, height_cm: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="170"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Fitness Level</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fitness Level</label>
                   <select
                     aria-label="Select fitness level"
                     value={profile.fitness_level || ''}
                     onChange={(e) => setProfile({ ...profile, fitness_level: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
                     <option value="">Select fitness level</option>
                     <option value="lean">Lean</option>
@@ -640,12 +640,12 @@ export default function AvatarGenerationFlow({
 
                 {profile.gender && ['female', 'non-binary'].includes(profile.gender) && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Breast Size</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Breast Size</label>
                     <select
                       aria-label="Select breast size"
                       value={profile.breast_size || ''}
                       onChange={(e) => setProfile({ ...profile, breast_size: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       <option value="">Select size</option>
                       <option value="small">Small</option>
@@ -657,12 +657,12 @@ export default function AvatarGenerationFlow({
 
                 {profile.gender && ['male'].includes(profile.gender) && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Facial Hair</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Facial Hair</label>
                     <select
                       aria-label="Select facial hair"
                       value={profile.facial_hair || ''}
                       onChange={(e) => setProfile({ ...profile, facial_hair: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
                       <option value="">Select style</option>
                       <option value="none">Clean shaven</option>
@@ -681,7 +681,7 @@ export default function AvatarGenerationFlow({
           {mode === 'photo' && (
             <div>
               {userPhotos.length === 0 ? (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <div className="text-center py-8 bg-gray-50 dark:bg-gray-900 rounded-lg">
                   <Camera className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                   <p className="text-gray-500 mb-2">No photos uploaded yet</p>
                   <p className="text-sm text-gray-400">Upload photos to your profile first, then come back here.</p>
@@ -734,7 +734,7 @@ export default function AvatarGenerationFlow({
       {step === 'style' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Look</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Choose Your Look</h2>
             <p className="text-gray-600">
               Select a style and boost level for your avatar.
             </p>
@@ -744,7 +744,7 @@ export default function AvatarGenerationFlow({
           <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-pink-500" />
                   Sexy Boost
                 </h3>
@@ -756,7 +756,7 @@ export default function AvatarGenerationFlow({
                   sexyBoost ? 'bg-gradient-to-r from-pink-500 to-purple-500' : 'bg-gray-300'
                 }`}
               >
-                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white dark:bg-gray-800 shadow-md transition-transform ${
                   sexyBoost ? 'translate-x-8' : 'translate-x-1'
                 }`} />
               </button>
@@ -802,7 +802,7 @@ export default function AvatarGenerationFlow({
 
           {showReferralModal && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                  <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-200">
                       <div className="flex justify-between items-start mb-4">
                           <div className="p-3 bg-purple-100 rounded-full">
                             <Users className="w-6 h-6 text-purple-600" />
@@ -811,7 +811,7 @@ export default function AvatarGenerationFlow({
                               <X className="w-5 h-5" />
                           </button>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Unlock Premium Styles</h3>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Unlock Premium Styles</h3>
                       <p className="text-gray-600 mb-6">
                           Invite just 1 friend to unlock Neon Cyberpunk, Oil Painting, and other premium styles forever.
                       </p>
@@ -830,7 +830,7 @@ export default function AvatarGenerationFlow({
           <div className="border-t pt-4">
             <button 
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-white"
             >
                 <Settings className="w-4 h-4" />
                 {showAdvanced ? 'Hide Advanced Settings' : 'Show Advanced Settings'}
@@ -838,13 +838,13 @@ export default function AvatarGenerationFlow({
           </div>
 
           {showAdvanced && (
-            <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">AI Provider</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">AI Provider</label>
                     <select 
                         value={selectedProvider}
                         onChange={(e) => setSelectedProvider(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
                         title="Select AI Provider"
                     >
                         {Object.keys(providers).map(p => (
@@ -854,20 +854,20 @@ export default function AvatarGenerationFlow({
                 </div>
                 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Model / Version</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Model / Version</label>
                     <input 
                         type="text" 
                         value={customModel}
                         onChange={(e) => setCustomModel(e.target.value)}
                         placeholder={providers[selectedProvider]?.model || "Default Model"}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
                     />
                     <p className="text-xs text-gray-500 mt-1">Leave empty to use default.</p>
                 </div>
 
                 {selectedProvider === 'replicate' && (
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">LoRA Scale ({loraScale})</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">LoRA Scale ({loraScale})</label>
                         <input 
                             type="range" 
                             aria-label="LoRA Scale"
@@ -886,7 +886,7 @@ export default function AvatarGenerationFlow({
           <div className="flex justify-between">
             <button
               onClick={() => setStep('profile')}
-              className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-purple-600 hover:text-purple-600 transition-colors font-medium"
+              className="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:border-purple-600 hover:text-purple-600 transition-colors font-medium"
             >
               Back
             </button>
@@ -904,7 +904,7 @@ export default function AvatarGenerationFlow({
       {step === 'generating' && (
         <div className="text-center py-12">
           <Loader2 className="w-16 h-16 text-purple-600 animate-spin mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             {mode === 'photo' ? 'Transforming Your Photo...' : 'Generating Your Avatar...'}
           </h3>
           <p className="text-gray-600">
@@ -925,7 +925,7 @@ export default function AvatarGenerationFlow({
       {step === 'preview' && generatedAvatar && (
         <div className="space-y-6">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your New Avatar</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your New Avatar</h2>
             <p className="text-gray-600">
               Review your AI-generated avatar. You can regenerate if you&apos;d like a different result.
             </p>
@@ -960,7 +960,7 @@ export default function AvatarGenerationFlow({
             <button
               onClick={handleRegenerate}
               disabled={generateMutation.isPending || generateFromPhotoMutation.isPending}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-purple-600 hover:text-purple-600 disabled:opacity-50 transition-colors font-medium"
+              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:border-purple-600 hover:text-purple-600 disabled:opacity-50 transition-colors font-medium"
             >
               <RefreshCw className="w-5 h-5" />
               Regenerate
@@ -978,7 +978,7 @@ export default function AvatarGenerationFlow({
 
           <button
             onClick={handleReject}
-            className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="w-full text-sm text-gray-500 hover:text-gray-700 dark:text-gray-300 transition-colors"
           >
             Start over with different source
           </button>
@@ -991,7 +991,7 @@ export default function AvatarGenerationFlow({
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-10 h-10 text-green-600" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">Avatar Created!</h3>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Avatar Created!</h3>
           <p className="text-gray-600 mb-6">
             Your AI-generated avatar is now active on your profile.
           </p>

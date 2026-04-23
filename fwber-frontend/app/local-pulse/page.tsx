@@ -14,9 +14,9 @@ export default function LocalPulsePage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Authentication Required</h1>
           <p className="text-gray-600 mb-6">Please log in to access Local Pulse.</p>
           <button
             onClick={() => router.push('/login')}
@@ -31,7 +31,7 @@ export default function LocalPulsePage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <AppHeader title="Local Pulse" />
         <LocalPulse />
       </div>

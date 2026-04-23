@@ -73,7 +73,7 @@ export default function EventsPage() {
         <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
           <button
             onClick={() => setSelectedType(undefined)}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${!selectedType ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${!selectedType ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 dark:text-gray-300'}`}
           >
             All Events
           </button>
@@ -81,7 +81,7 @@ export default function EventsPage() {
             <button
               key={type}
               onClick={() => setSelectedType(type)}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm capitalize ${selectedType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm capitalize ${selectedType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 dark:text-gray-300'}`}
             >
               {type.replace('_', ' ')}
             </button>

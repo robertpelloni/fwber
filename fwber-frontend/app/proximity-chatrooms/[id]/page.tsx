@@ -193,9 +193,9 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Authentication Required</h1>
           <p className="text-gray-600 mb-6">Please log in to access proximity chatrooms.</p>
           <button
             onClick={() => router.push('/login')}
@@ -210,7 +210,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
 
   if (chatroomLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="text-gray-600 mt-2">Loading chatroom...</p>
@@ -221,9 +221,9 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
 
   if (!chatroom) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Chatroom Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Chatroom Not Found</h1>
           <p className="text-gray-600 mb-6">The proximity chatroom you&apos;re looking for doesn&apos;t exist.</p>
           <button
             onClick={() => router.push('/proximity-chatrooms')}
@@ -240,9 +240,9 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
   const isOwner = String(chatroom.owner_id) === String(user?.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
@@ -253,7 +253,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                 <ArrowLeft className="h-6 w-6" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">{chatroom.name}</h1>
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">{chatroom.name}</h1>
                 <p className="text-sm text-gray-600">{chatroom.description}</p>
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Chat Area */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm border">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
               {/* Chat Header */}
               <div className="border-b p-4">
                 <div className="flex items-center justify-between">
@@ -360,7 +360,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                 ) : messages?.data?.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No messages yet</h3>
                     <p className="text-gray-600">Be the first to start the conversation!</p>
                   </div>
                 ) : (
@@ -373,7 +373,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
                             {message.user?.name || 'Anonymous'}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -383,7 +383,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                             <Pin className="h-3 w-3 text-yellow-500" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-700 mb-2">{message.content}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{message.content}</p>
                         
                         {/* Reactions */}
                         {message.reactions && message.reactions.length > 0 && (
@@ -392,7 +392,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                               <button
                                 key={index}
                                 onClick={() => handleReaction(message.id, reaction.emoji)}
-                                className="flex items-center space-x-1 text-xs bg-gray-100 rounded-full px-2 py-1 hover:bg-gray-200"
+                                className="flex items-center space-x-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-1 hover:bg-gray-200"
                               >
                                 <span>{reaction.emoji}</span>
                                 <span>{reaction.count}</span>
@@ -450,7 +450,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type your message..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       disabled={sendMessage.isPending}
                     />
                     <button
@@ -481,8 +481,8 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Chatroom Info */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Chatroom Info</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-4 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Chatroom Info</h3>
               <div className="space-y-3">
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <MapPin className="h-4 w-4" />
@@ -500,8 +500,8 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
             </div>
 
             {/* Actions */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Actions</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-4 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Actions</h3>
               <div className="space-y-2">
                 {isMember ? (
                   <button
@@ -527,8 +527,8 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
 
             {/* Members */}
             {showMembers && (
-              <div className="bg-white rounded-lg shadow-sm border p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Members</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Members</h3>
                 <div className="space-y-2">
                   {membersLoading ? (
                     <div className="text-center py-4">
@@ -543,7 +543,7 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                           {member.user?.name?.charAt(0) || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {member.user?.name || 'Anonymous'}
                           </p>
                           <p className="text-xs text-gray-500">{member.role}</p>
@@ -563,18 +563,18 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
       {/* Payment Confirmation Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-sm w-full p-6 text-center">
             <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">💎</span>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Pay to Join?</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Pay to Join?</h3>
             <p className="text-gray-600 mb-6">
-              This chatroom requires an entry fee of <strong className="text-gray-900">{chatroom?.token_entry_fee} tokens</strong>.
+              This chatroom requires an entry fee of <strong className="text-gray-900 dark:text-white">{chatroom?.token_entry_fee} tokens</strong>.
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowPaymentModal(false)}
-                className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200"
+                className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-200"
               >
                 Cancel
               </button>

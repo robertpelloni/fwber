@@ -44,12 +44,12 @@ export default function HomePage() {
   }
 
   return (
-      <div className="min-h-screen bg-white dark:bg-slate-950">
+      <div className="min-h-screen bg-white dark:bg-gray-800 dark:bg-slate-950">
       <Suspense fallback={null}>
         <ReferralBanner />
       </Suspense>
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/85">
+      <nav className="sticky top-0 z-50 border-b border-slate-200/70 bg-white dark:bg-gray-800/90 backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-950/85">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -64,7 +64,7 @@ export default function HomePage() {
               <Link href="#safety" className="text-gray-600 hover:text-blue-600 font-medium">Safety</Link>
               <ThemeToggle />
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="text-gray-900 hover:text-blue-600 font-medium">
+                <Link href="/login" className="text-gray-900 dark:text-white hover:text-blue-600 font-medium">
                   Log in
                 </Link>
                 <Link href="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full font-medium transition-colors">
@@ -97,7 +97,7 @@ export default function HomePage() {
               The open-source adult network built on privacy. Meet locals, verify with AI, and chat with end-to-end encryption.
             </p>
             
-            <div className="w-full max-w-2xl mx-auto mb-10 rounded-[28px] border border-white/70 bg-white/70 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/35">
+            <div className="w-full max-w-2xl mx-auto mb-10 rounded-[28px] border border-white/70 bg-white dark:bg-gray-800/70 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/35">
               <SexQuote />
             </div>
 
@@ -369,7 +369,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200 py-12">
+      <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-8 md:mb-0">
@@ -379,16 +379,16 @@ export default function HomePage() {
               <p className="text-gray-500 mt-2">© 2026 fwber. All rights reserved.</p>
             </div>
             <div className="flex space-x-8">
-              <Link href="/privacy" className="text-gray-600 hover:text-gray-900">Privacy Policy</Link>
-              <Link href="/terms" className="text-gray-600 hover:text-gray-900">Terms of Service</Link>
-              <Link href="/contact" className="text-gray-600 hover:text-gray-900">Contact Us</Link>
+              <Link href="/privacy" className="text-gray-600 hover:text-gray-900 dark:text-white">Privacy Policy</Link>
+              <Link href="/terms" className="text-gray-600 hover:text-gray-900 dark:text-white">Terms of Service</Link>
+              <Link href="/contact" className="text-gray-600 hover:text-gray-900 dark:text-white">Contact Us</Link>
             </div>
           </div>
         </div>
       </footer>
       
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 pb-safe">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 dark:border-gray-800 z-50 pb-safe">
         <div className="flex justify-around items-center h-16">
           <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-500">
             <Home className="w-6 h-6 mb-1" />

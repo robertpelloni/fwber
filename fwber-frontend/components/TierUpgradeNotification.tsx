@@ -112,7 +112,7 @@ export default function TierUpgradeNotification({
           </p>
 
           {/* New unlocks */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
+          <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-800 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-sm mb-3 text-gray-700 dark:text-gray-300">
               What&apos;s new:
             </h3>

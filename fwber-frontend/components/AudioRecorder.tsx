@@ -170,7 +170,7 @@ export default function AudioRecorder({
 
   if (audioBlob) {
     return (
-      <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg w-full animate-in fade-in slide-in-from-bottom-2">
+      <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 dark:bg-gray-700 p-2 rounded-lg w-full animate-in fade-in slide-in-from-bottom-2">
         <div className="flex-1 flex items-center gap-2">
           <span className="text-sm font-medium text-gray-600 dark:text-gray-300 w-10">{formatDuration(duration)}</span>
           <audio src={URL.createObjectURL(audioBlob)} controls className="h-8 w-40 md:w-48" />

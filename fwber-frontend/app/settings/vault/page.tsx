@@ -26,7 +26,7 @@ export default function VaultSettingsPage() {
   if (!isEnabled) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
           <div className="mx-auto max-w-2xl">
             <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-6 text-center">
               <Shield className="mx-auto h-12 w-12 text-yellow-500" />
@@ -139,7 +139,7 @@ function VaultSettingsContent() {
 
   if (!vault.isSupported) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
         <div className="mx-auto max-w-2xl">
           <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
             <XCircle className="mx-auto h-12 w-12 text-red-500" />
@@ -157,11 +157,11 @@ function VaultSettingsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
       <div className="mx-auto max-w-2xl space-y-6">
         {/* Header */}
         <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
             <Shield className="h-7 w-7 text-purple-600" />
             Local Media Vault
           </h1>
@@ -171,8 +171,8 @@ function VaultSettingsContent() {
         </div>
 
         {/* Status Card */}
-        <div className="rounded-lg border bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Vault Status</h2>
+        <div className="rounded-lg border bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Vault Status</h2>
 
           <div className="mt-4 flex items-center gap-4">
             <div
@@ -193,7 +193,7 @@ function VaultSettingsContent() {
               )}
             </div>
             <div>
-              <p className="text-lg font-medium capitalize text-gray-900">
+              <p className="text-lg font-medium capitalize text-gray-900 dark:text-white">
                 {vault.status === 'uninitialized' ? 'Not Set Up' : vault.status}
               </p>
               {vault.info && (
@@ -235,8 +235,8 @@ function VaultSettingsContent() {
 
         {/* Initialize or Unlock Form */}
         {vault.status !== 'unlocked' && (
-          <div className="rounded-lg border bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="rounded-lg border bg-white dark:bg-gray-800 p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               {vault.status === 'uninitialized' ? 'Set Up Your Vault' : 'Unlock Your Vault'}
             </h2>
             <p className="mt-1 text-sm text-gray-500">
@@ -247,13 +247,13 @@ function VaultSettingsContent() {
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Passphrase</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Passphrase</label>
                 <div className="relative mt-1">
                   <input
                     type={showPassphrase ? 'text' : 'password'}
                     value={passphrase}
                     onChange={(e) => setPassphrase(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2 pr-10 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 pr-10 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                     placeholder="Enter your passphrase"
                   />
                   <button
@@ -307,14 +307,14 @@ function VaultSettingsContent() {
 
               {vault.status === 'uninitialized' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Confirm Passphrase
                   </label>
                   <input
                     type={showPassphrase ? 'text' : 'password'}
                     value={confirmPassphrase}
                     onChange={(e) => setConfirmPassphrase(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
                     placeholder="Confirm your passphrase"
                   />
                   {confirmPassphrase && passphrase !== confirmPassphrase && (
@@ -352,9 +352,9 @@ function VaultSettingsContent() {
 
         {/* Vault Contents (when unlocked) */}
         {vault.isUnlocked && (
-          <div className="rounded-lg border bg-white p-6 shadow-sm">
+          <div className="rounded-lg border bg-white dark:bg-gray-800 p-6 shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Vault Contents</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Vault Contents</h2>
               <button
                 onClick={handleExport}
                 disabled={actionLoading === 'export' || vault.items.length === 0}
@@ -370,7 +370,7 @@ function VaultSettingsContent() {
             </div>
 
             {vault.items.length === 0 ? (
-              <div className="mt-4 rounded-lg bg-gray-50 p-8 text-center">
+              <div className="mt-4 rounded-lg bg-gray-50 dark:bg-gray-900 p-8 text-center">
                 <HardDrive className="mx-auto h-12 w-12 text-gray-300" />
                 <p className="mt-2 text-gray-500">Your vault is empty</p>
                 <p className="text-sm text-gray-400">
@@ -382,7 +382,7 @@ function VaultSettingsContent() {
                 {vault.items.slice(0, 10).map((item) => (
                   <li key={item.id} className="flex items-center justify-between py-3">
                     <div>
-                      <p className="font-medium text-gray-900">{item.originalName}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{item.originalName}</p>
                       <p className="text-xs text-gray-500">
                         {formatBytes(item.size)} ·{' '}
                         {new Date(item.createdAt).toLocaleDateString()}
@@ -426,7 +426,7 @@ function VaultSettingsContent() {
 
         {/* Danger Zone */}
         {vault.status !== 'uninitialized' && (
-          <div className="rounded-lg border border-red-200 bg-white p-6 shadow-sm">
+          <div className="rounded-lg border border-red-200 bg-white dark:bg-gray-800 p-6 shadow-sm">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-red-600">
               <AlertTriangle className="h-5 w-5" />
               Danger Zone
@@ -465,7 +465,7 @@ function VaultSettingsContent() {
                   </button>
                   <button
                     onClick={() => setShowResetConfirm(false)}
-                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900"
                   >
                     Cancel
                   </button>

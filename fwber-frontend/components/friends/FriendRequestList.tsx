@@ -19,7 +19,7 @@ export default function FriendRequestList({ friendRequests, onRespondToRequest }
   return (
     <div className="space-y-4">
       {friendRequests.map((request) => (
-        <div key={request.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+        <div key={request.id} className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
           <div>
             <p className="font-semibold">{request.user?.name || 'Unknown User'}</p>
             <p className="text-sm text-gray-500">{request.user?.email || ''}</p>

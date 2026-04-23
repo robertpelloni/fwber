@@ -178,7 +178,7 @@ export default function SwipeableCard({ user, onSwipe, onAction }: SwipeableCard
                         <audio ref={audioRef} src={user.voice_intro_url} onEnded={() => setIsPlaying(false)} className="hidden" />
                         <button
                             onClick={toggleAudio}
-                            className="w-full py-4 bg-white text-black rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition active:scale-95"
+                            className="w-full py-4 bg-white dark:bg-gray-800 text-black rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition active:scale-95"
                         >
                             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
                             {isPlaying ? 'PAUSE INTRO' : 'HEAR MY VOICE'}

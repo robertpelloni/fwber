@@ -102,15 +102,15 @@ export default function JournalPage() {
     <ProtectedRoute>
       <AppHeader title="Field Notes" />
       <ToastContainer />
-      <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 xl:grid-cols-[1.1fr_0.9fr]">
-          <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+          <section className="rounded-3xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
             <div className="mb-6 flex items-start gap-4">
               <div className="rounded-2xl bg-pink-100 p-3 text-pink-600">
                 <BookHeart className="h-6 w-6" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Long-form journals & field notes</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Long-form journals & field notes</h1>
                 <p className="mt-2 max-w-2xl text-sm text-gray-600">
                   Capture scenes, thoughts, and post-event reflections with privacy controls that map to your real social graph.
                 </p>
@@ -119,34 +119,34 @@ export default function JournalPage() {
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2 md:col-span-2">
-                <span className="text-sm font-medium text-gray-700">Title</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Title</span>
                 <input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                   maxLength={120}
                   placeholder="Late-night warehouse thoughts"
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                 />
               </label>
 
               <label className="space-y-2 md:col-span-2">
-                <span className="text-sm font-medium text-gray-700">Field note</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Field note</span>
                 <textarea
                   value={content}
                   onChange={(event) => setContent(event.target.value)}
                   rows={8}
                   maxLength={5000}
                   placeholder="Write the longer thought you want to keep..."
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                 />
               </label>
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Visibility</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Visibility</span>
                 <select
                   value={visibility}
                   onChange={(event) => setVisibility(event.target.value as JournalVisibility)}
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                 >
                   {visibilityOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -157,23 +157,23 @@ export default function JournalPage() {
               </label>
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Mood emoji</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Mood emoji</span>
                 <input
                   value={moodEmoji}
                   onChange={(event) => setMoodEmoji(event.target.value)}
                   maxLength={10}
                   placeholder="✨"
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                 />
               </label>
 
               {visibility === 'circle' && (
                 <label className="space-y-2 md:col-span-2">
-                  <span className="text-sm font-medium text-gray-700">Circle group</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Circle group</span>
                   <select
                     value={circleGroupId}
                     onChange={(event) => setCircleGroupId(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                    className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                   >
                     <option value="">Select one of your groups</option>
                     {availableGroups.map((group) => (
@@ -186,22 +186,22 @@ export default function JournalPage() {
               )}
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Tags</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tags</span>
                 <input
                   value={tags}
                   onChange={(event) => setTags(event.target.value)}
                   placeholder="aftercare, warehouse, jazz"
-                  className="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
+                  className="w-full rounded-2xl border border-gray-300 dark:border-gray-600 px-4 py-3 text-sm outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                 />
               </label>
 
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Accent color</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Accent color</span>
                 <input
                   type="color"
                   value={accentColor}
                   onChange={(event) => setAccentColor(event.target.value)}
-                  className="h-12 w-full rounded-2xl border border-gray-300 bg-white px-2 py-2"
+                  className="h-12 w-full rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-2"
                 />
               </label>
             </div>
@@ -229,18 +229,18 @@ export default function JournalPage() {
           </section>
 
           <section className="space-y-4">
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-gray-900">Privacy defaults</h2>
+            <div className="rounded-3xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Privacy defaults</h2>
               <p className="mt-2 text-sm text-gray-600">
-                Your default visibility is currently <span className="font-semibold text-gray-900">{settings?.default_visibility ?? 'friends'}</span>.
-                Update it anytime in <span className="font-semibold text-gray-900">Settings → Journal Privacy</span>.
+                Your default visibility is currently <span className="font-semibold text-gray-900 dark:text-white">{settings?.default_visibility ?? 'friends'}</span>.
+                Update it anytime in <span className="font-semibold text-gray-900 dark:text-white">Settings → Journal Privacy</span>.
               </p>
             </div>
 
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-3xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Recent field notes</h2>
-                <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent field notes</h2>
+                <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs font-semibold text-gray-600">
                   {journals.length} saved
                 </span>
               </div>
@@ -248,7 +248,7 @@ export default function JournalPage() {
               {isLoading ? (
                 <div className="text-sm text-gray-500">Loading field notes...</div>
               ) : journals.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-500">
+                <div className="rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 px-4 py-8 text-center text-sm text-gray-500">
                   No field notes yet. Write the first one on the left.
                 </div>
               ) : (
@@ -256,13 +256,13 @@ export default function JournalPage() {
                   {journals.map((journal) => (
                     <article
                       key={journal.id}
-                      className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                      className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm"
                       style={{ borderLeftColor: journal.accent_color ?? '#a855f7', borderLeftWidth: '6px' }}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="mb-2 flex flex-wrap items-center gap-2">
-                            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                            <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
                               {journal.visibility_label}
                             </span>
                             {journal.circle_group?.name && (
@@ -272,7 +272,7 @@ export default function JournalPage() {
                             )}
                             {journal.mood_emoji && <span className="text-lg">{journal.mood_emoji}</span>}
                           </div>
-                          <h3 className="text-base font-semibold text-gray-900">
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                             {journal.title || 'Untitled field note'}
                           </h3>
                         </div>
@@ -287,12 +287,12 @@ export default function JournalPage() {
                         </button>
                       </div>
 
-                      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-gray-700">{journal.content}</p>
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-gray-700 dark:text-gray-300">{journal.content}</p>
 
                       {journal.tags.length > 0 && (
                         <div className="mt-4 flex flex-wrap gap-2">
                           {journal.tags.map((tag) => (
-                            <span key={tag} className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                            <span key={tag} className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs font-medium text-gray-600">
                               #{tag}
                             </span>
                           ))}

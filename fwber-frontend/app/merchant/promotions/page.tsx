@@ -63,10 +63,10 @@ export default function PromotionsListPage() {
       </div>
 
       {promotions.length === 0 ? (
-        <Card className="bg-gray-50 dark:bg-gray-800/50 border-dashed py-12">
+        <Card className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-800/50 border-dashed py-12">
             <CardContent className="flex flex-col items-center justify-center text-center">
                 <Tag className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100">No promotions yet</h3>
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white dark:text-gray-100">No promotions yet</h3>
                 <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
                     Create your first promotion to start attracting customers to your business.
                 </p>

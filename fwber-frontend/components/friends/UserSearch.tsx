@@ -9,7 +9,7 @@ export default function UserSearch({ searchResults, onSendRequest }: UserSearchP
   return (
     <div className="space-y-4">
       {searchResults.map((user) => (
-        <div key={user.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+        <div key={user.id} className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
           <div>
             <p className="font-semibold">{user.name}</p>
             <p className="text-sm text-gray-500">{user.email}</p>

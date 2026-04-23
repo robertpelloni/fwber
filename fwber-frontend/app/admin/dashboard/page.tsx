@@ -24,7 +24,7 @@ export default function ProjectDashboardPage() {
               <div className="flex items-center gap-3">
                 <a
                   href="/admin/settings"
-                  className="rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  className="rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 transition-colors"
                 >
                   Back to Settings
                 </a>
@@ -41,7 +41,7 @@ export default function ProjectDashboardPage() {
               Component Versions
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+              <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900 dark:text-white">Project Root</span>
                   <span className="text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 px-2 py-0.5 rounded-full">
@@ -52,7 +52,7 @@ export default function ProjectDashboardPage() {
                 <div className="mt-4 text-xs text-gray-400 dark:text-gray-600 font-mono">Source: /VERSION</div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+              <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900 dark:text-white">Backend API</span>
                   <span className="text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full">
@@ -63,7 +63,7 @@ export default function ProjectDashboardPage() {
                 <div className="mt-4 text-xs text-gray-400 dark:text-gray-600 font-mono">Source: /fwber-backend/package.json</div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+              <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-gray-900 dark:text-white">Frontend App</span>
                   <span className="text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-0.5 rounded-full">
@@ -82,7 +82,7 @@ export default function ProjectDashboardPage() {
               <Folder className="h-5 w-5 text-gray-500 dark:text-gray-400" />
               Project Structure
             </h2>
-            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 overflow-hidden shadow-sm">
               <div className="p-6">
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
@@ -96,13 +96,13 @@ export default function ProjectDashboardPage() {
                         Acts as the monorepo root.
                       </p>
                       <div className="mt-2 flex gap-2 flex-wrap">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
                           docker-compose.yml
                         </span>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
                           deploy.sh
                         </span>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
                           VERSION
                         </span>
                       </div>

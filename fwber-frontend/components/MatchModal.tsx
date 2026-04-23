@@ -85,7 +85,7 @@ export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }
               </div>
 
               {/* Heart Icon */}
-              <div className="z-10 bg-white rounded-full p-2 shadow-lg animate-bounce">
+              <div className="z-10 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg animate-bounce">
                 <svg className="w-8 h-8 text-red-500 fill-current" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
@@ -121,7 +121,7 @@ export default function MatchModal({ isOpen, onClose, matchedUser, currentUser }
               
               <button
                 onClick={onClose}
-                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold py-3 px-6 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="w-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 dark:text-gray-200 font-semibold py-3 px-6 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               >
                 Keep Swiping
               </button>

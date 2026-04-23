@@ -94,9 +94,9 @@ export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigge
           {ideas.length > 0 && (
             <div className="space-y-4">
               {ideas.map((idea, index) => (
-                <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-100 hover:border-pink-200 transition-colors">
+                <div key={index} className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-100 hover:border-pink-200 transition-colors">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900">{idea.title}</h3>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{idea.title}</h3>
                     <Button
                       variant="ghost"
                       size="icon"

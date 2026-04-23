@@ -101,7 +101,7 @@ export default function ProfileViewsPage() {
           <div className="mb-8">
             <Link 
               href="/dashboard" 
-              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4 transition-colors"
+              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-white mb-4 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Dashboard
@@ -146,8 +146,8 @@ export default function ProfileViewsPage() {
             </div>
           )}
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 dark:border-gray-800 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 dark:border-gray-800">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 <Users className="w-5 h-5 text-blue-500" />
                 Recent Visitors
@@ -163,7 +163,7 @@ export default function ProfileViewsPage() {
                   <Link
                     key={view.id}
                     href={`/profile/${view.viewer.id}`}
-                    className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group"
+                    className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50 transition-colors group"
                   >
                     <div className="relative">
                       {view.viewer.avatar_url ? (
@@ -278,7 +278,7 @@ function StatCard({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-4">
       <div className={`w-10 h-10 rounded-lg ${colorClasses[color]} flex items-center justify-center mb-3`}>
         {icon}
       </div>

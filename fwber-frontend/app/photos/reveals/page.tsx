@@ -238,7 +238,7 @@ function PhotoRevealsContent() {
               </div>
               <Link
                 href="/matches"
-                className="px-4 py-2 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition"
+                className="px-4 py-2 bg-white dark:bg-gray-800 text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition"
               >
                 My Matches
               </Link>

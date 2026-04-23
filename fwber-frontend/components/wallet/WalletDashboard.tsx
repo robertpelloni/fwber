@@ -102,7 +102,7 @@ export default function WalletDashboard() {
             </div>
 
             {/* Tabs */}
-            <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-700/50 rounded-lg overflow-x-auto">
+            <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 dark:bg-gray-700/50 rounded-lg overflow-x-auto">
                 {(['wallet', 'requests', 'merchant', 'bridge'] as const).map(tab => (
                     <button
                         key={tab}
@@ -219,7 +219,7 @@ export default function WalletDashboard() {
                                     </button>
                                 </div>
                                 <div className="flex justify-center">
-                                    <QRCodeSVG value={internalWallet?.treasury_address || ''} size={64} className="p-1 bg-white rounded border" />
+                                    <QRCodeSVG value={internalWallet?.treasury_address || ''} size={64} className="p-1 bg-white dark:bg-gray-800 rounded border" />
                                 </div>
                             </div>
                         </div>
@@ -290,7 +290,7 @@ export default function WalletDashboard() {
                         {!merchantKeys ? (
                             <button
                                 onClick={generateMerchantKeys}
-                                className="bg-white text-gray-900 px-4 py-2 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+                                className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-100 transition-colors"
                             >
                                 Generate API Keys
                             </button>
@@ -313,7 +313,7 @@ export default function WalletDashboard() {
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                             1. Create a payment intent via API:
                         </p>
-                        <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-xs overflow-x-auto">
+                        <pre className="bg-gray-100 dark:bg-gray-800 dark:bg-gray-900 p-2 rounded text-xs overflow-x-auto">
                             {`POST /api/merchant/checkout
 Headers: { "X-Merchant-Secret": "sk_..." }
 Body: {

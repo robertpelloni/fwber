@@ -56,7 +56,7 @@ export default function ReferralsPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader title="Referrals" />
         <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Referrals & Payouts</h1>
@@ -75,7 +75,7 @@ export default function ReferralsPage() {
             <MetricCard icon={<DollarSign className="h-5 w-5" />} label="Pending Cash" value={`$${Number(summary?.pending_cash_usd ?? 0).toFixed(2)}`} />
           </section>
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Invite Link</h2>
             {isLoading ? (
               <p className="mt-3 text-sm text-gray-500">Loading referral summary…</p>
@@ -104,7 +104,7 @@ export default function ReferralsPage() {
 
 function MetricCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-3 inline-flex rounded-xl bg-emerald-50 p-3 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300">{icon}</div>
       <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
       <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{value}</div>

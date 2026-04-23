@@ -76,7 +76,7 @@ export default function MarketplacePage() {
             <button 
               onClick={() => fetchItems(true)}
               disabled={loading || refreshing}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-full font-bold hover:bg-gray-50 dark:hover:bg-zinc-800 transition disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 dark:bg-zinc-900 border border-gray-200 dark:border-gray-700 dark:border-zinc-800 rounded-full font-bold hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-zinc-800 transition disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${(loading || refreshing) ? 'animate-spin' : ''}`} />
               Refresh
@@ -86,11 +86,11 @@ export default function MarketplacePage() {
           {loading ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white dark:bg-zinc-900 rounded-3xl h-64 animate-pulse" />
+                <div key={i} className="bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-3xl h-64 animate-pulse" />
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-[3rem] border border-gray-100 dark:border-zinc-800">
+            <div className="text-center py-20 bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-[3rem] border border-gray-100 dark:border-zinc-800">
               <Store className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No items found nearby</h2>
               <p className="text-gray-500 max-w-sm mx-auto mb-8">
@@ -109,9 +109,9 @@ export default function MarketplacePage() {
                 <Link 
                   key={item.id} 
                   href={`/marketplace/${item.merchant_profile_id}`}
-                  className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition group border border-gray-100 dark:border-zinc-800"
+                  className="bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition group border border-gray-100 dark:border-zinc-800"
                 >
-                  <div className="relative h-48 bg-gray-100 dark:bg-zinc-800">
+                  <div className="relative h-48 bg-gray-100 dark:bg-gray-800 dark:bg-zinc-800">
                     {item.image_url ? (
                       <Image 
                         src={item.image_url} 
@@ -159,7 +159,7 @@ export default function MarketplacePage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/economy"
-                  className="px-8 py-4 bg-white text-orange-600 font-black rounded-2xl hover:scale-105 transition active:scale-95 shadow-xl"
+                  className="px-8 py-4 bg-white dark:bg-gray-800 text-orange-600 font-black rounded-2xl hover:scale-105 transition active:scale-95 shadow-xl"
                 >
                   Get Tokens
                 </Link>

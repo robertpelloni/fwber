@@ -125,7 +125,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
 
   if (chatroomLoading) {
     return (
-      <div className="min-h-[400px] bg-gray-50 flex items-center justify-center">
+      <div className="min-h-[400px] bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading chatroom...</p>
@@ -136,9 +136,9 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
 
   if (!chatroom) {
     return (
-      <div className="min-h-[400px] bg-gray-50 flex items-center justify-center">
+      <div className="min-h-[400px] bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Chatroom not found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Chatroom not found</h1>
           <p className="text-gray-600 mb-4">The chatroom you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.</p>
         </div>
       </div>
@@ -146,14 +146,14 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
   }
 
   return (
-    <div className="min-h-[600px] bg-gray-50 rounded-lg">
+    <div className="min-h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg">
       <div className="flex flex-col h-[600px]">
         {/* Chatroom Header */}
-        <div className="bg-white rounded-t-lg shadow-sm border-b border-gray-200 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-t-lg shadow-sm border-b border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-xl font-bold text-gray-900">{chatroom.display_name || chatroom.name}</h1>
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white">{chatroom.display_name || chatroom.name}</h1>
                 <ConnectionStatusBadge />
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -168,7 +168,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
 
               {/* Online Users Panel */}
               {showOnlineUsers && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg absolute z-20 shadow-lg border">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg absolute z-20 shadow-lg border">
                   <OnlineUsersList userIds={memberIds} maxDisplay={8} />
                 </div>
               )}
@@ -177,16 +177,16 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
         </div>
 
         {/* Chat Interface */}
-        <div className="bg-white flex-1 flex flex-col relative rounded-b-lg">
+        <div className="bg-white dark:bg-gray-800 flex-1 flex flex-col relative rounded-b-lg">
 
           {/* Preview Mode Overlay */}
           {(chatroomData?.preview_mode) && (
-            <div className="absolute inset-0 z-10 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
-              <div className="bg-white p-8 rounded-xl shadow-2xl border border-gray-200 max-w-md w-full text-center">
+            <div className="absolute inset-0 z-10 bg-white dark:bg-gray-800/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-md w-full text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">🔒</span>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Join to Chat</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Join to Chat</h2>
                 <p className="text-gray-600 mb-6">
                   {chatroom?.token_entry_fee && chatroom.token_entry_fee > 0
                     ? `This chatroom requires an entry fee of ${chatroom.token_entry_fee} tokens.`
@@ -232,7 +232,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">
                         {message.display_user}
                       </span>
                       <span className="text-xs text-gray-500">
@@ -242,7 +242,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                         <span className="text-xs text-gray-400">(edited)</span>
                       )}
                     </div>
-                    <p className="text-gray-900 whitespace-pre-wrap">{message.display_content}</p>
+                    <p className="text-gray-900 dark:text-white whitespace-pre-wrap">{message.display_content}</p>
 
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
@@ -251,7 +251,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                           <button
                             key={emoji}
                             onClick={() => handleReaction(message.id, emoji)}
-                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 rounded-full transition-colors"
                           >
                             <span className="mr-1">{emoji}</span>
                             <span>{count as number}</span>
@@ -269,7 +269,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No messages yet</h3>
                 <p className="text-gray-600">Start the conversation by sending the first message!</p>
               </div>
             )}
@@ -277,7 +277,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
           </div>
 
           {/* Message Input */}
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
             <form onSubmit={handleSendMessage} className="flex space-x-3">
               <div className="flex-1">
                 <textarea
@@ -288,7 +288,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                   }}
                   placeholder="Type your message..."
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-black"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-black"
                   disabled={isSending}
                 />
               </div>
@@ -312,7 +312,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
         </div>
 
         {/* Quick Reactions */}
-        <div className="bg-gray-50 p-2 flex items-center space-x-2 rounded-b-lg">
+        <div className="bg-gray-50 dark:bg-gray-900 p-2 flex items-center space-x-2 rounded-b-lg">
           <span className="text-sm text-gray-500">Quick reactions:</span>
           {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
             <button

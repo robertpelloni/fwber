@@ -282,18 +282,18 @@ export default function FriendsPage() {
               {activeTab === 'relationships' && (
                 <div className="space-y-6">
                   <div className="rounded-2xl border border-rose-100 bg-rose-50/60 p-5">
-                    <h3 className="text-lg font-semibold text-gray-900">Create a relationship link</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Create a relationship link</h3>
                     <p className="mt-1 text-sm text-gray-600">
                       Relationship links require mutual confirmation and work only with accepted friends.
                     </p>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-gray-700">Friend</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Friend</span>
                         <select
                           value={selectedFriendId}
                           onChange={(e) => setSelectedFriendId(e.target.value)}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
                         >
                           <option value="">Select a friend</option>
                           {friends.map((friend) => (
@@ -305,11 +305,11 @@ export default function FriendsPage() {
                       </label>
 
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-gray-700">Relationship type</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Relationship type</span>
                         <select
                           value={relationshipType}
                           onChange={(e) => setRelationshipType(e.target.value as RelationshipLinkType)}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
                         >
                           {relationshipTypeOptions.map((option) => (
                             <option key={option} value={option}>
@@ -320,11 +320,11 @@ export default function FriendsPage() {
                       </label>
 
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-gray-700">Visibility</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Visibility</span>
                         <select
                           value={relationshipVisibility}
                           onChange={(e) => setRelationshipVisibility(e.target.value as RelationshipLinkVisibility)}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
                         >
                           {relationshipVisibilityOptions.map((option) => (
                             <option key={option} value={option}>
@@ -335,13 +335,13 @@ export default function FriendsPage() {
                       </label>
 
                       <label className="space-y-2 md:col-span-2">
-                        <span className="text-sm font-medium text-gray-700">Note</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Note</span>
                         <input
                           value={relationshipNote}
                           onChange={(e) => setRelationshipNote(e.target.value)}
                           maxLength={280}
                           placeholder="Optional context for the other person"
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
                         />
                       </label>
                     </div>
@@ -374,10 +374,10 @@ export default function FriendsPage() {
                     <p className="text-sm text-gray-500">No pending relationship link requests.</p>
                   ) : (
                     relationshipRequests.map((link) => (
-                      <div key={link.id} className="rounded-lg border border-gray-200 p-4">
+                      <div key={link.id} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                           <div>
-                            <p className="font-semibold text-gray-900">
+                            <p className="font-semibold text-gray-900 dark:text-white">
                               {link.related_user?.display_name || link.related_user?.name || 'Connection'} wants to link as{' '}
                               {link.relationship_type_label.toLowerCase()}
                             </p>
@@ -453,10 +453,10 @@ function RelationshipLinkCard({
   const [note, setNote] = useState(link.note || '');
 
   return (
-    <div className="rounded-2xl border border-gray-200 p-4 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <p className="font-semibold text-gray-900">
+          <p className="font-semibold text-gray-900 dark:text-white">
             {link.related_user?.display_name || link.related_user?.name || 'Connection'}
           </p>
           <p className="mt-1 text-sm text-gray-500">
@@ -470,11 +470,11 @@ function RelationshipLinkCard({
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-medium text-gray-700">Relationship type</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Relationship type</span>
           <select
             value={relationshipType}
             onChange={(e) => setRelationshipType(e.target.value as RelationshipLinkType)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
           >
             {relationshipTypeOptions.map((option) => (
               <option key={option} value={option}>
@@ -485,11 +485,11 @@ function RelationshipLinkCard({
         </label>
 
         <label className="space-y-2">
-          <span className="text-sm font-medium text-gray-700">Visibility</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Visibility</span>
           <select
             value={visibility}
             onChange={(e) => setVisibility(e.target.value as RelationshipLinkVisibility)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
           >
             {relationshipVisibilityOptions.map((option) => (
               <option key={option} value={option}>
@@ -500,12 +500,12 @@ function RelationshipLinkCard({
         </label>
 
         <label className="space-y-2 md:col-span-2">
-          <span className="text-sm font-medium text-gray-700">Note</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Note</span>
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             maxLength={280}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm"
           />
         </label>
       </div>

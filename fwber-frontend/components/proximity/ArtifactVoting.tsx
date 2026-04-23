@@ -47,7 +47,7 @@ export default function ArtifactVoting({ artifactId, initialScore, initialUserVo
     };
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-1 mr-3 border border-gray-100">
+        <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg p-1 mr-3 border border-gray-100">
             <button
                 onClick={() => handleVote(1)}
                 disabled={isVoting || !token}
@@ -60,7 +60,7 @@ export default function ArtifactVoting({ artifactId, initialScore, initialUserVo
                 <ChevronUp className="h-5 w-5 stroke-[2.5]" />
             </button>
 
-            <span className={`text-sm font-bold my-1 ${userVote === 1 ? 'text-orange-600' : userVote === -1 ? 'text-purple-600' : 'text-gray-700'
+            <span className={`text-sm font-bold my-1 ${userVote === 1 ? 'text-orange-600' : userVote === -1 ? 'text-purple-600' : 'text-gray-700 dark:text-gray-300'
                 }`}>
                 {score}
             </span>

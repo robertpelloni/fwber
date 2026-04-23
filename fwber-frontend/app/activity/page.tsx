@@ -93,14 +93,14 @@ export default function ActivityPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader title="Activity" />
         <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="mb-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Activity</h1>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
               Restored the full-screen activity view so dashboard feed links and restored social surfaces land on a real page instead of a dead route.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
             {isLoading ? (
               <div className="p-8 text-sm text-gray-500">Loading activity…</div>
             ) : activities.length === 0 ? (
@@ -111,7 +111,7 @@ export default function ActivityPage() {
                   <Link
                     key={`${activity.type}-${activity.user.id}-${activity.timestamp}-${index}`}
                     href={getHref(activity)}
-                    className="block p-4 transition hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    className="block p-4 transition hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50"
                   >
                     <div className="flex items-start gap-3">
                       <div className="mt-1 rounded-full bg-gray-100 p-2 dark:bg-gray-800">

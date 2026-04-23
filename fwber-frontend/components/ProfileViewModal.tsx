@@ -251,7 +251,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
       <div className={`relative w-full max-w-2xl bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-8'}`}>
         
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 dark:border-gray-800 flex justify-between items-center">
           <div className="flex items-center gap-3">
             {/* Presence Indicator */}
             <PresenceIndicator 
@@ -282,7 +282,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
             </button>
             <button 
               onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800"
               aria-label="Close profile view"
               title="Close"
             >
@@ -318,7 +318,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
           {user.profile?.bio && (
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">About</h3>
-              <p className="text-gray-800 dark:text-gray-200">{user.profile.bio}</p>
+              <p className="text-gray-800 dark:text-gray-100 dark:text-gray-200">{user.profile.bio}</p>
             </div>
           )}
 
@@ -340,7 +340,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                   </div>
 
                   {insights.is_locked && !isSubscribed ? (
-                    <div className="bg-white/50 dark:bg-black/20 p-4 rounded-lg backdrop-blur-sm border border-white/20 text-center">
+                    <div className="bg-white dark:bg-gray-800/50 dark:bg-black/20 p-4 rounded-lg backdrop-blur-sm border border-white/20 text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 filter blur-[3px]">
                            Based on your lifestyle and preferences, we found that you are highly compatible in...
                         </p>
@@ -354,7 +354,7 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
                     </div>
                   ) : (
                     <div className="space-y-3">
-                        <div className="text-sm text-gray-800 dark:text-gray-200 italic">
+                        <div className="text-sm text-gray-800 dark:text-gray-100 dark:text-gray-200 italic">
                            &ldquo;{insights.ai_explanation}&rdquo;
                         </div>
                         {insights.breakdown && (

@@ -64,7 +64,7 @@ export default function TierDemoPage() {
         </p>
 
         {/* Controls */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 mb-6">
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6 mb-6">
           <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Controls</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

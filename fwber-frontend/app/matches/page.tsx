@@ -164,7 +164,7 @@ export default function MatchesPage() {
                         <audio ref={audioRef} src={currentMatch.voice_intro_url} onEnded={() => setIsPlaying(false)} className="hidden" />
                         <button
                             onClick={toggleAudio}
-                            className="w-full py-4 bg-white text-black rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition active:scale-95"
+                            className="w-full py-4 bg-white dark:bg-gray-800 text-black rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition active:scale-95"
                         >
                             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
                             {isPlaying ? 'PAUSE INTRO' : 'HEAR MY VOICE'}
@@ -209,7 +209,7 @@ export default function MatchesPage() {
                   {currentMatch.shared_interests.map((interest: string) => (
                     <span
                       key={interest}
-                      className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white/90"
+                      className="rounded-full border border-white/20 bg-white dark:bg-gray-800/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white/90"
                     >
                       {interest}
                     </span>
@@ -237,7 +237,7 @@ export default function MatchesPage() {
                     {currentMatch.scene_overlap.shared_scene_tags.slice(0, 3).map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-medium text-white/80"
+                        className="rounded-full border border-white/15 bg-white dark:bg-gray-800/10 px-2.5 py-1 text-[11px] font-medium text-white/80"
                       >
                         #{tag}
                       </span>
@@ -249,7 +249,7 @@ export default function MatchesPage() {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="text-white hover:bg-white/20 pointer-events-auto mb-2 z-10"
+                  className="text-white hover:bg-white dark:bg-gray-800/20 pointer-events-auto mb-2 z-10"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsProfileOpen(true);
@@ -282,7 +282,7 @@ export default function MatchesPage() {
             <Button
               size="icon"
               variant="outline"
-              className="h-14 w-14 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50 shadow-lg hover:scale-110 transition-transform bg-white/10 backdrop-blur-md"
+              className="h-14 w-14 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50 shadow-lg hover:scale-110 transition-transform bg-white dark:bg-gray-800/10 backdrop-blur-md"
               onClick={() => handleAction('pass')}
             >
               <X className="h-8 w-8" />
@@ -291,7 +291,7 @@ export default function MatchesPage() {
             <Button
               size="icon"
               variant="outline"
-              className="h-10 w-10 rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-50 mt-2 shadow-lg hover:scale-110 transition-transform bg-white/10 backdrop-blur-md"
+              className="h-10 w-10 rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-50 mt-2 shadow-lg hover:scale-110 transition-transform bg-white dark:bg-gray-800/10 backdrop-blur-md"
               onClick={() => handleAction('super_like')}
             >
               <Star className="h-5 w-5" />
@@ -300,7 +300,7 @@ export default function MatchesPage() {
             <Button
               size="icon"
               variant="outline"
-              className="h-14 w-14 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-50 shadow-lg hover:scale-110 transition-transform bg-white/10 backdrop-blur-md"
+              className="h-14 w-14 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-50 shadow-lg hover:scale-110 transition-transform bg-white dark:bg-gray-800/10 backdrop-blur-md"
               onClick={() => handleAction('like')}
             >
               <Heart className="h-8 w-8" />

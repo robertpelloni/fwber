@@ -88,7 +88,7 @@ export default function ContentUnlockGate({
   }
 
   return (
-    <div className={`relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 ${className}`}>
+    <div className={`relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 ${className}`}>
       {/* Content Preview (Blurred/Obscured) */}
       <div className="relative">
         <div className="filter blur-md opacity-50 pointer-events-none select-none" aria-hidden="true">

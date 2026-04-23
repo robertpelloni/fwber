@@ -259,7 +259,7 @@ export default function FederationActivityPage() {
                       </div>
                     ) : (
                       activityItems.map((item) => (
-                        <div key={item.id} className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-950/30">
+                        <div key={item.id} className="rounded-xl border bg-white dark:bg-gray-800 p-4 shadow-sm dark:bg-gray-950/30">
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <Link
@@ -280,7 +280,7 @@ export default function FederationActivityPage() {
                             </Badge>
                           </div>
                           <div
-                            className="mt-3 text-sm text-gray-700 dark:text-gray-200 prose dark:prose-invert max-w-none"
+                            className="mt-3 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200 prose dark:prose-invert max-w-none"
                             dangerouslySetInnerHTML={{ __html: item.content }}
                           />
                           <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">

@@ -84,7 +84,7 @@ export default function WingmanArcadePage() {
                                 repeat: Infinity,
                                 delay: Math.random() * 5
                             }}
-                            className="absolute bg-white rounded-full"
+                            className="absolute bg-white dark:bg-gray-800 rounded-full"
                             style={{
                                 width: Math.random() * 2 + 1 + 'px',
                                 height: Math.random() * 2 + 1 + 'px',
@@ -220,7 +220,7 @@ export default function WingmanArcadePage() {
                         </div>
                         <Link
                             href="/help"
-                            className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition"
+                            className="px-6 py-3 rounded-xl bg-white dark:bg-gray-800/5 hover:bg-white/10 text-white text-sm font-semibold transition"
                         >
                             Learn More
                         </Link>

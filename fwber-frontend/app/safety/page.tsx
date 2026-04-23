@@ -262,7 +262,7 @@ export default function SafetyPage() {
                         <CardContent className="space-y-6">
 
                             {/* Add New Contact Form */}
-                            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row gap-3 items-end border border-gray-200 dark:border-gray-700">
+                            <div className="bg-gray-50 dark:bg-gray-900 dark:bg-gray-800 p-4 rounded-lg flex flex-col sm:flex-row gap-3 items-end border border-gray-200 dark:border-gray-700">
                                 <div className="space-y-1 w-full flex-1">
                                     <Label className="text-xs">Contact Name</Label>
                                     <Input
@@ -291,7 +291,7 @@ export default function SafetyPage() {
                                 {isLoadingContacts ? (
                                     <p className="text-center text-sm text-gray-500 py-4">Loading contacts...</p>
                                 ) : contacts.length === 0 ? (
-                                    <div className="text-center p-6 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg">
+                                    <div className="text-center p-6 border-2 border-dashed border-gray-200 dark:border-gray-700 dark:border-gray-800 rounded-lg">
                                         <p className="text-gray-500 dark:text-gray-400">No emergency contacts set up yet. Please add one for your safety.</p>
                                     </div>
                                 ) : (

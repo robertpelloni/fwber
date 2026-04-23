@@ -155,7 +155,7 @@ export default function GlobalFeedPage() {
                     </CardHeader>
                     <CardContent>
                       <div
-                        className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200"
+                        className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-100 dark:text-gray-200"
                         dangerouslySetInnerHTML={{ __html: post.content }}
                       />
                       <div className="flex items-center gap-6 mt-6 pt-4 border-t dark:border-gray-700 text-gray-500">

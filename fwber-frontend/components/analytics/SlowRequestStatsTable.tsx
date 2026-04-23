@@ -8,11 +8,11 @@ export default function SlowRequestStatsTable() {
 
   if (isLoading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">📊 Slow Request Stats</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">📊 Slow Request Stats</h2>
         <div className="mt-4 space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded bg-gray-100" />
+            <div key={i} className="h-12 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
           ))}
         </div>
       </div>
@@ -21,8 +21,8 @@ export default function SlowRequestStatsTable() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">📊 Slow Request Stats</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">📊 Slow Request Stats</h2>
         <p className="mt-2 text-sm text-red-600">Failed to load slow request stats.</p>
       </div>
     );
@@ -30,17 +30,17 @@ export default function SlowRequestStatsTable() {
 
   if (!stats || stats.length === 0) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">📊 Slow Request Stats</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">📊 Slow Request Stats</h2>
         <p className="mt-2 text-sm text-gray-500">No aggregated stats available.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">📊 Slow Request Stats</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">📊 Slow Request Stats</h2>
         <span className="text-xs text-gray-500">Aggregated by Route</span>
       </div>
       <div className="mt-4 overflow-x-auto">
@@ -56,26 +56,26 @@ export default function SlowRequestStatsTable() {
               <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Last Seen</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-800">
             {stats.map((stat, index) => (
-              <tr key={index} className="hover:bg-gray-50">
-                <td className="px-3 py-2 text-sm text-gray-900">
+              <tr key={index} className="hover:bg-gray-50 dark:bg-gray-900">
+                <td className="px-3 py-2 text-sm text-gray-900 dark:text-white">
                   <div className="font-medium">{stat.route_name || 'Unknown Route'}</div>
                   <div className="text-xs text-gray-500">{stat.action || 'Unknown Action'}</div>
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900">
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white">
                   {stat.count}
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-mono">
                   {(stat.avg_duration / 1000).toFixed(2)}s
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-mono">
                   {(stat.max_duration / 1000).toFixed(2)}s
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-mono">
                   {stat.avg_queries ? Math.round(stat.avg_queries) : '-'}
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-mono">
                   {stat.avg_memory ? `${(stat.avg_memory / 1024).toFixed(1)} MB` : '-'}
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-500">

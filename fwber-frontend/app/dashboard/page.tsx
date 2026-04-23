@@ -457,7 +457,7 @@ function FeatureSurfaceCard({
   return (
     <Link href={href} prefetch={false} className="block">
       <div className={`h-full rounded-xl border p-4 transition hover:shadow-md ${accentClasses[accent]}`}>
-        <div className="mb-3 inline-flex rounded-lg bg-white/70 p-2 dark:bg-black/20">{icon}</div>
+        <div className="mb-3 inline-flex rounded-lg bg-white dark:bg-gray-800/70 p-2 dark:bg-black/20">{icon}</div>
         <h4 className="text-sm font-semibold">{title}</h4>
         <p className="mt-2 text-sm leading-6 text-current/80">{description}</p>
       </div>

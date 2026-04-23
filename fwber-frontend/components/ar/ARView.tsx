@@ -223,7 +223,7 @@ export default function ARView({ artifacts, candidates, userLocation, onClose }:
                 <p className="mb-4">{error}</p>
                 <button 
                     onClick={onClose}
-                    className="bg-white text-red-900 px-4 py-2 rounded font-semibold"
+                    className="bg-white dark:bg-gray-800 text-red-900 px-4 py-2 rounded font-semibold"
                 >
                     Close AR View
                 </button>

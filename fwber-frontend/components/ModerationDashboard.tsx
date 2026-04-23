@@ -63,7 +63,7 @@ export default function ModerationDashboard() {
         <button
           onClick={() => dashboard.refetch()}
           disabled={dashboard.isFetching}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border rounded-lg hover:bg-gray-50 dark:bg-gray-900 disabled:opacity-50"
         >
           <RefreshCw className={`h-4 w-4 ${dashboard.isFetching ? 'animate-spin' : ''}`} />
           Refresh
@@ -79,7 +79,7 @@ export default function ModerationDashboard() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => (
             <button
@@ -106,7 +106,7 @@ export default function ModerationDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white border rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border rounded-lg shadow-sm">
         {activeTab === 'flagged' && (
           <FlaggedContentPanel
             data={flagged.data}
@@ -202,14 +202,14 @@ function Pagination({ page, lastPage, setPage }: { page: number; lastPage: numbe
         <button
           onClick={() => setPage(Math.max(1, page - 1))}
           disabled={page === 1}
-          className="px-3 py-1 text-sm border rounded disabled:opacity-50 hover:bg-gray-50"
+          className="px-3 py-1 text-sm border rounded disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-900"
         >
           Previous
         </button>
         <button
           onClick={() => setPage(Math.min(lastPage, page + 1))}
           disabled={page === lastPage}
-          className="px-3 py-1 text-sm border rounded disabled:opacity-50 hover:bg-gray-50"
+          className="px-3 py-1 text-sm border rounded disabled:opacity-50 hover:bg-gray-50 dark:bg-gray-900"
         >
           Next
         </button>
@@ -242,12 +242,12 @@ function FlaggedContentPanel({
     <div>
       <ul className="divide-y">
         {data.data.map((item: any) => (
-          <li key={item.id} className="p-4 hover:bg-gray-50">
+          <li key={item.id} className="p-4 hover:bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900">#{item.id}</span>
-                  <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded">{item.type}</span>
+                  <span className="font-medium text-gray-900 dark:text-white">#{item.id}</span>
+                  <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded">{item.type}</span>
                   <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded flex items-center gap-1">
                     <AlertTriangle className="h-3 w-3" /> {item.flag_count} flags
                   </span>
@@ -323,7 +323,7 @@ function SpoofDetectionsPanel({
     <div>
       <ul className="divide-y">
         {data.data.map((d: any) => (
-          <li key={d.id} className="p-4 hover:bg-gray-50">
+          <li key={d.id} className="p-4 hover:bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -400,7 +400,7 @@ function ThrottlesPanel({
     <div>
       <ul className="divide-y">
         {data.data.map((t: any) => (
-          <li key={t.id} className="p-4 hover:bg-gray-50">
+          <li key={t.id} className="p-4 hover:bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
@@ -464,7 +464,7 @@ function ActionsPanel({
     <div>
       <ul className="divide-y">
         {data.map((a: any) => (
-          <li key={a.id} className="p-4 hover:bg-gray-50">
+          <li key={a.id} className="p-4 hover:bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -513,12 +513,12 @@ function UserProfileModal({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+        <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="sticky top-0 bg-white dark:bg-gray-800 border-b px-6 py-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <User className="h-5 w-5 text-purple-600" /> User #{userId} Profile
             </h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full" aria-label="Close modal" title="Close">
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:bg-gray-800 rounded-full" aria-label="Close modal" title="Close">
               <X className="h-5 w-5" />
             </button>
           </div>
@@ -527,15 +527,15 @@ function UserProfileModal({
             {isLoading ? (
               <div className="space-y-4">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-16 bg-gray-100 rounded animate-pulse" />
+                  <div key={i} className="h-16 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
                 ))}
               </div>
             ) : profile ? (
               <div className="space-y-6">
                 {/* User Info */}
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-2">Account Info</h3>
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Account Info</h3>
+                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
                     <p><span className="text-gray-500">Email:</span> {profile.user?.email ?? '—'}</p>
                     <p><span className="text-gray-500">Created:</span> {profile.user?.created_at ? new Date(profile.user.created_at).toLocaleString() : '—'}</p>
                   </div>
@@ -543,7 +543,7 @@ function UserProfileModal({
 
                 {/* Moderation Stats */}
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-2">Moderation Stats</h3>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Moderation Stats</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-red-50 rounded-lg p-4 text-center">
                       <p className="text-sm text-red-600">Total Flags Received</p>
@@ -567,8 +567,8 @@ function UserProfileModal({
                 {/* Throttle Stats */}
                 {profile.throttle_stats && (
                   <div>
-                    <h3 className="font-medium text-gray-700 mb-2">Throttle Details</h3>
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                    <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Throttle Details</h3>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
                       <p><span className="text-gray-500">Cumulative Score:</span> {profile.throttle_stats.cumulative_score ?? 0}</p>
                       <p><span className="text-gray-500">Is Throttled:</span> {profile.throttle_stats.is_throttled ? 'Yes' : 'No'}</p>
                       <p><span className="text-gray-500">Current Severity:</span> {profile.throttle_stats.current_severity ?? 0}</p>
@@ -579,8 +579,8 @@ function UserProfileModal({
                 {/* Recent Spoof Detections */}
                 {profile.recent_spoof_detections?.length > 0 && (
                   <div>
-                    <h3 className="font-medium text-gray-700 mb-2">Recent Spoof Detections</h3>
-                    <ul className="bg-gray-50 rounded-lg divide-y divide-gray-200">
+                    <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Recent Spoof Detections</h3>
+                    <ul className="bg-gray-50 dark:bg-gray-900 rounded-lg divide-y divide-gray-200">
                       {profile.recent_spoof_detections.slice(0, 5).map((s: any) => (
                         <li key={s.id} className="p-3 text-sm">
                           <span className={`px-2 py-0.5 text-xs font-medium rounded ${
@@ -599,11 +599,11 @@ function UserProfileModal({
                 {/* Recent Moderation Actions */}
                 {profile.recent_moderation_actions?.length > 0 && (
                   <div>
-                    <h3 className="font-medium text-gray-700 mb-2">Recent Actions Against User</h3>
-                    <ul className="bg-gray-50 rounded-lg divide-y divide-gray-200">
+                    <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Recent Actions Against User</h3>
+                    <ul className="bg-gray-50 dark:bg-gray-900 rounded-lg divide-y divide-gray-200">
                       {profile.recent_moderation_actions.slice(0, 5).map((a: any) => (
                         <li key={a.id} className="p-3 text-sm flex justify-between items-center">
-                          <span className="font-medium text-gray-700">{a.action_type}</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{a.action_type}</span>
                           <span className="text-gray-400">{a.created_at ? new Date(a.created_at).toLocaleDateString() : '—'}</span>
                         </li>
                       ))}

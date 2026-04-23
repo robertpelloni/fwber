@@ -76,7 +76,7 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
 
     return (
         <div className="mt-4 pt-4 border-t border-gray-100">
-            <h4 className="flex items-center gap-2 font-semibold text-gray-800 mb-4 whitespace-nowrap">
+            <h4 className="flex items-center gap-2 font-semibold text-gray-800 dark:text-gray-100 mb-4 whitespace-nowrap">
                 <MessageSquare className="h-4 w-4" /> Discussion
             </h4>
 
@@ -87,7 +87,7 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Add a comment..."
-                    className="flex-1 rounded-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-4"
+                    className="flex-1 rounded-full border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-4"
                     disabled={isSubmitting}
                 />
                 <button
@@ -119,10 +119,10 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-end gap-2 mb-1">
-                                    <span className="font-semibold text-sm text-gray-900">{comment.user?.name || `User #${comment.user_id}`}</span>
+                                    <span className="font-semibold text-sm text-gray-900 dark:text-white">{comment.user?.name || `User #${comment.user_id}`}</span>
                                     <span className="text-xs text-gray-500">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
                                 </div>
-                                <p className="text-sm text-gray-800 break-words">{comment.content}</p>
+                                <p className="text-sm text-gray-800 dark:text-gray-100 break-words">{comment.content}</p>
 
                                 {/* Nested Replies (1 level deep) */}
                                 {comment.replies && comment.replies.length > 0 && (
@@ -136,10 +136,10 @@ export default function ArtifactComments({ artifactId, isOpen }: ArtifactComment
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-end gap-2">
-                                                        <span className="font-semibold text-xs text-gray-900">{reply.user?.name || `User #${reply.user_id}`}</span>
+                                                        <span className="font-semibold text-xs text-gray-900 dark:text-white">{reply.user?.name || `User #${reply.user_id}`}</span>
                                                         <span className="text-[10px] text-gray-500">{formatDistanceToNow(new Date(reply.created_at), { addSuffix: true })}</span>
                                                     </div>
-                                                    <p className="text-xs text-gray-800">{reply.content}</p>
+                                                    <p className="text-xs text-gray-800 dark:text-gray-100">{reply.content}</p>
                                                 </div>
                                             </div>
                                         ))}
