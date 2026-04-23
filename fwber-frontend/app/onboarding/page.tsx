@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import { useState, useEffect, useCallback, useRef, Dispatch, SetStateAction } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { updateUserProfile, completeOnboarding, getUserProfile, type UserProfile } from '@/lib/api/profile'
@@ -41,7 +41,11 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
   
+  // Auto-save debounce timer
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   // Photo management
   const { photos, uploadPhotos, deletePhoto } = usePhotos()
 
@@ -123,11 +127,18 @@ export default function OnboardingPage() {
     }
   }, [isAuthenticated, token])
 
+  // Cleanup auto-save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    }
+  }, [])
+
   const handleUseCurrentLocation = async () => {
     setIsLoading(true)
     try {
       const position = await getCurrentGeolocation()
-      setFormData(prev => ({
+      updateFormData((prev: typeof formData) => ({
         ...prev,
         location: {
           ...prev.location,
@@ -166,8 +177,95 @@ export default function OnboardingPage() {
       return
     }
 
-    await updateUserProfile(token, updates)
+    setSaving(true)
+    try {
+      await updateUserProfile(token, updates)
+    } catch (err) {
+      console.error('Auto-save failed:', err)
+    } finally {
+      setSaving(false)
+    }
   }
+
+  // Debounced auto-save: saves current step data after 800ms of inactivity
+  const autoSave = useCallback(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => {
+      const stepId = STEPS[currentStep].id
+      let updates: Record<string, unknown> = {}
+
+      if (stepId === 'basics') {
+        updates = {
+          display_name: formData.display_name,
+          date_of_birth: formData.date_of_birth,
+          gender: formData.gender,
+          location: sanitizeLocationUpdate(),
+        }
+      } else if (stepId === 'physical') {
+        updates = {
+          height_cm: formData.height_cm,
+          body_type: formData.body_type,
+          hair_color: formData.hair_color,
+          eye_color: formData.eye_color,
+          skin_tone: formData.skin_tone,
+          ethnicity: formData.ethnicity,
+          facial_hair: formData.facial_hair,
+          fitness_level: formData.fitness_level,
+          tattoos: formData.tattoos ? 'yes' : undefined,
+          piercings: formData.piercings ? 'yes' : undefined,
+        }
+      } else if (stepId === 'lifestyle') {
+        updates = {
+          occupation: formData.occupation,
+          education: formData.education,
+          smoking_status: formData.smoking_status,
+          drinking_status: formData.drinking_status,
+          cannabis_status: formData.cannabis_status,
+          dietary_preferences: formData.dietary_preferences,
+        }
+      } else if (stepId === 'personality') {
+        const allowedRelationshipStyles = new Set([
+          'monogamous', 'non-monogamous', 'polyamorous', 'open', 'swinger', 'other', 'prefer-not-to-say',
+        ])
+        updates = {
+          bio: formData.bio,
+          zodiac_sign: formData.zodiac_sign,
+          love_language: formData.love_language,
+          personality_type: formData.personality_type.length === 4 ? formData.personality_type : undefined,
+          political_views: formData.political_views,
+          religion: formData.religion,
+          sleep_schedule: formData.sleep_schedule,
+          relationship_style: allowedRelationshipStyles.has(formData.relationship_style) ? formData.relationship_style : undefined,
+          sexual_orientation: formData.sexual_orientation,
+        }
+      } else if (stepId === 'intimate') {
+        updates = {
+          breast_size: formData.breast_size,
+          penis_length_cm: formData.penis_length_cm,
+          penis_girth_cm: formData.penis_girth_cm,
+          sti_status: formData.sti_status,
+          fetishes: formData.fetishes,
+        }
+      } else if (stepId === 'preferences') {
+        const minAge = Math.min(formData.preferences.age_range_min, formData.preferences.age_range_max)
+        const maxAge = Math.max(formData.preferences.age_range_min, formData.preferences.age_range_max)
+        updates = {
+          looking_for: formData.looking_for,
+          preferences: { age_range_min: minAge, age_range_max: maxAge },
+        }
+      }
+
+      if (Object.keys(updates).length > 0) {
+        persistStepUpdate(updates)
+      }
+    }, 800)
+  }, [currentStep, formData, token])
+
+  // Wrapper for setFormData that triggers auto-save
+  const updateFormData = useCallback((update: any | ((prev: any) => any)) => {
+    setFormData(update)
+    autoSave()
+  }, [autoSave])
 
   const handleNext = async () => {
     setError(null)
@@ -268,6 +366,21 @@ export default function OnboardingPage() {
   }
 
   const handleBack = () => {
+    // Cancel any pending auto-save and save immediately before going back
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    // Save current step before navigating back
+    const stepId = STEPS[currentStep].id
+    const getStepUpdates = (): Record<string, unknown> => {
+      if (stepId === 'basics') return { display_name: formData.display_name, date_of_birth: formData.date_of_birth, gender: formData.gender, location: sanitizeLocationUpdate() }
+      if (stepId === 'physical') return { height_cm: formData.height_cm, body_type: formData.body_type, hair_color: formData.hair_color, eye_color: formData.eye_color, skin_tone: formData.skin_tone, ethnicity: formData.ethnicity, facial_hair: formData.facial_hair, fitness_level: formData.fitness_level, tattoos: formData.tattoos ? 'yes' : undefined, piercings: formData.piercings ? 'yes' : undefined }
+      if (stepId === 'lifestyle') return { occupation: formData.occupation, education: formData.education, smoking_status: formData.smoking_status, drinking_status: formData.drinking_status, cannabis_status: formData.cannabis_status, dietary_preferences: formData.dietary_preferences }
+      if (stepId === 'personality') return { bio: formData.bio, zodiac_sign: formData.zodiac_sign, love_language: formData.love_language, personality_type: formData.personality_type, political_views: formData.political_views, religion: formData.religion, sleep_schedule: formData.sleep_schedule, relationship_style: formData.relationship_style, sexual_orientation: formData.sexual_orientation }
+      if (stepId === 'intimate') return { breast_size: formData.breast_size, penis_length_cm: formData.penis_length_cm, penis_girth_cm: formData.penis_girth_cm, sti_status: formData.sti_status, fetishes: formData.fetishes }
+      if (stepId === 'preferences') return { looking_for: formData.looking_for, preferences: { age_range_min: Math.min(formData.preferences.age_range_min, formData.preferences.age_range_max), age_range_max: Math.max(formData.preferences.age_range_min, formData.preferences.age_range_max) } }
+      return {}
+    }
+    const updates = getStepUpdates()
+    if (Object.keys(updates).length > 0) persistStepUpdate(updates)
     setCurrentStep(prev => Math.max(0, prev - 1))
   }
 
@@ -305,7 +418,7 @@ export default function OnboardingPage() {
               <Input 
                 id="display_name" 
                 value={formData.display_name} 
-                onChange={e => setFormData({...formData, display_name: e.target.value})}
+                onChange={e => updateFormData({...formData, display_name: e.target.value})}
                 placeholder="What should we call you?"
               />
             </div>
@@ -317,7 +430,7 @@ export default function OnboardingPage() {
                   value={formData.date_of_birth ? formData.date_of_birth.split('-')[1] : ''}
                   onChange={e => {
                     const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
-                    setFormData({...formData, date_of_birth: `${y}-${e.target.value}-${d}`});
+                    updateFormData({...formData, date_of_birth: `${y}-${e.target.value}-${d}`});
                   }}
                 >
                   <option value="">Month</option>
@@ -330,7 +443,7 @@ export default function OnboardingPage() {
                   value={formData.date_of_birth ? formData.date_of_birth.split('-')[2] : ''}
                   onChange={e => {
                     const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
-                    setFormData({...formData, date_of_birth: `${y}-${m}-${e.target.value}`});
+                    updateFormData({...formData, date_of_birth: `${y}-${m}-${e.target.value}`});
                   }}
                 >
                   <option value="">Day</option>
@@ -344,7 +457,7 @@ export default function OnboardingPage() {
                   value={formData.date_of_birth ? formData.date_of_birth.split('-')[0] : ''}
                   onChange={e => {
                     const [y, m, d] = formData.date_of_birth ? formData.date_of_birth.split('-') : [`${new Date().getFullYear() - 18}`, '01', '01'];
-                    setFormData({...formData, date_of_birth: `${e.target.value}-${m}-${d}`});
+                    updateFormData({...formData, date_of_birth: `${e.target.value}-${m}-${d}`});
                   }}
                 >
                   <option value="">Year</option>
@@ -361,7 +474,7 @@ export default function OnboardingPage() {
                 id="gender"
                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={formData.gender}
-                onChange={e => setFormData({...formData, gender: e.target.value})}
+                onChange={e => updateFormData({...formData, gender: e.target.value})}
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
@@ -376,7 +489,7 @@ export default function OnboardingPage() {
                 <Input 
                   id="city" 
                   value={formData.location.city} 
-                  onChange={e => setFormData({...formData, location: {...formData.location, city: e.target.value}})}
+                  onChange={e => updateFormData({...formData, location: {...formData.location, city: e.target.value}})}
                   placeholder="City"
                 />
               </div>
@@ -385,7 +498,7 @@ export default function OnboardingPage() {
                 <Input 
                   id="state" 
                   value={formData.location.state} 
-                  onChange={e => setFormData({...formData, location: {...formData.location, state: e.target.value}})}
+                  onChange={e => updateFormData({...formData, location: {...formData.location, state: e.target.value}})}
                   placeholder="State"
                 />
               </div>
@@ -424,27 +537,27 @@ export default function OnboardingPage() {
 
       case 'physical':
         return (
-          <PhysicalStep formData={formData} setFormData={setFormData} />
+          <PhysicalStep formData={formData} setFormData={updateFormData} />
         )
 
       case 'lifestyle':
         return (
-          <LifestyleStep formData={formData} setFormData={setFormData} />
+          <LifestyleStep formData={formData} setFormData={updateFormData} />
         )
 
       case 'personality':
         return (
-          <PersonalityStep formData={formData} setFormData={setFormData} />
+          <PersonalityStep formData={formData} setFormData={updateFormData} />
         )
 
       case 'intimate':
         return (
-          <IntimateStep formData={formData} setFormData={setFormData} />
+          <IntimateStep formData={formData} setFormData={updateFormData} />
         )
 
       case 'preferences':
         return (
-          <PreferencesStep formData={formData} setFormData={setFormData} />
+          <PreferencesStep formData={formData} setFormData={updateFormData} />
         )
 
       case 'complete':
@@ -473,7 +586,7 @@ export default function OnboardingPage() {
               </div>
             ))}
           </div>
-          <CardTitle>{STEPS[currentStep].title}</CardTitle>
+          <CardTitle>{STEPS[currentStep].title} {saving && <span className="text-xs font-normal text-gray-400 ml-2">Saving...</span>}</CardTitle>
         </CardHeader>
         <CardContent>
           {error && (
