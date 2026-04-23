@@ -46,7 +46,7 @@ export function useWebSocketLogic(options: UseWebSocketOptions = {}) {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>([]);
 
-  const wsUrl = options.wsUrl || process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080';
+  const wsUrl = options.wsUrl || process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api', '').replace('https', 'wss').replace('http', 'ws') || 'ws://localhost:8080';
   const token = authToken || '';
 
   const handlersRef = useRef({

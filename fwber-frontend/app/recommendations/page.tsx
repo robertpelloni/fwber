@@ -279,12 +279,12 @@ export default function RecommendationsPage() {
                 <p className="mb-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{recommendation.scene_signals.headline}</p>
               )}
               <div className="flex flex-wrap gap-2">
-                {recommendation.scene_signals.matched_topics.map((topic) => (
+                {(recommendation.scene_signals.matched_topics || []).map((topic) => (
                   <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white dark:bg-gray-800 text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
                     {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                   </Badge>
                 ))}
-                {recommendation.scene_signals.matched_tags.map((tag) => (
+                {(recommendation.scene_signals.matched_tags || []).map((tag) => (
                   <Badge key={tag} variant="secondary">#{tag}</Badge>
                 ))}
               </div>
@@ -386,12 +386,12 @@ export default function RecommendationsPage() {
                 <p className="mb-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{item.scene_signals.headline}</p>
               )}
               <div className="flex flex-wrap gap-2">
-                {item.scene_signals.matched_topics.map((topic) => (
+                {(item.scene_signals.matched_topics || []).map((topic) => (
                   <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white dark:bg-gray-800 text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
                     {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                   </Badge>
                 ))}
-                {item.scene_signals.matched_tags.map((tag) => (
+                {(item.scene_signals.matched_tags || []).map((tag) => (
                   <Badge key={tag} variant="secondary">#{tag}</Badge>
                 ))}
               </div>

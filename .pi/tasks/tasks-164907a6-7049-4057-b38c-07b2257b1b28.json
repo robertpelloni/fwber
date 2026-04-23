@@ -1,5 +1,5 @@
 {
-  "nextId": 11,
+  "nextId": 12,
   "tasks": [
     {
       "id": "4",
@@ -74,13 +74,25 @@
       "id": "10",
       "subject": "Fix dark mode readability across all frontend pages",
       "description": "Replace all hardcoded light-only Tailwind colors with dark-mode-aware equivalents across all app pages. Pattern: text-gray-900 → text-gray-900 dark:text-white, bg-white → bg-white dark:bg-gray-800, etc. 1367 instances across settings (170), profile (71), matches (28), dashboard (23), register (15), messages (14), login (13), onboarding (3), and other pages.",
-      "status": "in_progress",
+      "status": "completed",
       "activeForm": "Fixing dark mode readability across all pages",
       "metadata": {},
       "blocks": [],
       "blockedBy": [],
       "createdAt": 1776980878719,
-      "updatedAt": 1776980889172
+      "updatedAt": 1776981166389
+    },
+    {
+      "id": "11",
+      "subject": "Fix Socket.io cycling and .map() TypeError crash",
+      "description": "1. Socket.io connects/disconnects repeatedly - check backend socket config and frontend connection logic\\n2. TypeError: Cannot read properties of undefined (reading 'map') in page-8c36468e3ae69f79.js at useMemo - find the page and add null guards",
+      "status": "in_progress",
+      "activeForm": "Fixing Socket.io cycling and .map() crash",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776982010210,
+      "updatedAt": 1776982015691
     }
   ]
 }

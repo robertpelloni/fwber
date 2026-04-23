@@ -33,9 +33,9 @@ export function ProximityPresenceView({
   maxDisplay = 8,
   className = '',
 }: ProximityPresenceViewProps) {
-  const userIds = useMemo(() => nearbyUsers.map(u => u.id), [nearbyUsers]);
-  const displayUsers = nearbyUsers.slice(0, maxDisplay);
-  const remainingCount = nearbyUsers.length - maxDisplay;
+  const userIds = useMemo(() => (nearbyUsers || []).map(u => u.id), [nearbyUsers]);
+  const displayUsers = (nearbyUsers || []).slice(0, maxDisplay);
+  const remainingCount = (nearbyUsers || []).length - maxDisplay;
 
   if (!currentLocation) {
     return (

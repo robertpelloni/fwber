@@ -23,11 +23,15 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
   const connect = useCallback(() => {
     if (socketRef.current || !token) return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:4000';
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL?.replace(/\/api$/, '') || 'http://localhost:4000';
     
     const socket = io(socketUrl, {
       auth: { token },
       transports: ['websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 30000,
+      timeout: 10000,
     });
 
     socket.on('connect', () => {
@@ -35,9 +39,14 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
       console.log('[Socket.io] Connected to server');
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
       setConnected(false);
-      console.log('[Socket.io] Disconnected from server');
+      console.log('[Socket.io] Disconnected from server:', reason);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.warn('[Socket.io] Connection error:', error.message);
+      // Don't log full errors to avoid noise from expected failures
     });
 
     socket.on('new_message', (data: any) => {
