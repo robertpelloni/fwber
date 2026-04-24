@@ -17,6 +17,7 @@ import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import AnalyticsProvider from '@/components/AnalyticsProvider'
 import SafeWalkTracker from '@/components/safety/SafeWalkTracker'
 import AssetRecovery from '@/components/AssetRecovery'
+import { AuthenticatedRealtimeProvider } from '@/components/AuthenticatedRealtimeProvider'
 import GlobalSubpageNav from '@/components/GlobalSubpageNav'
 import NativeForegroundNotificationBridge from '@/components/NativeForegroundNotificationBridge'
 
@@ -120,6 +121,7 @@ export default function RootLayout({
                   <AnalyticsProvider />
                 </Suspense>
                 <ToastProvider>
+                  <AuthenticatedRealtimeProvider>
                   <NativeForegroundNotificationBridge />
                   <NotificationListener />
                   <SafeWalkTracker />
@@ -132,8 +134,8 @@ export default function RootLayout({
                   <div className="fixed bottom-1 right-1 text-[10px] text-muted-foreground opacity-50 pointer-events-none z-50">
                     v{process.env.NEXT_PUBLIC_FRONTEND_VERSION || process.env.NEXT_PUBLIC_PROJECT_VERSION || '1.0.2'}
                   </div>
+                  </AuthenticatedRealtimeProvider>
                 </ToastProvider>
-              </SolanaProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
