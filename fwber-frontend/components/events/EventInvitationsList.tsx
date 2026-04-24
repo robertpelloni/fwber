@@ -32,7 +32,7 @@ export default function EventInvitationsList() {
   const fetchInvitations = async () => {
     try {
       const response = await api.get<EventInvitation[]>('/events/invitations');
-      setInvitations(response);
+      setInvitations(Array.isArray(response) ? response : response ? (response as any).data || [] : []);
     } catch (error) {
       console.error('Failed to fetch invitations', error);
     } finally {
@@ -67,7 +67,7 @@ export default function EventInvitationsList() {
         </h2>
       </div>
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        {invitations.map((invitation) => (
+        {(Array.isArray(invitations) ? invitations : []).map((invitation) => (
           <div key={invitation.id} className="p-4 flex items-center justify-between">
             <div>
               <p className="font-medium text-gray-900 dark:text-white">
