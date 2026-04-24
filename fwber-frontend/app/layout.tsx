@@ -136,6 +136,7 @@ export default function RootLayout({
                   </div>
                   </AuthenticatedRealtimeProvider>
                 </ToastProvider>
+              </SolanaProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>
