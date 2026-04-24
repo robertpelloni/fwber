@@ -64,7 +64,7 @@ export function ActivityFeed({
 
     try {
       const data = await api.get<ActivityItem[]>(`/dashboard/activity?limit=${maxItems}`);
-      setActivities(data || []);
+      setActivities(Array.isArray(data) ? data : data ? (data as any).data || [] : []);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch activities:', err);
@@ -219,7 +219,7 @@ export function ActivityFeed({
             </p>
           </div>
         ) : (
-          activities.map((activity) => (
+          (Array.isArray(activities) ? activities : []).map((activity) => (
             <Link
               key={activity.id}
               href={

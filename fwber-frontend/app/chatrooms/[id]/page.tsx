@@ -335,7 +335,7 @@ export default function ChatroomPage() {
                 <p className="mt-2 text-gray-600 dark:text-gray-400">Loading messages...</p>
               </div>
             ) : messages.length > 0 ? (
-              messages.map((message: any) => (
+              (messages || []).map((message: any) => (
                 <div key={message.id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0 relative">
                     <div className="w-8 h-8 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">

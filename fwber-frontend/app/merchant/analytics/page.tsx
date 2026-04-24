@@ -260,7 +260,7 @@ export default function MerchantAnalyticsPage() {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    {data.retention.map((entry) => (
+                                    {(data.retention || []).map((entry) => (
                                         <div key={entry.label} className="flex items-center justify-between text-sm">
                                             <span className="text-zinc-400">{entry.label}</span>
                                             <span className="font-semibold text-white">{entry.value}%</span>
@@ -297,7 +297,7 @@ export default function MerchantAnalyticsPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    {data.broadcasts.map((broadcast) => (
+                                    {(data.broadcasts || []).map((broadcast) => (
                                         <div
                                             key={broadcast.id}
                                             className="rounded-2xl border border-zinc-200 bg-white dark:bg-gray-800 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"

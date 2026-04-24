@@ -40,7 +40,9 @@ export default function ProfileCompletenessWidget() {
     );
   }
 
-  const { percentage = 0, required_complete = false, missing_required = [], missing_optional = [], sections } = data;
+  const { percentage = 0, required_complete = false, sections } = data;
+  const missing_required = Array.isArray(data?.missing_required) ? data.missing_required : [];
+  const missing_optional = Array.isArray(data?.missing_optional) ? data.missing_optional : [];
 
   const safeSections = sections || {
     basic: false,

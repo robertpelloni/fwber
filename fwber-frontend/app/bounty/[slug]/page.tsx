@@ -95,8 +95,8 @@ export default function BountyPage() {
       // Assuming we have a friends endpoint or similar. 
       // If strict friends aren't implemented, we might search all users? 
       // For now, let's assume /friends endpoint exists as per routes file check previously.
-      const response = await apiClient.get<Friend[]>("/friends"); 
-      setFriends(response.data);
+      const response = await apiClient.get<Friend[]>('/friends'); 
+      setFriends(Array.isArray(response.data) ? response.data : (response.data as any)?.data || []);
     } catch (error) {
       console.error("Failed to fetch friends", error);
     }

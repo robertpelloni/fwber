@@ -69,7 +69,7 @@ export default function FeedbackPage() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
-              {data?.data.map((item: FeedbackItem) => (
+              {(data?.data || []).map((item: FeedbackItem) => (
                 <tr key={item.id} className="hover:bg-gray-50 dark:bg-gray-900">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">

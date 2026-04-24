@@ -114,7 +114,9 @@ export default function AchievementsPage() {
       const response = await apiClient.get('/achievements')
       // The API returns { achievements: [...] } based on controller inspection
       // But let's handle if it returns array directly or wrapped
-      return (response.data as any).achievements || response.data
+      return Array.isArray((response.data as any).achievements) 
+        ? (response.data as any).achievements 
+        : Array.isArray(response.data) ? response.data : []
     },
     enabled: !!user
   })
