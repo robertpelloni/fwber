@@ -63,7 +63,7 @@ export default function NearbyPage() {
           ranking_strategy: 'trust-aware',
         })
         
-        setNearbyUsers(response.data)
+        setNearbyUsers(Array.isArray(response.data) ? response.data : response.data?.data || (response as any).users || [])
         setRankingSummary(response.meta?.ranking_strategy?.summary ?? null)
         setError(null)
       } catch (err: any) {
@@ -96,7 +96,7 @@ export default function NearbyPage() {
           limit: 50,
           ranking_strategy: 'trust-aware',
         })
-        setNearbyUsers(response.data)
+        setNearbyUsers(Array.isArray(response.data) ? response.data : response.data?.data || (response as any).users || [])
         setRankingSummary(response.meta?.ranking_strategy?.summary ?? null)
       } catch (err) {
         console.error('Failed to refresh:', err)
