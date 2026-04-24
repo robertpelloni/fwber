@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useFeatureFlag } from '@/lib/hooks/use-feature-flags';
 import { useAuth } from '@/lib/auth-context';
@@ -149,6 +150,7 @@ function SettingsButton({ onClick, icon, title, description, disabled }: Setting
 
 export default function SettingsPage() {
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const searchParams = useSearchParams();
   const { isEnabled: vaultEnabled } = useFeatureFlag('local_media_vault');
   const { isEnabled: faceRevealEnabled } = useFeatureFlag('face_reveal');
@@ -470,6 +472,8 @@ export default function SettingsPage() {
                 </div>
                 <select
                   aria-label="Theme selection"
+                  value={theme ?? 'system'}
+                  onChange={(e) => setTheme(e.target.value)}
                   className="text-sm border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="system">System</option>
