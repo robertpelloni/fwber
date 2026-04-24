@@ -66,7 +66,7 @@ export default function ReputationPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reputation & Trust</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent trust and reputation hub so achievements, profile views, verification, leaderboard surfaces, and social proof mechanics are reachable from one top-level destination.
+                  Track your achievements, verification status, leaderboard rank, and profile trust signals from one hub.
                 </p>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function ReputationPage() {
               <h2 className="text-lg font-semibold">Why this hub matters</h2>
             </div>
             <p className="mt-3 text-sm leading-6 text-purple-800 dark:text-purple-200/90">
-              The richer branch contains multiple overlapping trust and social-proof systems. Grouping them here makes the restored product feel deliberate instead of scattering reputation mechanics across distant settings, profile, and leaderboard routes.
+              A central place for trust and reputation — achievements, verification, leaderboard, and profile views all in one spot.
             </p>
           </section>
         </main>
