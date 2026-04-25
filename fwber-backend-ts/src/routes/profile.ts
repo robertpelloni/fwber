@@ -13,8 +13,18 @@ router.get('/', authenticate, async (req: any, res) => {
       where: { user_id: userId, is_private: false },
       orderBy: { is_primary: 'desc' },
     });
-    res.json({ ...profile, photos });
+    if (!profile) {
+      res.json({ photos });
+      return;
+    }
+    const result = serialize(profile);
+    // Parse JSON fields back to objects for the frontend
+    for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
+      result[col] = parseJsonField(result[col]);
+    }
+    res.json({ ...result, photos });
   } catch (error: any) {
+    console.error('[GET /api/profile]', error.message);
     res.json({});
   }
 });
@@ -36,6 +46,60 @@ router.post('/', authenticate, async (req: any, res) => {
   }
 });
 
+// Helper: recursively convert BigInt to Number for JSON serialization
+function serialize(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'bigint') return Number(obj);
+  if (obj instanceof Date) return obj;
+  if (Array.isArray(obj)) return obj.map((v: any) => serialize(v));
+  if (typeof obj === 'object') {
+    const out: any = {};
+    for (const key of Object.keys(obj)) {
+      out[key] = serialize(obj[key]);
+    }
+    return out;
+  }
+  return obj;
+}
+
+// Helper: safely parse JSON fields that may already be objects or strings
+function parseJsonField(val: any): any {
+  if (!val) return val;
+  if (typeof val === 'object') return val;
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return val; }
+  }
+  return val;
+}
+
+// Known columns that exist in user_profiles table
+const PROFILE_COLUMNS = new Set([
+  'id', 'user_id', 'display_name', 'date_of_birth', 'gender', 'pronouns',
+  'sexual_orientation', 'relationship_style', 'looking_for', 'bio',
+  'voice_intro_url', 'birthdate', 'location_latitude', 'location_longitude',
+  'location_description', 'sti_status', 'preferences', 'love_language',
+  'personality_type', 'political_views', 'religion', 'sleep_schedule',
+  'social_media', 'avatar_url', 'is_federated', 'journal_circle_group_id',
+  'created_at', 'updated_at', 'is_verified', 'is_id_verified', 'zk_id_issuer',
+  'id_verified_at', 'verified_at', 'verification_photo_path', 'smoking_status',
+  'drinking_status', 'cannabis_status', 'dietary_preferences', 'zodiac_sign',
+  'relationship_goals', 'has_children', 'wants_children', 'has_pets',
+  'languages', 'interests', 'height_cm', 'body_type', 'hair_color', 'eye_color',
+  'skin_tone', 'facial_hair', 'dominant_hand', 'fitness_level', 'clothing_style',
+  'ethnicity', 'occupation', 'education', 'relationship_status', 'interested_in',
+  'penis_length_cm', 'penis_girth_cm', 'fetishes', 'breast_size', 'tattoos',
+  'piercings', 'avatar_prompt', 'avatar_status', 'preferred_language',
+  'is_travel_mode', 'is_incognito', 'subscription_price', 'travel_latitude',
+  'travel_longitude', 'travel_location_name', 'latitude', 'longitude',
+  'location_name', 'current_emotion', 'emotion_updated_at',
+]);
+
+// JSON columns that should be stringified before saving
+const JSON_COLUMNS = new Set([
+  'preferences', 'looking_for', 'interests', 'languages', 'social_media',
+  'sti_status', 'fetishes', 'interested_in',
+]);
+
 // PUT /api/profile - Update profile
 router.put('/', authenticate, async (req: any, res) => {
   try {
@@ -51,8 +115,19 @@ router.put('/', authenticate, async (req: any, res) => {
         if (loc.latitude != null) data.location_latitude = loc.latitude;
         if (loc.longitude != null) data.location_longitude = loc.longitude;
         if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
-      } else if (key === 'preferences' || key === 'looking_for' || key === 'interests' || key === 'languages' || key === 'social_media' || key === 'sti_status') {
-        // Store as JSON strings for Prisma Json fields
+        if (loc.max_distance != null) data.location_name = String(loc.max_distance);
+        continue; // Don't pass nested 'location' to Prisma
+      }
+      if (key === 'travel_location') {
+        const loc = val as any;
+        if (loc.latitude != null) data.travel_latitude = loc.latitude;
+        if (loc.longitude != null) data.travel_longitude = loc.longitude;
+        if (loc.name != null) data.travel_location_name = loc.name;
+        continue;
+      }
+      if (key === 'voice_intro') continue; // Handled via multipart upload
+      if (!PROFILE_COLUMNS.has(key)) continue; // Skip unknown fields
+      if (JSON_COLUMNS.has(key)) {
         data[key] = typeof val === 'string' ? val : JSON.stringify(val);
       } else {
         data[key] = val;
@@ -67,7 +142,7 @@ router.put('/', authenticate, async (req: any, res) => {
       data.date_of_birth = new Date(data.date_of_birth + 'T00:00:00.000Z');
     }
 
-    // Remove fields that don't exist in user_profiles table
+    // Remove fields that should not be set directly
     delete data.id;
     delete data.user_id;
     delete data.created_at;
@@ -76,10 +151,10 @@ router.put('/', authenticate, async (req: any, res) => {
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
       const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
-      res.json(updated);
+      res.json(serialize(updated));
     } else {
       const created = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
-      res.json(created);
+      res.json(serialize(created));
     }
   } catch (error: any) {
     console.error('[PUT /api/profile]', error.message);
