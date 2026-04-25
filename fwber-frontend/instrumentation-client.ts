@@ -4,6 +4,7 @@ export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  tunnel: '/api/sentry-tunnel',
   tracesSampleRate: 1,
   debug: false,
   replaysOnErrorSampleRate: 1.0,
