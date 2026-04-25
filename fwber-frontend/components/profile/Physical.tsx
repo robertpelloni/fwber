@@ -61,23 +61,32 @@ export default function Physical({ formData, handleInputChange }: PhysicalProps)
         <CardTitle>Physical Attributes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-3">
-          <Label className="text-base font-medium">
-            Height: {formData.height_cm ? `${formData.height_cm} cm (${cmToFeetInches(formData.height_cm)})` : 'Not set'}
-          </Label>
-          <input
-            type="range"
-            value={formData.height_cm || 170}
-            onChange={e => handleInputChange('height_cm', parseInt(e.target.value))}
-            min={120}
-            max={220}
-            step={1}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-          />
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>120cm (3&apos;11&quot;)</span>
-            <span>220cm (7&apos;3&quot;)</span>
-          </div>
+        <div className="space-y-2">
+          <Label className="text-base font-medium">Your Height</Label>
+          <select
+            value={formData.height_cm || ''}
+            onChange={e => handleInputChange('height_cm', e.target.value ? parseInt(e.target.value) : null)}
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          >
+            <option value="">Select your height</option>
+            {Array.from({ length: 42 }, (_, i) => {
+              const cm = 145 + i * 2 // 145cm to 227cm in 2cm steps
+              const totalIn = Math.round(cm / 2.54)
+              const ft = Math.floor(totalIn / 12)
+              const inch = totalIn % 12
+              const label = `${cm} cm — ${ft}'${inch}" (${ft} ft${inch > 0 ? ` ${inch} in` : ''})`
+              return (
+                <option key={cm} value={cm}>
+                  {label}
+                </option>
+              )
+            })}
+          </select>
+          {formData.height_cm && (
+            <p className="text-sm text-gray-500">
+              {formData.height_cm} cm · {cmToFeetInches(formData.height_cm)}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
