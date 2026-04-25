@@ -579,11 +579,9 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 gap-1 w-full">
             {STEPS.map((step, idx) => (
-              <div key={step.id} className="flex flex-col items-center">
-                <div className={`h-2 w-full rounded-full mb-2 ${idx <= currentStep ? 'bg-blue-600' : 'bg-gray-200'}`} style={{width: '60px'}}></div>
-              </div>
+              <div key={step.id} className={`h-2 flex-1 rounded-full ${idx <= currentStep ? 'bg-blue-600' : 'bg-gray-200'}`} />
             ))}
           </div>
           <CardTitle>{STEPS[currentStep].title} {saving && <span className="text-xs font-normal text-gray-400 ml-2">Saving...</span>}</CardTitle>
