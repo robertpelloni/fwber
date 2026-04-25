@@ -28,12 +28,7 @@ export const verificationApi = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await apiClient.post<VerificationResult>('/verification/verify', formData, {
-      headers: {
-        ...headers,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await apiClient.post<VerificationResult>('/verification/verify', formData);
 
     return response.data;
   },

@@ -395,12 +395,7 @@ export async function updateUserProfile(
     // Add spoof _method to handle PUT with multipart
     formData.append('_method', 'PUT');
     
-    response = await apiClient.post('/profile', formData, {
-      headers: {
-        ...headers,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    response = await apiClient.post('/profile', formData);
   } else {
     response = await apiClient.put('/profile', sanitizedPayload, {
       headers,
