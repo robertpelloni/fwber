@@ -10,6 +10,7 @@ const SKIN_TONES = ['Very Fair', 'Fair', 'Light', 'Medium', 'Olive', 'Tan', 'Bro
 const ETHNICITIES = ['Asian', 'Black', 'Hispanic/Latino', 'Middle Eastern', 'Native American', 'Pacific Islander', 'White', 'Mixed', 'Other'];
 const FACIAL_HAIR = ['None', 'Stubble', 'Goatee', 'Mustache', 'Full Beard', 'Other'];
 const FITNESS_LEVELS = ['Sedentary', 'Light', 'Moderate', 'Active', 'Very Active', 'Athlete'];
+const CLOTHING_STYLES = ['Casual', 'Streetwear', 'Formal', 'Athleisure', 'Bohemian', 'Punk', 'Minimalist', 'Vintage', 'Other'];
 
 interface PhysicalProps {
   formData: {
@@ -23,20 +24,22 @@ interface PhysicalProps {
     fitness_level?: string;
     tattoos?: boolean;
     piercings?: boolean;
+    dominant_hand?: string;
+    clothing_style?: string;
   };
   handleInputChange: (field: string, value: string | number | boolean | null) => void;
 }
 
 export default function Physical({ formData, handleInputChange }: PhysicalProps) {
   const cmToFeetInches = (cm: number | null | undefined) => {
-    if (!cm) return "Not set";
+    if (!cm) return 'Not set';
     const totalInches = cm / 2.54;
     const feet = Math.floor(totalInches / 12);
     const inches = Math.round(totalInches % 12);
     return `${feet}'${inches}"`;
   };
 
-  const SelectGrid = ({ options, selected, field, cols = 4 }: { options: string[], selected: string | undefined, field: string, cols?: number }) => (
+  const SelectGrid = ({ options, selected, field, cols = 4 }: { options: string[]; selected: string | undefined; field: string; cols?: number }) => (
     <div className={`grid grid-cols-2 sm:grid-cols-${cols} gap-2`}>
       {options.map(opt => (
         <button
@@ -70,22 +73,19 @@ export default function Physical({ formData, handleInputChange }: PhysicalProps)
           >
             <option value="">Select your height</option>
             {Array.from({ length: 42 }, (_, i) => {
-              const cm = 145 + i * 2 // 145cm to 227cm in 2cm steps
-              const totalIn = Math.round(cm / 2.54)
-              const ft = Math.floor(totalIn / 12)
-              const inch = totalIn % 12
-              const label = `${cm} cm — ${ft}'${inch}" (${ft} ft${inch > 0 ? ` ${inch} in` : ''})`
+              const cm = 145 + i * 2;
+              const totalIn = Math.round(cm / 2.54);
+              const ft = Math.floor(totalIn / 12);
+              const inch = totalIn % 12;
               return (
                 <option key={cm} value={cm}>
-                  {label}
+                  {cm} cm — {ft}'{inch}" ({ft} ft{inch > 0 ? ` ${inch} in` : ''})
                 </option>
-              )
+              );
             })}
           </select>
           {formData.height_cm && (
-            <p className="text-sm text-gray-500">
-              {formData.height_cm} cm · {cmToFeetInches(formData.height_cm)}
-            </p>
+            <p className="text-sm text-gray-500">{formData.height_cm} cm &middot; {cmToFeetInches(formData.height_cm)}</p>
           )}
         </div>
 
@@ -122,6 +122,34 @@ export default function Physical({ formData, handleInputChange }: PhysicalProps)
         <div className="space-y-2">
           <Label className="text-base font-medium">Fitness Level</Label>
           <SelectGrid options={FITNESS_LEVELS} selected={formData.fitness_level} field="fitness_level" cols={3} />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-base font-medium">Clothing Style</Label>
+          <SelectGrid options={CLOTHING_STYLES} selected={formData.clothing_style} field="clothing_style" cols={3} />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-base font-medium">Dominant Hand</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {['Left', 'Right', 'Ambidextrous'].map(opt => {
+              const val = opt.toLowerCase().replace(/ /g, '_');
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => handleInputChange('dominant_hand', val)}
+                  className={`px-3 py-2 text-sm rounded-lg border transition-all ${
+                    formData.dominant_hand === val
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-blue-400'
+                  }`}
+                >
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
