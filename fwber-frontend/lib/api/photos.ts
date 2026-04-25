@@ -93,11 +93,7 @@ class PhotoAPI {
             }
           }, 200)
           
-          const response = await apiClient.post<{ success: boolean; data: any }>('/photos', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          })
+          const response = await apiClient.post<{ success: boolean; data: any }>('/photos', formData)
           
           clearInterval(progressInterval)
           
@@ -120,11 +116,7 @@ class PhotoAPI {
           }
         } else {
           // No progress callback - simple upload
-          const response = await apiClient.post<{ success: boolean; data: any }>('/photos', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          })
+          const response = await apiClient.post<{ success: boolean; data: any }>('/photos', formData)
           
           const result = response.data
           if (result.success && result.data) {
