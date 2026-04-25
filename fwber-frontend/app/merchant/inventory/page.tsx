@@ -88,7 +88,7 @@ export default function MerchantInventoryPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Sidebar: Add Item */}
             <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 sticky top-24">
+              <div className="bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 sticky top-24">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <Plus className="w-5 h-5 text-amber-500" />
                   List New Item
@@ -101,7 +101,7 @@ export default function MerchantInventoryPage() {
                       value={newItem.name}
                       onChange={e => setNewItem({...newItem, name: e.target.value})}
                       placeholder="e.g. Craft Beer"
-                      className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none"
+                      className="w-full bg-gray-50 dark:bg-gray-900 dark:bg-black border border-gray-200 dark:border-gray-700 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none"
                     />
                   </div>
                   <div>
@@ -111,7 +111,7 @@ export default function MerchantInventoryPage() {
                       value={newItem.description}
                       onChange={e => setNewItem({...newItem, description: e.target.value})}
                       placeholder="One pint of local IPA..."
-                      className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none min-h-[100px] resize-none"
+                      className="w-full bg-gray-50 dark:bg-gray-900 dark:bg-black border border-gray-200 dark:border-gray-700 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none min-h-[100px] resize-none"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -122,7 +122,7 @@ export default function MerchantInventoryPage() {
                         required
                         value={newItem.price_tokens}
                         onChange={e => setNewItem({...newItem, price_tokens: parseInt(e.target.value)})}
-                        className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none"
+                        className="w-full bg-gray-50 dark:bg-gray-900 dark:bg-black border border-gray-200 dark:border-gray-700 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none"
                       />
                     </div>
                     <div>
@@ -132,7 +132,7 @@ export default function MerchantInventoryPage() {
                         required
                         value={newItem.stock_count}
                         onChange={e => setNewItem({...newItem, stock_count: parseInt(e.target.value)})}
-                        className="w-full bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none"
+                        className="w-full bg-gray-50 dark:bg-gray-900 dark:bg-black border border-gray-200 dark:border-gray-700 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-amber-500 transition outline-none"
                       />
                     </div>
                   </div>
@@ -152,11 +152,11 @@ export default function MerchantInventoryPage() {
               {loading ? (
                 <div className="space-y-4">
                   {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-32 bg-white dark:bg-zinc-900 rounded-3xl animate-pulse" />
+                    <div key={i} className="h-32 bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-3xl animate-pulse" />
                   ))}
                 </div>
               ) : items.length === 0 ? (
-                <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-[3rem] border border-dashed border-gray-200 dark:border-zinc-800">
+                <div className="text-center py-20 bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-[3rem] border border-dashed border-gray-200 dark:border-gray-700 dark:border-zinc-800">
                   <Package className="w-16 h-16 text-gray-200 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-400">No items listed yet</h3>
                   <p className="text-gray-500 text-sm mt-2">Start by adding your first redeemable item.</p>
@@ -166,7 +166,7 @@ export default function MerchantInventoryPage() {
                   {items.map(item => (
                     <div 
                       key={item.id}
-                      className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center justify-between"
+                      className="bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-zinc-800 flex items-center justify-between"
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-600">

@@ -191,7 +191,7 @@ function ProposalCard({
     isFinalized?: boolean
 }) {
     return (
-        <Card className="border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden bg-white dark:bg-zinc-900">
+        <Card className="border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden bg-white dark:bg-gray-800 dark:bg-zinc-900">
             <div className="flex flex-col md:flex-row">
                 <div className="flex-1 p-6 md:p-8">
                     <div className="flex items-center gap-3 mb-4">

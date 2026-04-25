@@ -49,6 +49,19 @@ import notificationPreferencesRoutes from './routes/notification-preferences.js'
 import hardwareTokensRoutes from './routes/hardware-tokens.js';
 import merchantRoutes from './routes/merchant.js';
 import bountiesRoutes from './routes/bounties.js';
+import achievementsRoutes from './routes/achievements.js';
+import scrapbookRoutes from './routes/scrapbook.js';
+import chatroomsRoutes from './routes/chatrooms.js';
+import bulletinBoardsRoutes from './routes/bulletin-boards.js';
+import burnerLinksRoutes from './routes/burner-links.js';
+import feedbackRoutes from './routes/feedback.js';
+import journalsRoutes from './routes/journals.js';
+import proximityChatroomsRoutes from './routes/proximity-chatrooms.js';
+import reportsRoutes from './routes/reports.js';
+import merchantPortalRoutes from './routes/merchant-portal.js';
+import moderationRoutes from './routes/moderation.js';
+import messagesRoutes from './routes/messages.js';
+import federationRoutes from './routes/federation.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -110,6 +123,19 @@ app.use('/api/notification-preferences', notificationPreferencesRoutes);
 app.use('/api/hardware-tokens', hardwareTokensRoutes);
 app.use('/api/merchant', merchantRoutes);
 app.use('/api/bounties', bountiesRoutes);
+app.use('/api/achievements', achievementsRoutes);
+app.use('/api/scrapbook', scrapbookRoutes);
+app.use('/api/chatrooms', chatroomsRoutes);
+app.use('/api/bulletin-boards', bulletinBoardsRoutes);
+app.use('/api/burner-links', burnerLinksRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/journals', journalsRoutes);
+app.use('/api/proximity-chatrooms', proximityChatroomsRoutes);
+app.use('/api/reports', reportsRoutes);
+app.use('/api/merchant-portal', merchantPortalRoutes);
+app.use('/api/moderation', moderationRoutes);
+app.use('/api/messages', messagesRoutes);
+app.use('/api/federation', federationRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {

@@ -32,10 +32,10 @@ export default function ContentGenerationPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">AI Content Generation</h1>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">AI Content Generation</h1>
             <p className="text-gray-600">Leverage the power of AI to create engaging content</p>
           </div>
 
@@ -61,7 +61,7 @@ export default function ContentGenerationPage() {
           </div>
 
           {/* Tab Content */}
-          <div className="bg-white rounded-lg shadow-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
             {activeTab === 'profile' && (
               <div className="p-6">
                 <AIProfileBuilder onProfileGenerated={handleProfileGenerated} />
@@ -244,8 +244,8 @@ export default function ContentGenerationPage() {
 
           {/* Quick Actions */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">🚀 Quick Start</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">🚀 Quick Start</h3>
               <p className="text-gray-600 mb-4">
                 Get started with AI content generation in just a few clicks.
               </p>
@@ -257,8 +257,8 @@ export default function ContentGenerationPage() {
               </button>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">✍️ Smart Editor</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">✍️ Smart Editor</h3>
               <p className="text-gray-600 mb-4">
                 Use our AI-powered editor to create and optimize content.
               </p>
@@ -270,8 +270,8 @@ export default function ContentGenerationPage() {
               </button>
             </div>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">📊 Analytics</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">📊 Analytics</h3>
               <p className="text-gray-600 mb-4">
                 Track your content performance and optimization results.
               </p>

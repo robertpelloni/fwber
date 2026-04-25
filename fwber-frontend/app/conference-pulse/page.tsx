@@ -442,7 +442,7 @@ export default function ConferencePulsePage() {
                 {/* Active Events */}
                 {data?.chatrooms && data.chatrooms.length > 0 && (
                     <div className="conference-events">
-                        {data.chatrooms.map((ch) => (
+                        {(data?.chatrooms || []).map((ch) => (
                             <div key={ch.id} className="conference-event-chip">
                                 <Users size={12} />
                                 {ch.event_name || ch.name}
@@ -476,7 +476,7 @@ export default function ConferencePulsePage() {
                     </div>
                 ) : (
                     <div className="conference-grid">
-                        {data?.professionals.map((pro) => (
+                        {(data?.professionals || []).map((pro) => (
                             <ProfessionalCard
                                 key={pro.user_id}
                                 pro={pro}

@@ -151,7 +151,7 @@ export default function EnhancedProfileEditor() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
             <p className="text-gray-600 mt-1">Update your information and preferences</p>
           </div>
           <div className="text-right">
@@ -196,7 +196,7 @@ export default function EnhancedProfileEditor() {
 
       {/* AI Wingman Insights */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-purple-600" />
           AI Wingman Insights
         </h2>
@@ -993,7 +993,7 @@ export default function EnhancedProfileEditor() {
           </div>
 
           <div className="mt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Social Media (Optional)</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Social Media (Optional)</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <input
                 type="text"
@@ -1082,7 +1082,7 @@ export default function EnhancedProfileEditor() {
                     type="date"
                     value={profile.sti_status?.last_tested || ''}
                     onChange={(e) => handleChange('sti_status', { ...profile.sti_status, last_tested: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                   />
                 </div>
               </div>
@@ -1111,7 +1111,7 @@ export default function EnhancedProfileEditor() {
           <button
             type="button"
             onClick={() => window.history.back()}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors"
           >
             Cancel
           </button>
@@ -1141,10 +1141,10 @@ export default function EnhancedProfileEditor() {
 // Helper Components
 function Section({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center gap-2 mb-4">
         <div className="text-purple-600">{icon}</div>
-        <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
       </div>
       <div className="space-y-4">
         {children}
@@ -1170,7 +1170,7 @@ function FormField({
 }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>

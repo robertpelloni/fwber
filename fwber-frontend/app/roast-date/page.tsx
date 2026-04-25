@@ -88,7 +88,7 @@ export default function RoastDatePage() {
           <div className="w-16 h-16 bg-gradient-to-tr from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
             <Flame className="w-8 h-8 text-white" />
           </div>
-          <CardTitle className="text-3xl font-black text-gray-900">Roast Your Date</CardTitle>
+          <CardTitle className="text-3xl font-black text-gray-900 dark:text-white">Roast Your Date</CardTitle>
           <CardDescription className="text-lg text-gray-600">
             AI-powered savage comebacks & gentle teasing.
           </CardDescription>
@@ -97,32 +97,32 @@ export default function RoastDatePage() {
           {!roast ? (
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Their Name</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Their Name</label>
                 <Input
                   placeholder="e.g. Brad"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-white"
+                  className="bg-white dark:bg-gray-800"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">What do they do?</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">What do they do?</label>
                 <Input
                   placeholder="e.g. DJ / Entrepreneur"
                   value={job}
                   onChange={(e) => setJob(e.target.value)}
-                  className="bg-white"
+                  className="bg-white dark:bg-gray-800"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">One Specific Trait / Flaw</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">One Specific Trait / Flaw</label>
                 <Textarea
                   placeholder="e.g. Never stops talking about crypto, wears sunglasses indoors..."
                   value={trait}
                   onChange={(e) => setTrait(e.target.value)}
-                  className="bg-white resize-none"
+                  className="bg-white dark:bg-gray-800 resize-none"
                   rows={3}
                 />
               </div>
@@ -150,9 +150,9 @@ export default function RoastDatePage() {
             </div>
           ) : (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-white border-2 border-orange-100 rounded-xl p-6 shadow-inner relative">
+              <div className="bg-white dark:bg-gray-800 border-2 border-orange-100 rounded-xl p-6 shadow-inner relative">
                 <Flame className="absolute -top-3 -right-3 w-8 h-8 text-orange-400 rotate-12" />
-                <p className="text-lg font-medium text-gray-800 leading-relaxed italic">
+                <p className="text-lg font-medium text-gray-800 dark:text-gray-100 leading-relaxed italic">
                   &quot;{roast}&quot;
                 </p>
               </div>

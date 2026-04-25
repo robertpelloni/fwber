@@ -105,7 +105,7 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
       <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:text-gray-400 dark:hover:text-gray-200"
           aria-label="Close"
         >
           <X className="w-6 h-6" />
@@ -155,7 +155,7 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
               <div className="text-center py-4 text-gray-500">No matches found to invite.</div>
             ) : (
               matches.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
+                <div key={user.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden relative">
                       {user.avatar_url ? (
@@ -202,7 +202,7 @@ export default function InviteUserModal({ eventId, isOpen, onClose }: InviteUser
               <div className="text-center py-4 text-gray-500">No groups found to invite.</div>
             ) : (
               groups.map((group) => (
-                <div key={group.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
+                <div key={group.id} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gray-200 rounded-lg overflow-hidden relative flex items-center justify-center bg-indigo-100 text-indigo-600">
                       {group.icon ? (

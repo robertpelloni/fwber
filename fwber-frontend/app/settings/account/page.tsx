@@ -101,7 +101,7 @@ export default function AccountSettingsPage() {
         <header className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-10">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
-              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 dark:bg-gray-800 rounded-full transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">Account Settings</h1>
@@ -127,7 +127,7 @@ export default function AccountSettingsPage() {
               </div>
               <form onSubmit={handleUpdateEmail} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                   <input
                     type="email"
                     name="email"
@@ -159,7 +159,7 @@ export default function AccountSettingsPage() {
               </div>
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
                   <input
                     type="password"
                     name="current_password"
@@ -170,7 +170,7 @@ export default function AccountSettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
                   <input
                     type="password"
                     name="password"
@@ -182,7 +182,7 @@ export default function AccountSettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
                   <input
                     type="password"
                     name="password_confirmation"
@@ -306,7 +306,7 @@ export default function AccountSettingsPage() {
                           setShowDeleteConfirm(false);
                           setDeletePassword('');
                         }}
-                        className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                        className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-100"
                       >
                         Cancel
                       </button>

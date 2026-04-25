@@ -47,13 +47,13 @@ export function CallHistory() {
         }
 
         return (
-          <div key={call.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+          <div key={call.id} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full bg-gray-50 ${color}`}>
+              <div className={`p-2 rounded-full bg-gray-50 dark:bg-gray-900 ${color}`}>
                 <Icon className="w-5 h-5" />
               </div>
               <div>
-                <div className="font-medium text-gray-900">{otherUser?.name || 'Unknown User'}</div>
+                <div className="font-medium text-gray-900 dark:text-white">{otherUser?.name || 'Unknown User'}</div>
                 <div className="text-xs text-gray-500 flex items-center gap-1">
                   {date.toLocaleDateString()} {date.toLocaleTimeString()}
                   {call.duration && (

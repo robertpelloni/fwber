@@ -58,7 +58,7 @@ export default function ReputationPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader title="Reputation & Trust" />
         <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-start gap-3">
               <div className="rounded-2xl bg-amber-100 p-3 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
                 <Shield className="h-6 w-6" />
@@ -66,7 +66,7 @@ export default function ReputationPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reputation & Trust</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent trust and reputation hub so achievements, profile views, verification, leaderboard surfaces, and social proof mechanics are reachable from one top-level destination.
+                  Track your achievements, verification status, leaderboard rank, and profile trust signals from one hub.
                 </p>
               </div>
             </div>
@@ -76,7 +76,7 @@ export default function ReputationPage() {
             {reputationSurfaces.map((surface) => {
               const Icon = surface.icon
               const card = (
-                <div className="h-full rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+                <div className="h-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
                   <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${surface.accent} p-3 text-white`}>
                     <Icon className="h-5 w-5" />
                   </div>
@@ -106,7 +106,7 @@ export default function ReputationPage() {
               <h2 className="text-lg font-semibold">Why this hub matters</h2>
             </div>
             <p className="mt-3 text-sm leading-6 text-purple-800 dark:text-purple-200/90">
-              The richer branch contains multiple overlapping trust and social-proof systems. Grouping them here makes the restored product feel deliberate instead of scattering reputation mechanics across distant settings, profile, and leaderboard routes.
+              A central place for trust and reputation — achievements, verification, leaderboard, and profile views all in one spot.
             </p>
           </section>
         </main>

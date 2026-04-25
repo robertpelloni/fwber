@@ -251,7 +251,7 @@ export default function RecommendationsPage() {
     const contentId = String(recommendation.content.id || recommendation.id);
 
     return (
-      <Card key={recommendation.id || `${activeTab}-${index}`} className="h-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+      <Card key={recommendation.id || `${activeTab}-${index}`} className="h-full border-gray-200 dark:border-gray-700 bg-white dark:border-gray-800 dark:bg-gray-900">
         <CardHeader className="space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-2">
@@ -276,15 +276,15 @@ export default function RecommendationsPage() {
                 Scene-aligned +{Math.round(recommendation.scene_signals.score_boost * 100)} pts
               </div>
               {recommendation.scene_signals.headline && (
-                <p className="mb-2 text-sm text-gray-700 dark:text-gray-200">{recommendation.scene_signals.headline}</p>
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{recommendation.scene_signals.headline}</p>
               )}
               <div className="flex flex-wrap gap-2">
-                {recommendation.scene_signals.matched_topics.map((topic) => (
-                  <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
+                {(recommendation.scene_signals.matched_topics || []).map((topic) => (
+                  <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white dark:bg-gray-800 text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
                     {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                   </Badge>
                 ))}
-                {recommendation.scene_signals.matched_tags.map((tag) => (
+                {(recommendation.scene_signals.matched_tags || []).map((tag) => (
                   <Badge key={tag} variant="secondary">#{tag}</Badge>
                 ))}
               </div>
@@ -327,7 +327,7 @@ export default function RecommendationsPage() {
   };
 
   const renderTrendingCard = (item: TrendingContent, index: number) => (
-    <Card key={item.id || `${activeTab}-${index}`} className="h-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <Card key={item.id || `${activeTab}-${index}`} className="h-full border-gray-200 dark:border-gray-700 bg-white dark:border-gray-800 dark:bg-gray-900">
       <CardHeader className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-2">
@@ -360,7 +360,7 @@ export default function RecommendationsPage() {
     const description = item.reason || item.content?.description || 'Personalized recommendation item';
 
     return (
-      <Card key={item.id || `${activeTab}-${index}`} className="h-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+      <Card key={item.id || `${activeTab}-${index}`} className="h-full border-gray-200 dark:border-gray-700 bg-white dark:border-gray-800 dark:bg-gray-900">
         <CardHeader className="space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-2">
@@ -383,15 +383,15 @@ export default function RecommendationsPage() {
                 Scene cue
               </div>
               {item.scene_signals.headline && (
-                <p className="mb-2 text-sm text-gray-700 dark:text-gray-200">{item.scene_signals.headline}</p>
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{item.scene_signals.headline}</p>
               )}
               <div className="flex flex-wrap gap-2">
-                {item.scene_signals.matched_topics.map((topic) => (
-                  <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
+                {(item.scene_signals.matched_topics || []).map((topic) => (
+                  <Badge key={topic.slug} variant="outline" className="border-cyan-300 bg-white dark:bg-gray-800 text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/20 dark:text-cyan-200">
                     {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                   </Badge>
                 ))}
-                {item.scene_signals.matched_tags.map((tag) => (
+                {(item.scene_signals.matched_tags || []).map((tag) => (
                   <Badge key={tag} variant="secondary">#{tag}</Badge>
                 ))}
               </div>
@@ -466,7 +466,7 @@ export default function RecommendationsPage() {
             </div>
           </div>
 
-          <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:border-gray-800 dark:bg-gray-900">
             <CardHeader>
               <CardTitle className="text-lg text-gray-900 dark:text-white">Context</CardTitle>
               <CardDescription>
@@ -520,7 +520,7 @@ export default function RecommendationsPage() {
                     <Compass className="h-4 w-4" />
                     Ranking strategy
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-200">{currentRankingStrategy.summary}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{currentRankingStrategy.summary}</p>
                   <div className="flex flex-wrap gap-2">
                     {currentRankingStrategy.base_relevance ? <Badge variant="outline">Base relevance</Badge> : null}
                     {currentRankingStrategy.trusted_connections ? <Badge variant="outline">Trusted connections</Badge> : null}
@@ -553,7 +553,7 @@ export default function RecommendationsPage() {
           </section>
 
           {mixedMetadata ? (
-            <Card className="border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <Card className="border-gray-200 dark:border-gray-700 bg-white dark:border-gray-800 dark:bg-gray-900">
               <CardHeader>
                 <CardTitle className="text-lg text-gray-900 dark:text-white">Mixed recommendation metadata</CardTitle>
                 <CardDescription>Live details for the current combined recommendation batch.</CardDescription>

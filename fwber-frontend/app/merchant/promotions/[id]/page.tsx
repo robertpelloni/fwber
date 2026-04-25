@@ -192,13 +192,13 @@ export default function MerchantPromotionDetailPage() {
     <div className="space-y-6 px-4 sm:px-0 pb-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Link href="/merchant/promotions" className="mb-3 inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-200">
+          <Link href="/merchant/promotions" className="mb-3 inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-white dark:hover:text-gray-200">
             <ArrowLeft className="mr-1 h-4 w-4" />
             Back to Promotions
           </Link>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{promotion.title}</h1>
-            <Badge className={form.is_active ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-200'}>
+            <Badge className={form.is_active ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700 dark:text-gray-300 dark:bg-gray-800 dark:text-gray-200'}>
               {form.is_active ? 'Active' : 'Inactive'}
             </Badge>
           </div>
@@ -266,7 +266,7 @@ export default function MerchantPromotionDetailPage() {
                     type="checkbox"
                     checked={form.is_active}
                     onChange={(event) => handleChange('is_active', event.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-600"
                   />
                   Promotion is active
                 </label>

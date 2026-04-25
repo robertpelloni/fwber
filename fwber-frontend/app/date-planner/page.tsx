@@ -375,7 +375,7 @@ function DatePlannerContent() {
                     ) : data?.ideas && data.ideas.length > 0 ? (
                         <>
                             <div className="dp-timeline">
-                                {data.ideas.map((idea, i) => (
+                                {(data.ideas || []).map((idea, i) => (
                                     <TimelineStep key={i} idea={idea} index={i} />
                                 ))}
                             </div>

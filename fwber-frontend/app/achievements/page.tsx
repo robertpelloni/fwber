@@ -53,7 +53,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
   return (
     <Card className={`relative overflow-hidden transition-all duration-300 ${achievement.is_unlocked ? 'border-primary/50 bg-primary/5' : 'opacity-70 grayscale'}`}>
       <CardHeader className="flex flex-row items-center gap-4 pb-2">
-        <div className={`p-3 rounded-full ${achievement.is_unlocked ? 'bg-primary/20 text-primary' : 'bg-gray-100 text-gray-400'}`}>
+        <div className={`p-3 rounded-full ${achievement.is_unlocked ? 'bg-primary/20 text-primary' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
           {achievement.is_hidden ? <Lock className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
         </div>
         <div className="flex-1">
@@ -114,7 +114,9 @@ export default function AchievementsPage() {
       const response = await apiClient.get('/achievements')
       // The API returns { achievements: [...] } based on controller inspection
       // But let's handle if it returns array directly or wrapped
-      return (response.data as any).achievements || response.data
+      return Array.isArray((response.data as any).achievements) 
+        ? (response.data as any).achievements 
+        : Array.isArray(response.data) ? response.data : []
     },
     enabled: !!user
   })

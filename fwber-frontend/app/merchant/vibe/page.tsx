@@ -180,7 +180,7 @@ export default function VibeBroadcastPage() {
                                 type="submit" 
                                 size="lg"
                                 disabled={isSubmitting}
-                                className="w-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 rounded-2xl h-16 text-lg font-black italic uppercase tracking-tighter"
+                                className="w-full bg-zinc-900 dark:bg-white dark:bg-gray-800 text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 rounded-2xl h-16 text-lg font-black italic uppercase tracking-tighter"
                             >
                                 {isSubmitting ? 'Transmitting...' : (
                                     <>

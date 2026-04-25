@@ -72,7 +72,7 @@ export function VouchClient({ code }: VouchClientProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
       </div>
     )
@@ -80,8 +80,8 @@ export function VouchClient({ code }: VouchClientProps) {
 
   if (error || !referrer) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Link Expired or Invalid</h1>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Link Expired or Invalid</h1>
         <p className="text-gray-600 mb-6">We couldn&apos;t find the user you&apos;re looking for.</p>
         <Link href="/" className="text-purple-600 font-bold hover:underline">Go Home</Link>
       </div>
@@ -90,10 +90,10 @@ export function VouchClient({ code }: VouchClientProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
 
         {/* Header / Profile */}
-        <div className="bg-gray-50 p-8 text-center border-b border-gray-100">
+        <div className="bg-gray-50 dark:bg-gray-900 p-8 text-center border-b border-gray-100">
           <div className="w-24 h-24 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4 relative">
             {referrer.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -105,7 +105,7 @@ export function VouchClient({ code }: VouchClientProps) {
                 <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Vouch for {referrer.name}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Vouch for {referrer.name}</h1>
           <p className="text-gray-500 mt-2">Help them verify their reputation on fwber.</p>
         </div>
 
@@ -115,7 +115,7 @@ export function VouchClient({ code }: VouchClientProps) {
             <>
               {step === 'type' ? (
                 <>
-                  <p className="text-center text-gray-700 font-medium mb-6">
+                  <p className="text-center text-gray-700 dark:text-gray-300 font-medium mb-6">
                     How do you know {referrer.name}?
                   </p>
 
@@ -128,7 +128,7 @@ export function VouchClient({ code }: VouchClientProps) {
                         <Shield className="w-6 h-6 text-green-600" />
                       </div>
                       <div className="text-left">
-                        <span className="block font-bold text-gray-900">Trustworthy & Safe</span>
+                        <span className="block font-bold text-gray-900 dark:text-white">Trustworthy & Safe</span>
                         <span className="text-sm text-gray-500">I&apos;d trust them with my drink</span>
                       </div>
                     </button>
@@ -141,7 +141,7 @@ export function VouchClient({ code }: VouchClientProps) {
                         <PartyPopper className="w-6 h-6 text-purple-600" />
                       </div>
                       <div className="text-left">
-                        <span className="block font-bold text-gray-900">Fun & Social</span>
+                        <span className="block font-bold text-gray-900 dark:text-white">Fun & Social</span>
                         <span className="text-sm text-gray-500">Life of the party</span>
                       </div>
                     </button>
@@ -154,7 +154,7 @@ export function VouchClient({ code }: VouchClientProps) {
                         <Flame className="w-6 h-6 text-orange-600" />
                       </div>
                       <div className="text-left">
-                        <span className="block font-bold text-gray-900">Hot & Sexy</span>
+                        <span className="block font-bold text-gray-900 dark:text-white">Hot & Sexy</span>
                         <span className="text-sm text-gray-500">Total catch</span>
                       </div>
                     </button>
@@ -165,28 +165,28 @@ export function VouchClient({ code }: VouchClientProps) {
                    <button 
                      type="button" 
                      onClick={() => setStep('type')}
-                     className="text-sm text-gray-500 hover:text-gray-800 mb-2 flex items-center"
+                     className="text-sm text-gray-500 hover:text-gray-800 dark:text-gray-100 mb-2 flex items-center"
                    >
                      ← Back
                    </button>
                    
                    <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Your Name (Optional)</label>
+                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Name (Optional)</label>
                      <input 
                         type="text" 
                         value={voucherName}
                         onChange={(e) => setVoucherName(e.target.value)}
                         placeholder="Anonymous Friend"
-                        className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                        className="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500"
                      />
                    </div>
 
                    <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Relationship to {referrer.name}</label>
+                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relationship to {referrer.name}</label>
                      <select 
                         value={relationshipType}
                         onChange={(e) => setRelationshipType(e.target.value)}
-                        className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                        className="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500"
                      >
                         <option value="">Select relationship...</option>
                         <option value="friend">Friend</option>
@@ -198,13 +198,13 @@ export function VouchClient({ code }: VouchClientProps) {
                    </div>
 
                    <div>
-                     <label className="block text-sm font-medium text-gray-700 mb-1">Vouch Comment</label>
+                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vouch Comment</label>
                      <textarea 
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder={`Tell us why ${referrer.name} is a catch...`}
                         rows={3}
-                        className="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                        className="w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500"
                      />
                    </div>
 
@@ -222,7 +222,7 @@ export function VouchClient({ code }: VouchClientProps) {
                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                  <CheckCircle2 className="w-8 h-8" />
                </div>
-               <h2 className="text-xl font-bold text-gray-900 mb-2">Vouch Recorded!</h2>
+               <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Vouch Recorded!</h2>
                <p className="text-gray-600 mb-6">
                  Thanks for verifying {referrer.name}. You&apos;ve unlocked a reward for yourself.
                </p>

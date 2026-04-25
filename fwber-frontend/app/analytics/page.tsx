@@ -38,7 +38,7 @@ function AnalyticsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={`analytics-skeleton-${index}`} className="rounded-lg bg-white p-6 shadow-sm">
+        <div key={`analytics-skeleton-${index}`} className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
           <div className="h-4 w-24 animate-pulse rounded bg-gray-200" />
           <div className="mt-4 h-8 w-32 animate-pulse rounded bg-gray-200" />
         </div>
@@ -106,13 +106,13 @@ export default function AnalyticsPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-wide text-gray-500">Admin Observatory</p>
-          <h1 className="text-3xl font-semibold text-gray-900">Platform Analytics</h1>
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">Platform Analytics</h1>
           <p className="mt-1 text-sm text-gray-600">
             Unified snapshot of growth, engagement, and operational health.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex rounded-full bg-gray-100 p-1 text-sm font-medium">
+          <div className="inline-flex rounded-full bg-gray-100 dark:bg-gray-800 p-1 text-sm font-medium">
             {RANGE_OPTIONS.map((option) => (
               <button
                 key={option.value}
@@ -120,8 +120,8 @@ export default function AnalyticsPage() {
                 onClick={() => setRange(option.value)}
                 className={`rounded-full px-3 py-1 ${
                   option.value === range
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 dark:text-white'
                 }`}
               >
                 {option.label}
@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
             type="button"
             onClick={() => platformQuery.refetch()}
             disabled={platformQuery.isFetching}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {platformQuery.isFetching ? 'Refreshing…' : 'Refresh data'}
           </button>
@@ -172,10 +172,10 @@ export default function AnalyticsPage() {
       <SlowRequestAnalysis />
 
       {/* System Health Status */}
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">🩺 System Health</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🩺 System Health</h2>
             <p className="text-sm text-gray-500">Backend services and infrastructure status</p>
           </div>
           {healthQuery.isFetching && <span className="text-xs text-gray-500">Checking…</span>}
@@ -241,7 +241,7 @@ export default function AnalyticsPage() {
               }`}>Reverb Hub</p>
               <p className={`mt-2 text-2xl font-semibold ${
                 systemHealth.services?.reverb === 'up' ? 'text-green-900' : 
-                systemHealth.services?.reverb === 'down' ? 'text-red-900' : 'text-gray-900'
+                systemHealth.services?.reverb === 'down' ? 'text-red-900' : 'text-gray-900 dark:text-white'
               }`}>
                 {systemHealth.services?.reverb === 'up' ? '✓ Connected' : 
                  systemHealth.services?.reverb === 'down' ? '✕ Down' : '— N/A'}
@@ -252,11 +252,11 @@ export default function AnalyticsPage() {
         ) : healthQuery.isLoading ? (
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={`health-skeleton-${i}`} className="h-24 animate-pulse rounded-lg bg-gray-100" />
+              <div key={`health-skeleton-${i}`} className="h-24 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
             ))}
           </div>
         ) : (
-          <div className="mt-4 rounded-lg bg-gray-50 p-4 text-center">
+          <div className="mt-4 rounded-lg bg-gray-50 dark:bg-gray-900 p-4 text-center">
             <p className="text-sm text-gray-500">Health data unavailable.</p>
             <button
               onClick={() => healthQuery.refetch()}
@@ -270,10 +270,10 @@ export default function AnalyticsPage() {
 
       <FailedJobsTable />
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">🔌 Live System Signals</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🔌 Live System Signals</h2>
             <p className="text-sm text-gray-500">Real-time Reverb + infra health</p>
           </div>
           {realtimeQuery.isFetching && <span className="text-xs text-gray-500">Refreshing…</span>}
@@ -309,10 +309,10 @@ export default function AnalyticsPage() {
         )}
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🧹 Moderation Insights</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🧹 Moderation Insights</h2>
         {moderationQuery.isLoading && !moderationInsights ? (
-          <div className="mt-4 h-24 animate-pulse rounded-lg bg-gray-100" />
+          <div className="mt-4 h-24 animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
         ) : moderationInsights ? (
           <div className="mt-6 space-y-6">
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -342,15 +342,15 @@ export default function AnalyticsPage() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Top flagged categories</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Top flagged categories</h3>
               <div className="mt-3 space-y-2">
                 {moderationInsights.top_flagged_categories.map((item) => (
                   <div
                     key={item.category}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-2"
+                    className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-2"
                   >
                     <span className="text-sm text-gray-600">{item.category}</span>
-                    <span className="text-sm font-medium text-gray-900">{item.count}</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{item.count}</span>
                   </div>
                 ))}
               </div>
@@ -407,36 +407,36 @@ function AnalyticsOverview({
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
           <p className="text-sm font-medium text-gray-500">Total Users</p>
-          <p className="mt-3 text-3xl font-semibold text-gray-900">
+          <p className="mt-3 text-3xl font-semibold text-gray-900 dark:text-white">
             {formatNumber(analytics.users.total)}
           </p>
           <p className="mt-1 text-sm text-gray-500">
             {formatPercent(analytics.users.growth_rate)} vs prior period
           </p>
         </div>
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
           <p className="text-sm font-medium text-gray-500">Active Users</p>
-          <p className="mt-3 text-3xl font-semibold text-gray-900">
+          <p className="mt-3 text-3xl font-semibold text-gray-900 dark:text-white">
             {formatNumber(analytics.users.active)}
           </p>
           <p className="mt-1 text-sm text-gray-500">
             {formatNumber(analytics.users.new_today)} new in last 24h
           </p>
         </div>
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
           <p className="text-sm font-medium text-gray-500">Messages</p>
-          <p className="mt-3 text-3xl font-semibold text-gray-900">
+          <p className="mt-3 text-3xl font-semibold text-gray-900 dark:text-white">
             {formatNumber(analytics.messages.total)}
           </p>
           <p className="mt-1 text-sm text-gray-500">
             {formatNumber(analytics.messages.average_per_user)} per user
           </p>
         </div>
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
           <p className="text-sm font-medium text-gray-500">Flagged Content</p>
-          <p className="mt-3 text-3xl font-semibold text-gray-900">
+          <p className="mt-3 text-3xl font-semibold text-gray-900 dark:text-white">
             {formatNumber(analytics.messages.moderation_stats.flagged)}
           </p>
           <p className="mt-1 text-sm text-gray-500">
@@ -446,13 +446,13 @@ function AnalyticsOverview({
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">User Activity</h2>
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">User Activity</h2>
           <div className="mt-4 space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Active vs Total</p>
-                <p className="text-lg font-medium text-gray-900">
+                <p className="text-lg font-medium text-gray-900 dark:text-white">
                   {formatNumber(analytics.users.active)} / {formatNumber(analytics.users.total)}
                 </p>
               </div>
@@ -470,20 +470,20 @@ function AnalyticsOverview({
                   label="New users today"
                 />
               </div>
-              <p className="mt-1 text-sm font-medium text-gray-700">
+              <p className="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300">
                 {formatNumber(analytics.users.new_today)} joined
               </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">Moderation Stats</h2>
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Moderation Stats</h2>
           <div className="mt-4 grid grid-cols-2 gap-4">
             {moderationKeys.map((key) => (
-              <div key={key} className="rounded-lg bg-gray-50 p-4">
+              <div key={key} className="rounded-lg bg-gray-50 dark:bg-gray-900 p-4">
                 <p className="text-sm text-gray-500 capitalize">{key.replace('_', ' ')}</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                   {formatNumber(analytics.messages.moderation_stats[key])}
                 </p>
               </div>
@@ -493,9 +493,9 @@ function AnalyticsOverview({
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-lg bg-white p-6 shadow-sm">
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">📈 Hourly Activity</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">📈 Hourly Activity</h2>
             <span className="text-xs text-gray-500">UTC</span>
           </div>
           <div className="mt-4 space-y-2">
@@ -510,14 +510,14 @@ function AnalyticsOverview({
                     label={`Messages at ${hour.hour}:00`}
                   />
                 </div>
-                <span className="w-12 text-right text-sm font-medium text-gray-900">{hour.messages}</span>
+                <span className="w-12 text-right text-sm font-medium text-gray-900 dark:text-white">{hour.messages}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">🏷️ Top Categories</h2>
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🏷️ Top Categories</h2>
           <div className="mt-4 space-y-3">
             {analytics.trends.top_categories.map((category) => (
               <div key={category.category} className="flex items-center justify-between gap-4">
@@ -529,7 +529,7 @@ function AnalyticsOverview({
                     color="green"
                     label={`${category.category} share`}
                   />
-                  <span className="text-sm font-medium text-gray-900">{category.count}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{category.count}</span>
                 </div>
               </div>
             ))}
@@ -538,8 +538,8 @@ function AnalyticsOverview({
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">🌍 Active Areas</h2>
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🌍 Active Areas</h2>
           <p className="mt-1 text-sm text-gray-500">
             {analytics.locations.active_areas} hot zones · coverage radius {analytics.locations.coverage_radius}km
           </p>
@@ -550,14 +550,14 @@ function AnalyticsOverview({
               mostActiveAreas.map((area, index) => (
                 <div
                   key={`${area.name}-${index}`}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 p-4"
+                  className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-gray-900 p-4"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">{area.name}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{area.name}</p>
                     <p className="text-sm text-gray-600">{area.active_users} active users</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold text-gray-900">{area.message_count}</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{area.message_count}</p>
                     <p className="text-xs text-gray-500">messages</p>
                   </div>
                 </div>
@@ -566,8 +566,8 @@ function AnalyticsOverview({
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">⚙️ Performance</h2>
+        <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">⚙️ Performance</h2>
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="rounded-lg bg-blue-50 p-4">
               <p className="text-sm text-blue-600">API Latency</p>

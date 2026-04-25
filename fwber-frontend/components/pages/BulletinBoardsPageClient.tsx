@@ -143,7 +143,7 @@ export default function BulletinBoardsPageClient() {
       <AppHeader title="Bulletin Boards" />
       <div className="max-w-4xl mx-auto p-4">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-6">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6 mb-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               📍 Local Bulletin Boards
@@ -168,7 +168,7 @@ export default function BulletinBoardsPageClient() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Bulletin Boards List */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Nearby Boards
@@ -248,9 +248,9 @@ export default function BulletinBoardsPageClient() {
           {/* Messages Area */}
           <div className="lg:col-span-2">
             {selectedBoardId && boardData ? (
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
+              <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 dark:border-gray-800">
                 {/* Board Header */}
-                <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700 dark:border-gray-800">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {boardData.board.name}
                   </h2>
@@ -295,7 +295,7 @@ export default function BulletinBoardsPageClient() {
                                 {new Date(message.created_at).toLocaleString()}
                               </span>
                             </div>
-                            <p className="text-gray-800 dark:text-gray-200 mt-1">{message.content}</p>
+                            <p className="text-gray-800 dark:text-gray-100 dark:text-gray-200 mt-1">{message.content}</p>
                             {message.expires_at && (
                               <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                                 Expires: {new Date(message.expires_at).toLocaleString()}
@@ -309,7 +309,7 @@ export default function BulletinBoardsPageClient() {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+                <div className="p-6 border-t border-gray-200 dark:border-gray-700 dark:border-gray-800">
                   <div className="mb-4">
                     <PostSuggester 
                       boardId={selectedBoardId}
@@ -353,7 +353,7 @@ export default function BulletinBoardsPageClient() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-12 text-center">
+              <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-12 text-center">
                 <div className="text-gray-400 dark:text-gray-600 text-6xl mb-4">📍</div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   Select a Bulletin Board

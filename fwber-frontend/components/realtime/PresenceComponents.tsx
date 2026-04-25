@@ -161,7 +161,7 @@ export function OnlineUsersList({
   return (
     <div className={className}>
       {showCount && (
-        <div className="text-sm font-medium text-gray-700 mb-2">
+        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {onlineUsers.length} online
         </div>
       )}
@@ -169,14 +169,14 @@ export function OnlineUsersList({
         {displayUsers.map((user: OnlineUser) => (
           <div
             key={user.user_id}
-            className="inline-flex items-center gap-1.5 px-2 py-1 bg-gray-100 rounded-full text-sm"
+            className="inline-flex items-center gap-1.5 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm"
           >
             <PresenceIndicator userId={user.user_id} size="sm" />
-            <span className="text-gray-700">User #{user.user_id}</span>
+            <span className="text-gray-700 dark:text-gray-300">User #{user.user_id}</span>
           </div>
         ))}
         {remainingCount > 0 && (
-          <div className="inline-flex items-center px-2 py-1 bg-gray-100 rounded-full text-sm text-gray-500">
+          <div className="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm text-gray-500">
             +{remainingCount} more
           </div>
         )}

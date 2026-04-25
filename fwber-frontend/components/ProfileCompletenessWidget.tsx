@@ -32,7 +32,7 @@ export default function ProfileCompletenessWidget() {
 
   if (isLoading || !data) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
         <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
         <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
         <div className="h-4 bg-gray-200 rounded w-full"></div>
@@ -40,7 +40,9 @@ export default function ProfileCompletenessWidget() {
     );
   }
 
-  const { percentage = 0, required_complete = false, missing_required = [], missing_optional = [], sections } = data;
+  const { percentage = 0, required_complete = false, sections } = data;
+  const missing_required = Array.isArray(data?.missing_required) ? data.missing_required : [];
+  const missing_optional = Array.isArray(data?.missing_optional) ? data.missing_optional : [];
 
   const safeSections = sections || {
     basic: false,
@@ -64,10 +66,10 @@ export default function ProfileCompletenessWidget() {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Profile Completeness</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Profile Completeness</h3>
         <span className={`text-2xl font-bold ${getStatusColor(percentage)}`}>
           {percentage}%
         </span>
@@ -107,7 +109,7 @@ export default function ProfileCompletenessWidget() {
       {/* Missing Fields */}
       {missing_required.length > 0 && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">Required fields:</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Required fields:</p>
           <ul className="space-y-1">
             {missing_required.map(field => (
               <li key={field} className="text-sm text-red-600 flex items-center gap-2">
@@ -121,7 +123,7 @@ export default function ProfileCompletenessWidget() {
 
       {missing_optional.length > 0 && percentage >= 60 && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-2">Optional fields (improve matches):</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Optional fields (improve matches):</p>
           <ul className="space-y-1">
             {missing_optional.slice(0, 3).map(field => (
               <li key={field} className="text-sm text-gray-600 flex items-center gap-2">
@@ -167,7 +169,7 @@ function SectionItem({ label, complete }: { label: string; complete: boolean }) 
       ) : (
         <Circle className="w-5 h-5 text-gray-300" />
       )}
-      <span className={`text-sm ${complete ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+      <span className={`text-sm ${complete ? 'text-gray-900 dark:text-white font-medium' : 'text-gray-500'}`}>
         {label}
       </span>
     </div>

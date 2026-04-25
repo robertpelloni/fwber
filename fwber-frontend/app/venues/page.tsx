@@ -106,7 +106,7 @@ export default function VenuesPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-8">Venues Nearby</h1>
 
@@ -137,7 +137,7 @@ export default function VenuesPage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             {venues.map(venue => (
-              <div key={venue.id} className="bg-white rounded-lg shadow-md p-6">
+              <div key={venue.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h2 className="text-xl font-semibold">{venue.name}</h2>
@@ -178,7 +178,7 @@ export default function VenuesPage() {
                     </button>
                   )}
                 </div>
-                <p className="text-gray-700 mb-4">{venue.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">{venue.description}</p>
               </div>
             ))}
             {venues.length === 0 && (

@@ -7,7 +7,7 @@ const router = Router();
 // GET /api/location/nearby - Find nearby users
 router.get('/nearby', authenticate, async (req: any, res) => {
   const { latitude, longitude, radius = 1000, limit = 50, ranking_strategy } = req.query;
-  res.json({ users: [], total: 0, radius: Number(radius) });
+  res.json({ success: true, data: [], meta: { total: 0, radius: Number(radius) } });
 });
 
 // POST /api/location/update - Update user's location

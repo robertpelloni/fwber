@@ -21,7 +21,7 @@ export default function GiftsPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader title="Gifts" />
         <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gift Shop</h1>
@@ -56,8 +56,8 @@ export default function GiftsPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="mb-4 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+          <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="mb-4 flex items-center gap-2 text-gray-700 dark:text-gray-300 dark:text-gray-200">
               <Inbox className="h-5 w-5" />
               <h2 className="text-lg font-semibold">Received Gifts</h2>
             </div>
@@ -68,7 +68,7 @@ export default function GiftsPage() {
             ) : (
               <div className="space-y-3">
                 {receivedGifts.map((gift) => (
-                  <div key={gift.id} className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+                  <div key={gift.id} className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 dark:border-gray-800">
                     <div className="flex items-center gap-3">
                       <div className="rounded-full bg-pink-100 p-2 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300">
                         <Gift className="h-5 w-5" />

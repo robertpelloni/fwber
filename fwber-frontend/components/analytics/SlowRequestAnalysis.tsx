@@ -7,11 +7,11 @@ export default function SlowRequestAnalysis() {
 
   if (isLoading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🔍 Performance Insights</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🔍 Performance Insights</h2>
         <div className="mt-4 space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-24 animate-pulse rounded bg-gray-100" />
+            <div key={i} className="h-24 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
           ))}
         </div>
       </div>
@@ -20,8 +20,8 @@ export default function SlowRequestAnalysis() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🔍 Performance Insights</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🔍 Performance Insights</h2>
         <p className="mt-2 text-sm text-red-600">Failed to load analysis.</p>
       </div>
     );
@@ -29,17 +29,17 @@ export default function SlowRequestAnalysis() {
 
   if (!analysis || analysis.length === 0) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🔍 Performance Insights</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🔍 Performance Insights</h2>
         <p className="mt-2 text-sm text-gray-500">No critical performance issues detected.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">🔍 Performance Insights</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🔍 Performance Insights</h2>
         <span className="text-xs text-gray-500">Actionable Recommendations</span>
       </div>
       <div className="mt-4 space-y-4">

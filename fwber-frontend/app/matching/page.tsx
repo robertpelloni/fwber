@@ -77,7 +77,7 @@ export default function MatchingPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader title="Matching" />
         <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-          <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="flex items-start gap-3">
               <div className="rounded-2xl bg-pink-100 p-3 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300">
                 <Heart className="h-6 w-6" />
@@ -96,7 +96,7 @@ export default function MatchingPage() {
               const Icon = surface.icon
               return (
                 <Link key={surface.href} href={surface.href} prefetch={false} className="block">
-                  <div className="h-full rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+                  <div className="h-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
                     <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${surface.accent} p-3 text-white`}>
                       <Icon className="h-5 w-5" />
                     </div>

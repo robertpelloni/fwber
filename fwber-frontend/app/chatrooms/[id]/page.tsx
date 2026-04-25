@@ -246,7 +246,7 @@ export default function ChatroomPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Chatroom Header */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-6">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-6 mb-6">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2 flex-wrap">
@@ -275,7 +275,7 @@ export default function ChatroomPage() {
 
               {/* Online Users Panel */}
               {showOnlineUsers && (
-                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 dark:bg-gray-800 rounded-lg">
                   <OnlineUsersList userIds={memberIds} maxDisplay={8} />
                 </div>
               )}
@@ -292,12 +292,12 @@ export default function ChatroomPage() {
         </div>
 
         {/* Chat Interface */}
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 flex flex-col h-[600px] relative">
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 dark:border-gray-800 flex flex-col h-[600px] relative">
 
           {/* Preview Mode Overlay */}
           {(standardChatroomData?.preview_mode && !isProximity) && (
-            <div className="absolute inset-0 z-10 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
-              <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 max-w-md w-full text-center">
+            <div className="absolute inset-0 z-10 bg-white dark:bg-gray-800/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 dark:border-gray-800 max-w-md w-full text-center">
                 <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-3xl">🔒</span>
                 </div>
@@ -335,7 +335,7 @@ export default function ChatroomPage() {
                 <p className="mt-2 text-gray-600 dark:text-gray-400">Loading messages...</p>
               </div>
             ) : messages.length > 0 ? (
-              messages.map((message: any) => (
+              (messages || []).map((message: any) => (
                 <div key={message.id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0 relative">
                     <div className="w-8 h-8 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -357,7 +357,7 @@ export default function ChatroomPage() {
                         <span className="text-xs text-gray-400 dark:text-gray-600">(edited)</span>
                       )}
                     </div>
-                    <p className="text-gray-900 dark:text-gray-200 whitespace-pre-wrap">{message.display_content}</p>
+                    <p className="text-gray-900 dark:text-white dark:text-gray-200 whitespace-pre-wrap">{message.display_content}</p>
 
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
@@ -366,7 +366,7 @@ export default function ChatroomPage() {
                           <button
                             key={emoji}
                             onClick={() => handleReaction(message.id, emoji)}
-                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-full transition-colors border border-gray-200 dark:border-gray-700"
+                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-200 rounded-full transition-colors border border-gray-200 dark:border-gray-700"
                           >
                             <span className="mr-1">{emoji}</span>
                             <span>{count as number}</span>
@@ -392,7 +392,7 @@ export default function ChatroomPage() {
           </div>
 
           {/* Message Input */}
-          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+          <div className="border-t border-gray-200 dark:border-gray-700 dark:border-gray-800 p-4">
             <form onSubmit={handleSendMessage} className="flex space-x-3">
               <div className="flex-1">
                 <textarea

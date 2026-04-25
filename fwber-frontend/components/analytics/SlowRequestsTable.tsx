@@ -8,11 +8,11 @@ export default function SlowRequestsTable() {
 
   if (isLoading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🐢 Slow Requests</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🐢 Slow Requests</h2>
         <div className="mt-4 space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-12 animate-pulse rounded bg-gray-100" />
+            <div key={i} className="h-12 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
           ))}
         </div>
       </div>
@@ -21,8 +21,8 @@ export default function SlowRequestsTable() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🐢 Slow Requests</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🐢 Slow Requests</h2>
         <p className="mt-2 text-sm text-red-600">Failed to load slow requests.</p>
       </div>
     );
@@ -30,17 +30,17 @@ export default function SlowRequestsTable() {
 
   if (!slowRequests || slowRequests.length === 0) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">🐢 Slow Requests</h2>
+      <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🐢 Slow Requests</h2>
         <p className="mt-2 text-sm text-gray-500">No slow requests detected recently. Great job!</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm">
+    <div className="rounded-lg bg-white dark:bg-gray-800 p-6 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">🐢 Slow Requests</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">🐢 Slow Requests</h2>
         <span className="text-xs text-gray-500">Last 24h (&gt;1000ms)</span>
       </div>
       <div className="mt-4 overflow-x-auto">
@@ -54,10 +54,10 @@ export default function SlowRequestsTable() {
               <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-800">
             {slowRequests.map((req) => (
-              <tr key={req.id} className="hover:bg-gray-50">
-                <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+              <tr key={req.id} className="hover:bg-gray-50 dark:bg-gray-900">
+                <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                   <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${
                     req.method === 'GET' ? 'bg-blue-100 text-blue-800' :
                     req.method === 'POST' ? 'bg-green-100 text-green-800' :
@@ -71,7 +71,7 @@ export default function SlowRequestsTable() {
                 <td className="px-3 py-2 text-sm text-gray-500 max-w-xs truncate" title={req.url}>
                   {req.url}
                 </td>
-                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 font-mono">
+                <td className="px-3 py-2 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-mono">
                   {(req.duration_ms / 1000).toFixed(2)}s
                 </td>
                 <td className="px-3 py-2 whitespace-nowrap text-center text-sm">

@@ -249,7 +249,7 @@ export default function MerchantAnalyticsPage() {
                             </CardHeader>
                             <CardContent className="space-y-8 relative z-10">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                                    <div className="p-4 rounded-2xl bg-white dark:bg-gray-800/5 border border-white/10">
                                         <TrendingUp className="w-8 h-8 text-blue-400" />
                                     </div>
                                     <div>
@@ -260,7 +260,7 @@ export default function MerchantAnalyticsPage() {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    {data.retention.map((entry) => (
+                                    {(data.retention || []).map((entry) => (
                                         <div key={entry.label} className="flex items-center justify-between text-sm">
                                             <span className="text-zinc-400">{entry.label}</span>
                                             <span className="font-semibold text-white">{entry.value}%</span>
@@ -297,10 +297,10 @@ export default function MerchantAnalyticsPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    {data.broadcasts.map((broadcast) => (
+                                    {(data.broadcasts || []).map((broadcast) => (
                                         <div
                                             key={broadcast.id}
-                                            className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+                                            className="rounded-2xl border border-zinc-200 bg-white dark:bg-gray-800 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
                                         >
                                             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                                 <div className="space-y-3">

@@ -68,7 +68,7 @@ export default function GlobalSubpageNav() {
       <button
         type="button"
         onClick={handleBack}
-        className="rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+        className="rounded-full p-2 text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-800"
         aria-label="Go back"
         title="Go back"
       >

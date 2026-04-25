@@ -35,7 +35,9 @@ export function VibeCheck() {
 
   const handleCopyVibe = () => {
     if (vibeResult) {
-      const text = `My Vibe Check:\n\n🟢 Green Flags:\n${vibeResult.green_flags.map(f => `- ${f}`).join('\n')}\n\n🚩 Red Flags:\n${vibeResult.red_flags.map(f => `- ${f}`).join('\n')}`;
+      const greens = (vibeResult.green_flags || []).map(f => `- ${f}`).join('\n');
+      const reds = (vibeResult.red_flags || []).map(f => `- ${f}`).join('\n');
+      const text = `My Vibe Check:\n\n🟢 Green Flags:\n${greens}\n\n🚩 Red Flags:\n${reds}`;
       navigator.clipboard.writeText(text);
       toast({
         title: "Copied to clipboard",
@@ -57,7 +59,9 @@ export function VibeCheck() {
 
   const handleShareVibe = async () => {
     if (vibeResult && navigator.share) {
-      const text = `My Vibe Check:\n\n🟢 Green Flags:\n${vibeResult.green_flags.map(f => `- ${f}`).join('\n')}\n\n🚩 Red Flags:\n${vibeResult.red_flags.map(f => `- ${f}`).join('\n')}`;
+      const greens = (vibeResult.green_flags || []).map(f => `- ${f}`).join('\n');
+      const reds = (vibeResult.red_flags || []).map(f => `- ${f}`).join('\n');
+      const text = `My Vibe Check:\n\n🟢 Green Flags:\n${greens}\n\n🚩 Red Flags:\n${reds}`;
       try {
         const url = vibeResult.share_id 
           ? `${window.location.origin}/share/${vibeResult.share_id}`
@@ -145,7 +149,7 @@ export function VibeCheck() {
                                     <CheckCircle2 className="w-4 h-4" /> Green Flags
                                 </h4>
                                 <ul className="space-y-2">
-                                    {vibeResult.green_flags.map((flag, i) => (
+                                    {(vibeResult.green_flags || []).map((flag, i) => (
                                         <li key={i} className="bg-green-900/20 border border-green-500/20 rounded px-3 py-2 text-sm text-green-100">
                                             {flag}
                                         </li>
@@ -157,7 +161,7 @@ export function VibeCheck() {
                                     <AlertTriangle className="w-4 h-4" /> Red Flags
                                 </h4>
                                 <ul className="space-y-2">
-                                    {vibeResult.red_flags.map((flag, i) => (
+                                    {(vibeResult.red_flags || []).map((flag, i) => (
                                         <li key={i} className="bg-red-900/20 border border-red-500/20 rounded px-3 py-2 text-sm text-red-100">
                                             {flag}
                                         </li>

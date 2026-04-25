@@ -159,7 +159,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*', 
+        source: '/api/:path((?!sentry-tunnel).*)', 
         destination: 'https://api.fwber.me/api/:path*',
       },
       {

@@ -39,7 +39,7 @@ export function EventCard({ event }: EventCardProps) {
               {event.scene_signals.matched_topics.map((topic) => (
                 <span
                   key={`event-topic-${event.id}-${topic.slug}`}
-                  className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-purple-800"
+                  className="rounded-full bg-white dark:bg-gray-800 px-2.5 py-1 text-xs font-medium text-purple-800"
                 >
                   {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                 </span>
@@ -47,7 +47,7 @@ export function EventCard({ event }: EventCardProps) {
               {event.scene_signals.matched_tags.map((tag) => (
                 <span
                   key={`event-tag-${event.id}-${tag}`}
-                  className="rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium text-purple-700"
+                  className="rounded-full bg-white dark:bg-gray-800/80 px-2.5 py-1 text-xs font-medium text-purple-700"
                 >
                   #{tag}
                 </span>

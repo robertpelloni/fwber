@@ -326,7 +326,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setIsFedModalOpen(true)}
-              className="group relative w-full flex justify-center py-2 px-4 border border-zinc-200 dark:border-zinc-800 text-sm font-bold rounded-md text-zinc-900 dark:text-white bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
+              className="group relative w-full flex justify-center py-2 px-4 border border-zinc-200 dark:border-zinc-800 text-sm font-bold rounded-md text-zinc-900 dark:text-white bg-white dark:bg-gray-800 dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
             >
               <Globe className="w-4 h-4 mr-2 text-purple-500" />
               Sign in with ActivityPub

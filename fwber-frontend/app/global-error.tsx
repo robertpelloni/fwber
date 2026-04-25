@@ -10,7 +10,7 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('Global error:', error)
+    console.error('Page error:', error, { url: window.location.href, stack: error.stack })
   }, [error])
 
   return (

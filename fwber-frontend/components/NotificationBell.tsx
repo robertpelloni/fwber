@@ -182,7 +182,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-gray-100 transition-colors"
+        className="relative p-2 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors"
         aria-label="Notifications"
       >
         <Bell className="h-6 w-6 text-gray-600" />
@@ -195,10 +195,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50 dark:bg-gray-900">
+            <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <button
@@ -240,7 +240,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                       if (!notification.read) markAsRead(notification.id);
                       setIsOpen(false);
                     }}
-                    className={`flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors ${!notification.read ? 'bg-blue-50' : ''
+                    className={`flex items-start gap-3 p-4 hover:bg-gray-50 dark:bg-gray-900 transition-colors ${!notification.read ? 'bg-blue-50' : ''
                       }`}
                   >
                     {/* Icon */}
@@ -258,7 +258,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                           </div>
                         </div>
                       ) : (
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
                           {getNotificationIcon(notification.type)}
                         </div>
                       )}
@@ -266,7 +266,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {notification.title}
                       </p>
                       <p className="text-sm text-gray-500 line-clamp-2">
@@ -291,7 +291,7 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
+            <div className="border-t border-gray-100 px-4 py-3 bg-gray-50 dark:bg-gray-900">
               <Link
                 href="/notifications"
                 onClick={() => setIsOpen(false)}

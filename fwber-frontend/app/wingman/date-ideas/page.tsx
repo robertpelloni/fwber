@@ -90,7 +90,7 @@ export default function DateIdeasPage() {
             {ideas.map((idea, i) => (
               <div 
                 key={i}
-                className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-xl border border-rose-100 dark:border-rose-900/30 flex flex-col justify-between"
+                className="bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-3xl p-6 shadow-xl border border-rose-100 dark:border-rose-900/30 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex justify-between items-start mb-4">
@@ -105,7 +105,7 @@ export default function DateIdeasPage() {
                   </p>
                 </div>
                 
-                <button className="w-full py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl text-sm font-bold hover:bg-rose-600 hover:text-white transition flex items-center justify-center gap-2">
+                <button className="w-full py-3 bg-gray-50 dark:bg-gray-900 dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl text-sm font-bold hover:bg-rose-600 hover:text-white transition flex items-center justify-center gap-2">
                   <MapPin className="w-4 h-4" />
                   Show on Map
                 </button>
@@ -113,7 +113,7 @@ export default function DateIdeasPage() {
             ))}
           </div>
 
-          <section className="mt-16 bg-white dark:bg-zinc-900 rounded-[2rem] p-8 border border-rose-100 dark:border-rose-900/30">
+          <section className="mt-16 bg-white dark:bg-gray-800 dark:bg-zinc-900 rounded-[2rem] p-8 border border-rose-100 dark:border-rose-900/30">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="flex-1 text-center md:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Want personalized ideas?</h2>

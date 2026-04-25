@@ -63,7 +63,7 @@ export default function NearbyPage() {
           ranking_strategy: 'trust-aware',
         })
         
-        setNearbyUsers(response.data)
+        setNearbyUsers(Array.isArray(response.data) ? response.data : response.data?.data || (response as any).users || [])
         setRankingSummary(response.meta?.ranking_strategy?.summary ?? null)
         setError(null)
       } catch (err: any) {
@@ -96,7 +96,7 @@ export default function NearbyPage() {
           limit: 50,
           ranking_strategy: 'trust-aware',
         })
-        setNearbyUsers(response.data)
+        setNearbyUsers(Array.isArray(response.data) ? response.data : response.data?.data || (response as any).users || [])
         setRankingSummary(response.meta?.ranking_strategy?.summary ?? null)
       } catch (err) {
         console.error('Failed to refresh:', err)
@@ -156,7 +156,7 @@ export default function NearbyPage() {
         <AppHeader title="Nearby" />
         <div className="p-8">
           <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-6">
             {/* Header with Real-time Status */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ export default function NearbyPage() {
                   <MapPin className="h-6 w-6 text-orange-600" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">People Nearby</h1>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">People Nearby</h1>
                   <div className="flex items-center gap-2 mt-1">
                     <ConnectionStatusBadge />
                     <span className="text-sm text-gray-500">•</span>
@@ -176,21 +176,21 @@ export default function NearbyPage() {
                 <button
                   onClick={handleRefresh}
                   disabled={isRefreshing}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 rounded-lg text-gray-700 dark:text-gray-300 transition-colors disabled:opacity-50"
                 >
                   <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                   Refresh
                 </button>
-                <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+                <div className="flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 hover:bg-gray-50 dark:bg-gray-900'}`}
                   >
                     Grid
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`px-3 py-2 text-sm ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                    className={`px-3 py-2 text-sm ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 hover:bg-gray-50 dark:bg-gray-900'}`}
                   >
                     List
                   </button>
@@ -207,7 +207,7 @@ export default function NearbyPage() {
             )}
 
             <div className="mb-6">
-              <label htmlFor="radius" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="radius" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Search Radius: {radius}m
               </label>
               <input
@@ -280,7 +280,7 @@ export default function NearbyPage() {
                             </div>
                           </div>
                           <div>
-                            <h3 className="text-xl font-semibold text-gray-800">
+                            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
                               {user.display_name}
                             </h3>
                             <PresenceIndicator userId={String(user.id)} showLabel size="sm" />

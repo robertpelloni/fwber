@@ -80,7 +80,7 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
     return (
         <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700 w-full">
             <div
-                className="px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
+                className="px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-white dark:bg-gray-800/5 transition-colors"
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 <div className="flex items-center gap-3 w-1/2">
@@ -95,7 +95,7 @@ export function TierUnlockGuide({ matchId }: TierUnlockGuideProps) {
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     onClick={handleShareMilestone}
-                                    className="p-1 hover:bg-white/10 rounded-full transition-colors text-pink-400"
+                                    className="p-1 hover:bg-white dark:bg-gray-800/10 rounded-full transition-colors text-pink-400"
                                     title="Share Milestone"
                                 >
                                     <Share2 className="w-3 h-3" />

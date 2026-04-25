@@ -64,7 +64,7 @@ export function ActivityFeed({
 
     try {
       const data = await api.get<ActivityItem[]>(`/dashboard/activity?limit=${maxItems}`);
-      setActivities(data || []);
+      setActivities(Array.isArray(data) ? data : data ? (data as any).data || [] : []);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch activities:', err);
@@ -190,7 +190,7 @@ export function ActivityFeed({
           <button
             onClick={() => fetchActivities(true)}
             disabled={isRefreshing}
-            className="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -219,7 +219,7 @@ export function ActivityFeed({
             </p>
           </div>
         ) : (
-          activities.map((activity) => (
+          (Array.isArray(activities) ? activities : []).map((activity) => (
             <Link
               key={activity.id}
               href={
@@ -231,7 +231,7 @@ export function ActivityFeed({
                       ? `/friends`
                       : `/profile/${activity.user.id}`
               }
-              className={`flex items-start gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${getActivityBgStyle(activity.type)} border-l-4`}
+              className={`flex items-start gap-3 p-4 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-700/50 transition-colors ${getActivityBgStyle(activity.type)} border-l-4`}
             >
               {/* User Avatar with Presence */}
               <div className="relative flex-shrink-0">
@@ -291,7 +291,7 @@ export function ActivityFeed({
 
       {/* View All Link */}
       {activities.length > 0 && (
-        <div className="p-3 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 text-center">
+        <div className="p-3 bg-gray-50 dark:bg-gray-900 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700 text-center">
           <Link 
             href="/activity"
             className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium"

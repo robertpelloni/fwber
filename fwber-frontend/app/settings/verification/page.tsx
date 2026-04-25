@@ -66,7 +66,7 @@ export default function VerificationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
       </div>
     );
@@ -74,27 +74,27 @@ export default function VerificationPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <header className="bg-white dark:bg-gray-800 shadow-sm">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-3">
-              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 dark:bg-gray-800 rounded-full transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
-              <h1 className="text-xl font-bold text-gray-900">Identity Verification</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Identity Verification</h1>
             </div>
           </div>
         </header>
 
         <main className="max-w-md mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="p-6 text-center">
               {status?.is_verified ? (
                 <div className="space-y-4">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
                     <CheckCircle className="w-10 h-10 text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">You are Verified!</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">You are Verified!</h2>
                   <p className="text-gray-500">
                     Your profile has been verified. You now have the blue checkmark badge on your profile.
                   </p>
@@ -111,7 +111,7 @@ export default function VerificationPage() {
                   </div>
                   
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Identity</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Verify Your Identity</h2>
                     <p className="text-gray-500">
                       Take a selfie to verify that you match your profile photos. This helps keep our community safe.
                     </p>

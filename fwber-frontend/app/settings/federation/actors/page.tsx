@@ -227,7 +227,7 @@ function FederationActorExplorerContent() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="rounded-xl border bg-white p-4 text-sm text-gray-700 dark:bg-gray-950/30 dark:text-gray-300">
+                  <div className="rounded-xl border bg-white dark:bg-gray-800 p-4 text-sm text-gray-700 dark:bg-gray-950/30 dark:text-gray-300">
                     {actor.summary || 'This remote actor has not published a summary yet.'}
                   </div>
                   <div className="flex flex-wrap gap-3">
@@ -314,7 +314,7 @@ function FederationActorExplorerContent() {
                     const authorName = post.metadata?.name || post.actor_username || actor.name || 'Federated User'
 
                     return (
-                      <article key={post.id} className="rounded-xl border bg-white p-4 shadow-sm dark:bg-gray-950/30">
+                      <article key={post.id} className="rounded-xl border bg-white dark:bg-gray-800 p-4 shadow-sm dark:bg-gray-950/30">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="relative h-10 w-10 overflow-hidden rounded-full bg-blue-100">

@@ -213,14 +213,14 @@ export default function PublicProfilePage() {
                   <h3 className="text-lg font-semibold">Scene Summary</h3>
                 </div>
                 {p.scene_summary.headline && (
-                  <p className="mb-4 text-sm text-gray-700 dark:text-gray-200">{p.scene_summary.headline}</p>
+                  <p className="mb-4 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{p.scene_summary.headline}</p>
                 )}
                 {p.scene_summary.followed_topics.length > 0 && (
                   <div className="mb-4 flex flex-wrap gap-2">
                     {p.scene_summary.followed_topics.map((topic) => (
                       <span
                         key={topic.slug}
-                        className="rounded-full border border-cyan-200 bg-white px-3 py-1 text-xs font-semibold text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/30 dark:text-cyan-200"
+                        className="rounded-full border border-cyan-200 bg-white dark:bg-gray-800 px-3 py-1 text-xs font-semibold text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/30 dark:text-cyan-200"
                       >
                         {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                       </span>
@@ -266,11 +266,11 @@ export default function PublicProfilePage() {
                   {p.journals.map((journal) => (
                     <article
                       key={journal.id}
-                      className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
+                      className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm"
                       style={{ borderLeftColor: journal.accent_color || '#ec4899', borderLeftWidth: '4px' }}
                     >
                       <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+                        <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
                           {journal.visibility_label}
                         </span>
                         {journal.circle_group?.name && (
@@ -289,7 +289,7 @@ export default function PublicProfilePage() {
                       {journal.tags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {journal.tags.map((tag) => (
-                            <span key={tag} className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                            <span key={tag} className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                               #{tag}
                             </span>
                           ))}
@@ -314,7 +314,7 @@ export default function PublicProfilePage() {
                       className="rounded-2xl border border-rose-100 bg-rose-50/60 p-4 shadow-sm dark:border-rose-900/40 dark:bg-rose-950/20"
                     >
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
+                        <span className="rounded-full bg-white dark:bg-gray-800 px-3 py-1 text-xs font-semibold text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">
                           {link.relationship_type_label}
                         </span>
                         <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300">
@@ -357,7 +357,7 @@ export default function PublicProfilePage() {
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={() => handleAction('pass')}
-                    className="px-8 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-full font-semibold hover:bg-gray-300 transition-colors"
+                    className="px-8 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 dark:text-white rounded-full font-semibold hover:bg-gray-300 transition-colors"
                   >
                     Pass
                   </button>

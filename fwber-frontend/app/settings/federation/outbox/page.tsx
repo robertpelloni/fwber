@@ -160,7 +160,7 @@ export default function FederationOutboxPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div
-                      className="prose max-w-none text-sm text-gray-700 dark:prose-invert dark:text-gray-200"
+                      className="prose max-w-none text-sm text-gray-700 dark:text-gray-300 dark:prose-invert dark:text-gray-200"
                       dangerouslySetInnerHTML={{ __html: activity.object.content }}
                     />
                     <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">

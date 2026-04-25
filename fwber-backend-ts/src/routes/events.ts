@@ -11,7 +11,7 @@ router.get('/', authenticate, async (req: any, res) => {
 
 // GET /api/events/invitations
 router.get('/invitations', authenticate, async (req: any, res) => {
-  res.json({ invitations: [], total: 0 });
+  res.json([]);
 });
 
 // POST /api/events

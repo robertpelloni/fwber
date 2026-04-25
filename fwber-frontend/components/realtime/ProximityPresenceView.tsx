@@ -33,17 +33,17 @@ export function ProximityPresenceView({
   maxDisplay = 8,
   className = '',
 }: ProximityPresenceViewProps) {
-  const userIds = useMemo(() => nearbyUsers.map(u => u.id), [nearbyUsers]);
-  const displayUsers = nearbyUsers.slice(0, maxDisplay);
-  const remainingCount = nearbyUsers.length - maxDisplay;
+  const userIds = useMemo(() => (nearbyUsers || []).map(u => u.id), [nearbyUsers]);
+  const displayUsers = (nearbyUsers || []).slice(0, maxDisplay);
+  const remainingCount = (nearbyUsers || []).length - maxDisplay;
 
   if (!currentLocation) {
     return (
-      <div className={`rounded-xl border border-gray-200 bg-white p-6 shadow-sm ${className}`}>
+      <div className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm ${className}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-gray-400" />
-            <h3 className="font-semibold text-gray-900">Who&apos;s Nearby</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Who&apos;s Nearby</h3>
           </div>
         </div>
         <div className="text-center py-8">
@@ -58,7 +58,7 @@ export function ProximityPresenceView({
   }
 
   return (
-    <div className={`rounded-xl border border-gray-200 bg-white p-6 shadow-sm ${className}`}>
+    <div className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -69,7 +69,7 @@ export function ProximityPresenceView({
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900">Who&apos;s Nearby Now</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">Who&apos;s Nearby Now</h3>
         </div>
         <ConnectionStatusBadge />
       </div>
@@ -90,7 +90,7 @@ export function ProximityPresenceView({
             <Link
               key={user.id}
               href={`/profile/${user.id}`}
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -102,7 +102,7 @@ export function ProximityPresenceView({
                   </div>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 text-sm">{user.displayName}</p>
+                  <p className="font-medium text-gray-900 dark:text-white text-sm">{user.displayName}</p>
                   {user.distance !== undefined && (
                     <p className="text-xs text-gray-500">
                       {user.distance < 1
@@ -177,7 +177,7 @@ export function ProximityPresenceCompact({
           )}
         </div>
         <div>
-          <p className="font-semibold text-gray-900">
+          <p className="font-semibold text-gray-900 dark:text-white">
             {onlineCount > 0 ? `${onlineCount} Online Nearby` : 'Explore Nearby'}
           </p>
           <p className="text-xs text-gray-600">

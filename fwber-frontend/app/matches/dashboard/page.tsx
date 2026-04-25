@@ -107,7 +107,7 @@ export default function MatchesDashboardPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 dark:border-gray-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
@@ -161,7 +161,7 @@ export default function MatchesDashboardPage() {
           </div>
 
           {/* Filters */}
-          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 mb-6">
+          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 p-4 mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               {/* Search */}
               <div className="flex-1 relative">
@@ -244,7 +244,7 @@ export default function MatchesDashboardPage() {
               {filteredMatches.map((match) => (
                 <div
                   key={match.id}
-                  className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-shadow"
+                  className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 dark:border-gray-800 overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   {/* Photo */}
                   <div className="relative aspect-square bg-gradient-to-br from-blue-400 to-purple-500">

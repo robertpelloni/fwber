@@ -59,21 +59,21 @@ export default function BlockedUsersPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm sticky top-0 z-10">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <header className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
-              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Link href="/settings" className="p-2 -ml-2 hover:bg-gray-100 dark:bg-gray-800 rounded-full transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </Link>
-              <h1 className="text-xl font-bold text-gray-900">Blocked Users</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Blocked Users</h1>
             </div>
           </div>
         </header>
 
         <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -81,7 +81,7 @@ export default function BlockedUsersPage() {
                   placeholder="Search blocked users..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -90,10 +90,10 @@ export default function BlockedUsersPage() {
               <div className="p-8 text-center text-gray-500">Loading...</div>
             ) : filteredUsers.length === 0 ? (
               <div className="p-12 text-center">
-                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
                   <Shield className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">No blocked users</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">No blocked users</h3>
                 <p className="text-gray-500 mt-1">
                   {searchQuery ? 'No users match your search.' : 'You haven\'t blocked anyone yet.'}
                 </p>
@@ -101,7 +101,7 @@ export default function BlockedUsersPage() {
             ) : (
               <ul className="divide-y divide-gray-200">
                 {filteredUsers.map((user) => (
-                  <li key={user.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                  <li key={user.id} className="p-4 flex items-center justify-between hover:bg-gray-50 dark:bg-gray-900 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200">
                         {user.profile.avatarUrl ? (
@@ -118,7 +118,7 @@ export default function BlockedUsersPage() {
                         )}
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900">{user.profile.displayName}</h3>
+                        <h3 className="font-medium text-gray-900 dark:text-white">{user.profile.displayName}</h3>
                         <p className="text-sm text-gray-500">Blocked on {new Date(user.blocked_at).toLocaleDateString()}</p>
                       </div>
                     </div>
@@ -138,15 +138,15 @@ export default function BlockedUsersPage() {
         {/* Confirmation Modal */}
         {showConfirmModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-sm w-full p-6 shadow-xl">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Unblock User?</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-sm w-full p-6 shadow-xl">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Unblock User?</h3>
               <p className="text-gray-600 mb-6">
                 Are you sure you want to unblock this user? They will be able to see your profile and send you messages again.
               </p>
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setShowConfirmModal(null)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-800 rounded-md transition-colors"
                 >
                   Cancel
                 </button>

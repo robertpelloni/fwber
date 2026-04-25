@@ -134,11 +134,11 @@ function FeatureToggle({
   const info = FEATURE_DESCRIPTIONS[flag];
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+    <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 transition-colors">
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <h4 className="font-medium text-gray-900">{info.label}</h4>
-          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">{info.category}</span>
+          <h4 className="font-medium text-gray-900 dark:text-white">{info.label}</h4>
+          <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 rounded">{info.category}</span>
         </div>
         <p className="text-sm text-gray-500 mt-1">{info.description}</p>
       </div>
@@ -152,7 +152,7 @@ function FeatureToggle({
         aria-label={`Toggle ${info.label}`}
       >
         <span
-          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${enabled ? 'translate-x-5' : 'translate-x-0'
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white dark:bg-gray-800 shadow ring-0 transition duration-200 ease-in-out ${enabled ? 'translate-x-5' : 'translate-x-0'
             }`}
         />
       </button>
@@ -227,7 +227,7 @@ export default function AdminSettingsPage() {
   if (featuresQuery.error) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
           <div className="max-w-4xl mx-auto">
             <div className="rounded-lg border border-red-200 bg-red-50 p-6">
               <h1 className="text-xl font-semibold text-red-800">Unable to load settings</h1>
@@ -249,15 +249,15 @@ export default function AdminSettingsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
-        <header className="bg-white shadow">
+        <header className="bg-white dark:bg-gray-800 shadow">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Settings className="h-8 w-8 text-gray-600" />
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Settings</h1>
                   <p className="text-sm text-gray-500">Manage feature flags and system configuration</p>
                 </div>
               </div>
@@ -269,7 +269,7 @@ export default function AdminSettingsPage() {
                     metricsQuery.refetch();
                   }}
                   disabled={featuresQuery.isFetching || healthQuery.isFetching || metricsQuery.isFetching}
-                  className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900 disabled:opacity-50"
                 >
                   <RefreshCw className={`h-4 w-4 ${featuresQuery.isFetching || metricsQuery.isFetching ? 'animate-spin' : ''}`} />
                   Refresh
@@ -300,13 +300,13 @@ export default function AdminSettingsPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* System Health Section */}
           <section className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <Activity className="h-5 w-5" />
               System Health
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Reverb Status */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     {health?.services.reverb === 'up' ? (
@@ -314,7 +314,7 @@ export default function AdminSettingsPage() {
                     ) : (
                       <WifiOff className="h-5 w-5 text-gray-400" />
                     )}
-                    <span className="font-medium text-gray-900">Reverb Hub</span>
+                    <span className="font-medium text-gray-900 dark:text-white">Reverb Hub</span>
                   </div>
                   <HealthStatusBadge status={health?.services.reverb ?? 'unknown'} />
                 </div>
@@ -324,11 +324,11 @@ export default function AdminSettingsPage() {
               </div>
 
               {/* Cache Status */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Database className="h-5 w-5 text-blue-600" />
-                    <span className="font-medium text-gray-900">Cache</span>
+                    <span className="font-medium text-gray-900 dark:text-white">Cache</span>
                   </div>
                   <HealthStatusBadge status={health?.services.cache ?? 'unknown'} />
                 </div>
@@ -336,11 +336,11 @@ export default function AdminSettingsPage() {
               </div>
 
               {/* Queue Status */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Shield className="h-5 w-5 text-purple-600" />
-                    <span className="font-medium text-gray-900">Queue</span>
+                    <span className="font-medium text-gray-900 dark:text-white">Queue</span>
                   </div>
                   <HealthStatusBadge status={health?.services.queue ?? 'unknown'} />
                 </div>
@@ -351,15 +351,15 @@ export default function AdminSettingsPage() {
 
           {/* Infrastructure Metrics Section */}
           <section className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <Server className="h-5 w-5" />
               Infrastructure Metrics
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Redis Memory */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-900">Redis Memory</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Redis Memory</span>
                   <span className="text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
                     {metrics?.redis.used_memory_human ?? '...'}
                   </span>
@@ -368,9 +368,9 @@ export default function AdminSettingsPage() {
               </div>
 
               {/* Redis Clients */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-900">Redis Clients</span>
+                  <span className="font-medium text-gray-900 dark:text-white">Redis Clients</span>
                   <span className="text-xs font-medium bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
                     {metrics?.redis.connected_clients ?? '...'}
                   </span>
@@ -379,9 +379,9 @@ export default function AdminSettingsPage() {
               </div>
 
               {/* DB Threads */}
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-900">DB Threads</span>
+                  <span className="font-medium text-gray-900 dark:text-white">DB Threads</span>
                   <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
                     {metrics?.database.threads_connected ?? (metrics?.database.info ? 'N/A' : '...')}
                   </span>
@@ -394,7 +394,7 @@ export default function AdminSettingsPage() {
           {/* Feature Flags Section */}
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Feature Flags</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Feature Flags</h2>
               {featuresQuery.data?.timestamp && (
                 <span className="text-xs text-gray-500">
                   Last updated: {new Date(featuresQuery.data.timestamp).toLocaleString()}
@@ -419,7 +419,7 @@ export default function AdminSettingsPage() {
 
                   return (
                     <div key={category}>
-                      <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">
+                      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">
                         {category}
                       </h3>
                       <div className="space-y-3">
@@ -457,14 +457,14 @@ export default function AdminSettingsPage() {
 
           {/* Machine Learning & Moderation */}
           <section className="mt-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
               <Shield className="h-5 w-5" />
               Machine Learning & Moderation
             </h2>
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Active Moderation Driver</h3>
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-white">Active Moderation Driver</h3>
                   <p className="text-sm text-gray-500 mt-1">
                     Select the AI service responsible for media and text moderation. Reverts to default if service is unavailable.
                   </p>
@@ -474,7 +474,7 @@ export default function AdminSettingsPage() {
                     value={currentDriver}
                     onChange={handleDriverChange}
                     disabled={pendingDriver !== null || featuresQuery.isLoading}
-                    className="block w-48 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50"
+                    className="block w-48 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50"
                   >
                     <option value="aws">AWS Rekognition</option>
                     <option value="google">Google Cloud Vision</option>

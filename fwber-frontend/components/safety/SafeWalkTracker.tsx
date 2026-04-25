@@ -128,7 +128,7 @@ export default function SafeWalkTracker() {
                         size="sm"
                         onClick={handleEndWalk}
                         disabled={isFinishing}
-                        className="w-full sm:w-auto bg-white text-orange-600 hover:bg-orange-50 font-semibold"
+                        className="w-full sm:w-auto bg-white dark:bg-gray-800 text-orange-600 hover:bg-orange-50 font-semibold"
                     >
                         {isFinishing ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
