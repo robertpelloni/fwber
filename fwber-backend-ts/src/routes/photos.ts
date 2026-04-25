@@ -109,7 +109,11 @@ router.get('/', authenticate, async (req: any, res: Response) => {
 });
 
 // POST /api/photos — Upload a photo
-router.post('/', authenticate, upload.single('photo'), async (req: any, res: Response) => {
+router.post('/', authenticate, (req: any, _res, next) => {
+  console.log('[photos] POST headers:', JSON.stringify(req.headers['content-type']));
+  console.log('[photos] POST body type:', typeof req.body, req.body ? Object.keys(req.body) : 'null');
+  next();
+}, upload.single('photo'), async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
     const file = req.file as Express.Multer.File | undefined;

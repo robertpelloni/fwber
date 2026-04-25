@@ -79,7 +79,12 @@ setupSocketIO(httpServer);
 app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(morgan('dev'));
-app.use(express.json());
+// Parse JSON bodies — skip for multipart/form-data (file uploads)
+app.use(express.json({ verify: (req, _res, buf) => {
+  // Only parse if content-type is JSON; skip multipart
+  if (req.headers['content-type']?.startsWith('multipart/')) return;
+  (req as any)._rawBody = buf;
+} }));
 
 // Serve uploaded photos as static files
 import path from 'path';
