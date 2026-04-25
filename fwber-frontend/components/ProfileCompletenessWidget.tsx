@@ -79,8 +79,8 @@ export default function ProfileCompletenessWidget() {
       <div className="mb-6">
         <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
           <div
-            className={`h-full bg-gradient-to-r ${getBarColor(percentage)} transition-all duration-700 ease-out`}
-            style={{ width: `${percentage}%` }}
+            className={`h-full bg-gradient-to-r ${getBarColor(percentage)} transition-all duration-700 ease-out max-w-full`}
+            style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
           />
         </div>
       </div>
