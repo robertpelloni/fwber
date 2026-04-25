@@ -46,11 +46,13 @@ const upload = multer({
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
+const API_BASE = process.env.API_BASE_URL || '';
+
 function serialize(photo: any) {
   return {
     id: String(photo.id),
-    url: `/uploads/${photo.filename}`,
-    thumbnail_url: photo.thumbnail_path ? `/uploads/thumbnails/${path.basename(photo.thumbnail_path)}` : null,
+    url: `${API_BASE}/uploads/${photo.filename}`,
+    thumbnail_url: photo.thumbnail_path ? `${API_BASE}/uploads/thumbnails/${path.basename(photo.thumbnail_path)}` : null,
     file_path: photo.file_path,
     original_path: photo.original_path,
     filename: photo.filename,
