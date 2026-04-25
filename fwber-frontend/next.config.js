@@ -182,4 +182,8 @@ const sentryWebpackPluginOptions = {
   hideSourceMaps: true,
 };
 
-module.exports = withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions);
+// Only wrap with Sentry in production builds — skip entirely in dev
+const isProd = process.env.NODE_ENV === 'production';
+module.exports = isProd
+  ? withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions)
+  : withPWA(withBundleAnalyzer(nextConfig));
