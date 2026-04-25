@@ -33,7 +33,9 @@ const getFrontendVersion = () => {
   }
 };
 
-const { withSentryConfig } = require('@sentry/nextjs');
+const { withSentryConfig } = (() => {
+  try { return require('@sentry/nextjs') } catch { return { withSentryConfig: (c) => c } }
+})()
 const withPWA = (config) => config; // Passthrough until PWA is fixed
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({

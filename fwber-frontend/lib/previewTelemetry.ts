@@ -151,6 +151,8 @@ const postBatch = async (events: PendingTelemetryEvent[]) => {
     })
 
     if (!response.ok) {
+      // Stop retrying on 404 — endpoint not implemented yet
+      if (response.status === 404) return
       throw new Error(`Telemetry upload failed: ${response.status}`)
     }
   } catch (error) {

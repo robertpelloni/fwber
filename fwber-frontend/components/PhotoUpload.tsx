@@ -3,7 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
-import { Upload, X, Camera, RotateCw, Download, Eye, ChevronLeft, ChevronRight, Trash2, Lock, Unlock } from 'lucide-react'
+import { Upload, X, Camera, RotateCw, Download, Eye, ChevronLeft, ChevronRight, Trash2, Lock, Unlock, Pencil } from 'lucide-react'
+import PhotoEditor, { type PhotoEditorResult } from '@/components/PhotoEditor'
 import { blurFacesOnFile, FaceBlurError } from '@/lib/faceBlur'
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import { attachFaceBlurMetadata } from '@/lib/faceBlurTelemetry'
@@ -69,6 +70,7 @@ export default function PhotoUpload({
   const [clientProcessingMessage, setClientProcessingMessage] = useState<string | null>(null)
   const [processingWarnings, setProcessingWarnings] = useState<string[]>([])
   const [comparisonPreviewId, setComparisonPreviewId] = useState<string | null>(null)
+  const [editingPreviewId, setEditingPreviewId] = useState<string | null>(null)
   const [comparisonSliderValue, setComparisonSliderValue] = useState(50)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const previewsRef = useRef<PhotoPreview[]>([])
@@ -829,6 +831,13 @@ export default function PhotoUpload({
                         >
                           <X className="w-4 h-4" />
                         </button>
+                        <button
+                          onClick={() => setEditingPreviewId(preview.id)}
+                          className="p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors"
+                          title="Edit photo"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
                         {preview.blurApplied && preview.previewUrls.processed && (
                           <button
                             onClick={(event) => {
@@ -993,6 +1002,50 @@ export default function PhotoUpload({
         })()
       )}
 
+
+      {/* Photo Editor Modal */}
+      {editingPreviewId && (() => {
+        const editPreview = previews.find(p => p.id === editingPreviewId)
+        if (!editPreview) return null
+        const editSrc = editPreview.activeView === 'processed' && editPreview.previewUrls.processed
+          ? editPreview.previewUrls.processed
+          : editPreview.previewUrls.original
+        return (
+          <PhotoEditor
+            src={editSrc}
+            fileName={editPreview.file.name}
+            onSave={(result: PhotoEditorResult) => {
+              // Replace the preview's file and URL with the edited version
+              setPreviews(prev => prev.map(p => {
+                if (p.id !== editingPreviewId) return p
+                // Revoke old URLs
+                revokePreviewUrls(p)
+                const newMetadata = p.file.faceBlurMetadata ? {
+                  ...p.file.faceBlurMetadata,
+                  edited: true,
+                } : undefined
+                const editedFile = new File([result.file], result.file.name, { type: result.file.type }) as FileWithFaceBlurMetadata
+                if (newMetadata) {
+                  editedFile.faceBlurMetadata = newMetadata
+                }
+                return {
+                  ...p,
+                  file: editedFile,
+                  previewUrls: {
+                    original: result.previewUrl,
+                    processed: undefined,
+                  },
+                  activeView: 'original' as PreviewView,
+                  id: p.id,
+                  blurApplied: false,
+                }
+              }))
+              setEditingPreviewId(null)
+            }}
+            onCancel={() => setEditingPreviewId(null)}
+          />
+        )
+      })()}
 
       {/* Photo Tips */}
       <div className="bg-muted/50 rounded-lg p-4">
