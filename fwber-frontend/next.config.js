@@ -126,7 +126,7 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: '' }, // Neutralize legacy block
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()' }
+          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(self)' }
         ],
       },
       {
