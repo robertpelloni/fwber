@@ -81,6 +81,11 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Serve uploaded photos as static files
+import path from 'path';
+const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || 'uploads');
+app.use('/uploads', express.static(UPLOAD_DIR));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/analytics', analyticsRoutes);
