@@ -606,10 +606,10 @@ export default function ProfilePage() {
                     setTimeout(() => element.classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50'), 2000)
                   }
                 }, 400)
-              }}
-              }}
-              }}
+            }}
             />
+          </CardContent>
+        </Card>
           </CardContent>
         </Card>
 
