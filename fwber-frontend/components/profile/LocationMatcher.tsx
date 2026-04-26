@@ -308,10 +308,7 @@ export default function LocationMatcher({ formData, handleLocationChange }: Loca
           </label>
 
           {/* ── Auto-detect button ──────────────────────────────────────── */}
-          <button
-            type="button"
-            onClick={detectLocation}
-            disabled={detecting}
+          <div className="flex flex-col items-end gap-1">
             <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
               <Sparkles className="w-3 h-3" />
               Recommended for best results
@@ -346,6 +343,7 @@ export default function LocationMatcher({ formData, handleLocationChange }: Loca
                 </>
               )}
             </button>
+          </div>
         </div>
 
         {/* Detection status message */}
