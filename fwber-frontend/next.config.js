@@ -185,6 +185,7 @@ const sentryWebpackPluginOptions = {
 };
 
 // Wrap config — Sentry only if available, bundle analyzer passthrough
+const isProd = process.env.NODE_ENV === 'production';
 let finalConfig = withPWA(withBundleAnalyzer(nextConfig));
 if (isProd && withSentryConfig !== ((c) => c)) {
   try {
