@@ -1,5 +1,7 @@
 'use client';
 
+import { useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BasicInformation from './BasicInformation';
 import Bio from './Bio';
@@ -39,6 +41,20 @@ interface ProfileTabsProps {
   handleVoiceDelete?: () => void;
 }
 
+const TAB_ITEMS = [
+  { value: 'basic', label: '👤 Basic Info' },
+  { value: 'bio', label: '✍️ About You' },
+  { value: 'photos', label: '📷 Photos' },
+  { value: 'physical', label: '📏 Physical' },
+  { value: 'intimate', label: '🔒 Intimate' },
+  { value: 'lookingFor', label: '🎯 Looking For' },
+  { value: 'location', label: '📍 Location' },
+  { value: 'lifestyle', label: '🍷 Lifestyle' },
+  { value: 'dating', label: '💕 Dating' },
+  { value: 'interests', label: '🎯 Interests' },
+  { value: 'communication', label: '💬 Communication' },
+];
+
 export default function ProfileTabs({
   formData,
   handleInputChange,
@@ -53,22 +69,57 @@ export default function ProfileTabs({
   handleVoiceUpload,
   handleVoiceDelete,
 }: ProfileTabsProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const amount = direction === 'left' ? -200 : 200;
+      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div>
       <Tabs defaultValue="basic">
-        <TabsList>
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="bio">About You</TabsTrigger>
-          <TabsTrigger value="physical">Physical</TabsTrigger>
-          <TabsTrigger value="intimate">Intimate</TabsTrigger>
-          <TabsTrigger value="lookingFor">Looking For</TabsTrigger>
-          <TabsTrigger value="location">Location</TabsTrigger>
-          <TabsTrigger value="lifestyle">Lifestyle</TabsTrigger>
-          <TabsTrigger value="dating">Dating</TabsTrigger>
-          <TabsTrigger value="interests">Interests</TabsTrigger>
-          <TabsTrigger value="communication">Communication</TabsTrigger>
-          <TabsTrigger value="photos">Photos</TabsTrigger>
-        </TabsList>
+        {/* Scrollable tab bar with arrows */}
+        <div className="relative flex items-center gap-1 mb-6">
+          <button
+            type="button"
+            onClick={() => scroll('left')}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors z-10"
+            aria-label="Scroll tabs left"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-x-auto scrollbar-hide"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <TabsList className="inline-flex w-max bg-gray-100 dark:bg-gray-800 p-1 rounded-lg gap-1">
+              {TAB_ITEMS.map(tab => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="px-4 py-2 text-sm font-medium whitespace-nowrap rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => scroll('right')}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors z-10"
+            aria-label="Scroll tabs right"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
         <TabsContent value="basic">
           <BasicInformation formData={formData} handleInputChange={handleInputChange} handleLocationChange={handleLocationChange} />
         </TabsContent>
@@ -79,30 +130,6 @@ export default function ProfileTabs({
             handleVoiceUpload={handleVoiceUpload}
             handleVoiceDelete={handleVoiceDelete}
           />
-        </TabsContent>
-        <TabsContent value="physical">
-          <Physical formData={formData} handleInputChange={handleInputChange} />
-        </TabsContent>
-        <TabsContent value="intimate">
-          <Intimate formData={formData} handleInputChange={handleInputChange} handleArrayChange={handleArrayChange} />
-        </TabsContent>
-        <TabsContent value="lookingFor">
-          <LookingFor formData={formData} handleLookingForChange={handleLookingForChange} />
-        </TabsContent>
-        <TabsContent value="location">
-          <Location formData={formData} handleLocationChange={handleLocationChange} />
-        </TabsContent>
-        <TabsContent value="lifestyle">
-          <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} />
-        </TabsContent>
-        <TabsContent value="dating">
-          <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} />
-        </TabsContent>
-        <TabsContent value="interests">
-          <Interests formData={formData} handleArrayPreferenceChange={handleArrayPreferenceChange} />
-        </TabsContent>
-        <TabsContent value="communication">
-          <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} />
         </TabsContent>
         <TabsContent value="photos">
           <Card id="photos">
@@ -127,6 +154,30 @@ export default function ProfileTabs({
               />
             </CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="physical">
+          <Physical />
+        </TabsContent>
+        <TabsContent value="intimate">
+          <Intimate formData={formData} handleInputChange={handleInputChange} handleArrayChange={handleArrayChange} />
+        </TabsContent>
+        <TabsContent value="lookingFor">
+          <LookingFor formData={formData} handleLookingForChange={handleLookingForChange} />
+        </TabsContent>
+        <TabsContent value="location">
+          <Location formData={formData} handleLocationChange={handleLocationChange} />
+        </TabsContent>
+        <TabsContent value="lifestyle">
+          <Lifestyle formData={formData} handlePreferenceChange={handlePreferenceChange} />
+        </TabsContent>
+        <TabsContent value="dating">
+          <Dating formData={formData} handlePreferenceChange={handlePreferenceChange} />
+        </TabsContent>
+        <TabsContent value="interests">
+          <Interests formData={formData} handleArrayPreferenceChange={handleArrayPreferenceChange} />
+        </TabsContent>
+        <TabsContent value="communication">
+          <Communication formData={formData} handlePreferenceChange={handlePreferenceChange} />
         </TabsContent>
       </Tabs>
     </div>

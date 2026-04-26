@@ -16,7 +16,7 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
       <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div>
           <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Your Height
+            Partner Height Range (min)
           </label>
           <input
             type="text"
@@ -24,7 +24,7 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
             value={formData.preferences.height_min}
             onChange={(e) => handlePreferenceChange('height_min', e.target.value)}
             className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="e.g., 5'10&quot; or 178cm"
+            placeholder="e.g., 5'2&quot; or 158cm"
           />
         </div>
 
@@ -60,7 +60,7 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
 
         <div>
           <label htmlFor="body_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Body Type Preference
+            Partner Body Type Preference
           </label>
           <select
             id="body_type"
@@ -80,7 +80,7 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
 
         <div>
           <label htmlFor="religion" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Religion
+            Partner Religion Preference
           </label>
           <select
             id="religion"
@@ -104,7 +104,7 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
 
         <div>
           <label htmlFor="politics" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Politics
+            Partner Politics Preference
           </label>
           <select
             id="politics"

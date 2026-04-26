@@ -13,9 +13,9 @@ const PhotoUpload = dynamic(() => import('@/components/PhotoUpload'), {
   ssr: false,
   loading: () => <div className="h-64 bg-muted animate-pulse rounded-lg" />
 })
-import { Camera, ShieldCheck, Star, Share2 } from 'lucide-react'
+import { Star, Share2 } from 'lucide-react'
 import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileCompleteness, type ProfileField } from '@/lib/profileCompleteness'
-import PhysicalProfileEditor from '@/components/PhysicalProfileEditor'
+// PhysicalProfileEditor removed — all fields now in Physical tab
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import ProfileTabs from '@/components/profile/ProfileTabs'
 import VerificationCard from '@/components/VerificationCard'
@@ -37,6 +37,7 @@ export default function ProfilePage() {
   const [completeness, setCompleteness] = useState<number>(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [interestTopics, setInterestTopics] = useState<Topic[]>([])
@@ -44,7 +45,7 @@ export default function ProfilePage() {
 
   // Photo management
   const { photos, uploadPhotos, deletePhoto, setPrimaryPhoto } = usePhotos()
-  const faceBlurEnabled = isFeatureEnabled('clientFaceBlur')
+  // faceBlurEnabled unused — blur handled inside PhotoUpload component
 
   // Local form type: ensure location, looking_for, and key array prefs are present for UI binding
   type BasePrefs = NonNullable<ProfileUpdateData['preferences']>
@@ -355,16 +356,21 @@ export default function ProfilePage() {
         ...formData,
         interests: getCombinedInterestValues(formData),
       })
-      setSuccess('Profile updated successfully!')
+      setSuccess('Profile saved successfully!')
+      setTimeout(() => setSuccess(null), 3000)
 
-      // Reload profile data
+      // Reload profile data (no scroll)
       await loadProfile()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile')
+      setTimeout(() => setError(null), 5000)
     } finally {
       setIsSaving(false)
     }
   }
+
+  const [photoSuccess, setPhotoSuccess] = useState<string | null>(null)
+  const [photoError, setPhotoError] = useState<string | null>(null)
 
   // Photo upload handlers
   const handlePhotoUpload = async (
@@ -372,19 +378,25 @@ export default function ProfilePage() {
     onProgress?: (fileIndex: number, progress: number, fileName: string) => void
   ) => {
     try {
+      setPhotoSuccess(null)
+      setPhotoError(null)
       await uploadPhotos(items, onProgress)
-      setSuccess('Photos uploaded successfully!')
+      setPhotoSuccess('Photos uploaded successfully!')
+      setTimeout(() => setPhotoSuccess(null), 4000)
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to upload photos')
+      setPhotoError(error instanceof Error ? error.message : 'Failed to upload photos')
+      setTimeout(() => setPhotoError(null), 6000)
     }
   }
 
   const handlePhotoRemove = async (index: number) => {
     try {
+      setPhotoSuccess(null)
       await deletePhoto(photos[index].id)
-      setSuccess('Photo removed successfully!')
+      setPhotoSuccess('Photo removed successfully!')
+      setTimeout(() => setPhotoSuccess(null), 4000)
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to remove photo')
+      setPhotoError(error instanceof Error ? error.message : 'Failed to remove photo')
     }
   }
 
@@ -579,10 +591,32 @@ export default function ProfilePage() {
         </Card>
 
 
-        {/* AI Wingman Features */}
-        <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Profile Form */}
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-24">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <ProfileTabs
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleLocationChange={handleLocationChange}
+              handleLookingForChange={handleLookingForChange}
+              handlePreferenceChange={handlePreferenceChange}
+              handleArrayPreferenceChange={handleArrayPreferenceChange}
+              handleArrayChange={handleArrayChange}
+              photos={photos}
+              uploadPhotos={handlePhotoUpload}
+              deletePhoto={handlePhotoRemove}
+              handleVoiceUpload={handleVoiceUpload}
+              handleVoiceDelete={handleVoiceDelete}
+            />
+
+            {/* Verification Section */}
+            <VerificationCard />
+          </form>
+        </div>
+
+        {/* AI Profile Tools — analysis, roast, vibes, etc. */}
+        <div className="mt-8 mb-24 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProfileAnalysis />
-          {/* <ProfileRoast /> Replaced by the new Viral Roast Page */}
           <Card className="bg-gradient-to-br from-orange-900 to-red-900 text-white border-orange-500/30 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none"></div>
             <CardHeader>
@@ -606,90 +640,39 @@ export default function ProfilePage() {
           <VouchLinkCard />
         </div>
 
-
-        {/* Profile Form */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <ProfileTabs
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleLocationChange={handleLocationChange}
-              handleLookingForChange={handleLookingForChange}
-              handlePreferenceChange={handlePreferenceChange}
-              handleArrayPreferenceChange={handleArrayPreferenceChange}
-              handleArrayChange={handleArrayChange}
-              photos={photos}
-              uploadPhotos={handlePhotoUpload}
-              deletePhoto={handlePhotoRemove}
-              handleVoiceUpload={handleVoiceUpload}
-              handleVoiceDelete={handleVoiceDelete}
-            />
-            {/* Photo Upload Section */}
-            <Card id="photos">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Camera className="w-5 h-5" />
-                  <span>Profile Photos</span>
-                  {photos.length > 0 && (
-                    <span className="text-sm text-muted-foreground">
-                      ({photos.length} photos)
-                    </span>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {faceBlurEnabled && (
-                  <div className="mb-4 flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm text-primary-900">
-                    <ShieldCheck className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-semibold">Client-side face blur is active</p>
-                      <p className="text-xs text-primary-800">
-                        New uploads blur detected faces locally before they leave your device so only redacted images reach fwber servers.
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <PhotoUpload
-                  onUpload={handlePhotoUpload}
-                  onRemove={handlePhotoRemove}
-                  photos={photos}
-                  maxPhotos={12}
-                  maxSize={5}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Verification Section */}
-            <VerificationCard />
-            {/* Error/Success Messages */}
-            {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-700">{error}</div>
-              </div>
-            )}
-
-            {success && (
-              <div className="rounded-md bg-green-50 p-4">
-                <div className="text-sm text-green-700">{success}</div>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? 'Saving...' : 'Save Profile'}
-              </button>
+        {/* Sticky Save Bar */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 shadow-lg z-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div>
+              {error && (
+                <span className="text-sm text-red-600 font-medium">{error}</span>
+              )}
+              {success && !error && (
+                <span className="text-sm text-green-600 font-medium">{success}</span>
+              )}
+              {!error && !success && (
+                <span className="text-sm text-gray-500">{currentCompleteness.percentage}% complete</span>
+              )}
             </div>
-          </form>
-        </div>
-
-        {/* Physical Profile Section */}
-        <div className="mt-8">
-          <PhysicalProfileEditor />
+            <button
+              type="button"
+              onClick={() => {
+                const form = document.querySelector('form')
+                if (form) {
+                  form.requestSubmit()
+                }
+              }}
+              disabled={isSaving}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md"
+            >
+              {isSaving ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                  Saving...
+                </>
+              ) : 'Save Profile'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
