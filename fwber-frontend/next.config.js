@@ -184,8 +184,14 @@ const sentryWebpackPluginOptions = {
   hideSourceMaps: true,
 };
 
-// Only wrap with Sentry in production builds — skip entirely in dev
-const isProd = process.env.NODE_ENV === 'production';
-module.exports = isProd
-  ? withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions)
-  : withPWA(withBundleAnalyzer(nextConfig));
+// Wrap config — Sentry only if available, bundle analyzer passthrough
+let finalConfig = withPWA(withBundleAnalyzer(nextConfig));
+if (isProd && withSentryConfig !== ((c) => c)) {
+  try {
+    finalConfig = withSentryConfig(finalConfig, sentryWebpackPluginOptions);
+  } catch (e) {
+    console.warn('[next.config] Sentry wrapping failed, using base config:', e.message);
+  }
+}
+
+module.exports = finalConfig;
