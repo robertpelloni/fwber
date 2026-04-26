@@ -18,6 +18,7 @@ import { ProfileCompletenessBar, ProfileCompletenessChecklist, calculateProfileC
 // PhysicalProfileEditor removed — all fields now in Physical tab
 import { isFeatureEnabled } from '@/lib/featureFlags'
 import ProfileTabs from '@/components/profile/ProfileTabs'
+import LocationMatcher from '@/components/profile/LocationMatcher'
 import VerificationCard from '@/components/VerificationCard'
 // import { ProfileRoast } from '@/components/profile/ProfileRoast' // Deprecated inline roast
 import { ProfileAnalysis } from '@/components/profile/ProfileAnalysis'
@@ -612,6 +613,18 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
+
+        {/* Location & Match Scope */}
+        <Card className="bg-white dark:bg-gray-800 shadow rounded-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              📍 Location & Match Scope
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LocationMatcher formData={formData} handleLocationChange={handleLocationChange} />
+          </CardContent>
+        </Card>
 
         {/* Profile Form */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-24">
