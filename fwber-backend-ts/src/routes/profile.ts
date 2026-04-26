@@ -148,6 +148,22 @@ router.put('/', authenticate, async (req: any, res) => {
     delete data.created_at;
     delete data.updated_at;
 
+    // Coerce boolean values to strings for string-typed columns
+    // (user_profiles has tattoos/piercings as String?, but frontend sends Boolean)
+    const STRING_BOOL_COLUMNS = ['tattoos', 'piercings'];
+    for (const col of STRING_BOOL_COLUMNS) {
+      if (col in data && typeof data[col] === 'boolean') {
+        data[col] = data[col] ? 'true' : 'false';
+      }
+    }
+    // Coerce boolean values for actual Boolean columns (ensure proper type)
+    const BOOL_COLUMNS = ['has_children', 'wants_children', 'has_pets'];
+    for (const col of BOOL_COLUMNS) {
+      if (col in data && typeof data[col] === 'string') {
+        data[col] = data[col] === 'true' || data[col] === '1';
+      }
+    }
+
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
       const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
