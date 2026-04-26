@@ -44,8 +44,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Fix multiple lockfile warning in monorepo setup
-  outputFileTracingRoot: path.join(__dirname, '../'),
+  // outputFileTracingRoot only works in monorepo; Vercel builds fwber-frontend/ as root
+  ...(fs.existsSync(path.join(__dirname, '../VERSION')) ? { outputFileTracingRoot: path.join(__dirname, '../') } : {}),
 
   // Performance optimizations
   compress: true,
@@ -189,4 +189,3 @@ const isProd = process.env.NODE_ENV === 'production';
 module.exports = isProd
   ? withSentryConfig(withPWA(withBundleAnalyzer(nextConfig)), sentryWebpackPluginOptions)
   : withPWA(withBundleAnalyzer(nextConfig));
-// Build: Sat Apr 25 20:58:30 EDT 2026
