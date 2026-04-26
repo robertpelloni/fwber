@@ -105,6 +105,20 @@ export default function ProfilePage() {
     }, 800)
   }, [])
 
+  // ─── Interest combiner (must be defined before performAutoSave) ───
+  const getCombinedInterestValues = useCallback((data: ProfileFormData) => {
+    return Array.from(new Set([
+      ...(data.interests ?? []),
+      ...(data.preferences.hobbies ?? []),
+      ...(data.preferences.music ?? []),
+      ...(data.preferences.movies ?? []),
+      ...(data.preferences.books ?? []),
+      ...(data.preferences.sports ?? []),
+    ]
+      .map(value => value.trim().toLowerCase())
+      .filter(Boolean)))
+  }, [])
+
   const performAutoSave = useCallback(async (data: ProfileFormData) => {
     if (!effectiveToken) return
     try {
@@ -203,19 +217,6 @@ export default function ProfilePage() {
     interests: [],
     voice_intro: null,
   })
-
-  const getCombinedInterestValues = useCallback((data: ProfileFormData) => {
-    return Array.from(new Set([
-      ...(data.interests ?? []),
-      ...(data.preferences.hobbies ?? []),
-      ...(data.preferences.music ?? []),
-      ...(data.preferences.movies ?? []),
-      ...(data.preferences.books ?? []),
-      ...(data.preferences.sports ?? []),
-    ]
-      .map(value => value.trim().toLowerCase())
-      .filter(Boolean)))
-  }, [])
 
   // Calculate completeness from current form data
   const currentCompleteness = useMemo(() => {
