@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import LocationMatcher from './LocationMatcher';
 
 interface BasicInformationProps {
   formData: any;
@@ -167,20 +168,7 @@ export default function BasicInformation({ formData, handleInputChange, handleLo
             </select>
           </div>
 
-          <div>
-            <label htmlFor="max_distance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Maximum Distance (miles)
-            </label>
-            <input
-              type="number"
-              id="max_distance"
-              min="1"
-              max="100"
-              value={formData.location.max_distance}
-              onChange={(e) => handleLocationChange('max_distance', parseInt(e.target.value))}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
+          <LocationMatcher formData={formData} handleLocationChange={handleLocationChange} />
 
           <div>
             <label htmlFor="zodiac_sign" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
