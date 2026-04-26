@@ -610,8 +610,6 @@ export default function ProfilePage() {
             />
           </CardContent>
         </Card>
-          </CardContent>
-        </Card>
 
 
         {/* Location & Match Scope */}
