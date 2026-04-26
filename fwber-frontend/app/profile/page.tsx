@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
+import { useAutoSave } from '@/lib/useAutoSave'
+import AutoSaveIndicator from '@/components/AutoSaveIndicator'
 import dynamic from 'next/dynamic'
 import { getUserProfile, updateUserProfile, getProfileCompleteness, type UserProfile, type ProfileUpdateData } from '@/lib/api/profile'
 import { getTopics, type Topic } from '@/lib/api/topics'
@@ -89,6 +91,39 @@ export default function ProfilePage() {
     interests?: string[]
     voice_intro?: File | null
   }
+
+  // ─── Auto-save ─────────────────────────────────────────────────────────────
+  // We track a "snapshot" that only updates when the user stops typing.
+  // This avoids triggering saves on every keystroke intermediate.
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [autoSaveSnapshot, setAutoSaveSnapshot] = useState<ProfileFormData | null>(null)
+
+  // Push a new snapshot after 800ms of calm (separate from the actual save debounce)
+  const scheduleAutoSave = useCallback((data: ProfileFormData) => {
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current)
+    autoSaveTimerRef.current = setTimeout(() => {
+      setAutoSaveSnapshot({ ...data })
+    }, 800)
+  }, [])
+
+  const performAutoSave = useCallback(async (data: ProfileFormData) => {
+    if (!effectiveToken) return
+    try {
+      await updateUserProfile(effectiveToken, {
+        ...data,
+        interests: getCombinedInterestValues(data),
+      })
+    } catch {
+      // Auto-save errors are shown via the indicator status
+    }
+  }, [effectiveToken, getCombinedInterestValues])
+
+  const { status: autoSaveStatus, saveNow: flushAutoSave, isDirty: hasUnsavedChanges } = useAutoSave({
+    data: autoSaveSnapshot,
+    onSave: performAutoSave,
+    debounceMs: 1200,
+    enabled: !isLoading && !!effectiveToken,
+  })
 
   // Form state
   const [formData, setFormData] = useState<ProfileFormData>({
@@ -408,56 +443,68 @@ export default function ProfilePage() {
     }
   }
 
+  // ─── Change handlers (auto-save aware) ────────────────────────────────────
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+    setFormData(prev => {
+      const next = { ...prev, [field]: value }
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   const handleLocationChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      location: {
-        ...prev.location,
-        [field]: value
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        location: { ...prev.location, [field]: value },
       }
-    }))
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   const handleLookingForChange = (value: string, checked: boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      looking_for: checked
-        ? [...prev.looking_for, value]
-        : prev.looking_for.filter(item => item !== value)
-    }))
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        looking_for: checked
+          ? [...prev.looking_for, value]
+          : prev.looking_for.filter(item => item !== value),
+      }
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   type PreferenceKey = keyof ProfileFormData['preferences']
   type PreferenceArrayKey = Extract<PreferenceKey, 'hobbies' | 'music' | 'movies' | 'books' | 'sports' | 'ethnicity'>
 
   const handlePreferenceChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      preferences: {
-        ...prev.preferences,
-        [field as PreferenceKey]: value
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        preferences: { ...prev.preferences, [field as PreferenceKey]: value },
       }
-    }))
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   const handleArrayPreferenceChange = (field: string, value: string, checked: boolean) => {
     const key = field as PreferenceArrayKey;
-    setFormData(prev => ({
-      ...prev,
-      preferences: {
-        ...prev.preferences,
-        [key]: checked
-          ? ([...(prev.preferences[key] as string[] | undefined ?? []), value])
-          : ((prev.preferences[key] as string[] | undefined ?? []).filter((item: string) => item !== value))
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        preferences: {
+          ...prev.preferences,
+          [key]: checked
+            ? ([...(prev.preferences[key] as string[] | undefined ?? []), value])
+            : ((prev.preferences[key] as string[] | undefined ?? []).filter((item: string) => item !== value)),
+        },
       }
-    }))
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   const handleArrayChange = (field: string, value: string, checked: boolean) => {
@@ -466,32 +513,39 @@ export default function ProfilePage() {
       const updatedArray = checked
         ? [...currentArray, value]
         : currentArray.filter((item: string) => item !== value);
-      return { ...prev, [field]: updatedArray };
+      const next = { ...prev, [field]: updatedArray };
+      scheduleAutoSave(next)
+      return next;
     });
   }
 
   const handleTopicInterestToggle = (slug: string) => {
-    setFormData(prev => ({
-      ...prev,
-      interests: prev.interests?.includes(slug)
-        ? prev.interests.filter(item => item !== slug)
-        : [...(prev.interests ?? []), slug]
-    }))
+    setFormData(prev => {
+      const next = {
+        ...prev,
+        interests: prev.interests?.includes(slug)
+          ? prev.interests.filter(item => item !== slug)
+          : [...(prev.interests ?? []), slug],
+      }
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   const handleVoiceUpload = (file: File) => {
-    setFormData(prev => ({
-      ...prev,
-      voice_intro: file
-    }))
+    setFormData(prev => {
+      const next = { ...prev, voice_intro: file }
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   const handleVoiceDelete = () => {
-    setFormData(prev => ({
-      ...prev,
-      voice_intro: null,
-      voice_intro_url: null
-    }))
+    setFormData(prev => {
+      const next = { ...prev, voice_intro: null, voice_intro_url: null as any }
+      scheduleAutoSave(next)
+      return next
+    })
   }
 
   if (authLoading || isLoading) {
@@ -673,38 +727,37 @@ export default function ProfilePage() {
           <VouchLinkCard />
         </div>
 
-        {/* Sticky Save Bar */}
+        {/* Sticky Auto-Save Bar */}
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 shadow-lg z-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <div>
+            <div className="flex items-center gap-3">
+              <AutoSaveIndicator
+                status={autoSaveStatus}
+                isDirty={hasUnsavedChanges}
+                compact
+              />
               {error && (
                 <span className="text-sm text-red-600 font-medium">{error}</span>
               )}
-              {success && !error && (
-                <span className="text-sm text-green-600 font-medium">{success}</span>
-              )}
-              {!error && !success && (
-                <span className="text-sm text-gray-500">{currentCompleteness.percentage}% complete</span>
-              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                const form = document.querySelector('form')
-                if (form) {
-                  form.requestSubmit()
-                }
-              }}
-              disabled={isSaving}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-8 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md"
-            >
-              {isSaving ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                  Saving...
-                </>
-              ) : 'Save Profile'}
-            </button>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">
+                {currentCompleteness.percentage}% complete
+              </span>
+              <button
+                type="button"
+                onClick={() => flushAutoSave()}
+                disabled={isSaving}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-md text-sm"
+              >
+                {isSaving ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                    Saving...
+                  </>
+                ) : 'Save Now'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
