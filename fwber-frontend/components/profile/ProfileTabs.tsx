@@ -156,7 +156,7 @@ export default function ProfileTabs({
           </Card>
         </TabsContent>
         <TabsContent value="physical">
-          <Physical formData={formData} handleInputChange={handleInputChange} />
+          <Physical />
         </TabsContent>
         <TabsContent value="intimate">
           <Intimate formData={formData} handleInputChange={handleInputChange} handleArrayChange={handleArrayChange} />

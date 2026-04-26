@@ -1,176 +1,34 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowRight, Ruler, User, Palette } from 'lucide-react';
 
-const BODY_TYPES = ['Slim', 'Athletic', 'Average', 'Curvy', 'Muscular', 'Plus Size', 'Dad Bod'];
-const HAIR_COLORS = ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White', 'Bald', 'Other'];
-const EYE_COLORS = ['Brown', 'Blue', 'Green', 'Hazel', 'Gray', 'Amber', 'Other'];
-const SKIN_TONES = ['Very Fair', 'Fair', 'Light', 'Medium', 'Olive', 'Tan', 'Brown', 'Dark Brown', 'Dark'];
-const ETHNICITIES = ['Asian', 'Black', 'Hispanic/Latino', 'Middle Eastern', 'Native American', 'Pacific Islander', 'White', 'Mixed', 'Other'];
-const FACIAL_HAIR = ['None', 'Stubble', 'Goatee', 'Mustache', 'Full Beard', 'Other'];
-const FITNESS_LEVELS = ['Sedentary', 'Light', 'Moderate', 'Active', 'Very Active', 'Athlete'];
-const CLOTHING_STYLES = ['Casual', 'Streetwear', 'Formal', 'Athleisure', 'Bohemian', 'Punk', 'Minimalist', 'Vintage', 'Other'];
-
-interface PhysicalProps {
-  formData: {
-    height_cm?: number | null;
-    body_type?: string;
-    hair_color?: string;
-    eye_color?: string;
-    skin_tone?: string;
-    ethnicity?: string;
-    facial_hair?: string;
-    fitness_level?: string;
-    tattoos?: boolean;
-    piercings?: boolean;
-    dominant_hand?: string;
-    clothing_style?: string;
-  };
-  handleInputChange: (field: string, value: string | number | boolean | null) => void;
-}
-
-export default function Physical({ formData, handleInputChange }: PhysicalProps) {
-  const cmToFeetInches = (cm: number | null | undefined) => {
-    if (!cm) return 'Not set';
-    const totalInches = cm / 2.54;
-    const feet = Math.floor(totalInches / 12);
-    const inches = Math.round(totalInches % 12);
-    return `${feet}'${inches}"`;
-  };
-
-  const SelectGrid = ({ options, selected, field, cols = 4 }: { options: string[]; selected: string | undefined; field: string; cols?: number }) => (
-    <div className={`grid grid-cols-2 sm:grid-cols-${cols} gap-2`}>
-      {options.map(opt => (
-        <button
-          key={opt}
-          type="button"
-          onClick={() => handleInputChange(field, opt.toLowerCase().replace(/ /g, '_'))}
-          className={`px-3 py-2 text-sm rounded-lg border transition-all ${
-            selected === opt.toLowerCase().replace(/ /g, '_')
-              ? 'bg-blue-600 text-white border-blue-600'
-              : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-blue-400'
-          }`}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
+export default function Physical() {
+  const router = useRouter();
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Physical Attributes</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Your Height</Label>
-          <select
-            value={formData.height_cm || ''}
-            onChange={e => handleInputChange('height_cm', e.target.value ? parseInt(e.target.value) : null)}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-          >
-            <option value="">Select your height</option>
-            {Array.from({ length: 42 }, (_, i) => {
-              const cm = 145 + i * 2;
-              const totalIn = Math.round(cm / 2.54);
-              const ft = Math.floor(totalIn / 12);
-              const inch = totalIn % 12;
-              return (
-                <option key={cm} value={cm}>
-                  {cm} cm — {ft}'{inch}" ({ft} ft{inch > 0 ? ` ${inch} in` : ''})
-                </option>
-              );
-            })}
-          </select>
-          {formData.height_cm && (
-            <p className="text-sm text-gray-500">{formData.height_cm} cm &middot; {cmToFeetInches(formData.height_cm)}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Body Type</Label>
-          <SelectGrid options={BODY_TYPES} selected={formData.body_type} field="body_type" />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Ethnicity</Label>
-          <SelectGrid options={ETHNICITIES} selected={formData.ethnicity} field="ethnicity" cols={3} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Hair Color</Label>
-          <SelectGrid options={HAIR_COLORS} selected={formData.hair_color} field="hair_color" />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Eye Color</Label>
-          <SelectGrid options={EYE_COLORS} selected={formData.eye_color} field="eye_color" />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Skin Tone</Label>
-          <SelectGrid options={SKIN_TONES} selected={formData.skin_tone} field="skin_tone" cols={3} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Facial Hair</Label>
-          <SelectGrid options={FACIAL_HAIR} selected={formData.facial_hair} field="facial_hair" cols={3} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Fitness Level</Label>
-          <SelectGrid options={FITNESS_LEVELS} selected={formData.fitness_level} field="fitness_level" cols={3} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Clothing Style</Label>
-          <SelectGrid options={CLOTHING_STYLES} selected={formData.clothing_style} field="clothing_style" cols={3} />
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-base font-medium">Dominant Hand</Label>
-          <div className="grid grid-cols-3 gap-2">
-            {['Left', 'Right', 'Ambidextrous'].map(opt => {
-              const val = opt.toLowerCase().replace(/ /g, '_');
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => handleInputChange('dominant_hand', val)}
-                  className={`px-3 py-2 text-sm rounded-lg border transition-all ${
-                    formData.dominant_hand === val
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:border-blue-400'
-                  }`}
-                >
-                  {opt}
-                </button>
-              );
-            })}
+      <CardContent className="py-12">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center gap-3 mb-2">
+            <Ruler className="w-8 h-8 text-blue-500" />
+            <User className="w-8 h-8 text-purple-500" />
+            <Palette className="w-8 h-8 text-pink-500" />
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <label className="flex items-center space-x-3 p-4 rounded-lg border cursor-pointer hover:border-blue-400 transition-colors">
-            <input
-              type="checkbox"
-              checked={formData.tattoos || false}
-              onChange={e => handleInputChange('tattoos', e.target.checked)}
-              className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 accent-blue-600 cursor-pointer"
-            />
-            <span className="text-sm font-medium">I have tattoos</span>
-          </label>
-          <label className="flex items-center space-x-3 p-4 rounded-lg border cursor-pointer hover:border-blue-400 transition-colors">
-            <input
-              type="checkbox"
-              checked={formData.piercings || false}
-              onChange={e => handleInputChange('piercings', e.target.checked)}
-              className="h-5 w-5 rounded border-2 border-gray-400 text-blue-600 accent-blue-600 cursor-pointer"
-            />
-            <span className="text-sm font-medium">I have piercings</span>
-          </label>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+            Physical Attributes
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+            Height, body type, ethnicity, hair &amp; eye color, fitness level, clothing style, tattoos, piercings, and more.
+          </p>
+          <button
+            onClick={() => router.push('/settings/physical-profile')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-md"
+          >
+            Edit Physical Attributes
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </CardContent>
     </Card>
