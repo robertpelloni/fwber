@@ -102,6 +102,7 @@ export default function ProfileTabs({
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
+                  data-tab={tab.value}
                   className="px-4 py-2 text-sm font-medium whitespace-nowrap rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600"
                 >
                   {tab.label}

@@ -195,11 +195,11 @@ export default function ProfilePage() {
       interests: getCombinedInterestValues(formData),
       occupation: formData.preferences.occupation,
       education: formData.preferences.education,
-      height: formData.preferences.height_min,
-      religion: formData.religion || formData.preferences.religion,
-      politics: formData.political_views || formData.preferences.politics,
-      drinking: formData.drinking_status || formData.preferences.drinking,
-      smoking: formData.smoking_status || formData.preferences.smoking
+      height: formData.height_cm,
+      religion: formData.religion,
+      politics: formData.political_views,
+      drinking: formData.drinking_status,
+      smoking: formData.smoking_status,
     });
   }, [formData, photos, getCombinedInterestValues]);
 
@@ -293,6 +293,7 @@ export default function ProfilePage() {
           political_views: profileData.profile.political_views || '',
           interests: profileData.profile.interests || [],
           voice_intro: null,
+          height_cm: (profileData.profile as any).height_cm || null,
 
           preferences: {
             // Lifestyle preferences
@@ -564,33 +565,48 @@ export default function ProfilePage() {
             <ProfileCompletenessChecklist
               completeness={currentCompleteness}
               onFieldClick={(field: ProfileField) => {
-                // Scroll to the corresponding field
-                const fieldMap: Record<string, string> = {
-                  name: 'display_name',
-                  age: 'date_of_birth',
-                  location: 'city',
-                  bio: 'bio',
-                  photos: 'photos',
-                  interests: 'hobbies',
-                  occupation: 'occupation',
-                  education: 'education',
-                  height: 'height_min',
-                  religion: 'religion',
-                  politics: 'politics',
-                  drinking: 'drinking',
-                  smoking: 'smoking'
+                const tabFieldMap: Record<string, { tab: string; id: string; href?: string }> = {
+                  name: { tab: 'basic', id: 'display_name' },
+                  age: { tab: 'basic', id: 'date_of_birth' },
+                  location: { tab: 'location', id: 'city' },
+                  bio: { tab: 'bio', id: 'bio' },
+                  photos: { tab: 'photos', id: 'photos' },
+                  interests: { tab: 'interests', id: 'hobbies' },
+                  occupation: { tab: 'lifestyle', id: 'occupation' },
+                  education: { tab: 'dating', id: 'education' },
+                  height: { tab: 'physical', id: '', href: '/settings/physical-profile' },
+                  religion: { tab: 'basic', id: 'religion' },
+                  politics: { tab: 'basic', id: 'political_views' },
+                  drinking: { tab: 'lifestyle', id: 'drinking' },
+                  smoking: { tab: 'lifestyle', id: 'smoking' },
                 }
-                const elementId = fieldMap[field.key]
-                if (elementId) {
-                  const element = document.getElementById(elementId)
-                  element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                  element?.focus()
-                  // Add highlight animation
-                  element?.classList.add('ring-4', 'ring-blue-500', 'ring-opacity-50')
-                  setTimeout(() => {
-                    element?.classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50')
-                  }, 2000)
+                const target = tabFieldMap[field.key]
+                if (!target) return
+
+                // Navigate to external page if needed
+                if (target.href) {
+                  router.push(target.href)
+                  return
                 }
+
+                // Click the correct tab trigger
+                const tabTrigger = document.querySelector(`[data-tab="${target.tab}"]`) as HTMLElement
+                if (tabTrigger) {
+                  tabTrigger.click()
+                }
+
+                // Wait for tab content to render, then scroll to the field
+                setTimeout(() => {
+                  const element = document.getElementById(target.id)
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    element.focus()
+                    element.classList.add('ring-4', 'ring-blue-500', 'ring-opacity-50')
+                    setTimeout(() => element.classList.remove('ring-4', 'ring-blue-500', 'ring-opacity-50'), 2000)
+                  }
+                }, 400)
+              }}
+              }}
               }}
             />
           </CardContent>
