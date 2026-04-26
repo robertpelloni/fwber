@@ -312,31 +312,40 @@ export default function LocationMatcher({ formData, handleLocationChange }: Loca
             type="button"
             onClick={detectLocation}
             disabled={detecting}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-              detected
-                ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-1 ring-green-300 dark:ring-green-700'
-                : detecting
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800 cursor-wait'
-                  : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-700 hover:ring-blue-400 dark:hover:ring-blue-500 hover:shadow-sm active:scale-95'
-            }`}
-          >
-            {detected ? (
-              <>
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                Detected!
-              </>
-            ) : detecting ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Detecting...
-              </>
-            ) : (
-              <>
-                <Crosshair className="w-3.5 h-3.5" />
-                Auto-detect
-              </>
-            )}
-          </button>
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+              <Sparkles className="w-3 h-3" />
+              Recommended for best results
+            </span>
+
+            <button
+              type="button"
+              onClick={detectLocation}
+              disabled={detecting}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                detected
+                  ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-1 ring-green-300 dark:ring-green-700'
+                  : detecting
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 ring-1 ring-blue-200 dark:ring-blue-800 cursor-wait'
+                    : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-700 hover:ring-blue-400 dark:hover:ring-blue-500 hover:shadow-sm active:scale-95'
+              }`}
+            >
+              {detected ? (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  Detected!
+                </>
+              ) : detecting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Detecting...
+                </>
+              ) : (
+                <>
+                  <Crosshair className="w-3.5 h-3.5" />
+                  Auto-detect
+                </>
+              )}
+            </button>
         </div>
 
         {/* Detection status message */}
