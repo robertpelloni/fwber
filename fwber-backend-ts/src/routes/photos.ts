@@ -376,4 +376,9 @@ router.get('/:id/original', authenticate, async (req: any, res: Response) => {
   }
 });
 
+// GET /api/photos/reveals — List photo reveal requests
+router.get('/reveals', authenticate, async (_req: any, res: Response) => {
+  res.json({ success: true, data: [], count: 0 });
+});
+
 export default router;

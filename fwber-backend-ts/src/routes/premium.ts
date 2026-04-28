@@ -18,6 +18,11 @@ router.get('/status', authenticate, async (req: any, res) => {
   });
 });
 
+// POST /api/premium/initiate - Initiate premium subscription
+router.post('/initiate', authenticate, async (req: any, res) => {
+  res.json({ success: true, session: null, message: 'Subscription initiated' });
+});
+
 // POST /api/premium/subscribe - Subscribe to premium
 router.post('/subscribe', authenticate, async (req: any, res) => {
   res.json({ message: 'Subscription initiated', session: null });
