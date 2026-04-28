@@ -13,7 +13,7 @@ export default function Interests({ formData, handleArrayPreferenceChange }: Int
       <CardHeader>
         <CardTitle>Interests & Hobbies</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent id="hobbies" className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             Hobbies
