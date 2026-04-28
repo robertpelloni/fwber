@@ -36,7 +36,15 @@ export const PremiumUpgradeModal = ({ isOpen, onClose }: PremiumUpgradeModalProp
     } else {
       initiate('gold_monthly', {
         onSuccess: (data) => {
-          setPaymentIntent(data);
+          // Only proceed if we got a valid client_secret from Stripe
+          if (data?.client_secret) {
+            setPaymentIntent(data);
+          } else {
+            alert('Card payments are not yet available. Please use tokens to upgrade.');
+          }
+        },
+        onError: (error: any) => {
+          alert(error?.response?.data?.error || 'Card payments are not yet available. Please use tokens to upgrade.');
         }
       });
     }

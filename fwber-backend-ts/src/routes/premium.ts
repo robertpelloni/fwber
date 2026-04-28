@@ -20,12 +20,18 @@ router.get('/status', authenticate, async (req: any, res) => {
 
 // POST /api/premium/initiate - Initiate premium subscription
 router.post('/initiate', authenticate, async (req: any, res) => {
-  res.json({ success: true, session: null, message: 'Subscription initiated' });
+  // Stripe is not configured — return an error so the frontend can show a message
+  res.status(501).json({ success: false, error: 'Card payments are not yet available. Please use tokens to upgrade.' });
 });
 
 // POST /api/premium/subscribe - Subscribe to premium
 router.post('/subscribe', authenticate, async (req: any, res) => {
   res.json({ message: 'Subscription initiated', session: null });
+});
+
+// POST /api/premium/purchase - Purchase premium with tokens
+router.post('/purchase', authenticate, async (req: any, res) => {
+  res.json({ success: false, error: 'Premium purchase not yet implemented' });
 });
 
 // POST /api/premium/cancel - Cancel premium
