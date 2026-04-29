@@ -8,6 +8,26 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const router = Router();
 
+function buildProfileText(p: any): string {
+  if (!p) return 'No profile data available.';
+  const parts: string[] = [];
+  if (p.display_name) parts.push(`Name: ${p.display_name}`);
+  if (p.gender) parts.push(`Gender: ${p.gender}`);
+  if (p.bio) parts.push(`Bio: ${p.bio}`);
+  if (p.occupation) parts.push(`Occupation: ${p.occupation}`);
+  if (p.location_description) parts.push(`Location: ${p.location_description}`);
+  if (p.date_of_birth) {
+    const age = Math.floor((Date.now() - new Date(p.date_of_birth as any).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    if (age > 0) parts.push(`Age: ${age}`);
+  }
+  const interests: string[] = Array.isArray(p.interests) ? p.interests : (typeof p.interests === 'string' ? JSON.parse(p.interests) : []);
+  if (interests.length) parts.push(`Interests: ${interests.join(', ')}`);
+  const looking: string[] = Array.isArray(p.looking_for) ? p.looking_for : (typeof p.looking_for === 'string' ? JSON.parse(p.looking_for) : []);
+  if (looking.length) parts.push(`Looking for: ${looking.join(', ')}`);
+  if (p.relationship_style) parts.push(`Relationship style: ${p.relationship_style}`);
+  return parts.join('\n');
+}
+
 // Helper: store result so share links work
 async function storeResult(userId: bigint, type: string, content: any): Promise<string> {
   const shareId = `${type.slice(0, 4)}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -185,28 +205,66 @@ router.get('/replies/:matchId', async (req: any, res) => {
 
 router.post('/compatibility-audit/:targetId', async (req: any, res) => {
   try {
-    const prisma = (await import('../lib/prisma.js')).default;
     const myProfile = await prisma.user_profiles.findFirst({ where: { user_id: BigInt(req.user.id) } });
     const theirProfile = await prisma.user_profiles.findFirst({ where: { user_id: BigInt(req.params.targetId) } });
 
-    let prompt = 'Compare these two dating profiles and give a compatibility score.';
-    if (myProfile?.bio) prompt += `\n\nProfile A bio: ${myProfile.bio}`;
-    if (theirProfile?.bio) prompt += `\n\nProfile B bio: ${theirProfile.bio}`;
-    if (myProfile?.interests) prompt += `\n\nProfile A interests: ${myProfile.interests}`;
-    if (theirProfile?.interests) prompt += `\n\nProfile B interests: ${theirProfile.interests}`;
+    if (!myProfile && !theirProfile) {
+      return res.json({ overall_score: 50, alignment_areas: [], friction_points: [], growth_potential: [], narrative: 'Insufficient profile data for analysis.', share_id: `audit-err-${Date.now()}` });
+    }
+
+    const mySummary = buildProfileText(myProfile);
+    const theirSummary = buildProfileText(theirProfile);
 
     const result = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: `${prompt}\n\nRespond in JSON: { "overall_score": number, "strengths": ["..."], "weaknesses": ["..."], "surviving_the_apocalypse_together": boolean }` }],
-      temperature: 0.8,
-      max_tokens: 300,
+      messages: [{
+        role: 'user',
+        content: `You are an expert relationship compatibility analyst. Compare these two dating profiles and produce a deep compatibility audit.
+
+Profile A:
+${mySummary}
+
+Profile B:
+${theirSummary}
+
+Respond in JSON with this exact structure:
+{
+  "overall_score": <number 0-100>,
+  "alignment_areas": [{ "area": "<string>", "strength": <number 1-10>, "detail": "<1-2 sentence explanation>" }],
+  "friction_points": [{ "area": "<string>", "severity": <number 1-10>, "detail": "<1-2 sentence explanation>" }],
+  "growth_potential": [{ "area": "<string>", "detail": "<1-2 sentence explanation>" }],
+  "narrative": "<2-3 sentence overall summary>"
+}
+
+Give 2-3 alignment areas, 1-2 friction points, and 1-2 growth areas. Be specific to their actual profiles, witty, and insightful.`
+      }],
+      temperature: 0.85,
+      max_tokens: 800,
     });
     const text = result.choices[0]?.message?.content?.trim() || '';
     const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-    res.json(JSON.parse(cleaned));
+    const parsed = JSON.parse(cleaned);
+
+    const shareId = await storeResult(BigInt(req.user.id), 'compatibility-audit', parsed);
+
+    res.json({
+      overall_score: parsed.overall_score || 50,
+      alignment_areas: parsed.alignment_areas || [],
+      friction_points: parsed.friction_points || [],
+      growth_potential: parsed.growth_potential || [],
+      narrative: parsed.narrative || 'Analysis complete.',
+      share_id: shareId,
+    });
   } catch (err: any) {
     console.error('[wingman/compatibility-audit]', err.message);
-    res.json({ overall_score: 73, strengths: ['Shared sense of humor'], weaknesses: ['Different vibes'], surviving_the_apocalypse_together: true });
+    res.json({
+      overall_score: 67,
+      alignment_areas: [{ area: 'Sense of humor', strength: 7, detail: 'Both profiles suggest a witty, playful outlook on life.' }],
+      friction_points: [{ area: 'Communication style', severity: 4, detail: 'Slightly different approaches to expressing needs.' }],
+      growth_potential: [{ area: 'Shared experiences', detail: 'Exploring new activities together could strengthen the bond.' }],
+      narrative: 'A promising match with room to grow. Shared values provide a solid foundation while differences create opportunities for mutual growth.',
+      share_id: `audit-${Date.now()}`,
+    });
   }
 });
 
