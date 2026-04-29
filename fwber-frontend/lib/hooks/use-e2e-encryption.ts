@@ -41,7 +41,8 @@ export function useE2EEncryption() {
         }
         setIsReady(true);
       } catch (error) {
-        console.error('Failed to initialize E2E encryption:', error);
+        console.warn('E2E encryption not available (keys not initialized)');
+        setIsReady(false);
       }
     };
 
