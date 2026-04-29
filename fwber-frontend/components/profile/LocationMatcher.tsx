@@ -299,6 +299,41 @@ export default function LocationMatcher({ formData, handleLocationChange }: Loca
         </div>
       )}
 
+      {/* ── Hometown ──────────────────────────────────────────────────────── */}
+      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <Building2 className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+          Hometown
+          <span className="ml-2 text-xs text-gray-400 dark:text-gray-500 font-normal">Where you grew up</span>
+        </label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
+              City
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Chicago"
+              value={location.hometown_city || ''}
+              onChange={(e) => handleLocationChange('hometown_city', e.target.value)}
+              className="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">
+              State / Region
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Illinois"
+              value={location.hometown_state || ''}
+              onChange={(e) => handleLocationChange('hometown_state', e.target.value)}
+              className="w-full border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* ── Your Location ────────────────────────────────────────────────── */}
       <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between mb-3">

@@ -168,7 +168,7 @@ router.post('/', authenticate, async (req: any, res) => {
           if (loc.match_scope) mergedPrefs.match_scope = loc.match_scope;
           if (loc.search_country) mergedPrefs.search_country = loc.search_country;
           if (loc.search_city) mergedPrefs.search_city = loc.search_city;
-          raw.preferences = mergedPrefs;
+          raw.preferences = mergedPrefs; console.log("[MERGED PREFS]", JSON.stringify(mergedPrefs));
         }
         continue;
       }
@@ -208,6 +208,7 @@ router.post('/', authenticate, async (req: any, res) => {
       if (col in data && typeof data[col] === 'string') data[col] = data[col] === 'true' || data[col] === '1';
     }
 
+    console.log("[POST] data.preferences:", data.preferences);
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
       const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
@@ -282,6 +283,7 @@ router.put('/', authenticate, async (req: any, res) => {
     const userId = BigInt(req.user.id);
     const raw = req.body;
     console.log('[PUT /api/profile] location:', JSON.stringify(raw.location));
+    console.log('[PUT /api/profile] preferences:', JSON.stringify(raw.preferences));
 
     // Map nested objects to flat DB columns
     const data: any = {};
@@ -300,7 +302,7 @@ router.put('/', authenticate, async (req: any, res) => {
           if (loc.match_scope) mergedPrefs.match_scope = loc.match_scope;
           if (loc.search_country) mergedPrefs.search_country = loc.search_country;
           if (loc.search_city) mergedPrefs.search_city = loc.search_city;
-          raw.preferences = mergedPrefs;
+          raw.preferences = mergedPrefs; console.log("[MERGED PREFS]", JSON.stringify(mergedPrefs));
         }
         continue; // Don't pass nested 'location' to Prisma
       }
@@ -354,6 +356,7 @@ router.put('/', authenticate, async (req: any, res) => {
       }
     }
 
+    console.log("[PUT] data.preferences:", data.preferences);
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
       const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
