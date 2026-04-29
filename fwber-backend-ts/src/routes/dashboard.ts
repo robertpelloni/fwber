@@ -12,27 +12,50 @@ router.get('/stats', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
 
-    const [tokenBalance, matchBountyCount, matchAssistCount] = await Promise.all([
-      prisma.users.findUnique({ where: { id: userId }, select: { token_balance: true } }),
-      prisma.match_bounties.count({ where: { user_id: userId, status: 'active' } }),
-      prisma.match_assists.count({ where: { matchmaker_id: userId, status: 'matched' } }),
+    const [
+      user,
+      totalMatches,
+      pendingMatches,
+      acceptedMatches,
+      profileViews,
+      conversations,
+    ] = await Promise.all([
+      prisma.users.findUnique({ where: { id: userId } }),
+      prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }] } }),
+      prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'pending' } }),
+      prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' } }),
+      prisma.profile_views.count({ where: { viewed_user_id: userId } }).catch(() => 0),
+      prisma.chatrooms.count({ where: { participants: { some: {} } } }).catch(() => 0),
     ]);
 
+    const daysActive = user?.created_at
+      ? Math.max(1, Math.floor((Date.now() - new Date(user.created_at as any).getTime()) / 86400000))
+      : 1;
+
     res.json({
-      token_balance: Number(tokenBalance?.token_balance || 0),
-      active_bounties: matchBountyCount,
-      successful_matches: matchAssistCount,
-      total_vouches: 0,
-      trust_score: 50,
+      total_matches: totalMatches,
+      pending_matches: pendingMatches,
+      accepted_matches: acceptedMatches,
+      conversations,
+      profile_views: typeof profileViews === 'number' ? profileViews : 0,
+      today_views: 0,
+      match_score_avg: 50,
+      response_rate: 0,
+      days_active: daysActive,
+      last_login: user?.last_seen_at?.toISOString() || new Date().toISOString(),
+      current_streak: user?.current_streak || 0,
+      streak_just_updated: false,
+      reverb_healthy: true,
+      token_balance: Number(user?.token_balance || 0),
     });
   } catch (error: any) {
     console.error('[Dashboard] Stats error:', error.message);
     res.json({
-      token_balance: 0,
-      active_bounties: 0,
-      successful_matches: 0,
-      total_vouches: 0,
-      trust_score: 50,
+      total_matches: 0, pending_matches: 0, accepted_matches: 0,
+      conversations: 0, profile_views: 0, today_views: 0,
+      match_score_avg: 0, response_rate: 0, days_active: 1,
+      last_login: new Date().toISOString(), current_streak: 0,
+      streak_just_updated: false, reverb_healthy: true, token_balance: 0,
     });
   }
 });

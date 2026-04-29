@@ -398,15 +398,42 @@ router.delete('/', authenticate, async (req: any, res) => {
 router.get('/completeness', authenticate, async (req: any, res) => {
   try {
     const profile = await prisma.user_profiles.findFirst({ where: { user_id: BigInt(req.user.id) } });
-    if (!profile) return res.json({ completeness: 10, missing: ['profile'] });
-    const fields: Record<string, boolean> = {
-      display_name: !!profile.display_name, bio: !!profile.bio,
-      avatar_url: !!profile.avatar_url, date_of_birth: !!profile.date_of_birth,
-      gender: !!profile.gender, interests: !!profile.interests,
-    };
-    const filled = Object.values(fields).filter(Boolean).length;
-    res.json({ completeness: Math.round((filled / Object.keys(fields).length) * 100), missing: Object.entries(fields).filter(([, v]) => !v).map(([k]) => k) });
-  } catch { res.json({ completeness: 10, missing: ['profile'] }); }
+    if (!profile) return res.json({ percentage: 10, required_complete: false, missing_required: ['profile'], missing_optional: [], sections: { basic: false, location: false, preferences: false, interests: false, physical: false, lifestyle: false } });
+    
+    // Check each section
+    const basic = !!(profile.display_name && profile.bio && profile.date_of_birth && profile.gender);
+    const location = !!(profile.location_description || profile.location_latitude);
+    const prefsRaw: any = profile.preferences;
+    const prefs = typeof prefsRaw === 'string' ? JSON.parse(prefsRaw) : prefsRaw;
+    const preferences = !!(prefs && (prefs.looking_for || prefs.age_range_min));
+    const interestsArr: any[] = (() => { try { const v = profile.interests; return typeof v === 'string' ? JSON.parse(v) : (Array.isArray(v) ? v : []); } catch { return []; } })();
+    const interests = interestsArr.length > 0;
+    const physical = !!(profile.height_cm || profile.body_type);
+    const lifestyle = !!(profile.drinking_status || profile.smoking_status || profile.occupation);
+
+    const sections = { basic, location, preferences, interests, physical, lifestyle };
+    const filledCount = Object.values(sections).filter(Boolean).length;
+    const percentage = Math.round((filledCount / 6) * 100);
+
+    // Build missing lists
+    const missing_required: string[] = [];
+    const missing_optional: string[] = [];
+    if (!profile.display_name) missing_required.push('Display name');
+    if (!profile.bio) missing_required.push('Bio');
+    if (!profile.date_of_birth) missing_required.push('Date of birth');
+    if (!profile.gender) missing_required.push('Gender');
+    if (!profile.location_description && !profile.location_latitude) missing_optional.push('Location');
+    if (interestsArr.length === 0) missing_optional.push('Interests');
+    if (!profile.occupation) missing_optional.push('Occupation');
+    if (!profile.height_cm && !profile.body_type) missing_optional.push('Physical info');
+    if (!profile.avatar_url) missing_optional.push('Profile photo');
+
+    const required_complete = missing_required.length === 0;
+
+    res.json({ percentage, required_complete, missing_required, missing_optional, sections });
+  } catch (err) {
+    res.json({ percentage: 10, required_complete: false, missing_required: ['profile'], missing_optional: [], sections: { basic: false, location: false, preferences: false, interests: false, physical: false, lifestyle: false } });
+  }
 });
 
 // GET /api/profile/:id/views - Profile view history
