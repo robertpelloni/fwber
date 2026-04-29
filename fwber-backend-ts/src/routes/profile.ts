@@ -8,21 +8,99 @@ const router = Router();
 router.get('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({ where: { id: userId } });
     const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     const photos = await prisma.photos.findMany({
       where: { user_id: userId, is_private: false },
       orderBy: { is_primary: 'desc' },
     });
     if (!profile) {
-      res.json({ photos });
+      res.json({
+        id: Number(userId),
+        email: user?.email || '',
+        email_verified: !!user?.email_verified_at,
+        created_at: user?.created_at?.toISOString() || '',
+        last_online: user?.last_seen_at?.toISOString() || '',
+        profile: null,
+        photos,
+      });
       return;
     }
-    const result = serialize(profile);
-    // Parse JSON fields back to objects for the frontend
+    const p = serialize(profile);
+    // Parse JSON fields back to objects
     for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
-      result[col] = parseJsonField(result[col]);
+      p[col] = parseJsonField(p[col]);
     }
-    res.json({ ...result, photos });
+
+    // Build the nested structure the frontend expects
+    const prefs = p.preferences || {};
+    res.json({
+      id: Number(userId),
+      email: user?.email || '',
+      email_verified: !!user?.email_verified_at,
+      created_at: user?.created_at?.toISOString() || '',
+      last_online: user?.last_seen_at?.toISOString() || '',
+      profile: {
+        display_name: p.display_name,
+        bio: p.bio,
+        date_of_birth: p.date_of_birth,
+        age: p.date_of_birth ? Math.floor((Date.now() - new Date(p.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+        gender: p.gender,
+        pronouns: p.pronouns,
+        sexual_orientation: p.sexual_orientation,
+        relationship_style: p.relationship_style,
+        looking_for: p.looking_for || [],
+        interests: p.interests || [],
+        location: {
+          latitude: p.location_latitude ?? null,
+          longitude: p.location_longitude ?? null,
+          max_distance: 25,
+          city: p.location_description || '',
+          state: '',
+        },
+        love_language: p.love_language,
+        personality_type: p.personality_type,
+        chronotype: p.chronotype || p.sleep_schedule,
+        social_media: p.social_media || {},
+        communication_style: prefs.communication_style,
+        blood_type: p.blood_type,
+        sti_status: p.sti_status || {},
+        family_plans: p.family_plans,
+        relationship_goals: p.relationship_goals,
+        languages: p.languages || [],
+        zodiac_sign: p.zodiac_sign,
+        drinking_status: p.drinking_status,
+        smoking_status: p.smoking_status,
+        cannabis_status: p.cannabis_status,
+        dietary_preferences: p.dietary_preferences,
+        exercise_habits: prefs.exercise,
+        sleep_habits: p.sleep_schedule,
+        pets: p.has_pets ? ['yes'] : [],
+        children: p.has_children ? 'yes' : '',
+        religion: p.religion,
+        political_views: p.political_views,
+        voice_intro_url: p.voice_intro_url,
+        is_federated: p.is_federated,
+        is_travel_mode: p.is_travel_mode,
+        travel_latitude: p.travel_latitude,
+        travel_longitude: p.travel_longitude,
+        travel_location_name: p.travel_location_name,
+        height_cm: p.height_cm,
+        body_type: p.body_type,
+        ethnicity: p.ethnicity,
+        occupation: p.occupation,
+        education: p.education,
+        preferences: prefs,
+        profile_complete: true,
+        completion_percentage: 0,
+        photos: photos.map((ph: any) => ({
+          id: Number(ph.id),
+          url: ph.file_path || '',
+          is_private: ph.is_private || false,
+          is_primary: ph.is_primary || false,
+        })),
+      },
+    });
   } catch (error: any) {
     console.error('[GET /api/profile]', error.message);
     res.json({});
