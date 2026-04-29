@@ -241,7 +241,7 @@ export default function NearbyPage() {
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">📍</div>
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">No one nearby</h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 dark:text-gray-400">
                   Try increasing your search radius or check back later!
                 </p>
               </div>
@@ -290,7 +290,7 @@ export default function NearbyPage() {
                           user.is_recent 
                             ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
                             : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                        }`>}>
+                        }`}>
                           {user.is_recent ? 'Active' : 'Inactive'}
                         </span>
                       </div>
