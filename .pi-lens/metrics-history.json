@@ -158,8 +158,8 @@
     },
     "fwber-frontend\\lib\\hooks\\use-websocket.ts": {
       "latest": {
-        "commit": "48fec365c",
-        "timestamp": "2026-04-29T18:57:49.768Z",
+        "commit": "8494eee3c",
+        "timestamp": "2026-04-29T20:38:49.326Z",
         "mi": 36.6,
         "cognitive": 16,
         "nesting": 4,
@@ -171,6 +171,16 @@
         {
           "commit": "48fec365c",
           "timestamp": "2026-04-29T18:57:49.768Z",
+          "mi": 36.6,
+          "cognitive": 16,
+          "nesting": 4,
+          "lines": 133,
+          "maxCyclomatic": 9,
+          "entropy": 6.03
+        },
+        {
+          "commit": "8494eee3c",
+          "timestamp": "2026-04-29T20:38:49.326Z",
           "mi": 36.6,
           "cognitive": 16,
           "nesting": 4,
@@ -330,7 +340,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\components\\ai\\WingmanSuggestions.tsx": {
+      "latest": {
+        "commit": "8494eee3c",
+        "timestamp": "2026-04-29T20:39:28.618Z",
+        "mi": 38.5,
+        "cognitive": 7,
+        "nesting": 3,
+        "lines": 74,
+        "maxCyclomatic": 6,
+        "entropy": 4.98
+      },
+      "history": [
+        {
+          "commit": "8494eee3c",
+          "timestamp": "2026-04-29T20:39:28.618Z",
+          "mi": 38.5,
+          "cognitive": 7,
+          "nesting": 3,
+          "lines": 74,
+          "maxCyclomatic": 6,
+          "entropy": 4.98
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T19:58:45.661Z"
+  "capturedAt": "2026-04-29T20:39:33.701Z"
 }
