@@ -4,7 +4,7 @@
  *   or: npx tsx scripts/seed-detroit.ts
  */
 
-import Prisma from '../src/lib/prisma.js';
+import prisma from '../src/lib/prisma.js';
 import crypto from 'crypto';
 
 // ─── Data pools ────────────────────────────────────────────────────────────
