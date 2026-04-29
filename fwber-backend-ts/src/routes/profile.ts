@@ -14,7 +14,7 @@ router.get('/', authenticate, async (req: any, res) => {
       orderBy: { is_primary: 'desc' },
     });
     if (!profile) {
-      res.json({ photos });
+      res.json({ profile: null, photos });
       return;
     }
     const result = serialize(profile);
@@ -22,10 +22,18 @@ router.get('/', authenticate, async (req: any, res) => {
     for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
       result[col] = parseJsonField(result[col]);
     }
-    res.json({ ...result, photos });
+    // Map flat location columns to nested location object for the frontend
+    result.location = {
+      latitude: result.location_latitude ?? null,
+      longitude: result.location_longitude ?? null,
+      max_distance: result.location_name ? parseInt(result.location_name) : 25,
+      city: result.location_description ? result.location_description.split(', ')[0] || '' : '',
+      state: result.location_description ? result.location_description.split(', ')[1] || '' : '',
+    };
+    res.json({ profile: result, photos });
   } catch (error: any) {
     console.error('[GET /api/profile]', error.message);
-    res.json({});
+    res.json({ profile: null, photos: [] });
   }
 });
 
@@ -34,13 +42,17 @@ router.post('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    let result;
     if (existing) {
-      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
-      res.json(updated);
+      result = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
     } else {
-      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
-      res.json(created);
+      result = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
     }
+    const serialized = serialize(result);
+    for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
+      serialized[col] = parseJsonField(serialized[col]);
+    }
+    res.json({ profile: serialized });
   } catch (error: any) {
     res.status(500).json({ message: 'Failed to update profile' });
   }
@@ -165,13 +177,17 @@ router.put('/', authenticate, async (req: any, res) => {
     }
 
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    let result;
     if (existing) {
-      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
-      res.json(serialize(updated));
+      result = await prisma.user_profiles.update({ where: { id: existing.id }, data });
     } else {
-      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
-      res.json(serialize(created));
+      result = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
     }
+    const serialized = serialize(result);
+    for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
+      serialized[col] = parseJsonField(serialized[col]);
+    }
+    res.json({ profile: serialized });
   } catch (error: any) {
     console.error('[PUT /api/profile]', error.message);
     res.status(500).json({ message: error.message || 'Failed to update profile' });

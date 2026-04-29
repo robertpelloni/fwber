@@ -148,6 +148,16 @@ export default function ProfilePage() {
     sexual_orientation: '',
     relationship_style: '',
     looking_for: [],
+    height_cm: null,
+    body_type: '',
+    hair_color: '',
+    eye_color: '',
+    skin_tone: '',
+    ethnicity: '',
+    facial_hair: '',
+    fitness_level: '',
+    clothing_style: '',
+    dominant_hand: '',
     location: {
       latitude: undefined,
       longitude: undefined,
@@ -330,6 +340,25 @@ export default function ProfilePage() {
           interests: profileData.profile.interests || [],
           voice_intro: null,
           height_cm: (profileData.profile as any).height_cm || null,
+
+          // Physical attributes
+          body_type: (profileData.profile as any).body_type || '',
+          hair_color: (profileData.profile as any).hair_color || '',
+          eye_color: (profileData.profile as any).eye_color || '',
+          skin_tone: (profileData.profile as any).skin_tone || '',
+          ethnicity: (profileData.profile as any).ethnicity || '',
+          facial_hair: (profileData.profile as any).facial_hair || '',
+          fitness_level: (profileData.profile as any).fitness_level || '',
+          tattoos: (profileData.profile as any).tattoos === 'true' || (profileData.profile as any).tattoos === true,
+          piercings: (profileData.profile as any).piercings === 'true' || (profileData.profile as any).piercings === true,
+          clothing_style: (profileData.profile as any).clothing_style || '',
+          dominant_hand: (profileData.profile as any).dominant_hand || '',
+
+          // Intimate details
+          breast_size: (profileData.profile as any).breast_size || '',
+          penis_length_cm: (profileData.profile as any).penis_length_cm || null,
+          penis_girth_cm: (profileData.profile as any).penis_girth_cm || null,
+          fetishes: Array.isArray((profileData.profile as any).fetishes) ? (profileData.profile as any).fetishes : [],
 
           preferences: {
             // Lifestyle preferences
