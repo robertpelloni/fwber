@@ -380,7 +380,7 @@ export default function RecommendationsPage() {
               </Badge>
               <CardTitle className="text-xl text-gray-900 dark:text-white">{title}</CardTitle>
             </div>
-            {typeof item.score === 'number' ? <Badge variant="secondary">{(item.score * 100).toFixed(1)}%</Badge> : null}
+            {typeof item.score === 'number' ? <Badge variant="secondary">{Math.round(item.score)}%</Badge> : null}
           </div>
           <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
             {description}
