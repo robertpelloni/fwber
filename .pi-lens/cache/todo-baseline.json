@@ -1,0 +1,158 @@
+{
+  "items": [
+    {
+      "type": "FIXME",
+      "message": "remove before merging to master...",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\examples-select.jsx",
+      "line": 25,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "clean this up",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\examples-select.jsx",
+      "line": 68,
+      "column": 7
+    },
+    {
+      "type": "FIXME",
+      "message": "should this only trigger if `currentExamplesKey` is nullish?",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\examples-select.jsx",
+      "line": 69,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "this puts us in a weird area btwn un/controlled selection... review",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\layout-utils.jsx",
+      "line": 187,
+      "column": 7
+    },
+    {
+      "type": "BUG",
+      "message": "props.response is always coming back as a new Immutable instance",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\live-response.jsx",
+      "line": 41,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "test this behavior by stubbing `window.location` in an Enzyme/JSDom env",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\online-validator-badge.jsx",
+      "line": 27,
+      "column": 9
+    },
+    {
+      "type": "TODO",
+      "message": "use wrapComponents here, swagger-ui doesn't care about jumpToPath */}",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\operation-summary.jsx",
+      "line": 99,
+      "column": 42
+    },
+    {
+      "type": "BUG",
+      "message": "props.tryItOutResponse is always coming back as a new Immutable instance",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\components\\responses.jsx",
+      "line": 37,
+      "column": 10
+    },
+    {
+      "type": "TODO",
+      "message": "rename this, or refactor - we don't need presets _and_ plugins. Its just there for performance.",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\config\\defaults.js",
+      "line": 68,
+      "column": 30
+    },
+    {
+      "type": "TODO",
+      "message": "vladimir.gorej@gmail.com): remove deep-extend in favor of lodash.merge",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\config\\merge.js",
+      "line": 13,
+      "column": 3
+    },
+    {
+      "type": "TODO",
+      "message": "oliwia.rogala@smartbear.com): drop support for `config` in the next major release",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\config\\sources\\query.js",
+      "line": 16,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "remove this in v4.0, it is deprecated",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\deep-linking\\layout.js",
+      "line": 87,
+      "column": 9
+    },
+    {
+      "type": "TODO",
+      "message": "remove this in v4.0, it is deprecated",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\deep-linking\\layout.js",
+      "line": 97,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "re-resolve line number if we've transformed it away",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\err\\error-transformers\\hook.js",
+      "line": 33,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "finish implementing, fix flattening problem",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\err\\error-transformers\\transformers\\parameter-oneof.js",
+      "line": 6,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "use json-pointer serilization instead of fromJS(...), for performance",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\layout\\reducers.js",
+      "line": 18,
+      "column": 7
+    },
+    {
+      "type": "FIXME",
+      "message": "we should be keeping up with this in props/state upstream of us",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\oas3\\components\\operation-servers.jsx",
+      "line": 24,
+      "column": 7
+    },
+    {
+      "type": "FIXME",
+      "message": "we should be keeping up with this in props/state upstream of us",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\oas3\\components\\operation-servers.jsx",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "achieve this in a selector instead",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\oas3\\components\\request-body-editor.jsx",
+      "line": 32,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "push error to state",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\plugins\\spec\\actions.js",
+      "line": 69,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "expose the system of presets.apis in docs, so we know what is supported",
+      "file": "ARCHIVE_v1_8_php_legacy\\fwber-backend\\vendor\\swagger-api\\swagger-ui\\src\\core\\utils\\index.js",
+      "line": 664,
+      "column": 49
+    },
+    {
+      "type": "TODO",
+      "message": "Queue actual avatar generation job here when provider is wired up",
+      "file": "fwber-backend-ts\\src\\routes\\physical-profile.ts",
+      "line": 105,
+      "column": 7
+    }
+  ]
+}

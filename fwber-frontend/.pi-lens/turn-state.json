@@ -1,0 +1,41 @@
+{
+  "files": {
+    "app/matches/page.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 4,
+          "end": 4
+        },
+        {
+          "start": 10,
+          "end": 10
+        },
+        {
+          "start": 20,
+          "end": 20
+        },
+        {
+          "start": 35,
+          "end": 35
+        },
+        {
+          "start": 137,
+          "end": 137
+        },
+        {
+          "start": 140,
+          "end": 140
+        },
+        {
+          "start": 310,
+          "end": 310
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-29T17:31:43.869Z"
+    }
+  },
+  "turnCycles": 0,
+  "maxCycles": 3,
+  "lastUpdated": "2026-04-29T17:31:43.869Z"
+}
