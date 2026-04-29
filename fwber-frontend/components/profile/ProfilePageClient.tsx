@@ -123,12 +123,13 @@ export default function ProfilePage() {
   const performAutoSave = useCallback(async (data: ProfileFormData) => {
     if (!effectiveToken) return
     try {
+      console.log('[AutoSave] drinking_status:', data.drinking_status, 'smoking_status:', data.smoking_status, 'cannabis_status:', data.cannabis_status, 'prefs.drinking:', data.preferences?.drinking)
       await updateUserProfile(effectiveToken, {
         ...data,
         interests: getCombinedInterestValues(data),
       })
-    } catch {
-      // Auto-save errors are shown via the indicator status
+    } catch (e) {
+      console.error('[AutoSave] FAILED:', e)
     }
   }, [effectiveToken, getCombinedInterestValues])
 
