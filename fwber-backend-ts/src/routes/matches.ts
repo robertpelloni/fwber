@@ -49,7 +49,7 @@ router.get('/', authenticate, async (req: any, res) => {
     });
 
     const matches = candidates.map((u: any) => {
-      const p = u.user_profiles || {};
+      const p = (Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles) || {};
       return {
         id: Number(u.id),
         name: p.display_name || u.name || 'Anonymous',
