@@ -372,8 +372,9 @@ export async function updateUserProfile(
   const payload: any = { ...updates };
 
   if (updates.date_of_birth) {
+    payload.date_of_birth = updates.date_of_birth;
+    // Also set birthdate column since DB has both
     payload.birthdate = updates.date_of_birth;
-    delete payload.date_of_birth;
   }
 
   const sanitizedPayload = sanitizeProfileUpdatePayload(payload) ?? {};

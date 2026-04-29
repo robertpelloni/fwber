@@ -4,6 +4,29 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 
+// ─── Zodiac calculation ─────────────────────────────────────────────────────
+function getZodiacSign(month: number, day: number): string {
+  const signs = [
+    { sign: 'Capricorn', end: [1, 19] },
+    { sign: 'Aquarius', end: [2, 18] },
+    { sign: 'Pisces', end: [3, 20] },
+    { sign: 'Aries', end: [4, 19] },
+    { sign: 'Taurus', end: [5, 20] },
+    { sign: 'Gemini', end: [6, 20] },
+    { sign: 'Cancer', end: [7, 22] },
+    { sign: 'Leo', end: [8, 22] },
+    { sign: 'Virgo', end: [9, 22] },
+    { sign: 'Libra', end: [10, 22] },
+    { sign: 'Scorpio', end: [11, 21] },
+    { sign: 'Sagittarius', end: [12, 21] },
+    { sign: 'Capricorn', end: [12, 31] },
+  ];
+  for (const { sign, end } of signs) {
+    if (month < end[0] || (month === end[0] && day <= end[1])) return sign;
+  }
+  return 'Capricorn';
+}
+
 // GET /api/profile - Get current user's profile
 router.get('/', authenticate, async (req: any, res) => {
   try {
@@ -43,8 +66,8 @@ router.get('/', authenticate, async (req: any, res) => {
       profile: {
         display_name: p.display_name,
         bio: p.bio,
-        date_of_birth: p.date_of_birth,
-        age: p.date_of_birth ? Math.floor((Date.now() - new Date(p.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+        date_of_birth: p.date_of_birth || p.birthdate,
+        age: (p.date_of_birth || p.birthdate) ? Math.floor((Date.now() - new Date(p.date_of_birth || p.birthdate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
         gender: p.gender,
         pronouns: p.pronouns,
         sexual_orientation: p.sexual_orientation,
@@ -68,7 +91,13 @@ router.get('/', authenticate, async (req: any, res) => {
         family_plans: p.family_plans,
         relationship_goals: p.relationship_goals,
         languages: p.languages || [],
-        zodiac_sign: p.zodiac_sign,
+        zodiac_sign: (() => {
+          if (p.zodiac_sign) return p.zodiac_sign;
+          const dob = p.date_of_birth || p.birthdate;
+          if (!dob) return null;
+          const d = new Date(dob);
+          return getZodiacSign(d.getMonth() + 1, d.getDate());
+        })(),
         drinking_status: p.drinking_status,
         smoking_status: p.smoking_status,
         cannabis_status: p.cannabis_status,
@@ -141,6 +170,9 @@ router.post('/', authenticate, async (req: any, res) => {
       }
     }
 
+    // Sync both date columns so reads always work
+    if (data.birthdate && !data.date_of_birth) data.date_of_birth = data.birthdate;
+    if (data.date_of_birth && !data.birthdate) data.birthdate = data.date_of_birth;
     if (data.birthdate && typeof data.birthdate === 'string' && data.birthdate.length === 10)
       data.birthdate = new Date(data.birthdate + 'T00:00:00.000Z');
     if (data.date_of_birth && typeof data.date_of_birth === 'string' && data.date_of_birth.length === 10)
@@ -260,6 +292,10 @@ router.put('/', authenticate, async (req: any, res) => {
     }
 
     // Convert date-only strings to full ISO DateTime for Prisma
+    // Sync both date columns so reads always work
+    if (data.birthdate && !data.date_of_birth) data.date_of_birth = data.birthdate;
+    if (data.date_of_birth && !data.birthdate) data.birthdate = data.date_of_birth;
+
     if (data.birthdate && typeof data.birthdate === 'string' && data.birthdate.length === 10) {
       data.birthdate = new Date(data.birthdate + 'T00:00:00.000Z');
     }
