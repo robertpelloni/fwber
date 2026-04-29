@@ -284,7 +284,7 @@ export default function RealTimeChat({
 			const messageContent = message.trim();
 
 			// Handle offline queuing for text-only messages
-			if (!isConnected || !navigator.onLine) {
+			if (!navigator.onLine) {
 				if (selectedFile) {
 					showError("Offline", "File uploads require an active connection.");
 					setIsSending(false);
@@ -941,11 +941,7 @@ export default function RealTimeChat({
 							</div>
 							<button
 								type="submit"
-								disabled={
-									(!message.trim() && !selectedFile) ||
-									!isConnected ||
-									isSending
-								}
+								disabled={(!message.trim() && !selectedFile) || isSending}
 								className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors"
 							>
 								{isSending ? (
