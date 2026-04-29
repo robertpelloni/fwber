@@ -281,6 +281,7 @@ router.put('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const raw = req.body;
+    console.log('[PUT /api/profile] location:', JSON.stringify(raw.location));
 
     // Map nested objects to flat DB columns
     const data: any = {};
