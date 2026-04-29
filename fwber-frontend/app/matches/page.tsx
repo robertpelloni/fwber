@@ -161,7 +161,8 @@ export default function MatchesPage() {
 					</div>
 
 					<div
-						className={`relative h-[600px] overflow-hidden rounded-lg border shadow-sm bg-gray-900 border-gray-700 ${isConfessional ? "border-purple-500/30 bg-zinc-950" : ""}`}
+						className={`relative h-[600px] overflow-hidden rounded-lg border shadow-sm border-gray-700 ${isConfessional ? "border-purple-500/30" : ""}`}
+						style={{ backgroundColor: "#111827" }}
 					>
 						<div className="relative h-full">
 							{/* Image/Content Area */}
@@ -228,7 +229,10 @@ export default function MatchesPage() {
 								)}
 							</div>
 
-							<div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white h-1/2 flex flex-col justify-end pointer-events-none">
+							<div
+								className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 h-1/2 flex flex-col justify-end pointer-events-none"
+								style={{ color: "#ffffff" }}
+							>
 								<div className="flex justify-between items-end">
 									<div>
 										<h2 className="text-3xl font-bold flex items-center gap-2">
