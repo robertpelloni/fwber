@@ -33,7 +33,7 @@ router.get('/', authenticate, async (req: any, res) => {
     const candidates = await prisma.users.findMany({
       where: {
         id: { notIn: Array.from(excludeIds).map((id) => BigInt(id)) },
-        user_profiles: { isNot: {} },
+        user_profiles: { some: {} },
       },
       include: {
         user_profiles: true,
