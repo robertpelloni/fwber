@@ -4,57 +4,208 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 
+// ─── Zodiac calculation ─────────────────────────────────────────────────────
+function getZodiacSign(month: number, day: number): string {
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquarius';
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 'Pisces';
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Aries';
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Taurus';
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gemini';
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Cancer';
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leo';
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgo';
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Scorpio';
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagittarius';
+  return 'Capricorn';
+}
+
 // GET /api/profile - Get current user's profile
 router.get('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({ where: { id: userId } });
     const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     const photos = await prisma.photos.findMany({
       where: { user_id: userId, is_private: false },
       orderBy: { is_primary: 'desc' },
     });
     if (!profile) {
-      res.json({ profile: null, photos });
+      res.json({
+        id: Number(userId),
+        email: user?.email || '',
+        email_verified: !!user?.email_verified_at,
+        created_at: user?.created_at?.toISOString() || '',
+        last_online: user?.last_seen_at?.toISOString() || '',
+        profile: null,
+        photos,
+      });
       return;
     }
-    const result = serialize(profile);
-    // Parse JSON fields back to objects for the frontend
+    const p = serialize(profile);
+    // Parse JSON fields back to objects
     for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
-      result[col] = parseJsonField(result[col]);
+      p[col] = parseJsonField(p[col]);
     }
-    // Map flat location columns to nested location object for the frontend
-    result.location = {
-      latitude: result.location_latitude ?? null,
-      longitude: result.location_longitude ?? null,
-      max_distance: result.location_name ? parseInt(result.location_name) : 25,
-      city: result.location_description ? result.location_description.split(', ')[0] || '' : '',
-      state: result.location_description ? result.location_description.split(', ')[1] || '' : '',
-    };
-    res.json({ profile: result, photos });
+
+    // Build the nested structure the frontend expects
+    const prefs = p.preferences || {};
+    res.json({
+      id: Number(userId),
+      email: user?.email || '',
+      email_verified: !!user?.email_verified_at,
+      created_at: user?.created_at?.toISOString() || '',
+      last_online: user?.last_seen_at?.toISOString() || '',
+      profile: {
+        display_name: p.display_name,
+        bio: p.bio,
+        date_of_birth: p.date_of_birth || p.birthdate,
+        age: (p.date_of_birth || p.birthdate) ? Math.floor((Date.now() - new Date(p.date_of_birth || p.birthdate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+        gender: p.gender,
+        pronouns: p.pronouns,
+        sexual_orientation: p.sexual_orientation,
+        relationship_style: p.relationship_style,
+        looking_for: p.looking_for || [],
+        interests: p.interests || [],
+        location: {
+          latitude: p.location_latitude ? Number(p.location_latitude) : null,
+          longitude: p.location_longitude ? Number(p.location_longitude) : null,
+          max_distance: 25,
+          city: p.location_description ? p.location_description.split(',')[0]?.trim() || '' : '',
+          state: p.location_description ? p.location_description.split(',')[1]?.trim() || '' : '',
+        },
+        love_language: p.love_language,
+        personality_type: p.personality_type,
+        chronotype: p.chronotype || p.sleep_schedule,
+        social_media: p.social_media || {},
+        communication_style: prefs.communication_style,
+        blood_type: p.blood_type,
+        sti_status: p.sti_status || {},
+        family_plans: p.family_plans,
+        relationship_goals: p.relationship_goals,
+        languages: p.languages || [],
+        zodiac_sign: (() => {
+          if (p.zodiac_sign) return p.zodiac_sign;
+          const dob = p.date_of_birth || p.birthdate;
+          if (!dob) return null;
+          const d = new Date(dob);
+          return getZodiacSign(d.getMonth() + 1, d.getDate());
+        })(),
+        drinking_status: p.drinking_status,
+        smoking_status: p.smoking_status,
+        cannabis_status: p.cannabis_status,
+        dietary_preferences: p.dietary_preferences,
+        exercise_habits: prefs.exercise,
+        sleep_habits: p.sleep_schedule,
+        pets: p.has_pets ? ['yes'] : [],
+        children: p.has_children ? 'yes' : '',
+        religion: p.religion,
+        political_views: p.political_views,
+        voice_intro_url: p.voice_intro_url,
+        is_federated: p.is_federated,
+        is_travel_mode: p.is_travel_mode,
+        travel_latitude: p.travel_latitude ? Number(p.travel_latitude) : null,
+        travel_longitude: p.travel_longitude ? Number(p.travel_longitude) : null,
+        travel_location_name: p.travel_location_name,
+        height_cm: p.height_cm,
+        body_type: p.body_type,
+        hair_color: p.hair_color,
+        eye_color: p.eye_color,
+        skin_tone: p.skin_tone,
+        facial_hair: p.facial_hair,
+        fitness_level: p.fitness_level,
+        clothing_style: p.clothing_style,
+        dominant_hand: p.dominant_hand,
+        ethnicity: p.ethnicity,
+        occupation: p.occupation,
+        education: p.education,
+        tattoos: p.tattoos === 'true' || p.tattoos === true,
+        piercings: p.piercings === 'true' || p.piercings === true,
+        breast_size: p.breast_size || null,
+        penis_length_cm: p.penis_length_cm || null,
+        penis_girth_cm: p.penis_girth_cm || null,
+        fetishes: p.fetishes || [],
+        preferences: prefs,
+        profile_complete: true,
+        completion_percentage: 0,
+        photos: photos.map((ph: any) => ({
+          id: Number(ph.id),
+          url: ph.file_path || '',
+          is_private: ph.is_private || false,
+          is_primary: ph.is_primary || false,
+        })),
+      },
+    });
   } catch (error: any) {
     console.error('[GET /api/profile]', error.message);
-    res.json({ profile: null, photos: [] });
+    res.json({});
   }
 });
 
 // POST /api/profile - Create/update profile
 router.post('/', authenticate, async (req: any, res) => {
+  // Reuse PUT logic — same sanitization, column filtering, type coercion
   try {
     const userId = BigInt(req.user.id);
+    const raw = req.body;
+
+    const data: any = {};
+    for (const [key, val] of Object.entries(raw)) {
+      if (val === undefined || val === null) continue;
+      if (key === 'location') {
+        const loc = val as any;
+        if (loc.latitude != null) data.location_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.location_longitude = Number(loc.longitude);
+        if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
+        continue;
+      }
+      if (key === 'travel_location') {
+        const loc = val as any;
+        if (loc.latitude != null) data.travel_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.travel_longitude = Number(loc.longitude);
+        if (loc.name != null) data.travel_location_name = loc.name;
+        continue;
+      }
+      if (key === 'voice_intro' || key === 'voice_intro_url') continue;
+      if (key === 'looking_for') { data[key] = typeof val === 'string' ? val : JSON.stringify(val); continue; }
+      if (!PROFILE_COLUMNS.has(key)) continue;
+      if (JSON_COLUMNS.has(key)) {
+        data[key] = typeof val === 'string' ? val : JSON.stringify(val);
+      } else {
+        data[key] = val;
+      }
+    }
+
+    // Sync both date columns so reads always work
+    if (data.birthdate && !data.date_of_birth) data.date_of_birth = data.birthdate;
+    if (data.date_of_birth && !data.birthdate) data.birthdate = data.date_of_birth;
+    if (data.birthdate && typeof data.birthdate === 'string' && data.birthdate.length === 10)
+      data.birthdate = new Date(data.birthdate + 'T00:00:00.000Z');
+    if (data.date_of_birth && typeof data.date_of_birth === 'string' && data.date_of_birth.length === 10)
+      data.date_of_birth = new Date(data.date_of_birth + 'T00:00:00.000Z');
+
+    delete data.id; delete data.user_id; delete data.created_at; delete data.updated_at;
+
+    const STRING_BOOL_COLUMNS = ['tattoos', 'piercings'];
+    for (const col of STRING_BOOL_COLUMNS) {
+      if (col in data && typeof data[col] === 'boolean') data[col] = data[col] ? 'true' : 'false';
+    }
+    const BOOL_COLUMNS = ['has_children', 'wants_children', 'has_pets'];
+    for (const col of BOOL_COLUMNS) {
+      if (col in data && typeof data[col] === 'string') data[col] = data[col] === 'true' || data[col] === '1';
+    }
+
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
-    let result;
     if (existing) {
-      result = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
+      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
+      res.json(serialize(updated));
     } else {
-      result = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
+      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
+      res.json(serialize(created));
     }
-    const serialized = serialize(result);
-    for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
-      serialized[col] = parseJsonField(serialized[col]);
-    }
-    res.json({ profile: serialized });
   } catch (error: any) {
-    res.status(500).json({ message: 'Failed to update profile' });
+    console.error('[POST /api/profile]', error.message);
+    res.status(500).json({ message: error.message || 'Failed to update profile' });
   }
 });
 
@@ -124,16 +275,16 @@ router.put('/', authenticate, async (req: any, res) => {
       if (val === undefined || val === null) continue;
       if (key === 'location') {
         const loc = val as any;
-        if (loc.latitude != null) data.location_latitude = loc.latitude;
-        if (loc.longitude != null) data.location_longitude = loc.longitude;
+        if (loc.latitude != null) data.location_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.location_longitude = Number(loc.longitude);
         if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
         if (loc.max_distance != null) data.location_name = String(loc.max_distance);
         continue; // Don't pass nested 'location' to Prisma
       }
       if (key === 'travel_location') {
         const loc = val as any;
-        if (loc.latitude != null) data.travel_latitude = loc.latitude;
-        if (loc.longitude != null) data.travel_longitude = loc.longitude;
+        if (loc.latitude != null) data.travel_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.travel_longitude = Number(loc.longitude);
         if (loc.name != null) data.travel_location_name = loc.name;
         continue;
       }
@@ -147,6 +298,10 @@ router.put('/', authenticate, async (req: any, res) => {
     }
 
     // Convert date-only strings to full ISO DateTime for Prisma
+    // Sync both date columns so reads always work
+    if (data.birthdate && !data.date_of_birth) data.date_of_birth = data.birthdate;
+    if (data.date_of_birth && !data.birthdate) data.birthdate = data.date_of_birth;
+
     if (data.birthdate && typeof data.birthdate === 'string' && data.birthdate.length === 10) {
       data.birthdate = new Date(data.birthdate + 'T00:00:00.000Z');
     }
@@ -177,17 +332,13 @@ router.put('/', authenticate, async (req: any, res) => {
     }
 
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
-    let result;
     if (existing) {
-      result = await prisma.user_profiles.update({ where: { id: existing.id }, data });
+      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
+      res.json(serialize(updated));
     } else {
-      result = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
+      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
+      res.json(serialize(created));
     }
-    const serialized = serialize(result);
-    for (const col of ['preferences', 'looking_for', 'interests', 'languages', 'social_media', 'sti_status', 'fetishes', 'interested_in']) {
-      serialized[col] = parseJsonField(serialized[col]);
-    }
-    res.json({ profile: serialized });
   } catch (error: any) {
     console.error('[PUT /api/profile]', error.message);
     res.status(500).json({ message: error.message || 'Failed to update profile' });

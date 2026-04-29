@@ -14,7 +14,7 @@ export default function Location({ formData, handleLocationChange }: LocationPro
       <CardHeader>
         <CardTitle>Location & Matching</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent id="city">
         <LocationMatcher formData={formData} handleLocationChange={handleLocationChange} />
       </CardContent>
     </Card>

@@ -20,4 +20,9 @@ router.post('/activate', (_req, res) => {
   res.json({ message: 'Boosts not yet implemented' });
 });
 
+// POST /api/boosts/purchase
+router.post('/purchase', (_req, res) => {
+  res.json({ success: true, boost: { id: Date.now(), type: _req.body.type, expires_at: null } });
+});
+
 export default router;

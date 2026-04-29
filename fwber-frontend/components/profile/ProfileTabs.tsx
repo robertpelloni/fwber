@@ -24,6 +24,8 @@ const PhotoUpload = dynamic(() => import('../PhotoUpload'), {
 });
 
 interface ProfileTabsProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
   formData: any;
   handleInputChange: (field: string, value: any) => void;
   handleLocationChange: (field: string, value: any) => void;
@@ -56,6 +58,8 @@ const TAB_ITEMS = [
 ];
 
 export default function ProfileTabs({
+  activeTab,
+  onTabChange,
   formData,
   handleInputChange,
   handleLocationChange,
@@ -80,7 +84,7 @@ export default function ProfileTabs({
 
   return (
     <div>
-      <Tabs defaultValue="basic">
+      <Tabs value={activeTab} onValueChange={onTabChange}>
         {/* Scrollable tab bar with arrows */}
         <div className="relative flex items-center gap-1 mb-6">
           <button

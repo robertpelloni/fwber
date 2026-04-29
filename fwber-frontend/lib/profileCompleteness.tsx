@@ -85,7 +85,7 @@ function checkFieldComplete(key: string, value: any): boolean {
     case 'interests':
       return Array.isArray(value) && value.length >= 3;
     case 'bio':
-      return typeof value === 'string' && value.trim().length >= 50;
+      return typeof value === 'string' && value.trim().length >= 10;
     default:
       if (Array.isArray(value)) return value.length > 0;
       if (typeof value === 'string') return value.trim().length > 0;

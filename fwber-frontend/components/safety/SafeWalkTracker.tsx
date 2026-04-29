@@ -25,11 +25,10 @@ export default function SafeWalkTracker() {
                 const { walk } = await getActiveWalk();
                 setActiveWalk(walk);
             } catch (e) {
+                // Silently ignore network/server errors — no need to spam console
                 if (e instanceof ApiError && e.isAuthError) {
                     setActiveWalk(null);
-                    return;
                 }
-                console.error('Failed to fetch active walk status', e);
             }
         };
 

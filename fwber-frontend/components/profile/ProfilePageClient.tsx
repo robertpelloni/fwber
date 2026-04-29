@@ -40,6 +40,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [activeTab, setActiveTab] = useState('basic')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [interestTopics, setInterestTopics] = useState<Topic[]>([])
@@ -650,11 +651,10 @@ export default function ProfilePage() {
               completeness={currentCompleteness}
               onFieldClick={(field: ProfileField) => {
                 const tabFieldMap: Record<string, { tab: string; id: string; href?: string }> = {
-                  name: { tab: 'basic', id: 'display_name' },
+                  photos: { tab: 'photos', id: 'photos' },
+                  bio: { tab: 'bio', id: 'bio' },
                   age: { tab: 'basic', id: 'date_of_birth' },
                   location: { tab: 'location', id: 'city' },
-                  bio: { tab: 'bio', id: 'bio' },
-                  photos: { tab: 'photos', id: 'photos' },
                   interests: { tab: 'interests', id: 'hobbies' },
                   occupation: { tab: 'lifestyle', id: 'occupation' },
                   education: { tab: 'dating', id: 'education' },
@@ -663,6 +663,7 @@ export default function ProfilePage() {
                   politics: { tab: 'basic', id: 'political_views' },
                   drinking: { tab: 'lifestyle', id: 'drinking' },
                   smoking: { tab: 'lifestyle', id: 'smoking' },
+                  name: { tab: 'basic', id: 'display_name' },
                 }
                 const target = tabFieldMap[field.key]
                 if (!target) return
@@ -673,11 +674,8 @@ export default function ProfilePage() {
                   return
                 }
 
-                // Click the correct tab trigger
-                const tabTrigger = document.querySelector(`[data-tab="${target.tab}"]`) as HTMLElement
-                if (tabTrigger) {
-                  tabTrigger.click()
-                }
+                // Switch tab via controlled state
+                setActiveTab(target.tab)
 
                 // Wait for tab content to render, then scroll to the field
                 setTimeout(() => {
@@ -699,6 +697,8 @@ export default function ProfilePage() {
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-24">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <ProfileTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
               formData={formData}
               handleInputChange={handleInputChange}
               handleLocationChange={handleLocationChange}

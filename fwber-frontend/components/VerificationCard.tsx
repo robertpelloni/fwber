@@ -20,7 +20,8 @@ export default function VerificationCard() {
 
   const loadStatus = async () => {
     try {
-      const data = await verificationApi.getStatus()
+      const result = await verificationApi.getStatus()
+      const data = 'data' in result && result.data ? result.data : result
       setStatus(data)
     } catch (err) {
       console.error('Failed to load verification status', err)
@@ -39,12 +40,13 @@ export default function VerificationCard() {
       setSuccessMessage(null)
 
       const result = await verificationApi.verify(file)
+      const data = 'data' in result && result.data ? result.data : result
 
-      if (result.verified) {
-        setSuccessMessage(result.message)
+      if (data.verified) {
+        setSuccessMessage(data.message)
         loadStatus() // Refresh status
       } else {
-        setError(result.message || 'Verification failed. Please try again.')
+        setError(data.message || 'Verification failed. Please try again.')
       }
     } catch (err: any) {
       const msg = err.response?.data?.message || 'An error occurred during verification.'

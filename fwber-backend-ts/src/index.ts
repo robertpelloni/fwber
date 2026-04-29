@@ -63,6 +63,7 @@ import merchantPortalRoutes from './routes/merchant-portal.js';
 import moderationRoutes from './routes/moderation.js';
 import messagesRoutes from './routes/messages.js';
 import federationRoutes from './routes/federation.js';
+import shareUnlocksRoutes from './routes/share-unlocks.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -148,6 +149,17 @@ app.use('/api/merchant-portal', merchantPortalRoutes);
 app.use('/api/moderation', moderationRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/federation', federationRoutes);
+app.use('/api/share-unlocks', shareUnlocksRoutes);
+
+// Catch-all for unmatched /api/* routes — return safe defaults instead of 404 HTML
+app.use('/api', (_req, res) => {
+  // Return an empty array for GET, success object for everything else
+  if (_req.method === 'GET') {
+    res.json([]);
+  } else {
+    res.json({ success: true });
+  }
+});
 
 // Health Check
 app.get('/health', async (req, res) => {
