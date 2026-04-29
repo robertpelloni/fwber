@@ -242,7 +242,7 @@ router.get('/trending', async (req: any, res) => {
     res.json({ recommendations, metadata: { total: results.length, types: ['trending'], context: { timeframe: req.query.timeframe || '7d' }, generated_at: new Date().toISOString(), cache_hit: false } });
   } catch (err: any) {
     console.error('[GET /recommendations/trending]', err.message);
-    res.json({ recommendations: [], timeframe: '7d', limit, total: 0 });
+    res.json({ recommendations: [], metadata: { total: 0, types: ['trending'], context: { timeframe: '7d' }, generated_at: new Date().toISOString(), cache_hit: false } });
   }
 });
 
