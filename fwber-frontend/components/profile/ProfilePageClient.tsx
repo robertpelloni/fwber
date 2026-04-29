@@ -363,8 +363,12 @@ export default function ProfilePage() {
 
           preferences: {
             // Lifestyle preferences
-            smoking: profileData.profile.preferences?.smoking || '',
-            drinking: profileData.profile.preferences?.drinking || '',
+            smoking: profileData.profile.preferences?.smoking || profileData.profile.smoking_status || '',
+            drinking: profileData.profile.preferences?.drinking || profileData.profile.drinking_status || '',
+            cannabis: profileData.profile.preferences?.cannabis || profileData.profile.cannabis_status || '',
+            psychedelics: profileData.profile.preferences?.psychedelics || '',
+            stimulants: profileData.profile.preferences?.stimulants || '',
+            opiates: profileData.profile.preferences?.opiates || '',
             exercise: profileData.profile.preferences?.exercise || '',
             diet: profileData.profile.preferences?.diet || '',
             pets: profileData.profile.preferences?.pets || '',

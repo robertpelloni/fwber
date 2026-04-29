@@ -120,17 +120,18 @@ export default function PublicProfilePage() {
   if (error) return <div className="text-red-500 p-8">{error}</div>;
   if (!profile) return <div className="p-8">Profile not found</div>;
 
-  const p = profile.profile;
+  const p = profile.profile || {};
+  const photos = Array.isArray(p.photos) ? p.photos : [];
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
           {/* Main Photo & Header */}
-          <div className="relative h-96 w-full bg-gray-200 flex justify-center items-center">
-            {p.photos?.[0] ? (
+          <div className="relative h-96 w-full bg-gray-200 dark:bg-gray-700 flex justify-center items-center">
+            {photos[0] ? (
               <EvolvingAvatar
-                src={p.photos[0].url}
+                src={photos[0].url}}
                 alt={p.display_name || 'User'}
                 size="2xl"
                 emotion={p.current_emotion as any || 'neutral'}
@@ -337,7 +338,7 @@ export default function PublicProfilePage() {
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-4">Photos</h3>
               <PhotoRevealGate
-                photos={p.photos?.map(ph => ({
+                photos={photos.map(ph => ({
                   id: String(ph.id),
                   url: ph.url,
                   isPrimary: ph.is_primary,
