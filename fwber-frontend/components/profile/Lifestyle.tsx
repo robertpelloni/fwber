@@ -43,6 +43,7 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
             <option value="occasional">Occasional smoker</option>
             <option value="regular">Regular smoker</option>
             <option value="social">Social smoker</option>
+            <option value="vaping">Vaping / E-cigarettes</option>
             <option value="trying-to-quit">Trying to quit</option>
           </select>
         </div>
@@ -63,6 +64,84 @@ export default function Lifestyle({ formData, handlePreferenceChange }: Lifestyl
             <option value="regular">Regular drinker</option>
             <option value="social">Social drinker</option>
             <option value="sober">Sober</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="cannabis" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Cannabis
+          </label>
+          <select
+            id="cannabis"
+            value={formData.preferences.cannabis || ''}
+            onChange={(e) => handlePreferenceChange('cannabis', e.target.value)}
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select preference</option>
+            <option value="never">Never</option>
+            <option value="occasional">Occasional</option>
+            <option value="regular">Regular</option>
+            <option value="social">Social</option>
+            <option value="medical">Medical use only</option>
+            <option value="prefer-not-to-say">Prefer not to say</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="psychedelics" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Psychedelics
+          </label>
+          <select
+            id="psychedelics"
+            value={formData.preferences.psychedelics || ''}
+            onChange={(e) => handlePreferenceChange('psychedelics', e.target.value)}
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select preference</option>
+            <option value="never">Never</option>
+            <option value="occasional">Occasional</option>
+            <option value="regular">Regular</option>
+            <option value="exploring">Open to exploring</option>
+            <option value="therapeutic">Therapeutic / guided use</option>
+            <option value="prefer-not-to-say">Prefer not to say</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="stimulants" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Stimulants
+          </label>
+          <select
+            id="stimulants"
+            value={formData.preferences.stimulants || ''}
+            onChange={(e) => handlePreferenceChange('stimulants', e.target.value)}
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select preference</option>
+            <option value="never">Never</option>
+            <option value="occasional">Occasional</option>
+            <option value="regular">Regular</option>
+            <option value="social">Social</option>
+            <option value="prefer-not-to-say">Prefer not to say</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="opiates" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Opiates
+          </label>
+          <select
+            id="opiates"
+            value={formData.preferences.opiates || ''}
+            onChange={(e) => handlePreferenceChange('opiates', e.target.value)}
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">Select preference</option>
+            <option value="never">Never</option>
+            <option value="prescribed">Prescribed use only</option>
+            <option value="occasional">Occasional</option>
+            <option value="in-recovery">In recovery</option>
+            <option value="prefer-not-to-say">Prefer not to say</option>
           </select>
         </div>
 
