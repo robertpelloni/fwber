@@ -593,7 +593,7 @@ export default function RealTimeChat({
             )}
           </div>
         ) : (
-          (messages as ChatMessage[]).map((msg, index) => {
+          ((messages || []) as ChatMessage[]).map((msg, index) => {
             const isOwnMessage = msg.from_user_id === user?.id;
             const content = msg.message?.content || msg.content || '';
             const messageType = msg.message_type || msg.message?.type || 'text';
@@ -691,7 +691,7 @@ export default function RealTimeChat({
                 {/* Display Reactions */}
                 {msg.reactions && msg.reactions.length > 0 && (
                   <div className="flex gap-1 mt-1 -translate-y-2 translate-x-2">
-                    {msg.reactions.map((r, i) => (
+                    {Array.isArray(msg.reactions) && msg.reactions.map((r, i) => (
                       <span key={i} className="bg-gray-800 border border-gray-600 rounded-full px-1 text-xs" title={r.user_name}>
                         {r.emoji}
                       </span>
@@ -807,7 +807,7 @@ export function ChatList({ className = '' }: { className?: string }) {
   const { chatMessages, onlineUsers } = useWebSocketChat();
 
   // Group messages by conversation
-  const conversations = (chatMessages as ChatMessage[]).reduce<Record<string, ChatMessage[]>>((acc, msg) => {
+  const conversations = ((chatMessages || []) as ChatMessage[]).reduce<Record<string, ChatMessage[]>>((acc, msg) => {
     const otherUserId = msg.from_user_id || msg.to_user_id || '';
     if (!acc[otherUserId]) {
       acc[otherUserId] = [];
@@ -874,7 +874,7 @@ export function OnlineUsers({ className = '' }: { className?: string }) {
         {(onlineUsers as OnlineUser[]).length === 0 ? (
           <p className="text-gray-400 text-center py-4">No users online</p>
         ) : (
-          (onlineUsers as OnlineUser[]).map((user) => (
+          ((onlineUsers || []) as OnlineUser[]).map((user) => (
             <div key={user.user_id} className="flex items-center space-x-3">
               <div className="relative">
                 <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">

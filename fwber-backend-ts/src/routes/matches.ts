@@ -242,7 +242,8 @@ router.get('/established', authenticate, async (req: any, res) => {
         ? match.users_matches_user2_idTousers
         : match.users_matches_user1_idTousers;
 
-      const profile = otherUser?.user_profiles || {};
+      const rawProfile = otherUser?.user_profiles;
+      const profile = Array.isArray(rawProfile) ? rawProfile[0] || {} : (rawProfile || {});
 
       return {
         id: Number(match.id),
@@ -314,7 +315,8 @@ router.get('/history', authenticate, async (req: any, res) => {
       const otherUser = isUser1
         ? match.users_matches_user2_idTousers
         : match.users_matches_user1_idTousers;
-      const profile = otherUser?.user_profiles || {};
+      const rawProfile = otherUser?.user_profiles;
+      const profile = Array.isArray(rawProfile) ? rawProfile[0] || {} : (rawProfile || {});
 
       return {
         id: Number(match.id),
