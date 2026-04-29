@@ -26,6 +26,7 @@ import MatchARView from "@/components/ar/MatchARView";
 import AppHeader from "@/components/AppHeader";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
 import { useSocketLogic } from "@/lib/hooks/use-socket-logic";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function MessagesPage() {
 	const { token, isAuthenticated } = useAuth();
@@ -316,7 +317,8 @@ export default function MessagesPage() {
 							{/* Messages Area */}
 							<div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow flex flex-col overflow-hidden">
 								{selectedConversation ? (
-									<RealTimeChat
+									<ErrorBoundary>
+										<RealTimeChat
 										recipientId={String(selectedConversation.other_user?.id)}
 										recipientName={
 											selectedConversation.other_user?.profile?.display_name ||
@@ -336,7 +338,8 @@ export default function MessagesPage() {
 										onReport={() => setIsReportModalOpen(true)}
 										onBlock={handleBlock}
 										onRateDate={() => setIsFeedbackModalOpen(true)}
-									/>
+										/>
+									</ErrorBoundary>
 								) : (
 									<div className="flex-1 flex items-center justify-center">
 										<div className="text-center">

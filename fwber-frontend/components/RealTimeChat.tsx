@@ -264,7 +264,7 @@ export default function RealTimeChat({
 	}, [messages]);
 
 	// Check if recipient is typing
-	const recipientTyping = typingIndicators.find(
+	const recipientTyping = (typingIndicators || []).find(
 		(indicator: any) =>
 			indicator.from_user_id === recipientId && indicator.is_typing,
 	);
