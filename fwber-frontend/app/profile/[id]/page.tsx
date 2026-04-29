@@ -131,7 +131,7 @@ export default function PublicProfilePage() {
           <div className="relative h-96 w-full bg-gray-200 dark:bg-gray-700 flex justify-center items-center">
             {photos[0] ? (
               <EvolvingAvatar
-                src={photos[0].url}}
+                src={photos[0].url}
                 alt={p.display_name || 'User'}
                 size="2xl"
                 emotion={p.current_emotion as any || 'neutral'}
