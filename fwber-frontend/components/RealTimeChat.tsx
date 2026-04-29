@@ -925,8 +925,8 @@ export default function RealTimeChat({
 											? "Type an encrypted message..."
 											: "Type a message..."
 									}
-									className="w-full bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-									disabled={!isConnected || isSending}
+									className="w-full bg-gray-700 text-white px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+									disabled={isSending}
 								/>
 								<div className="absolute right-2 top-1/2 transform -translate-y-1/2">
 									<ConversationCoach

@@ -193,8 +193,8 @@
     },
     "fwber-frontend\\lib\\hooks\\use-socket-logic.ts": {
       "latest": {
-        "commit": "48fec365c",
-        "timestamp": "2026-04-29T18:58:10.886Z",
+        "commit": "0d9059985",
+        "timestamp": "2026-04-29T22:24:27.283Z",
         "mi": 33.8,
         "cognitive": 19,
         "nesting": 6,
@@ -206,6 +206,16 @@
         {
           "commit": "48fec365c",
           "timestamp": "2026-04-29T18:58:10.886Z",
+          "mi": 33.8,
+          "cognitive": 19,
+          "nesting": 6,
+          "lines": 115,
+          "maxCyclomatic": 17,
+          "entropy": 5.74
+        },
+        {
+          "commit": "0d9059985",
+          "timestamp": "2026-04-29T22:24:27.283Z",
           "mi": 33.8,
           "cognitive": 19,
           "nesting": 6,
@@ -490,7 +500,57 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\components\\chat\\ConversationCoach.tsx": {
+      "latest": {
+        "commit": "0d9059985",
+        "timestamp": "2026-04-29T22:20:55.398Z",
+        "mi": 32,
+        "cognitive": 19,
+        "nesting": 4,
+        "lines": 122,
+        "maxCyclomatic": 11,
+        "entropy": 5.51
+      },
+      "history": [
+        {
+          "commit": "0d9059985",
+          "timestamp": "2026-04-29T22:20:55.398Z",
+          "mi": 32,
+          "cognitive": 19,
+          "nesting": 4,
+          "lines": 122,
+          "maxCyclomatic": 11,
+          "entropy": 5.51
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\chat\\TierUnlockGuide.tsx": {
+      "latest": {
+        "commit": "0d9059985",
+        "timestamp": "2026-04-29T22:23:36.025Z",
+        "mi": 25.1,
+        "cognitive": 51,
+        "nesting": 5,
+        "lines": 192,
+        "maxCyclomatic": 55,
+        "entropy": 5.74
+      },
+      "history": [
+        {
+          "commit": "0d9059985",
+          "timestamp": "2026-04-29T22:23:36.025Z",
+          "mi": 25.1,
+          "cognitive": 51,
+          "nesting": 5,
+          "lines": 192,
+          "maxCyclomatic": 55,
+          "entropy": 5.74
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T21:47:15.094Z"
+  "capturedAt": "2026-04-29T22:24:32.287Z"
 }
