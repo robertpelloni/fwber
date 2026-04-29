@@ -3,14 +3,14 @@
   "files": {
     "fwber-frontend\\app\\matches\\page.tsx": {
       "latest": {
-        "commit": "f2dfe5b90",
-        "timestamp": "2026-04-29T17:28:59.967Z",
-        "mi": 19.5,
+        "commit": "567f14f99",
+        "timestamp": "2026-04-29T18:05:40.225Z",
+        "mi": 17.6,
         "cognitive": 74,
         "nesting": 4,
-        "lines": 311,
+        "lines": 378,
         "maxCyclomatic": 68,
-        "entropy": 6.33
+        "entropy": 6.31
       },
       "history": [
         {
@@ -22,10 +22,20 @@
           "lines": 311,
           "maxCyclomatic": 68,
           "entropy": 6.33
+        },
+        {
+          "commit": "567f14f99",
+          "timestamp": "2026-04-29T18:05:40.225Z",
+          "mi": 17.6,
+          "cognitive": 74,
+          "nesting": 4,
+          "lines": 378,
+          "maxCyclomatic": 68,
+          "entropy": 6.31
         }
       ],
       "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T17:29:04.989Z"
+  "capturedAt": "2026-04-29T18:05:45.233Z"
 }

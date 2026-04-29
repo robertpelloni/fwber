@@ -261,7 +261,7 @@ export default function MatchesPage() {
 													(interest: string) => (
 														<span
 															key={interest}
-															className="rounded-full border border-white/20 bg-white dark:bg-gray-800/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white/90"
+															className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white"
 														>
 															{interest}
 														</span>
@@ -297,7 +297,7 @@ export default function MatchesPage() {
 													.map((tag) => (
 														<span
 															key={tag}
-															className="rounded-full border border-white/15 bg-white dark:bg-gray-800/10 px-2.5 py-1 text-[11px] font-medium text-white/80"
+															className="rounded-full border border-white/20 bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white"
 														>
 															#{tag}
 														</span>
@@ -309,7 +309,7 @@ export default function MatchesPage() {
 										<Button
 											size="icon"
 											variant="ghost"
-											className="text-white hover:bg-white dark:bg-gray-800/20 pointer-events-auto mb-2 z-10"
+											className="text-white hover:bg-white/20 pointer-events-auto mb-2 z-10"
 											onClick={(e) => {
 												e.stopPropagation();
 												setIsProfileOpen(true);
