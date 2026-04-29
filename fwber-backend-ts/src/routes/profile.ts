@@ -31,18 +31,65 @@ router.get('/', authenticate, async (req: any, res) => {
 
 // POST /api/profile - Create/update profile
 router.post('/', authenticate, async (req: any, res) => {
+  // Reuse PUT logic — same sanitization, column filtering, type coercion
   try {
     const userId = BigInt(req.user.id);
+    const raw = req.body;
+
+    const data: any = {};
+    for (const [key, val] of Object.entries(raw)) {
+      if (val === undefined || val === null) continue;
+      if (key === 'location') {
+        const loc = val as any;
+        if (loc.latitude != null) data.location_latitude = loc.latitude;
+        if (loc.longitude != null) data.location_longitude = loc.longitude;
+        if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
+        continue;
+      }
+      if (key === 'travel_location') {
+        const loc = val as any;
+        if (loc.latitude != null) data.travel_latitude = loc.latitude;
+        if (loc.longitude != null) data.travel_longitude = loc.longitude;
+        if (loc.name != null) data.travel_location_name = loc.name;
+        continue;
+      }
+      if (key === 'voice_intro' || key === 'voice_intro_url') continue;
+      if (key === 'looking_for') { data[key] = typeof val === 'string' ? val : JSON.stringify(val); continue; }
+      if (!PROFILE_COLUMNS.has(key)) continue;
+      if (JSON_COLUMNS.has(key)) {
+        data[key] = typeof val === 'string' ? val : JSON.stringify(val);
+      } else {
+        data[key] = val;
+      }
+    }
+
+    if (data.birthdate && typeof data.birthdate === 'string' && data.birthdate.length === 10)
+      data.birthdate = new Date(data.birthdate + 'T00:00:00.000Z');
+    if (data.date_of_birth && typeof data.date_of_birth === 'string' && data.date_of_birth.length === 10)
+      data.date_of_birth = new Date(data.date_of_birth + 'T00:00:00.000Z');
+
+    delete data.id; delete data.user_id; delete data.created_at; delete data.updated_at;
+
+    const STRING_BOOL_COLUMNS = ['tattoos', 'piercings'];
+    for (const col of STRING_BOOL_COLUMNS) {
+      if (col in data && typeof data[col] === 'boolean') data[col] = data[col] ? 'true' : 'false';
+    }
+    const BOOL_COLUMNS = ['has_children', 'wants_children', 'has_pets'];
+    for (const col of BOOL_COLUMNS) {
+      if (col in data && typeof data[col] === 'string') data[col] = data[col] === 'true' || data[col] === '1';
+    }
+
     const existing = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (existing) {
-      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data: req.body });
-      res.json(updated);
+      const updated = await prisma.user_profiles.update({ where: { id: existing.id }, data });
+      res.json(serialize(updated));
     } else {
-      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...req.body } });
-      res.json(created);
+      const created = await prisma.user_profiles.create({ data: { user_id: userId, ...data } });
+      res.json(serialize(created));
     }
   } catch (error: any) {
-    res.status(500).json({ message: 'Failed to update profile' });
+    console.error('[POST /api/profile]', error.message);
+    res.status(500).json({ message: error.message || 'Failed to update profile' });
   }
 });
 
