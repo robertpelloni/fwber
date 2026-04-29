@@ -15,7 +15,7 @@ const commerceSurfaces = [
     href: isMerchant ? '/merchant/dashboard' : '/merchant/register',
     title: isMerchant ? 'Merchant Dashboard' : 'Become a Merchant',
     description: isMerchant
-      ? 'Open the restored merchant portal for live business operations, local intelligence, and promotion control.'
+      ? 'Open the merchant portal for live business operations, local intelligence, and promotion control.'
       : 'Start the merchant onboarding flow that unlocks the local-business side of the platform.',
     icon: Store,
     accent: 'from-amber-500 to-orange-500',
@@ -86,7 +86,7 @@ const commerceSurfaces = [
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Merchants & Local Commerce</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch&apos;s merchant onboarding, business operations, analytics, promotions, and local broadcast tooling so the commerce layer feels intentional instead of split across scattered business routes.
+                  A central hub for the branch&apos;s merchant onboarding, business operations, analytics, promotions, and local broadcast tooling so the commerce layer feels intentional instead of split across scattered business routes.
                 </p>
               </div>
             </div>

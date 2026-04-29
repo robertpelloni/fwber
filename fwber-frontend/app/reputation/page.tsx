@@ -9,21 +9,21 @@ const reputationSurfaces = [
   {
     href: '/achievements',
     title: 'Achievements',
-    description: 'Open the restored achievement surface for streak, verification, and viral milestone progress.',
+    description: 'Open the achievement surface for streak, verification, and viral milestone progress.',
     icon: Award,
     accent: 'from-amber-500 to-yellow-500',
   },
   {
     href: '/leaderboard',
     title: 'Leaderboard',
-    description: 'Browse restored public ranking surfaces for vouches and other social-performance signals.',
+    description: 'Browse public ranking surfaces for vouches and other social-performance signals.',
     icon: Trophy,
     accent: 'from-orange-500 to-rose-500',
   },
   {
     href: '/profile-views',
     title: 'Profile Views',
-    description: 'Review recent profile-view activity from a dedicated restored route.',
+    description: 'Review recent profile-view activity from a dedicated route.',
     icon: Eye,
     accent: 'from-sky-500 to-cyan-500',
   },
@@ -37,7 +37,7 @@ const reputationSurfaces = [
   {
     href: '/vouch/placeholder',
     title: 'Vouch Flow',
-    description: 'Use the restored vouch code flow and social proof mechanics that feed reputation surfaces.',
+    description: 'Use the vouch code flow and social proof mechanics that feed reputation surfaces.',
     icon: UserCheck,
     accent: 'from-purple-500 to-fuchsia-500',
     disabled: true,

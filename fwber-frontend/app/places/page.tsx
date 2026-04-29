@@ -23,7 +23,7 @@ const placeSurfaces = [
   {
     href: '/date-planner',
     title: 'Date Planner',
-    description: 'Use the restored date-planning surface to shape meetup ideas around your area.',
+    description: 'Use the date-planning surface to shape meetup ideas around your area.',
     icon: CalendarHeart,
     accent: 'from-amber-500 to-orange-500',
   },
@@ -64,7 +64,7 @@ export default function PlacesPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Places & Nearby</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent destination for the branch’s place-aware discovery surfaces so nearby people, venues, deals, date planning, and location controls are easier to navigate as one local-discovery cluster.
+                  A central destination for the branch’s place-aware discovery surfaces so nearby people, venues, deals, date planning, and location controls are easier to navigate as one local-discovery cluster.
                 </p>
               </div>
             </div>

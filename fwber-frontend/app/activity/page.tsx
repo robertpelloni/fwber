@@ -96,7 +96,7 @@ export default function ActivityPage() {
           <div className="mb-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Activity</h1>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-              Restored the full-screen activity view so dashboard feed links and restored social surfaces land on a real page instead of a dead route.
+              The full-screen activity view so dashboard feed links and social surfaces land on a real page instead of a dead route.
             </p>
           </div>
 

@@ -160,15 +160,15 @@ export default function NearbyPage() {
             {/* Header with Real-time Status */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <MapPin className="h-6 w-6 text-orange-600" />
+                <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+                  <MapPin className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">People Nearby</h1>
                   <div className="flex items-center gap-2 mt-1">
                     <ConnectionStatusBadge />
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-500">{nearbyUsers.length} found</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">•</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{nearbyUsers.length} found</span>
                   </div>
                 </div>
               </div>
@@ -199,8 +199,8 @@ export default function NearbyPage() {
             </div>
             
             {userLocation && (
-              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-700">
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
                   <strong>Your Location:</strong> {userLocation.latitude.toFixed(6)}, {userLocation.longitude.toFixed(6)}
                 </p>
               </div>
@@ -218,9 +218,9 @@ export default function NearbyPage() {
                 step="100"
                 value={radius}
                 onChange={(e) => handleRadiusChange(parseInt(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                 <span>100m</span>
                 <span>5km</span>
                 <span>10km</span>
@@ -228,8 +228,8 @@ export default function NearbyPage() {
             </div>
 
             {rankingSummary && (
-              <div className="mb-6 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900">
-                <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+              <div className="mb-6 rounded-xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 px-4 py-3 text-sm text-purple-900 dark:text-purple-200">
+                <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700 dark:text-purple-400">
                   <Sparkles className="h-4 w-4" />
                   <span>Trust-aware nearby ranking</span>
                 </div>
@@ -248,10 +248,10 @@ export default function NearbyPage() {
             ) : (
               <>
                 {/* Online Users Summary */}
-                <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="flex items-center gap-2 mb-2">
-                    <Users className="h-5 w-5 text-green-600" />
-                    <span className="font-medium text-green-800">Online Now</span>
+                    <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <span className="font-medium text-green-800 dark:text-green-300">Online Now</span>
                   </div>
                   <OnlineUsersList userIds={nearbyUserIds} maxDisplay={6} showCount />
                 </div>
@@ -264,7 +264,7 @@ export default function NearbyPage() {
                 {nearbyUsers.map((user) => (
                   <div 
                     key={user.id} 
-                    className={`border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow ${
+                    className={`border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow ${
                       viewMode === 'list' ? 'flex items-center justify-between' : ''
                     }`}
                   >
@@ -288,21 +288,21 @@ export default function NearbyPage() {
                         </div>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           user.is_recent 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' 
+                            : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                        }`>}>
                           {user.is_recent ? 'Active' : 'Inactive'}
                         </span>
                       </div>
 
                       {typeof user.ranking_score === 'number' && (
-                        <div className="mb-3 inline-flex rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-800">
+                        <div className="mb-3 inline-flex rounded-full bg-purple-100 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-800 dark:text-purple-300">
                           Ranked {Math.round(user.ranking_score)}
                         </div>
                       )}
 
                       {user.scene_signals?.headline && (
-                        <p className="mb-3 text-sm text-purple-800">
+                        <p className="mb-3 text-sm text-purple-800 dark:text-purple-300">
                           {user.scene_signals.headline}
                         </p>
                       )}
@@ -312,7 +312,7 @@ export default function NearbyPage() {
                           {user.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
                             <span
                               key={topic.slug}
-                              className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
+                              className="rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-300"
                             >
                               {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                             </span>
@@ -320,7 +320,7 @@ export default function NearbyPage() {
                           {user.scene_signals?.matched_tags?.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
-                              className="rounded-full bg-orange-100 px-2 py-1 text-xs font-medium text-orange-700"
+                              className="rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-300"
                             >
                               #{tag}
                             </span>
@@ -328,7 +328,7 @@ export default function NearbyPage() {
                         </div>
                       ) : null}
 
-                      <div className={`space-y-2 text-sm text-gray-600 ${viewMode === 'list' ? 'flex gap-4' : ''}`}>
+                      <div className={`space-y-2 text-sm text-gray-600 dark:text-gray-300 ${viewMode === 'list' ? 'flex gap-4' : ''}`}>
                         {user.age && (
                           <p><strong>Age:</strong> {user.age}</p>
                         )}
@@ -358,7 +358,7 @@ export default function NearbyPage() {
             )}
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Found {nearbyUsers.length} people within {radius}m of your location
               </p>
             </div>

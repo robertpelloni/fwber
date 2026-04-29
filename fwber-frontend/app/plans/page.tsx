@@ -9,7 +9,7 @@ const planSurfaces = [
   {
     href: '/events',
     title: 'Events',
-    description: 'Browse the restored events layer for local meetups, date-ready gatherings, and attendance flows.',
+    description: 'Browse the events layer for local meetups, date-ready gatherings, and attendance flows.',
     icon: Calendar,
     accent: 'from-violet-500 to-purple-500',
   },
@@ -23,7 +23,7 @@ const planSurfaces = [
   {
     href: '/date-planner',
     title: 'Date Planner',
-    description: 'Use the restored planning surface to turn matches and local ideas into concrete date plans.',
+    description: 'Use the planning surface to turn matches and local ideas into concrete date plans.',
     icon: Heart,
     accent: 'from-red-500 to-orange-500',
   },
@@ -37,14 +37,14 @@ const planSurfaces = [
   {
     href: '/venues',
     title: 'Venues',
-    description: 'Open the restored venue surface for place-driven meetup and hangout discovery.',
+    description: 'Open the venue surface for place-driven meetup and hangout discovery.',
     icon: MapPin,
     accent: 'from-emerald-500 to-green-500',
   },
   {
     href: '/deals',
     title: 'Deals',
-    description: 'Review date-friendly offers and local incentives tied to the restored commerce-and-places layer.',
+    description: 'Review date-friendly offers and local incentives tied to the commerce-and-places layer.',
     icon: Store,
     accent: 'from-amber-500 to-yellow-500',
   },
@@ -71,7 +71,7 @@ export default function PlansPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Plans & Meetups</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch&apos;s real-world outing layer so events, nearby discovery, date planning, venues, and deals feel like one intentional product area instead of scattered local-destination pages.
+                  A central hub for the branch&apos;s real-world outing layer so events, nearby discovery, date planning, venues, and deals feel like one intentional product area instead of scattered local-destination pages.
                 </p>
               </div>
             </div>

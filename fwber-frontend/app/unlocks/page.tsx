@@ -23,7 +23,7 @@ const unlockSurfaces = [
   {
     href: '/share-unlock',
     title: 'Share to Unlock',
-    description: 'Use the restored viral unlock surface to trade distribution for gated profile rewards.',
+    description: 'Use the viral unlock surface to trade distribution for gated profile rewards.',
     icon: Share2,
     accent: 'from-sky-500 to-cyan-500',
   },
@@ -50,7 +50,7 @@ export default function UnlocksPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Unlock Center</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a single top-level destination for the token-gated and paywall-era surfaces so they are reachable as a coherent system instead of scattered across hidden routes.
+                  A single top-level destination for the token-gated and paywall-era surfaces so they are reachable as a coherent system instead of scattered across hidden routes.
                 </p>
               </div>
             </div>

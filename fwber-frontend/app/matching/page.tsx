@@ -16,7 +16,7 @@ const matchingSurfaces = [
   {
     href: '/matches',
     title: 'Matches Feed',
-    description: 'Jump directly into the restored swipe-and-match flow that turns attraction into mutual signals.',
+    description: 'Jump directly into the swipe-and-match flow that turns attraction into mutual signals.',
     icon: Heart,
     accent: 'from-pink-500 to-rose-500',
   },
@@ -37,7 +37,7 @@ const matchingSurfaces = [
   {
     href: '/profile-views',
     title: 'Profile Views',
-    description: 'Track who is checking you out and use that intent signal as part of the restored dating funnel.',
+    description: 'Track who is checking you out and use that intent signal as part of the dating funnel.',
     icon: Eye,
     accent: 'from-emerald-500 to-green-500',
   },
@@ -85,7 +85,7 @@ export default function MatchingPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Matching & Attraction</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the core dating funnel so recommendations, mutual-interest flows, profile-view signals, and nearby matching context feel like one intentional product area instead of scattered routes.
+                  A central hub for the core dating funnel so recommendations, mutual-interest flows, profile-view signals, and nearby matching context feel like one intentional product area instead of scattered routes.
                 </p>
               </div>
             </div>

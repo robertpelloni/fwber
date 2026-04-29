@@ -9,28 +9,28 @@ const connectionSurfaces = [
   {
     href: '/messages',
     title: 'Messages',
-    description: 'Open the restored real-time conversations shell with call history, safety actions, and chat tools.',
+    description: 'Open the real-time conversations shell with call history, safety actions, and chat tools.',
     icon: MessageCircle,
     accent: 'from-blue-500 to-cyan-500',
   },
   {
     href: '/friends',
     title: 'Friends & Connections',
-    description: 'Manage friends, friend requests, and mutual relationship-link flows from the restored social layer.',
+    description: 'Manage friends, friend requests, and mutual relationship-link flows from the social layer.',
     icon: HeartHandshake,
     accent: 'from-pink-500 to-rose-500',
   },
   {
     href: '/activity',
     title: 'Activity Feed',
-    description: 'Review social activity and recent movement across the branch’s restored signed-in experience.',
+    description: 'Review social activity and recent movement across the branch’s signed-in experience.',
     icon: Activity,
     accent: 'from-emerald-500 to-green-500',
   },
   {
     href: '/notifications',
     title: 'Notifications',
-    description: 'See alerts, callouts, and recent account-level signals in one restored notification surface.',
+    description: 'See alerts, callouts, and recent account-level signals in one notification surface.',
     icon: Bell,
     accent: 'from-amber-500 to-orange-500',
   },
@@ -51,7 +51,7 @@ const connectionSurfaces = [
   {
     href: '/video',
     title: 'Video Calls',
-    description: 'Open the restored video call surface to start real-time face-to-face conversations with matches.',
+    description: 'Open the video call surface to start real-time face-to-face conversations with matches.',
     icon: Phone,
     accent: 'from-indigo-500 to-blue-500',
   },
@@ -71,7 +71,7 @@ export default function ConnectionsPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Connections</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch’s direct-social layer so messaging, friends, activity, notifications, and adjacent relationship flows feel like one intentional destination instead of scattered endpoints.
+                  A central hub for the branch’s direct-social layer so messaging, friends, activity, notifications, and adjacent relationship flows feel like one intentional destination instead of scattered endpoints.
                 </p>
               </div>
             </div>

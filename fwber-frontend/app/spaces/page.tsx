@@ -9,7 +9,7 @@ const spaces = [
   {
     href: '/chatrooms',
     title: 'Chatrooms',
-    description: 'Browse the restored real-time public chatroom lobby for broader conversation threads.',
+    description: 'Browse the real-time public chatroom lobby for broader conversation threads.',
     icon: MessageSquare,
     accent: 'from-sky-500 to-blue-500',
   },
@@ -78,7 +78,7 @@ export default function SpacesPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Live Spaces</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a unified destination for the branch’s live, social, local, and ephemeral conversation surfaces so they are reachable as a coherent cluster instead of scattered isolated routes.
+                  A unified destination for the branch’s live, social, local, and ephemeral conversation surfaces so they are reachable as a coherent cluster instead of scattered isolated routes.
                 </p>
               </div>
             </div>

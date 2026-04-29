@@ -16,7 +16,7 @@ const identitySurfaces = [
   {
     href: '/photos',
     title: 'Photos',
-    description: 'Manage gallery media, primary photos, and reveal-aware presentation from the restored media layer.',
+    description: 'Manage gallery media, primary photos, and reveal-aware presentation from the media layer.',
     icon: Camera,
     accent: 'from-violet-500 to-purple-500',
   },
@@ -64,7 +64,7 @@ export default function IdentityPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Identity & Profile</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch&apos;s identity, media, verification, and self-presentation controls so the profile layer feels intentional instead of split across scattered settings and media routes.
+                  A central hub for the branch&apos;s identity, media, verification, and self-presentation controls so the profile layer feels intentional instead of split across scattered settings and media routes.
                 </p>
               </div>
             </div>

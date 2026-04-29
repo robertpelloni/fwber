@@ -90,7 +90,7 @@ export default function DashboardPage() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Dashboard</h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Here&apos;s what&apos;s happening with your matches and the restored surfaces that now belong in the signed-in app.
+                  Here&apos;s what&apos;s happening with your matches and the surfaces that now belong in the signed-in app.
                 </p>
               </div>
             </div>
@@ -180,21 +180,21 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/matching"
                           title="Matching & Attraction"
-                          description="Open recommendations, matches, admirers, profile-view intent, and nearby dating signals from one restored hub."
+                          description="Open recommendations, matches, admirers, profile-view intent, and nearby dating signals from one hub."
                           icon={<Heart className="h-5 w-5" />}
                           accent="pink"
                         />
                         <FeatureSurfaceCard
                           href="/connections"
                           title="Connections"
-                          description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one restored hub."
+                          description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one hub."
                           icon={<HeartHandshake className="h-5 w-5" />}
                           accent="red"
                         />
                         <FeatureSurfaceCard
                           href="/scenes"
                           title="Scenes & Discovery"
-                          description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one restored hub."
+                          description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one hub."
                           icon={<Compass className="h-5 w-5" />}
                           accent="purple"
                         />
@@ -208,7 +208,7 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/plans"
                           title="Plans & Meetups"
-                          description="Open events, date planning, nearby discovery, venues, and deals from one restored local outing hub."
+                          description="Open events, date planning, nearby discovery, venues, and deals from one local outing hub."
                           icon={<Calendar className="h-5 w-5" />}
                           accent="purple"
                         />
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/identity"
                           title="Identity & Profile"
-                          description="Open profile, photos, verification, and identity-focused settings from one restored hub."
+                          description="Open profile, photos, verification, and identity-focused settings from one hub."
                           icon={<User className="h-5 w-5" />}
                           accent="blue"
                         />
@@ -238,21 +238,21 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/operations"
                           title="Trust & Operations"
-                          description="Open safety, settings, merchant, moderation, and operational control surfaces from one restored hub."
+                          description="Open safety, settings, merchant, moderation, and operational control surfaces from one hub."
                           icon={<Shield className="h-5 w-5" />}
                           accent="red"
                         />
                         <FeatureSurfaceCard
                           href="/support"
                           title="Support & Policies"
-                          description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one restored hub."
+                          description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one hub."
                           icon={<CircleHelp className="h-5 w-5" />}
                           accent="blue"
                         />
                         <FeatureSurfaceCard
                           href="/settings/travel"
                           title="Travel Mode"
-                          description="Open the restored travel-mode controls directly from the dashboard."
+                          description="Open the travel-mode controls directly from the dashboard."
                           icon={<Plane className="h-5 w-5" />}
                           accent="slate"
                         />
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/economy"
                           title="Premium & Economy"
-                          description="Open premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one restored hub."
+                          description="Open premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one hub."
                           icon={<Wallet className="h-5 w-5" />}
                           accent="green"
                         />
@@ -282,14 +282,14 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/studio"
                           title="Studio & AI"
-                          description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one restored hub."
+                          description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one hub."
                           icon={<Wand2 className="h-5 w-5" />}
                           accent="pink"
                         />
                         <FeatureSurfaceCard
                           href="/video"
                           title="Video Calls"
-                          description="Open call history and start restored video calls from a top-level page."
+                          description="Open call history and start video calls from a top-level page."
                           icon={<Phone className="h-5 w-5" />}
                           accent="blue"
                         />
@@ -319,7 +319,7 @@ export default function DashboardPage() {
                         <FeatureSurfaceCard
                           href="/commerce"
                           title="Merchants & Commerce"
-                          description="Open merchant onboarding, business operations, analytics, promotions, and local broadcast tooling from one restored hub."
+                          description="Open merchant onboarding, business operations, analytics, promotions, and local broadcast tooling from one hub."
                           icon={<Store className="h-5 w-5" />}
                           accent="orange"
                         />

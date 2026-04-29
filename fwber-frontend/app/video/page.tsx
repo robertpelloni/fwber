@@ -23,7 +23,7 @@ export default function VideoPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Video Calls</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a dedicated video-call surface so call history and call initiation are reachable without depending only on inline chat triggers.
+                  A dedicated video-call surface so call history and call initiation are reachable without depending only on inline chat triggers.
                 </p>
               </div>
               <div className="flex w-full max-w-md gap-3">

@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import * as ai from '../lib/wingman-ai.js';
 import prisma from '../lib/prisma.js';
+import OpenAI from 'openai';
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const router = Router();
 
@@ -122,7 +125,7 @@ router.get('/profile-analysis', async (req: any, res) => {
 
 router.get('/date-ideas/:matchId', async (req: any, res) => {
   try {
-    const result = await (await import('openai')).default.chat.completions.create({
+    const result = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{
         role: 'user',
@@ -150,7 +153,7 @@ router.get('/date-ideas/:matchId', async (req: any, res) => {
 
 router.get('/ice-breakers/:matchId', async (req: any, res) => {
   try {
-    const suggestion = await (await import('openai')).default.chat.completions.create({
+    const suggestion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: 'Generate one clever, unique dating ice breaker message. Just the message text, nothing else. Be specific and creative — avoid clichés.' }],
       temperature: 0.95,
@@ -166,7 +169,7 @@ router.get('/ice-breakers/:matchId', async (req: any, res) => {
 
 router.get('/replies/:matchId', async (req: any, res) => {
   try {
-    const suggestion = await (await import('openai')).default.chat.completions.create({
+    const suggestion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: 'Generate one clever, flirty dating reply suggestion. Just the message text. Be witty and engaging.' }],
       temperature: 0.95,
@@ -192,7 +195,7 @@ router.post('/compatibility-audit/:targetId', async (req: any, res) => {
     if (myProfile?.interests) prompt += `\n\nProfile A interests: ${myProfile.interests}`;
     if (theirProfile?.interests) prompt += `\n\nProfile B interests: ${theirProfile.interests}`;
 
-    const result = await (await import('openai')).default.chat.completions.create({
+    const result = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: `${prompt}\n\nRespond in JSON: { "overall_score": number, "strengths": ["..."], "weaknesses": ["..."], "surviving_the_apocalypse_together": boolean }` }],
       temperature: 0.8,

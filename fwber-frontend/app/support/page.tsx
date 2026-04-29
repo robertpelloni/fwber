@@ -9,7 +9,7 @@ const supportSurfaces = [
   {
     href: '/help',
     title: 'Help Center',
-    description: 'Browse the restored help articles covering onboarding, privacy, wallet flows, features, and AI tooling.',
+    description: 'Browse the help articles covering onboarding, privacy, wallet flows, features, and AI tooling.',
     icon: LifeBuoy,
     accent: 'from-blue-500 to-cyan-500',
   },
@@ -64,7 +64,7 @@ export default function SupportPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Support & Policies</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for help, support contact, legal policies, safety information, and user-protection resources so the branch&apos;s trust-information layer feels intentional instead of scattered.
+                  A central hub for help, support contact, legal policies, safety information, and user-protection resources so the branch&apos;s trust-information layer feels intentional instead of scattered.
                 </p>
               </div>
             </div>

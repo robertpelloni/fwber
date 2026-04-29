@@ -30,7 +30,7 @@ const economySurfaces = [
   {
     href: '/boosts',
     title: 'Boosts',
-    description: 'Open the restored visibility-boost purchase and history surface from one coherent economy hub.',
+    description: 'Open the visibility-boost purchase and history surface from one coherent economy hub.',
     icon: Rocket,
     accent: 'from-orange-500 to-red-500',
   },
@@ -58,7 +58,7 @@ const economySurfaces = [
   {
     href: '/wallet?tab=bridge',
     title: 'Token Bridge (Swap)',
-    description: 'Exchange FWB tokens for other assets or bridge value across the restored economy layer.',
+    description: 'Exchange FWB tokens for other assets or bridge value across the economy layer.',
     icon: ArrowDownCircle,
     accent: 'from-indigo-500 to-blue-600',
   },
@@ -78,7 +78,7 @@ export default function EconomyPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Premium & Economy</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch&apos;s premium, token, referral, gifting, boosts, and unlock-related monetization surfaces so the economy layer feels intentional instead of scattered across separate routes.
+                  A central hub for the branch&apos;s premium, token, referral, gifting, boosts, and unlock-related monetization surfaces so the economy layer feels intentional instead of scattered across separate routes.
                 </p>
               </div>
             </div>

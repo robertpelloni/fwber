@@ -58,7 +58,7 @@ export default function EventsPage() {
           <div className="flex items-center space-x-2">
               <h1 className="text-2xl font-bold">Nearby Events</h1>
               {location.latitude && (
-                  <span className="flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800">
+                  <span className="flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-1 text-xs text-green-800 dark:text-green-300">
                       <MapPin className="mr-1 h-3 w-3" />
                       Located
                   </span>
@@ -73,7 +73,7 @@ export default function EventsPage() {
         <div className="mb-6 flex space-x-2 overflow-x-auto pb-2">
           <button
             onClick={() => setSelectedType(undefined)}
-            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${!selectedType ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 dark:text-gray-300'}`}
+            className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${!selectedType ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
           >
             All Events
           </button>
@@ -81,7 +81,7 @@ export default function EventsPage() {
             <button
               key={type}
               onClick={() => setSelectedType(type)}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm capitalize ${selectedType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 dark:text-gray-300'}`}
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm capitalize ${selectedType === type ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
             >
               {type.replace('_', ' ')}
             </button>
@@ -89,14 +89,14 @@ export default function EventsPage() {
         </div>
 
         {location.error && (
-          <div className="mb-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-3 text-yellow-800">
+          <div className="mb-4 rounded border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 text-yellow-800 dark:text-yellow-300">
               Location access denied or unavailable. Showing all events.
           </div>
         )}
 
         {rankingStrategy && (
-          <div className="mb-6 rounded-2xl border border-purple-200 bg-purple-50 px-4 py-4 text-sm text-purple-900">
-            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+          <div className="mb-6 rounded-2xl border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 px-4 py-4 text-sm text-purple-900 dark:text-purple-200">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700 dark:text-purple-400">
               <Sparkles className="h-4 w-4" />
               <span>Trust-aware event ranking</span>
             </div>

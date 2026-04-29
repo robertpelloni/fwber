@@ -15,7 +15,7 @@ export default function OperationsPage() {
     {
       href: '/safety',
       title: 'Safety Center',
-      description: 'Manage emergency contacts, safe walks, and panic-alert tooling from the restored safety layer.',
+      description: 'Manage emergency contacts, safe walks, and panic-alert tooling from the safety layer.',
       icon: Shield,
       accent: 'from-red-500 to-rose-500',
     },
@@ -55,7 +55,7 @@ export default function OperationsPage() {
       href: isModerator ? '/moderation' : '/settings/travel',
       title: isModerator ? 'Moderation Console' : 'Travel Mode',
       description: isModerator
-        ? 'Access the restored moderation dashboard and trust enforcement surface.'
+        ? 'Access the moderation dashboard and trust enforcement surface.'
         : 'Control location-shifting behavior and travel-aware discovery from a dedicated settings route.',
       icon: isModerator ? Gavel : Radio,
       accent: isModerator ? 'from-fuchsia-500 to-pink-500' : 'from-cyan-500 to-sky-500',
@@ -82,7 +82,7 @@ export default function OperationsPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Trust & Operations</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch&apos;s trust, safety, settings, merchant, and moderation-adjacent operational tooling so the product&apos;s control surfaces feel intentional instead of scattered.
+                  A central hub for the branch&apos;s trust, safety, settings, merchant, and moderation-adjacent operational tooling so the product&apos;s control surfaces feel intentional instead of scattered.
                 </p>
               </div>
             </div>

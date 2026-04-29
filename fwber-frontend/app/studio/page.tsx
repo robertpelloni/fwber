@@ -9,7 +9,7 @@ const studioSurfaces = [
   {
     href: '/roast',
     title: 'Profile Roast',
-    description: 'Use the restored roast/hype surface for public profile feedback and viral share prompts.',
+    description: 'Use the roast/hype surface for public profile feedback and viral share prompts.',
     icon: Flame,
     accent: 'from-orange-500 to-red-500',
   },
@@ -23,28 +23,28 @@ const studioSurfaces = [
   {
     href: '/content-generation',
     title: 'AI Content Generation',
-    description: 'Open the richer AI builder/editor/conversation-starter surface restored on the rewind branch.',
+    description: 'Open the richer AI builder/editor/conversation-starter surface on the rewind branch.',
     icon: Wand2,
     accent: 'from-violet-500 to-purple-500',
   },
   {
     href: '/wingman',
     title: 'Wingman Arcade',
-    description: 'Browse the restored AI mini-tools like fortune, cosmic match, nemesis, and vibe check.',
+    description: 'Browse the AI mini-tools like fortune, cosmic match, nemesis, and vibe check.',
     icon: Sparkles,
     accent: 'from-indigo-500 to-blue-500',
   },
   {
     href: '/bounties',
     title: 'Bounties',
-    description: 'Open the restored bounty surface for reward-driven profile discovery and social hunting loops.',
+    description: 'Open the bounty surface for reward-driven profile discovery and social hunting loops.',
     icon: Target,
     accent: 'from-amber-500 to-orange-500',
   },
   {
     href: '/rate-my-pussy',
     title: 'Rate My Pussy',
-    description: 'Browse the restored viral cat-rating surface and join the world’s most provocative cat leaderboard.',
+    description: 'Browse the viral cat-rating surface and join the world’s most provocative cat leaderboard.',
     icon: Heart,
     accent: 'from-pink-500 to-purple-500',
   },
@@ -71,7 +71,7 @@ export default function StudioPage() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Studio & AI</h1>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                  Restored a coherent home for the branch’s AI, creative, viral, and playful content-generation surfaces so they are reachable as one intentional product area instead of scattered routes.
+                  A central hub for the branch’s AI, creative, viral, and playful content-generation surfaces so they are reachable as one intentional product area instead of scattered routes.
                 </p>
               </div>
             </div>
