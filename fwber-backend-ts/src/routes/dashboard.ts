@@ -25,7 +25,7 @@ router.get('/stats', async (req: any, res) => {
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'pending' } }),
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' } }),
       prisma.profile_views.count({ where: { viewed_user_id: userId } }).catch(() => 0),
-      prisma.chatrooms.count({ where: { participants: { some: {} } } }).catch(() => 0),
+      prisma.chatrooms.count().catch(() => 0),
     ]);
 
     const daysActive = user?.created_at
