@@ -365,7 +365,107 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\app\\nearby\\page.tsx": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:49:22.013Z",
+        "mi": 18.3,
+        "cognitive": 99,
+        "nesting": 6,
+        "lines": 337,
+        "maxCyclomatic": 76,
+        "entropy": 6.48
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:49:22.013Z",
+          "mi": 18.3,
+          "cognitive": 99,
+          "nesting": 6,
+          "lines": 337,
+          "maxCyclomatic": 76,
+          "entropy": 6.48
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\location.ts": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:49:38.497Z",
+        "mi": 35.2,
+        "cognitive": 8,
+        "nesting": 3,
+        "lines": 205,
+        "maxCyclomatic": 4,
+        "entropy": 5.88
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:49:38.497Z",
+          "mi": 35.2,
+          "cognitive": 8,
+          "nesting": 3,
+          "lines": 205,
+          "maxCyclomatic": 4,
+          "entropy": 5.88
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\profile\\ProfilePageClient.tsx": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:52:40.129Z",
+        "mi": 10.1,
+        "cognitive": 242,
+        "nesting": 6,
+        "lines": 699,
+        "maxCyclomatic": 258,
+        "entropy": 7.76
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:52:40.129Z",
+          "mi": 10.1,
+          "cognitive": 242,
+          "nesting": 6,
+          "lines": 699,
+          "maxCyclomatic": 258,
+          "entropy": 7.76
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\profile.ts": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:57:39.413Z",
+        "mi": 19.4,
+        "cognitive": 43,
+        "nesting": 5,
+        "lines": 412,
+        "maxCyclomatic": 38,
+        "entropy": 6.24
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:57:39.413Z",
+          "mi": 19.4,
+          "cognitive": 43,
+          "nesting": 5,
+          "lines": 412,
+          "maxCyclomatic": 38,
+          "entropy": 6.24
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T20:39:33.701Z"
+  "capturedAt": "2026-04-29T20:57:44.580Z"
 }

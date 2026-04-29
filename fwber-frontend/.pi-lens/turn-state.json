@@ -119,9 +119,27 @@
       ],
       "importsChanged": false,
       "lastEdit": "2026-04-29T20:43:01.142Z"
+    },
+    "components/profile/ProfilePageClient.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 123,
+          "end": 124
+        },
+        {
+          "start": 161,
+          "end": 164
+        },
+        {
+          "start": 513,
+          "end": 516
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-04-29T21:08:21.223Z"
     }
   },
   "turnCycles": 0,
   "maxCycles": 3,
-  "lastUpdated": "2026-04-29T20:43:01.144Z"
+  "lastUpdated": "2026-04-29T21:08:21.225Z"
 }
