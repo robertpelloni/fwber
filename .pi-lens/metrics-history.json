@@ -465,7 +465,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\routes\\profile.ts": {
+      "latest": {
+        "commit": "325988b49",
+        "timestamp": "2026-04-29T21:47:07.166Z",
+        "mi": 14.9,
+        "cognitive": 534,
+        "nesting": 6,
+        "lines": 393,
+        "maxCyclomatic": 121,
+        "entropy": 6.8
+      },
+      "history": [
+        {
+          "commit": "325988b49",
+          "timestamp": "2026-04-29T21:47:07.166Z",
+          "mi": 14.9,
+          "cognitive": 534,
+          "nesting": 6,
+          "lines": 393,
+          "maxCyclomatic": 121,
+          "entropy": 6.8
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T20:57:44.580Z"
+  "capturedAt": "2026-04-29T21:47:15.094Z"
 }
