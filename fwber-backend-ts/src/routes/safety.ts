@@ -5,7 +5,7 @@ const router = Router();
 
 // GET /api/safety/walk/active
 router.get('/walk/active', authenticate, async (req, res) => {
-  res.json({ active: false });
+  res.json({ walk: null });
 });
 
 // GET /api/safety/contacts - Get emergency contacts
