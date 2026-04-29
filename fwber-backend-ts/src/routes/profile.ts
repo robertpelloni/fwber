@@ -21,8 +21,8 @@ function getZodiacSign(month: number, day: number): string {
     { sign: 'Sagittarius', end: [12, 21] },
     { sign: 'Capricorn', end: [12, 31] },
   ];
-  for (const { sign, end } of signs) {
-    if (month < end[0] || (month === end[0] && day <= end[1])) return sign;
+  for (const s of signs) {
+    if (month < s.end[0] || (month === s.end[0] && day <= s.end[1])) return s.sign;
   }
   return 'Capricorn';
 }
