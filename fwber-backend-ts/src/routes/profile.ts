@@ -283,6 +283,7 @@ router.put('/', authenticate, async (req: any, res) => {
 
     // Map nested objects to flat DB columns
     const data: any = {};
+    console.log('[PUT /api/profile] Received keys:', Object.keys(raw).join(', '), 'drinking_status:', raw.drinking_status, 'smoking_status:', raw.smoking_status);
     for (const [key, val] of Object.entries(raw)) {
       if (val === undefined || val === null) continue;
       if (key === 'location') {
