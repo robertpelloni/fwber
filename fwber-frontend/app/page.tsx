@@ -124,21 +124,28 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-8 mx-auto max-w-3xl rounded-2xl border border-purple-200/70 bg-white/85 p-5 text-left shadow-[0_16px_45px_rgba(168,85,247,0.12)] backdrop-blur-sm dark:border-purple-800/70 dark:bg-gray-900/75">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 p-2 dark:from-purple-900/60 dark:to-fuchsia-900/50">
-                  <Gift className="w-5 h-5 text-purple-600 dark:text-purple-300" />
+            <div className="mt-8 mx-auto max-w-3xl rounded-2xl border-2 border-yellow-400/80 bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 p-6 text-left shadow-[0_0_40px_rgba(234,179,8,0.25),0_16px_45px_rgba(234,179,8,0.15)] backdrop-blur-sm relative overflow-hidden dark:from-gray-900/90 dark:via-yellow-950/30 dark:to-gray-900/90 dark:border-yellow-500/50 dark:shadow-[0_0_40px_rgba(234,179,8,0.15)]">
+              {/* Floating gold coins */}
+              <div className="absolute top-2 right-3 text-4xl animate-bounce" style={{animationDuration:'2s'}}>🪙</div>
+              <div className="absolute bottom-2 left-4 text-3xl animate-bounce" style={{animationDuration:'2.5s', animationDelay:'0.5s'}}>💰</div>
+              <div className="absolute top-1/2 right-16 text-2xl animate-bounce" style={{animationDuration:'3s', animationDelay:'1s'}}>🪙</div>
+
+              <div className="flex items-start gap-4 relative z-10">
+                <div className="mt-1 flex-shrink-0 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 p-3 shadow-lg shadow-yellow-500/30 animate-pulse">
+                  <Gift className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Bring your people with you</h3>
-                    <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white">EARN GOLD COINS & REAL MONEY 💸</h3>
+                    <span className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white shadow-sm">
                       referral rewards
                     </span>
+                    <span className="rounded-full bg-green-500 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-white animate-pulse">
+                      real cash
+                    </span>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                    Send invites, grow your circle faster, and stack FWBcoin as your network moves. As Gold referrals roll through, direct upgrades are designed to unlock a small
-                    real-money bonus, with a smaller follow-on reward one level deeper.
+                  <p className="mt-2 text-sm leading-6 text-gray-700 dark:text-gray-200 font-medium">
+                    <span className="text-yellow-600 dark:text-yellow-400 font-bold">Stack FWBcoin</span> with every invite. Gold referrals unlock <span className="text-green-600 dark:text-green-400 font-bold">real-money bonuses</span> paid directly to you — plus smaller rewards one level deeper. Your network literally pays off. 🪙💵
                   </p>
                 </div>
               </div>
