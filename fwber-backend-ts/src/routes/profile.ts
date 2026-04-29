@@ -397,42 +397,65 @@ router.delete('/', authenticate, async (req: any, res) => {
 // GET /api/profile/completeness
 router.get('/completeness', authenticate, async (req: any, res) => {
   try {
-    const profile = await prisma.user_profiles.findFirst({ where: { user_id: BigInt(req.user.id) } });
-    if (!profile) return res.json({ percentage: 10, required_complete: false, missing_required: ['profile'], missing_optional: [], sections: { basic: false, location: false, preferences: false, interests: false, physical: false, lifestyle: false } });
-    
-    // Check each section
-    const basic = !!(profile.display_name && profile.bio && profile.date_of_birth && profile.gender);
-    const location = !!(profile.location_description || profile.location_latitude);
+    const userId = BigInt(req.user.id);
+    const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    const user = await prisma.users.findUnique({ where: { id: userId } });
+    if (!profile) return res.json({ percentage: 0, required_complete: false, missing_required: ['profile'], missing_optional: [], sections: { basic: false, location: false, preferences: false, interests: false, physical: false, lifestyle: false } });
+
+    // Count photos
+    const photoCount = await prisma.photos.count({ where: { user_id: userId, is_private: false } });
+
+    // Use same weighted formula as frontend (lib/profileCompleteness.tsx)
+    const interestsArr: any[] = (() => { try { const v = profile.interests; return typeof v === 'string' ? JSON.parse(v) : (Array.isArray(v) ? v : []); } catch { return []; } })();
     const prefsRaw: any = profile.preferences;
     const prefs = typeof prefsRaw === 'string' ? JSON.parse(prefsRaw) : prefsRaw;
-    const preferences = !!(prefs && (prefs.looking_for || prefs.age_range_min));
-    const interestsArr: any[] = (() => { try { const v = profile.interests; return typeof v === 'string' ? JSON.parse(v) : (Array.isArray(v) ? v : []); } catch { return []; } })();
-    const interests = interestsArr.length > 0;
-    const physical = !!(profile.height_cm || profile.body_type);
-    const lifestyle = !!(profile.drinking_status || profile.smoking_status || profile.occupation);
 
-    const sections = { basic, location, preferences, interests, physical, lifestyle };
-    const filledCount = Object.values(sections).filter(Boolean).length;
-    const percentage = Math.round((filledCount / 6) * 100);
-
-    // Build missing lists
+    // Weighted fields matching frontend DEFAULT_PROFILE_FIELDS
+    let earned = 0;
     const missing_required: string[] = [];
     const missing_optional: string[] = [];
-    if (!profile.display_name) missing_required.push('Display name');
-    if (!profile.bio) missing_required.push('Bio');
-    if (!profile.date_of_birth) missing_required.push('Date of birth');
-    if (!profile.gender) missing_required.push('Gender');
-    if (!profile.location_description && !profile.location_latitude) missing_optional.push('Location');
-    if (interestsArr.length === 0) missing_optional.push('Interests');
-    if (!profile.occupation) missing_optional.push('Occupation');
-    if (!profile.height_cm && !profile.body_type) missing_optional.push('Physical info');
-    if (!profile.avatar_url) missing_optional.push('Profile photo');
 
+    // Photos (weight 25) - needs 3+
+    if (photoCount >= 3) earned += 25; else { missing_required.push('Profile Photos (at least 3)'); }
+    // Bio (weight 20) - needs 10+ chars
+    if (profile.bio && profile.bio.trim().length >= 10) earned += 20; else { missing_required.push('Bio'); }
+    // Age (weight 10)
+    if (profile.date_of_birth) earned += 10; else { missing_required.push('Date of birth'); }
+    // Location (weight 10)
+    if (profile.location_description || profile.location_latitude) earned += 10; else { missing_required.push('Location'); }
+    // Interests (weight 10) - needs 3+
+    if (interestsArr.length >= 3) earned += 10; else { missing_optional.push('Interests (at least 3)'); }
+    // Occupation (weight 5)
+    if (profile.occupation) earned += 5; else { missing_optional.push('Occupation'); }
+    // Education (weight 5)
+    if (prefs?.education) earned += 5; else { missing_optional.push('Education'); }
+    // Height (weight 3)
+    if (profile.height_cm) earned += 3; else { missing_optional.push('Height'); }
+    // Religion (weight 3)
+    if (profile.religion) earned += 3; else { missing_optional.push('Religion'); }
+    // Politics (weight 3)
+    if (profile.political_views) earned += 3; else { missing_optional.push('Political Views'); }
+    // Drinking (weight 3)
+    if (profile.drinking_status) earned += 3; else { missing_optional.push('Drinking Preference'); }
+    // Smoking (weight 3)
+    if (profile.smoking_status) earned += 3; else { missing_optional.push('Smoking Preference'); }
+
+    const percentage = earned; // already 0-100
     const required_complete = missing_required.length === 0;
+
+    // Sections for dashboard
+    const sections = {
+      basic: !!(profile.display_name && profile.bio && profile.date_of_birth && profile.gender),
+      location: !!(profile.location_description || profile.location_latitude),
+      preferences: !!(prefs && (prefs.looking_for || prefs.age_range_min)),
+      interests: interestsArr.length > 0,
+      physical: !!(profile.height_cm || profile.body_type),
+      lifestyle: !!(profile.drinking_status || profile.smoking_status || profile.occupation),
+    };
 
     res.json({ percentage, required_complete, missing_required, missing_optional, sections });
   } catch (err) {
-    res.json({ percentage: 10, required_complete: false, missing_required: ['profile'], missing_optional: [], sections: { basic: false, location: false, preferences: false, interests: false, physical: false, lifestyle: false } });
+    res.json({ percentage: 0, required_complete: false, missing_required: ['profile'], missing_optional: [], sections: { basic: false, location: false, preferences: false, interests: false, physical: false, lifestyle: false } });
   }
 });
 
