@@ -1,8 +1,11 @@
 import { apiClient } from './client';
 
 export interface VerificationStatus {
+  status: string;
   is_verified: boolean;
+  is_id_verified: boolean;
   verified_at: string | null;
+  verification_photo_path: string | null;
 }
 
 export interface VerificationResult {
@@ -14,22 +17,13 @@ export interface VerificationResult {
 
 export const verificationApi = {
   getStatus: async (): Promise<VerificationStatus> => {
-    const response = await apiClient.get<VerificationStatus>('/verification/status');
-    return response.data;
+    return await apiClient.get<VerificationStatus>('/verification/status');
   },
 
   verify: async (photo: File): Promise<VerificationResult> => {
     const formData = new FormData();
     formData.append('photo', photo);
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('fwber_token') : null;
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await apiClient.post<VerificationResult>('/verification/verify', formData);
-
-    return response.data;
+    return await apiClient.post<VerificationResult>('/verification/verify', formData);
   },
 };
