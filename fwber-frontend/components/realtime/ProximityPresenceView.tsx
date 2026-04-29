@@ -13,19 +13,14 @@ interface NearbyUser {
 }
 
 interface ProximityPresenceViewProps {
-  /** List of nearby user IDs and their info */
   nearbyUsers: NearbyUser[];
-  /** Current user's location if available */
   currentLocation?: { lat: number; lng: number };
-  /** Max display count */
   maxDisplay?: number;
-  /** Class name for styling */
   className?: string;
 }
 
 /**
  * Shows real-time presence of nearby users
- * Displays who's online in proximity for spontaneous meetups
  */
 export function ProximityPresenceView({
   nearbyUsers,
@@ -47,9 +42,9 @@ export function ProximityPresenceView({
           </div>
         </div>
         <div className="text-center py-8">
-          <WifiOff className="mx-auto h-10 w-10 text-gray-300 mb-3" />
-          <p className="text-gray-500 text-sm">Enable location to see who&apos;s nearby</p>
-          <button className="mt-3 text-blue-600 text-sm font-medium hover:text-blue-700">
+          <WifiOff className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Enable location to see who&apos;s nearby</p>
+          <button className="mt-3 text-blue-600 dark:text-blue-400 text-sm font-medium hover:text-blue-700">
             Enable Location
           </button>
         </div>
@@ -80,9 +75,9 @@ export function ProximityPresenceView({
       {/* User List */}
       {displayUsers.length === 0 ? (
         <div className="text-center py-6">
-          <Users className="mx-auto h-10 w-10 text-gray-300 mb-3" />
-          <p className="text-gray-500 text-sm">No one online nearby right now</p>
-          <p className="text-gray-400 text-xs mt-1">Check back soon!</p>
+          <Users className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
+          <p className="text-gray-500 dark:text-gray-400 text-sm">No one online nearby right now</p>
+          <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Check back soon!</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -90,7 +85,7 @@ export function ProximityPresenceView({
             <Link
               key={user.id}
               href={`/profile/${user.id}`}
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:bg-gray-900 transition-colors"
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -104,7 +99,7 @@ export function ProximityPresenceView({
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white text-sm">{user.displayName}</p>
                   {user.distance !== undefined && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {user.distance < 1
                         ? `${Math.round(user.distance * 1000)}m away`
                         : `${user.distance.toFixed(1)} km away`}
@@ -121,9 +116,9 @@ export function ProximityPresenceView({
           {remainingCount > 0 && (
             <div className="text-center pt-2">
               <Link
-                href="/proximity"
+                href="/nearby"
                 prefetch={false}
-                className="text-sm text-blue-600 font-medium hover:text-blue-700"
+                className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700"
               >
                 View all {nearbyUsers.length} nearby →
               </Link>
@@ -133,9 +128,9 @@ export function ProximityPresenceView({
       )}
 
       {/* Footer */}
-      <div className="mt-4 pt-4 border-t border-gray-100">
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
         <Link
-          href="/proximity"
+          href="/nearby"
           prefetch={false}
           className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg font-medium text-sm hover:from-orange-600 hover:to-pink-600 transition-colors"
         >
@@ -161,9 +156,9 @@ export function ProximityPresenceCompact({
 
   return (
     <Link
-      href="/proximity"
+      href="/nearby"
       prefetch={false}
-      className={`flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-orange-50 to-pink-50 hover:from-orange-100 hover:to-pink-100 transition-colors ${className}`}
+      className={`flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-orange-50 to-pink-50 dark:from-orange-900/20 dark:to-pink-900/20 hover:from-orange-100 hover:to-pink-100 dark:hover:from-orange-900/30 dark:hover:to-pink-900/30 transition-colors ${className}`}
     >
       <div className="flex items-center gap-3">
         <div className="relative">
@@ -171,7 +166,7 @@ export function ProximityPresenceCompact({
             <MapPin className="h-5 w-5 text-white" />
           </div>
           {onlineCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white ring-2 ring-white">
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white ring-2 ring-white dark:ring-gray-900">
               {onlineCount > 9 ? '9+' : onlineCount}
             </span>
           )}
@@ -180,13 +175,13 @@ export function ProximityPresenceCompact({
           <p className="font-semibold text-gray-900 dark:text-white">
             {onlineCount > 0 ? `${onlineCount} Online Nearby` : 'Explore Nearby'}
           </p>
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-gray-600 dark:text-gray-400">
             {onlineCount > 0 ? 'See who\'s around' : 'Discover people near you'}
           </p>
         </div>
       </div>
       <svg
-        className="h-5 w-5 text-gray-400"
+        className="h-5 w-5 text-gray-400 dark:text-gray-500"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
