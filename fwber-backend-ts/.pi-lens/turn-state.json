@@ -3,8 +3,20 @@
     "src/routes/profile.ts": {
       "modifiedRanges": [
         {
+          "start": 150,
+          "end": 150
+        },
+        {
           "start": 333,
           "end": 340
+        },
+        {
+          "start": 503,
+          "end": 506
+        },
+        {
+          "start": 661,
+          "end": 661
         },
         {
           "start": 683,
@@ -24,10 +36,10 @@
         }
       ],
       "importsChanged": false,
-      "lastEdit": "2026-04-29T21:48:14.104Z"
+      "lastEdit": "2026-04-29T23:31:33.199Z"
     }
   },
   "turnCycles": 0,
   "maxCycles": 3,
-  "lastUpdated": "2026-04-29T21:48:14.105Z"
+  "lastUpdated": "2026-04-29T23:31:33.202Z"
 }

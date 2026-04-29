@@ -147,7 +147,7 @@ router.get("/", authenticate, async (req: any, res) => {
 				clothing_style: p.clothing_style,
 				dominant_hand: p.dominant_hand,
 				ethnicity: p.ethnicity,
-				occupation: p.occupation,
+				occupation: p.occupation || prefs.occupation,
 				education: p.education,
 				tattoos: p.tattoos === "true" || p.tattoos === true,
 				piercings: p.piercings === "true" || p.piercings === true,
@@ -500,6 +500,9 @@ router.put("/", authenticate, async (req: any, res) => {
 				data.smoking_status = prefs.smoking;
 			if (prefs.cannabis && !data.cannabis_status)
 				data.cannabis_status = prefs.cannabis;
+			if (prefs.occupation && !data.occupation)
+				data.occupation = prefs.occupation;
+			if (prefs.education && !data.education) data.education = prefs.education;
 		} catch (e) {}
 
 		// Remove fields that should not be set directly
@@ -655,7 +658,7 @@ router.get("/completeness", authenticate, async (req: any, res) => {
 			missing_optional.push("Interests (at least 3)");
 		}
 		// Occupation (weight 5)
-		if (profile.occupation) earned += 5;
+		if (profile.occupation || prefs?.occupation) earned += 5;
 		else {
 			missing_optional.push("Occupation");
 		}
