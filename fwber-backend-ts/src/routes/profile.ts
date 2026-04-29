@@ -68,8 +68,8 @@ router.get('/', authenticate, async (req: any, res) => {
         looking_for: p.looking_for || [],
         interests: p.interests || [],
         location: {
-          latitude: p.location_latitude ?? null,
-          longitude: p.location_longitude ?? null,
+          latitude: p.location_latitude ? Number(p.location_latitude) : null,
+          longitude: p.location_longitude ? Number(p.location_longitude) : null,
           max_distance: 25,
           city: p.location_description || '',
           state: '',
@@ -104,8 +104,8 @@ router.get('/', authenticate, async (req: any, res) => {
         voice_intro_url: p.voice_intro_url,
         is_federated: p.is_federated,
         is_travel_mode: p.is_travel_mode,
-        travel_latitude: p.travel_latitude,
-        travel_longitude: p.travel_longitude,
+        travel_latitude: p.travel_latitude ? Number(p.travel_latitude) : null,
+        travel_longitude: p.travel_longitude ? Number(p.travel_longitude) : null,
         travel_location_name: p.travel_location_name,
         height_cm: p.height_cm,
         body_type: p.body_type,
@@ -119,8 +119,8 @@ router.get('/', authenticate, async (req: any, res) => {
         ethnicity: p.ethnicity,
         occupation: p.occupation,
         education: p.education,
-        tattoos: p.tattoos,
-        piercings: p.piercings,
+        tattoos: p.tattoos === 'true' || p.tattoos === true,
+        piercings: p.piercings === 'true' || p.piercings === true,
         preferences: prefs,
         profile_complete: true,
         completion_percentage: 0,
@@ -150,15 +150,15 @@ router.post('/', authenticate, async (req: any, res) => {
       if (val === undefined || val === null) continue;
       if (key === 'location') {
         const loc = val as any;
-        if (loc.latitude != null) data.location_latitude = loc.latitude;
-        if (loc.longitude != null) data.location_longitude = loc.longitude;
+        if (loc.latitude != null) data.location_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.location_longitude = Number(loc.longitude);
         if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
         continue;
       }
       if (key === 'travel_location') {
         const loc = val as any;
-        if (loc.latitude != null) data.travel_latitude = loc.latitude;
-        if (loc.longitude != null) data.travel_longitude = loc.longitude;
+        if (loc.latitude != null) data.travel_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.travel_longitude = Number(loc.longitude);
         if (loc.name != null) data.travel_location_name = loc.name;
         continue;
       }
@@ -271,16 +271,16 @@ router.put('/', authenticate, async (req: any, res) => {
       if (val === undefined || val === null) continue;
       if (key === 'location') {
         const loc = val as any;
-        if (loc.latitude != null) data.location_latitude = loc.latitude;
-        if (loc.longitude != null) data.location_longitude = loc.longitude;
+        if (loc.latitude != null) data.location_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.location_longitude = Number(loc.longitude);
         if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
         if (loc.max_distance != null) data.location_name = String(loc.max_distance);
         continue; // Don't pass nested 'location' to Prisma
       }
       if (key === 'travel_location') {
         const loc = val as any;
-        if (loc.latitude != null) data.travel_latitude = loc.latitude;
-        if (loc.longitude != null) data.travel_longitude = loc.longitude;
+        if (loc.latitude != null) data.travel_latitude = Number(loc.latitude);
+        if (loc.longitude != null) data.travel_longitude = Number(loc.longitude);
         if (loc.name != null) data.travel_location_name = loc.name;
         continue;
       }
