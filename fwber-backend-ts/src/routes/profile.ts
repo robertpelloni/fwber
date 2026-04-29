@@ -70,9 +70,12 @@ router.get('/', authenticate, async (req: any, res) => {
         location: {
           latitude: p.location_latitude ? Number(p.location_latitude) : null,
           longitude: p.location_longitude ? Number(p.location_longitude) : null,
-          max_distance: 25,
+          max_distance: parseInt(p.location_name) || 25,
           city: p.location_description ? p.location_description.split(',')[0]?.trim() || '' : '',
           state: p.location_description ? p.location_description.split(',')[1]?.trim() || '' : '',
+          match_scope: prefs.match_scope || 'local',
+          search_country: prefs.search_country || '',
+          search_city: prefs.search_city || '',
         },
         love_language: p.love_language,
         personality_type: p.personality_type,
@@ -157,6 +160,16 @@ router.post('/', authenticate, async (req: any, res) => {
         if (loc.latitude != null) data.location_latitude = Number(loc.latitude);
         if (loc.longitude != null) data.location_longitude = Number(loc.longitude);
         if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
+        if (loc.max_distance != null) data.location_name = String(loc.max_distance);
+        // Store match_scope, search_country, search_city in preferences
+        if (loc.match_scope || loc.search_country || loc.search_city) {
+          const existingPrefs = typeof raw.preferences === 'object' ? raw.preferences : {};
+          const mergedPrefs = { ...existingPrefs };
+          if (loc.match_scope) mergedPrefs.match_scope = loc.match_scope;
+          if (loc.search_country) mergedPrefs.search_country = loc.search_country;
+          if (loc.search_city) mergedPrefs.search_city = loc.search_city;
+          raw.preferences = mergedPrefs;
+        }
         continue;
       }
       if (key === 'travel_location') {
@@ -279,6 +292,15 @@ router.put('/', authenticate, async (req: any, res) => {
         if (loc.longitude != null) data.location_longitude = Number(loc.longitude);
         if (loc.city || loc.state) data.location_description = [loc.city, loc.state].filter(Boolean).join(', ');
         if (loc.max_distance != null) data.location_name = String(loc.max_distance);
+        // Store match_scope, search_country, search_city in preferences
+        if (loc.match_scope || loc.search_country || loc.search_city) {
+          const existingPrefs = typeof raw.preferences === 'object' ? raw.preferences : {};
+          const mergedPrefs = { ...existingPrefs };
+          if (loc.match_scope) mergedPrefs.match_scope = loc.match_scope;
+          if (loc.search_country) mergedPrefs.search_country = loc.search_country;
+          if (loc.search_city) mergedPrefs.search_city = loc.search_city;
+          raw.preferences = mergedPrefs;
+        }
         continue; // Don't pass nested 'location' to Prisma
       }
       if (key === 'travel_location') {
