@@ -163,7 +163,7 @@ async function main() {
         } as any,
         looking_for: lookingFor as any,
         interests: hobbies as any,
-        is_verified: Math.random() > 0.7,
+        is_verified: true,
       }
     });
 

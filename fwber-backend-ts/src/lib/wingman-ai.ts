@@ -23,7 +23,7 @@ async function getProfileSummary(userId: bigint): Promise<string> {
   if (profile.bio) parts.push(`Bio: ${profile.bio}`);
   if (profile.date_of_birth || profile.birthdate) {
     const dob = profile.date_of_birth || profile.birthdate;
-    const age = dob ? Math.floor((Date.now() - new Date(dob as string | number).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
+    const age = dob ? Math.floor((Date.now() - new Date(dob as any).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
     if (age) parts.push(`Age: ${age}`);
     parts.push(`Age: ${age}`);
   }

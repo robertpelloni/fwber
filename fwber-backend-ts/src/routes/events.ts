@@ -90,8 +90,8 @@ router.get('/', authenticate, async (req: any, res) => {
 router.get('/invitations', authenticate, async (req: any, res) => {
   try {
     const invitations = await prisma.event_invitations.findMany({
-      where: { user_id: BigInt(req.user.id) },
-      include: { events: { include: { users: { select: { id: true, display_name: true } } } } },
+      where: { invitee_id: BigInt(req.user.id) },
+      include: { events: { include: { users: { select: { id: true } } } } },
       take: 20,
       orderBy: { created_at: 'desc' },
     });
@@ -104,7 +104,7 @@ router.get('/invitations', authenticate, async (req: any, res) => {
         description: inv.events.description,
         location_name: inv.events.location_name,
         starts_at: inv.events.starts_at?.toISOString(),
-        creator: inv.events.users ? { id: Number(inv.events.users.id), display_name: inv.events.users.display_name } : null,
+        creator: inv.events?.users ? { id: Number(inv.events.users.id) } : null,
       } : null,
       status: inv.status,
       created_at: inv.created_at?.toISOString(),
