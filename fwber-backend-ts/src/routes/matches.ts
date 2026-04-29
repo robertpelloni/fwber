@@ -13,23 +13,33 @@ router.get('/', authenticate, async (req: any, res) => {
     const userId = BigInt(req.user.id);
     const limit = parseInt(req.query.limit as string) || 20;
     const offset = parseInt(req.query.offset as string) || 0;
+    const userLat = req.query.latitude ? parseFloat(String(req.query.latitude)) : null;
+    const userLng = req.query.longitude ? parseFloat(String(req.query.longitude)) : null;
 
-    // Get users that the current user hasn't already matched with
+    // Exclude existing matches and self
     const existingMatches = await prisma.matches.findMany({
-      where: {
-        OR: [{ user1_id: userId }, { user2_id: userId }],
-      },
+      where: { OR: [{ user1_id: userId }, { user2_id: userId }] },
       select: { user1_id: true, user2_id: true },
     });
+    const excludeIds = new Set<string>([userId.toString()]);
+    existingMatches.forEach((m: any) => { excludeIds.add(m.user1_id.toString()); excludeIds.add(m.user2_id.toString()); });
 
-    const excludeIds = new Set<string>();
-    excludeIds.add(userId.toString());
-    existingMatches.forEach((m: any) => {
-      excludeIds.add(m.user1_id.toString());
-      excludeIds.add(m.user2_id.toString());
-    });
+    // Get current user's profile for preference matching
+    const myProfile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    const myPrefs: any = parseJson(myProfile?.preferences);
+    const myInterests: string[] = parseArr(myProfile?.interests);
+    const myLookingFor: string[] = parseArr(myProfile?.looking_for);
+    const myGender = myProfile?.gender;
+    const myOrientation = myProfile?.sexual_orientation;
+    const myAge = myProfile?.date_of_birth
+      ? new Date().getFullYear() - new Date(myProfile.date_of_birth as any).getFullYear()
+      : null;
 
-    // Get nearby users with profiles as potential matches
+    // Preference ranges
+    const prefMinAge = myPrefs?.age_range_min || 18;
+    const prefMaxAge = myPrefs?.age_range_max || 99;
+
+    // Fetch more candidates than needed so we can score/filter
     const candidates = await prisma.users.findMany({
       where: {
         id: { notIn: Array.from(excludeIds).map((id) => BigInt(id)) },
@@ -37,19 +47,57 @@ router.get('/', authenticate, async (req: any, res) => {
       },
       include: {
         user_profiles: true,
-        photos: {
-          where: { is_private: false },
-          orderBy: { is_primary: 'desc' as const },
-          take: 5,
-        },
+        photos: { where: { is_private: false }, orderBy: { is_primary: 'desc' as const }, take: 5 },
       },
-      take: limit,
+      take: limit * 5,
       skip: offset,
-      orderBy: { last_seen_at: 'desc' },
     });
 
-    const matches = candidates.map((u: any) => {
+    let scored = candidates.map((u: any) => {
       const p = (Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles) || {};
+      const theirAge = p.date_of_birth
+        ? new Date().getFullYear() - new Date(p.date_of_birth as any).getFullYear()
+        : null;
+      const theirGender = p.gender || null;
+      const theirInterests: string[] = parseArr(p.interests);
+      const sharedInterests = myInterests.filter(i => theirInterests.includes(i));
+
+      // Score calculation
+      let score = 20; // base
+
+      // Shared interests (+10 each, max 40)
+      score += Math.min(sharedInterests.length * 10, 40);
+
+      // Age preference match (+15 if within range)
+      if (theirAge && theirAge >= prefMinAge && theirAge <= prefMaxAge) score += 15;
+
+      // Mutual gender preference (+10)
+      // Simple: if user is straight, prefer opposite gender; if gay/lesbian, prefer same; bi/pan get bonus either way
+      if (myOrientation === 'straight' && theirGender && theirGender !== myGender) score += 10;
+      else if ((myOrientation === 'gay' || myOrientation === 'lesbian') && theirGender === myGender) score += 10;
+      else if (myOrientation === 'bisexual' || myOrientation === 'pansexual' || myOrientation === 'queer') score += 10;
+
+      // Location proximity (+15 if close)
+      let distanceMeters = 0;
+      if (userLat && userLng && p.location_latitude && p.location_longitude) {
+        const R = 6371;
+        const dLat = ((Number(p.location_latitude) - userLat) * Math.PI) / 180;
+        const dLon = ((Number(p.location_longitude) - userLng) * Math.PI) / 180;
+        const a = Math.sin(dLat / 2) ** 2 + Math.cos((userLat * Math.PI) / 180) * Math.cos((Number(p.location_latitude) * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+        distanceMeters = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 1000);
+        if (distanceMeters < 5000) score += 15;
+        else if (distanceMeters < 25000) score += 8;
+        else if (distanceMeters < 50000) score += 3;
+      }
+
+      // Verified bonus (+5)
+      if (p.is_verified) score += 5;
+
+      // Bio bonus (+5)
+      if (p.bio && p.bio.length > 20) score += 5;
+
+      score = Math.min(99, score);
+
       return {
         id: Number(u.id),
         name: p.display_name || u.name || 'Anonymous',
@@ -57,13 +105,11 @@ router.get('/', authenticate, async (req: any, res) => {
         avatarUrl: p.avatar_url || null,
         bio: p.bio || null,
         locationDescription: p.location_description || null,
-        distance: 0,
-        compatibilityScore: 0,
+        distance: distanceMeters,
+        compatibilityScore: score,
         lastSeenAt: u.last_seen_at?.toISOString() || null,
-        age: p.date_of_birth
-          ? new Date().getFullYear() - new Date(p.date_of_birth).getFullYear()
-          : null,
-        gender: p.gender || null,
+        age: theirAge,
+        gender: theirGender,
         is_verified: p.is_verified || false,
         voice_intro_url: p.voice_intro_url || null,
         photos: (u.photos || []).map((photo: any) => ({
@@ -72,12 +118,15 @@ router.get('/', authenticate, async (req: any, res) => {
           is_private: photo.is_private || false,
           is_primary: photo.is_primary || false,
         })),
-        shared_interests: [],
-        shared_interest_count: 0,
+        shared_interests: sharedInterests,
+        shared_interest_count: sharedInterests.length,
       };
     });
 
-    res.json({ matches, total: matches.length });
+    // Sort by score descending
+    scored.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
+
+    res.json({ matches: scored.slice(0, limit), total: scored.length });
   } catch (error: any) {
     console.error('[Matches] Error fetching matches:', error.message);
     res.json({ matches: [], total: 0 });
@@ -361,5 +410,19 @@ router.get('/insights/unlocked', authenticate, async (req: any, res) => {
 router.get('/insights/available', authenticate, async (req: any, res) => {
   res.json({ data: [] });
 });
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+
+function parseJson(val: any): any {
+  if (val && typeof val === 'object') return val;
+  if (typeof val === 'string') { try { return JSON.parse(val); } catch { return {}; } }
+  return {};
+}
+
+function parseArr(val: any): string[] {
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') { try { return JSON.parse(val); } catch { return []; } }
+  return [];
+}
 
 export default router;

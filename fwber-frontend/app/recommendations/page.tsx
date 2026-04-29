@@ -35,6 +35,7 @@ import {
   useRecommendationCache,
 } from '@/lib/hooks/use-recommendations';
 import type { FeedItem, Recommendation, TrendingContent } from '@/lib/api/recommendations';
+import { api } from '@/lib/api/client';
 
 type RecommendationTab =
   | 'mixed'
@@ -146,14 +147,24 @@ export default function RecommendationsPage() {
     rating?: number
   ) => {
     try {
+      if (action === 'like' || action === 'dislike') {
+        // Send actual match action
+        await api.post('/matches/action', {
+          target_user_id: parseInt(contentId),
+          action: action === 'like' ? 'like' : 'pass',
+        });
+      }
       await feedbackMutation.mutateAsync({
         recommendation_id: recommendationId,
         action,
         content_id: contentId,
         rating,
       });
+      if (action === 'like' || action === 'dislike') {
+        refreshRecommendations();
+      }
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      console.error('Failed to submit action:', error);
     }
   };
 
@@ -261,7 +272,7 @@ export default function RecommendationsPage() {
               <CardTitle className="text-xl text-gray-900 dark:text-white">{title}</CardTitle>
             </div>
             <Badge variant="secondary" className="shrink-0">
-              {(recommendation.score * 100).toFixed(1)}%
+              {Math.round(recommendation.score)}%
             </Badge>
           </div>
           <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
