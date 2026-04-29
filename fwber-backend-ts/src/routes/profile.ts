@@ -530,6 +530,23 @@ router.put("/", authenticate, async (req: any, res) => {
 		const existing = await prisma.user_profiles.findFirst({
 			where: { user_id: userId },
 		});
+		// Merge preferences instead of overwriting
+		if (existing && data.preferences) {
+			try {
+				const existingPrefs =
+					typeof existing.preferences === "string"
+						? JSON.parse(existing.preferences)
+						: existing.preferences || {};
+				const incomingPrefs =
+					typeof data.preferences === "string"
+						? JSON.parse(data.preferences)
+						: data.preferences;
+				data.preferences = JSON.stringify({
+					...existingPrefs,
+					...incomingPrefs,
+				});
+			} catch (e) {}
+		}
 		if (existing) {
 			const updated = await prisma.user_profiles.update({
 				where: { id: existing.id },

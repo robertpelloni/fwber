@@ -81,7 +81,8 @@ export async function getMessages(
 	const data = await api.get<any>(`/messages/${userId}`, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
-	return data.messages || data.data || data;
+	const result = data?.messages ?? data?.data ?? data;
+	return Array.isArray(result) ? result : [];
 }
 
 /**
@@ -121,7 +122,8 @@ export async function sendMessage(
 		headers: { Authorization: `Bearer ${token}` },
 	});
 
-	return data.message || data.data || data;
+	const result = data?.message ?? data?.data ?? data;
+	return result;
 }
 
 /**
