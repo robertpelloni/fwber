@@ -7,6 +7,18 @@ interface DatingProps {
   handlePreferenceChange: (field: string, value: any) => void;
 }
 
+// Height options from 4'0" (122cm) to 7'0" (213cm)
+const HEIGHT_OPTIONS = Array.from({ length: 37 }, (_, i) => {
+  const cm = 122 + i * 2;
+  const totalIn = Math.round(cm / 2.54);
+  const ft = Math.floor(totalIn / 12);
+  const inch = totalIn % 12;
+  return {
+    value: String(cm),
+    label: `${ft}'${inch}" — ${cm}cm`,
+  };
+});
+
 export default function Dating({ formData, handlePreferenceChange }: DatingProps) {
   return (
     <Card>
@@ -16,16 +28,36 @@ export default function Dating({ formData, handlePreferenceChange }: DatingProps
       <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div>
           <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Partner Height Range (min)
+            Partner Height (minimum)
           </label>
-          <input
-            type="text"
+          <select
             id="height_min"
-            value={formData.preferences.height_min}
+            value={formData.preferences.height_min || ''}
             onChange={(e) => handlePreferenceChange('height_min', e.target.value)}
             className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            placeholder="e.g., 5'2&quot; or 158cm"
-          />
+          >
+            <option value="">No preference</option>
+            {HEIGHT_OPTIONS.map(h => (
+              <option key={h.value} value={h.value}>{h.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="height_max" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Partner Height (maximum)
+          </label>
+          <select
+            id="height_max"
+            value={formData.preferences.height_max || ''}
+            onChange={(e) => handlePreferenceChange('height_max', e.target.value)}
+            className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          >
+            <option value="">No preference</option>
+            {HEIGHT_OPTIONS.map(h => (
+              <option key={h.value} value={h.value}>{h.label}</option>
+            ))}
+          </select>
         </div>
 
         <div>
