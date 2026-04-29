@@ -509,11 +509,19 @@ export default function ProfilePage() {
   type PreferenceKey = keyof ProfileFormData['preferences']
   type PreferenceArrayKey = Extract<PreferenceKey, 'hobbies' | 'music' | 'movies' | 'books' | 'sports' | 'ethnicity'>
 
+  // Map preference fields to top-level DB columns
+  const PREF_TO_DB_COLUMN: Record<string, string> = {
+    smoking: 'smoking_status',
+    drinking: 'drinking_status',
+    cannabis: 'cannabis_status',
+  };
+
   const handlePreferenceChange = (field: string, value: any) => {
     setFormData(prev => {
       const next = {
         ...prev,
         preferences: { ...prev.preferences, [field as PreferenceKey]: value },
+        ...(PREF_TO_DB_COLUMN[field] ? { [PREF_TO_DB_COLUMN[field]]: value } : {}),
       }
       scheduleAutoSave(next)
       return next

@@ -137,11 +137,11 @@ export default function MatchesPage() {
             <MatchFilter onFilterChange={handleFilterChange} />
           </div>
 
-          <Card className={`relative h-[600px] overflow-hidden ${isConfessional ? 'border-purple-500/30 bg-zinc-950' : ''}`}>
+          <Card className={`relative h-[600px] overflow-hidden bg-gray-900 border-gray-700 ${isConfessional ? 'border-purple-500/30 bg-zinc-950' : ''}`}>
             <div className="relative h-full">
           {/* Image/Content Area */}
           <div 
-            className={`h-3/4 relative cursor-pointer ${isConfessional ? 'bg-zinc-900 flex flex-col items-center justify-center p-8' : 'bg-gray-200'}`}
+            className={`h-3/4 relative cursor-pointer ${isConfessional ? 'bg-zinc-900 flex flex-col items-center justify-center p-8' : 'bg-gray-800'}`}
             onClick={() => !isConfessional && setIsProfileOpen(true)}
           >
             {isConfessional ? (
@@ -164,7 +164,7 @@ export default function MatchesPage() {
                         <audio ref={audioRef} src={currentMatch.voice_intro_url} onEnded={() => setIsPlaying(false)} className="hidden" />
                         <button
                             onClick={toggleAudio}
-                            className="w-full py-4 bg-white dark:bg-gray-800 text-black rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition active:scale-95"
+                            className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition active:scale-95"
                         >
                             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
                             {isPlaying ? 'PAUSE INTRO' : 'HEAR MY VOICE'}
@@ -185,7 +185,7 @@ export default function MatchesPage() {
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <span className="text-4xl text-gray-400">{currentMatch.name?.charAt(0)}</span>
+                  <span className="text-4xl text-gray-500">{currentMatch.name?.charAt(0)}</span>
                 </div>
               )
             )}
