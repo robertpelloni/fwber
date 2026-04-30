@@ -689,7 +689,7 @@ export default function RealTimeChat({
 						)}
 					</div>
 				) : (
-					((messages || []) as ChatMessage[]).map((msg, index) => {
+					{(Array.isArray(messages) ? messages : []).map((msg, index) => {
 						const isOwnMessage = msg.from_user_id === user?.id;
 						const content = msg.message?.content || msg.content || "";
 						const messageType = msg.message_type || msg.message?.type || "text";
@@ -975,7 +975,7 @@ export function ChatList({ className = "" }: { className?: string }) {
 	const { chatMessages, onlineUsers } = useWebSocketChat();
 
 	// Group messages by conversation
-	const conversations = ((chatMessages || []) as ChatMessage[]).reduce<
+	const conversations = (Array.isArray(chatMessages) ? chatMessages : []).reduce<
 		Record<string, ChatMessage[]>
 	>((acc, msg) => {
 		const otherUserId = msg.from_user_id || msg.to_user_id || "";
@@ -1050,10 +1050,10 @@ export function OnlineUsers({ className = "" }: { className?: string }) {
 			</div>
 
 			<div className="p-4 space-y-3">
-				{(onlineUsers as OnlineUser[]).length === 0 ? (
+				{(!Array.isArray(onlineUsers) || onlineUsers.length === 0) ? (
 					<p className="text-gray-400 text-center py-4">No users online</p>
 				) : (
-					((onlineUsers || []) as OnlineUser[]).map((user) => (
+					onlineUsers.map((user) => (
 						<div key={user.user_id} className="flex items-center space-x-3">
 							<div className="relative">
 								<div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
