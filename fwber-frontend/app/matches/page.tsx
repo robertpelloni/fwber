@@ -281,7 +281,7 @@ export default function MatchesPage() {
 												</p>
 											)}
 											<div className="flex flex-wrap gap-2">
-												{currentMatch.scene_overlap.shared_topics.map(
+												{(currentMatch.scene_overlap.shared_topics || []).map(
 													(topic) => (
 														<span
 															key={topic.slug}
@@ -292,7 +292,7 @@ export default function MatchesPage() {
 														</span>
 													),
 												)}
-												{currentMatch.scene_overlap.shared_scene_tags
+												{(currentMatch.scene_overlap.shared_scene_tags || [])
 													.slice(0, 3)
 													.map((tag) => (
 														<span
