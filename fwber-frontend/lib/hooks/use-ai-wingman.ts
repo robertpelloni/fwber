@@ -9,7 +9,9 @@ interface WingmanSuggestion {
 export interface DateIdea {
   title: string;
   description: string;
-  reason: string;
+  reason?: string;
+  vibe?: string;
+  estimated_cost?: string;
 }
 
 interface DateIdeasResponse {

@@ -34,7 +34,7 @@ export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigge
       { matchId },
       {
         onSuccess: (data) => {
-          setIdeas(data.ideas);
+          setIdeas(Array.isArray(data?.ideas) ? data.ideas : []);
         },
       }
     );
@@ -113,8 +113,11 @@ export function DatePlanner({ matchId, matchName, open, onOpenChange, hideTrigge
                   <p className="text-sm text-gray-600 mb-2">{idea.description}</p>
                   <div className="flex items-center gap-1.5 text-xs text-pink-600 bg-pink-50 px-2 py-1 rounded-full w-fit">
                     <Sparkles className="w-3 h-3" />
-                    {idea.reason}
+                    {idea.reason || idea.vibe || 'Great idea'}
                   </div>
+                  {(idea as any).estimated_cost && (
+                    <span className="text-xs text-gray-400 ml-2">{(idea as any).estimated_cost}</span>
+                  )}
                 </div>
               ))}
               
