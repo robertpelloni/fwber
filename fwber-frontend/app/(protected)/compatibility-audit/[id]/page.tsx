@@ -183,7 +183,7 @@ export default function CompatibilityAuditPage() {
                                     Alignment Areas
                                 </h3>
                                 <div className="space-y-3">
-                                    {audit.alignment_areas.map((item, i) => (
+                                    {(audit.alignment_areas || []).map((item, i) => (
                                         <motion.div
                                             key={i}
                                             initial={{ opacity: 0, y: 10 }}
@@ -219,7 +219,7 @@ export default function CompatibilityAuditPage() {
                                     Friction Points
                                 </h3>
                                 <div className="space-y-3">
-                                    {audit.friction_points.map((item, i) => (
+                                    {(audit.friction_points || []).map((item, i) => (
                                         <motion.div
                                             key={i}
                                             initial={{ opacity: 0, y: 10 }}
@@ -255,7 +255,7 @@ export default function CompatibilityAuditPage() {
                                     Growth Potential
                                 </h3>
                                 <div className="space-y-3">
-                                    {audit.growth_potential.map((item, i) => (
+                                    {(audit.growth_potential || []).map((item, i) => (
                                         <motion.div
                                             key={i}
                                             initial={{ opacity: 0, y: 10 }}
