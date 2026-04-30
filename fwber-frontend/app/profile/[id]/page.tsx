@@ -216,9 +216,9 @@ export default function PublicProfilePage() {
                 {p.scene_summary.headline && (
                   <p className="mb-4 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200">{p.scene_summary.headline}</p>
                 )}
-                {p.scene_summary.followed_topics.length > 0 && (
+                {(p.scene_summary.followed_topics || []).length > 0 && (
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {p.scene_summary.followed_topics.map((topic) => (
+                    {(p.scene_summary.followed_topics || []).map((topic) => (
                       <span
                         key={topic.slug}
                         className="rounded-full border border-cyan-200 bg-white dark:bg-gray-800 px-3 py-1 text-xs font-semibold text-cyan-700 dark:border-cyan-800 dark:bg-cyan-950/30 dark:text-cyan-200"
@@ -228,9 +228,9 @@ export default function PublicProfilePage() {
                     ))}
                   </div>
                 )}
-                {p.scene_summary.scene_tags.length > 0 && (
+                {(p.scene_summary.scene_tags || []).length > 0 && (
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {p.scene_summary.scene_tags.map((tag) => (
+                    {(p.scene_summary.scene_tags || []).map((tag) => (
                       <span
                         key={tag}
                         className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-medium text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-100"
@@ -264,7 +264,7 @@ export default function PublicProfilePage() {
                   <h3 className="text-lg font-semibold">Field Notes</h3>
                 </div>
                 <div className="space-y-4">
-                  {p.journals.map((journal) => (
+                  {(p.journals || []).map((journal) => (
                     <article
                       key={journal.id}
                       className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm"
@@ -289,7 +289,7 @@ export default function PublicProfilePage() {
                       </p>
                       {journal.tags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
-                          {journal.tags.map((tag) => (
+                          {(journal.tags || []).map((tag) => (
                             <span key={tag} className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
                               #{tag}
                             </span>
@@ -309,7 +309,7 @@ export default function PublicProfilePage() {
                   <h3 className="text-lg font-semibold">Relationship Links</h3>
                 </div>
                 <div className="space-y-4">
-                  {p.relationship_links.map((link) => (
+                  {(p.relationship_links || []).map((link) => (
                     <article
                       key={link.id}
                       className="rounded-2xl border border-rose-100 bg-rose-50/60 p-4 shadow-sm dark:border-rose-900/40 dark:bg-rose-950/20"
