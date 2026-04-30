@@ -40,6 +40,7 @@ import { useTranslation } from "@/lib/hooks/use-translation";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { MatchInsights } from "@/components/matches/MatchInsights";
 import { DatePlanner } from "@/components/realtime/DatePlanner";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { storeOfflineChatMessage } from "@/lib/offline-store";
 import { useToast } from "@/components/ToastProvider";
 import GiftShopModal from "@/components/gifts/GiftShopModal";
