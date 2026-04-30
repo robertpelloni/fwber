@@ -93,11 +93,15 @@ export function useE2EEncryption() {
   }, [user, sharedKeys]);
 
   const encrypt = useCallback(async (peerId: string | number, text: string) => {
-    const keyData = await getSharedKey(peerId);
-    if (keyData.type === 'rsa') {
-        return Crypto.encryptWithRsa(text, keyData.key);
+    try {
+      const keyData = await getSharedKey(peerId);
+      if (keyData.type === 'rsa') {
+          return Crypto.encryptWithRsa(text, keyData.key);
+      }
+      return Crypto.encryptMessage(text, keyData.key);
+    } catch {
+      throw new Error('E2E unavailable');
     }
-    return Crypto.encryptMessage(text, keyData.key);
   }, [getSharedKey]);
 
   const decrypt = useCallback(async (peerId: string | number, encryptedText: string) => {

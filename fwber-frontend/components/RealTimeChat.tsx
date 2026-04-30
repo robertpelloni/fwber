@@ -342,7 +342,7 @@ export default function RealTimeChat({
 						try {
 							payload = await encrypt(parseInt(recipientId), payload);
 						} catch (error) {
-							console.error("Encryption failed, sending plain text", error);
+							// E2E not available - send plain text silently
 						}
 					}
 
