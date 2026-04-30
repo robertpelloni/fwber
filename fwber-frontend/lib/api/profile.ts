@@ -113,6 +113,11 @@ export interface UserProfile {
       communication_style?: string;
       response_time?: string;
       meeting_preference?: string;
+      cannabis?: string;
+      psychedelics?: string;
+      stimulants?: string;
+      opiates?: string;
+      [key: string]: any;
     };
     photos?: Array<{
       id: number;
@@ -201,6 +206,9 @@ export interface ProfileUpdateData {
     latitude?: number;
     longitude?: number;
     max_distance?: number;
+    match_scope?: string;
+    search_country?: string;
+    search_city?: string;
     city?: string;
     state?: string;
   };
@@ -287,6 +295,11 @@ export interface ProfileUpdateData {
     communication_style?: string;
     response_time?: string;
     meeting_preference?: string;
+    cannabis?: string;
+    psychedelics?: string;
+    stimulants?: string;
+    opiates?: string;
+    [key: string]: any;
   };
 }
 
