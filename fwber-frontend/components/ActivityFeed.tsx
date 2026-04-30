@@ -219,7 +219,7 @@ export function ActivityFeed({
             </p>
           </div>
         ) : (
-          (Array.isArray(activities) ? activities : []).map((activity) => (
+          (Array.isArray(activities) ? activities : []).filter(a => a && a.user).map((activity) => (
             <Link
               key={activity.id}
               href={
