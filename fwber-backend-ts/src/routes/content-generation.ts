@@ -25,7 +25,8 @@ router.post('/generate-bio', async (req: any, res) => {
   const { personality, interests, goals, style, target_audience } = req.body;
 
   try {
-    // 1. Check/Deduct Tokens (20 tokens)
+    // AI Content Generation is free
+    /*
     const user = await prisma.users.findUnique({ where: { id: userId } });
     if (!user || Number(user.token_balance) < 20) {
       return res.status(403).json({ error: 'Insufficient tokens. Generating a bio costs 20 FWB tokens.' });
@@ -36,6 +37,7 @@ router.post('/generate-bio', async (req: any, res) => {
       where: { id: userId },
       data: { token_balance: { decrement: 20 } }
     });
+    */
 
     const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
 
