@@ -251,24 +251,48 @@ router.get('/:id', authenticate, async (req: any, res) => {
 router.post('/:id/rsvp', authenticate, async (req: any, res) => {
   try {
     const { status = 'attending' } = req.body;
-    await prisma.event_attendees.upsert({
-      where: {
-        event_id_user_id: {
-          event_id: BigInt(req.params.id),
-          user_id: BigInt(req.user.id),
-        },
-      },
-      create: {
-        event_id: BigInt(req.params.id),
-        user_id: BigInt(req.user.id),
-        status,
-      },
-      update: { status },
+    
+    // Check if event exists
+    const event = await prisma.events.findUnique({
+        where: { id: BigInt(req.params.id) }
     });
+
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+
+    // Validate status against enum
+    const validStatuses = ['attending', 'maybe', 'declined'];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid RSVP status' });
+    }
+
+    const userId = BigInt(req.user.id);
+    const eventId = BigInt(req.params.id);
+
+    // Use a transaction or check for existing record first to avoid the Prisma limitation 
+    // where upsert doesn't always handle manual map: unique constraints perfectly in some versions.
+    const existing = await prisma.event_attendees.findFirst({
+        where: { event_id: eventId, user_id: userId }
+    });
+
+    if (existing) {
+        await prisma.event_attendees.update({
+            where: { id: existing.id },
+            data: { status: status as any }
+        });
+    } else {
+        await prisma.event_attendees.create({
+            data: {
+                event_id: eventId,
+                user_id: userId,
+                status: status as any
+            }
+        });
+    }
+
     res.json({ message: 'RSVP updated', status });
   } catch (err: any) {
-    console.error('[POST /events/:id/rsvp]', err.message);
-    res.status(500).json({ error: 'Failed to RSVP' });
+    console.error('[POST /events/:id/rsvp]', err.message, err.stack);
+    res.status(500).json({ error: 'Failed to RSVP', details: err.message });
   }
 });
 
