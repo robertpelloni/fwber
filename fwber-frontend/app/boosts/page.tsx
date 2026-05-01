@@ -83,11 +83,11 @@ export default function BoostsPage() {
             </div>
             {isLoading ? (
               <p className="text-sm text-gray-500">Loading boost history…</p>
-            ) : !boostHistory || boostHistory.length === 0 ? (
+            ) : !boostHistory || !Array.isArray(boostHistory) || boostHistory.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400">No boosts purchased yet.</p>
             ) : (
               <div className="space-y-3">
-                {boostHistory.map((boost) => (
+                {boostHistory.map((boost: any) => (
                   <div key={boost.id} className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 dark:border-gray-800">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="font-medium text-gray-900 dark:text-white">{boost.boost_type} boost</div>
