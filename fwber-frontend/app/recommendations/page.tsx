@@ -169,33 +169,42 @@ export default function RecommendationsPage() {
   };
 
   const currentItems = useMemo(() => {
+    let items: any[] = [];
     switch (activeTab) {
       case 'mixed':
-        return (mixedRecommendations?.recommendations || []) as Recommendation[];
+        items = mixedRecommendations?.recommendations || [];
+        break;
       case 'ai':
-        return (aiRecommendations?.recommendations || []) as Recommendation[];
+        items = aiRecommendations?.recommendations || [];
+        break;
       case 'location':
-        return (locationRecommendations?.recommendations || []) as Recommendation[];
+        items = locationRecommendations?.recommendations || [];
+        break;
       case 'collaborative':
-        return (collaborativeRecommendations?.recommendations || []) as Recommendation[];
+        items = collaborativeRecommendations?.recommendations || [];
+        break;
       case 'content':
-        return (contentRecommendations?.recommendations || []) as Recommendation[];
+        items = contentRecommendations?.recommendations || [];
+        break;
       case 'trending':
-        return (trendingRecommendations?.trending || []) as TrendingContent[];
+        items = trendingRecommendations?.trending || [];
+        break;
       case 'feed':
-        return (personalizedFeed?.feed || []) as FeedItem[];
+        items = personalizedFeed?.feed || [];
+        break;
       default:
-        return [] as Recommendation[];
+        items = [];
     }
+    return Array.isArray(items) ? items : [];
   }, [
     activeTab,
-    aiRecommendations?.recommendations,
-    collaborativeRecommendations?.recommendations,
-    contentRecommendations?.recommendations,
-    locationRecommendations?.recommendations,
-    mixedRecommendations?.recommendations,
-    personalizedFeed?.feed,
-    trendingRecommendations?.trending,
+    aiRecommendations,
+    collaborativeRecommendations,
+    contentRecommendations,
+    locationRecommendations,
+    mixedRecommendations,
+    personalizedFeed,
+    trendingRecommendations,
   ]);
 
   const isCurrentLoading = useMemo(() => {
