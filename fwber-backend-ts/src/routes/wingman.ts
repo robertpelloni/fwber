@@ -302,4 +302,43 @@ Give 2-3 alignment areas, 1-2 friction points, and 1-2 growth areas. Be specific
   }
 });
 
+// ─── Message Feedback (Coach) ────────────────────────────────────────────────
+
+router.post('/message-feedback/:matchId', async (req: any, res) => {
+  try {
+    const { draft } = req.body;
+    if (!draft) return res.status(400).json({ message: 'No draft provided' });
+
+    const result = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{
+        role: 'user',
+        content: `You are a professional dating wingman coach. Analyze this draft message for a dating app match: "${draft}"
+
+Provide feedback in JSON format:
+{
+  "score": <number 0-100>,
+  "tone": "<string, e.g. Flirty, Casual, Direct>",
+  "feedback": "<2-3 sentence critique>",
+  "suggestion": "<optional improved version of the message>"
+}`
+      }],
+      temperature: 0.8,
+      max_tokens: 500,
+    });
+
+    const text = result.choices[0]?.message?.content?.trim() || '';
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+    res.json(JSON.parse(cleaned));
+  } catch (err: any) {
+    console.error('[wingman/message-feedback]', err.message);
+    res.json({
+      score: 50,
+      tone: 'Unknown',
+      feedback: 'The coach is taking a break. Trust your gut!',
+      suggestion: null
+    });
+  }
+});
+
 export default router;
