@@ -769,4 +769,123 @@ router.get("/:id/view-stats", authenticate, async (req: any, res) => {
 	res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
 });
 
+// GET /api/users/search - Search users
+router.get("/search", authenticate, async (req: any, res) => {
+	try {
+		const { q } = req.query;
+		if (!q) return res.json([]);
+
+		const users = await prisma.users.findMany({
+			where: {
+				OR: [
+					{ display_name: { contains: String(q) } },
+					{ email: { contains: String(q) } },
+				],
+			},
+			take: 20,
+			select: {
+				id: true,
+				display_name: true,
+				email: true,
+				user_profiles: {
+					select: {
+						bio: true,
+						location_description: true,
+					},
+				},
+			},
+		});
+
+		res.json(
+			users.map((u) => ({
+				id: Number(u.id),
+				email: u.email,
+				profile: {
+					display_name: u.display_name,
+					bio: u.user_profiles?.bio,
+					location: {
+						city: u.user_profiles?.location_description?.split(",")[0] || "",
+					},
+				},
+			})),
+		);
+	} catch (err) {
+		res.status(500).json({ message: "Search failed" });
+	}
+});
+
+// GET /api/users/:id - Get public profile
+router.get("/:id", authenticate, async (req: any, res) => {
+	try {
+		const targetUserId = BigInt(req.params.id);
+		const user = await prisma.users.findUnique({
+			where: { id: targetUserId },
+			include: { user_profiles: true },
+		});
+
+		if (!user) return res.status(404).json({ message: "User not found" });
+
+		const profile = user.user_profiles;
+		const photos = await prisma.photos.findMany({
+			where: { user_id: targetUserId, is_private: false },
+			orderBy: { is_primary: "desc" },
+		});
+
+		// Basic response similar to /api/profile but for public use
+		const p = profile ? serialize(profile) : {};
+		if (profile) {
+			for (const col of [
+				"preferences",
+				"looking_for",
+				"interests",
+				"languages",
+				"social_media",
+				"sti_status",
+				"fetishes",
+			]) {
+				p[col] = parseJsonField(p[col]);
+			}
+		}
+
+		res.json({
+			id: Number(targetUserId),
+			email_verified: !!user.email_verified_at,
+			created_at: user.created_at?.toISOString() || "",
+			last_online: user.last_seen_at?.toISOString() || "",
+			profile: {
+				display_name: p.display_name || user.display_name || "User",
+				bio: p.bio || "No bio yet.",
+				age:
+					p.date_of_birth || p.birthdate
+						? Math.floor(
+								(Date.now() -
+									new Date(p.date_of_birth || p.birthdate).getTime()) /
+									(365.25 * 24 * 60 * 60 * 1000),
+							)
+						: null,
+				gender: p.gender,
+				location: {
+					city: p.location_description?.split(",")[0] || "",
+					state: p.location_description?.split(",")[1]?.trim() || "",
+				},
+				looking_for: p.looking_for || [],
+				interests: p.interests || [],
+				photos: photos.map((ph: any) => ({
+					id: Number(ph.id),
+					url: ph.file_path || "",
+					is_private: ph.is_private || false,
+					is_primary: ph.is_primary || false,
+				})),
+				vouches: [],
+				relationship_links: [],
+				scene_summary: null,
+				journals: [],
+			},
+		});
+	} catch (error: any) {
+		console.error("[GET /api/users/:id]", error.message);
+		res.status(500).json({ message: "Failed to load profile" });
+	}
+});
+
 export default router;
