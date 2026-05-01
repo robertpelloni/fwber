@@ -16,8 +16,14 @@ export default function BoostPurchaseModal({ isOpen, onClose }: BoostPurchaseMod
 
   const handlePurchase = (type: 'standard' | 'super') => {
     purchaseBoost({ type, paymentMethod }, {
-      onSuccess: () => {
-        onClose();
+      onSuccess: (data: any) => {
+        if (data.checkoutUrl) {
+          // If Stripe checkout URL is provided, redirect to Stripe
+          window.location.href = data.checkoutUrl;
+        } else {
+          // Token purchase or immediate success
+          onClose();
+        }
       },
       onError: (error: any) => {
         alert(error.response?.data?.error || 'Failed to purchase boost');
