@@ -47,6 +47,25 @@ router.get("/", authenticate, async (req: any, res) => {
 			});
 			return;
 		}
+		// Fetch established relationship links
+		const relationshipLinks = await prisma.relationship_links.findMany({
+			where: { user_id: userId, is_confirmed: true },
+			include: {
+				users_relationship_links_related_user_idTousers: {
+					select: {
+						id: true,
+						name: true,
+						user_profiles: {
+							select: {
+								display_name: true,
+								avatar_url: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
 		const p = serialize(profile);
 		// Parse JSON fields back to objects
 		for (const col of [
@@ -847,6 +866,25 @@ router.get("/:id", authenticate, async (req: any, res) => {
 			}
 		}
 
+		// Fetch relationship links
+		const relationshipLinks = await prisma.relationship_links.findMany({
+			where: { user_id: targetUserId, is_confirmed: true, visibility: 'public' },
+			include: {
+				users_relationship_links_related_user_idTousers: {
+					select: {
+						id: true,
+						name: true,
+						user_profiles: {
+							select: {
+								display_name: true,
+								avatar_url: true,
+							},
+						},
+					},
+				},
+			},
+		});
+
 		res.json({
 			id: Number(targetUserId),
 			email_verified: !!user.email_verified_at,
@@ -877,7 +915,32 @@ router.get("/:id", authenticate, async (req: any, res) => {
 					is_primary: ph.is_primary || false,
 				})),
 				vouches: [],
-				relationship_links: [],
+				relationship_links: relationshipLinks.map((l: any) => ({
+					id: Number(l.id),
+					relationship_type: l.relationship_type,
+					relationship_type_label:
+						l.relationship_type.charAt(0).toUpperCase() +
+						l.relationship_type.slice(1),
+					visibility: l.visibility,
+					visibility_label:
+						l.visibility.charAt(0).toUpperCase() + l.visibility.slice(1),
+					note: l.note,
+					confirmed_at: l.confirmed_at?.toISOString(),
+					is_confirmed: l.is_confirmed,
+					requested_by_user_id: Number(l.requested_by_user_id),
+					related_user: l.users_relationship_links_related_user_idTousers
+						? {
+								id: Number(l.users_relationship_links_related_user_idTousers.id),
+								name: l.users_relationship_links_related_user_idTousers.name,
+								display_name:
+									l.users_relationship_links_related_user_idTousers
+										.user_profiles?.[0]?.display_name,
+								avatar_url:
+									l.users_relationship_links_related_user_idTousers
+										.user_profiles?.[0]?.avatar_url,
+							}
+						: null,
+				})),
 				scene_summary: null,
 				journals: [],
 			},

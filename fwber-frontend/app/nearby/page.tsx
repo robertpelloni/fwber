@@ -31,7 +31,7 @@ export default function NearbyPage() {
   // Transform for ProximityPresenceView
   const proximityUsers = useMemo(() => nearbyUsers.map(u => ({
     id: String(u.id),
-    displayName: u.display_name,
+    displayName: u.display_name || 'Anonymous',
     distance: ((u.distance_meters ?? u.location.distance_meters ?? parseFloat(u.location.distance.replace(/[^\d.]/g, '')) * (u.location.distance.includes('km') ? 1000 : 1)) || 0) / 1000,
   })), [nearbyUsers])
 
