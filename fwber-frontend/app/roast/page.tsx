@@ -186,7 +186,7 @@ export default function RoastPage() {
                   
                   <div className="flex flex-col gap-4">
                      <div className="flex gap-4 justify-center">
-                        <Button onClick={copyToClipboard} variant="outline" className="border-white/20 hover:bg-white dark:bg-gray-800/10 text-white">
+                        <Button onClick={copyToClipboard} variant="outline" className="border-white/20 hover:bg-white dark:bg-gray-800/10 text-white hover:text-black">
                         Copy Text
                         </Button>
                         <Button onClick={handleShare} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white">
@@ -307,7 +307,7 @@ export default function RoastPage() {
                <Button 
                variant="ghost" 
                onClick={() => { setResult(null); setShareId(null); }}
-               className="text-white/50 hover:text-white hover:bg-white dark:bg-gray-800/10"
+               className="text-white/50 hover:text-white hover:bg-white dark:bg-gray-800/10 hover:text-black"
              >
                Go Again
              </Button>
