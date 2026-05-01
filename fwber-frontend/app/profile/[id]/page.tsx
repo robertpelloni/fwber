@@ -120,7 +120,7 @@ export default function PublicProfilePage() {
   if (error) return <div className="text-red-500 p-8">{error}</div>;
   if (!profile) return <div className="p-8">Profile not found</div>;
 
-  const p = profile.profile || {};
+  const p = profile.profile || { display_name: 'User' };
   const photos = Array.isArray(p.photos) ? p.photos : [];
 
   return (
