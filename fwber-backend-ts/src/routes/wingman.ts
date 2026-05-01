@@ -143,6 +143,32 @@ router.get('/profile-analysis', async (req: any, res) => {
 
 // ─── Date Ideas ─────────────────────────────────────────────────────────────
 
+router.get('/date-ideas/general', async (req: any, res) => {
+  try {
+    const result = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{
+        role: 'user',
+        content: `Generate 5 creative date ideas for a couple in the Detroit metro area. Each should have a title, short description (1 sentence), vibe (one word), and estimated cost ($ to $$$). Respond in JSON: { "ideas": [{ "title": "...", "description": "...", "vibe": "...", "estimated_cost": "..." }] }`
+      }],
+      temperature: 0.9,
+      max_tokens: 600,
+    });
+    const text = result.choices[0]?.message?.content?.trim() || '';
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+    res.json(JSON.parse(cleaned));
+  } catch (err: any) {
+    console.error('[wingman/date-ideas/general]', err.message);
+    res.json({ ideas: [
+      { title: 'Sunset at Belle Isle', description: 'Pack a blanket and watch the skyline.', vibe: 'Romantic', estimated_cost: 'Free' },
+      { title: 'Jazz at Cliff Bell\'s', description: 'Classic Detroit with live jazz.', vibe: 'Sophisticated', estimated_cost: '$$' },
+      { title: 'Arcade Night at Offworld', description: 'Retro games and pizza.', vibe: 'Playful', estimated_cost: '$' },
+      { title: 'Eastern Market Morning', description: 'Browse vendors and grab coffee.', vibe: 'Casual', estimated_cost: '$' },
+      { title: 'Detroit Institute of Arts', description: 'Explore world-class art together.', vibe: 'Cultural', estimated_cost: '$' },
+    ] });
+  }
+});
+
 router.get('/date-ideas/:matchId', async (req: any, res) => {
   try {
     const result = await openai.chat.completions.create({
