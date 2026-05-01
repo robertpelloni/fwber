@@ -5,7 +5,14 @@
 
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENROUTER_API_KEY ? 'https://openrouter.ai/api/v1' : undefined,
+  defaultHeaders: process.env.OPENROUTER_API_KEY ? {
+    'HTTP-Referer': 'https://www.fwber.me',
+    'X-Title': 'fwber',
+  } : undefined
+});
 
 /** Fetch a user's profile as a plain summary string for prompts */
 async function getProfileSummary(userId: bigint): Promise<string> {
@@ -50,8 +57,10 @@ async function getProfileSummary(userId: bigint): Promise<string> {
 
 /** Generic OpenAI chat completion helper */
 async function ask(system: string, user: string, temperature = 0.9): Promise<string> {
+  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
+  
   const resp = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: model,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },

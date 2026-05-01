@@ -4,7 +4,14 @@ import * as ai from '../lib/wingman-ai.js';
 import prisma from '../lib/prisma.js';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENROUTER_API_KEY ? 'https://openrouter.ai/api/v1' : undefined,
+  defaultHeaders: process.env.OPENROUTER_API_KEY ? {
+    'HTTP-Referer': 'https://www.fwber.me',
+    'X-Title': 'fwber',
+  } : undefined
+});
 
 const router = Router();
 
@@ -144,9 +151,10 @@ router.get('/profile-analysis', async (req: any, res) => {
 // ─── Date Ideas ─────────────────────────────────────────────────────────────
 
 router.get('/date-ideas/general', async (req: any, res) => {
+  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
   try {
     const result = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: model,
       messages: [{
         role: 'user',
         content: `Generate 5 creative date ideas for a couple in the Detroit metro area. Each should have a title, short description (1 sentence), vibe (one word), and estimated cost ($ to $$$). Respond in JSON: { "ideas": [{ "title": "...", "description": "...", "vibe": "...", "estimated_cost": "..." }] }`
