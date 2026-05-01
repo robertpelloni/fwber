@@ -131,6 +131,7 @@ app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/video', videoRoutes);
 app.use('/api/referrals', referralsRoutes);
 app.use('/api/boosts', boostsRoutes);
+app.use('/api/content', contentGenerationRoutes);
 app.use('/api/content-generation', contentGenerationRoutes);
 app.use('/api/cats', catsRoutes);
 app.use('/api/security', securityRoutes);
