@@ -576,7 +576,9 @@ export default function RecommendationsPage() {
                 </div>
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-muted-foreground">Types</p>
-                  <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">{mixedMetadata.types.join(', ')}</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
+                    {Array.isArray(mixedMetadata.types) ? mixedMetadata.types.join(', ') : ''}
+                  </p>
                 </div>
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-muted-foreground">Generated</p>
