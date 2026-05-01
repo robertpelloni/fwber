@@ -689,7 +689,7 @@ export default function RealTimeChat({
 						)}
 					</div>
 				) : (
-					{(Array.isArray(messages) ? messages : []).map((msg, index) => {
+					(Array.isArray(messages) ? messages : []).map((msg, index) => {
 						const isOwnMessage = msg.from_user_id === user?.id;
 						const content = msg.message?.content || msg.content || "";
 						const messageType = msg.message_type || msg.message?.type || "text";
@@ -835,10 +835,9 @@ export default function RealTimeChat({
 								</div>
 
 								{/* Display Reactions */}
-								{msg.reactions && msg.reactions.length > 0 && (
+								{Array.isArray(msg.reactions) && msg.reactions.length > 0 && (
 									<div className="flex gap-1 mt-1 -translate-y-2 translate-x-2">
-										{Array.isArray(msg.reactions) &&
-											msg.reactions.map((r, i) => (
+										{msg.reactions.map((r: any, i: number) => (
 												<span
 													key={i}
 													className="bg-gray-800 border border-gray-600 rounded-full px-1 text-xs"
@@ -979,10 +978,12 @@ export function ChatList({ className = "" }: { className?: string }) {
 		Record<string, ChatMessage[]>
 	>((acc, msg) => {
 		const otherUserId = msg.from_user_id || msg.to_user_id || "";
-		if (!acc[otherUserId]) {
-			acc[otherUserId] = [];
+		if (otherUserId) {
+			if (!acc[otherUserId]) {
+				acc[otherUserId] = [];
+			}
+			acc[otherUserId].push(msg);
 		}
-		acc[otherUserId].push(msg);
 		return acc;
 	}, {});
 
@@ -994,9 +995,10 @@ export function ChatList({ className = "" }: { className?: string }) {
 
 			<div className="divide-y divide-gray-700">
 				{Object.entries(conversations).map(([userId, messages]) => {
+					if (!Array.isArray(messages) || messages.length === 0) return null;
 					const lastMessage = messages[messages.length - 1];
-					const isOnline = (onlineUsers as OnlineUser[]).some(
-						(user) => user.user_id === userId,
+					const isOnline = (Array.isArray(onlineUsers) ? onlineUsers : []).some(
+						(user) => user && String(user.user_id) === String(userId),
 					);
 
 					return (
@@ -1024,7 +1026,7 @@ export function ChatList({ className = "" }: { className?: string }) {
 									</p>
 								</div>
 								<div className="text-gray-400 text-xs">
-									{new Date(lastMessage.timestamp).toLocaleTimeString()}
+									{lastMessage?.timestamp ? new Date(lastMessage.timestamp).toLocaleTimeString() : ''}
 								</div>
 							</div>
 						</div>
@@ -1045,7 +1047,7 @@ export function OnlineUsers({ className = "" }: { className?: string }) {
 		<div className={`bg-gray-800 rounded-lg ${className}`}>
 			<div className="p-4 border-b border-gray-700">
 				<h3 className="text-white font-semibold">
-					Online Users ({(onlineUsers as OnlineUser[]).length})
+					Online Users ({(Array.isArray(onlineUsers) ? onlineUsers : []).length})
 				</h3>
 			</div>
 
@@ -1054,19 +1056,19 @@ export function OnlineUsers({ className = "" }: { className?: string }) {
 					<p className="text-gray-400 text-center py-4">No users online</p>
 				) : (
 					onlineUsers.map((user) => (
-						<div key={user.user_id} className="flex items-center space-x-3">
+						<div key={user?.user_id || 'unknown'} className="flex items-center space-x-3">
 							<div className="relative">
 								<div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
 									<span className="text-white text-sm font-bold">
-										{user.user_id.charAt(0).toUpperCase()}
+										{user?.user_id?.charAt(0).toUpperCase() || '?'}
 									</span>
 								</div>
 								<div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></div>
 							</div>
 							<div className="flex-1">
-								<p className="text-white text-sm">User {user.user_id}</p>
+								<p className="text-white text-sm">User {user?.user_id || 'Unknown'}</p>
 								<p className="text-gray-400 text-xs capitalize">
-									{user.status}
+									{user?.status || 'offline'}
 								</p>
 							</div>
 						</div>

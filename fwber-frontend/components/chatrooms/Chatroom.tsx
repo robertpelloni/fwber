@@ -245,7 +245,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                     <p className="text-gray-900 dark:text-white whitespace-pre-wrap">{message.display_content}</p>
 
                     {/* Reactions */}
-                    {message.reactions && message.reactions.length > 0 && (
+                    {Array.isArray(message.reactions) && message.reactions.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {Object.entries(message.reaction_summary || {}).map(([emoji, count]) => (
                           <button

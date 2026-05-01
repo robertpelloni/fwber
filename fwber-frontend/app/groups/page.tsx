@@ -34,9 +34,9 @@ export default function GroupsPage() {
     return matchesSearch && matchesCategory;
   });
 
-  const myGroupIds = new Set(myGroups.map(g => g.id));
+  const myGroupIds = new Set((Array.isArray(myGroups) ? myGroups : []).map(g => g.id));
   
-  const categories = Array.from(new Set(groups.map(g => g.category).filter(Boolean)));
+  const categories = Array.from(new Set((Array.isArray(groups) ? groups : []).map(g => g.category).filter(Boolean)));
 
   if (isLoadingGroups || isLoadingMyGroups) {
     return (

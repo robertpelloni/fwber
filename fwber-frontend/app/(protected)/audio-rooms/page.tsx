@@ -181,14 +181,7 @@ export default function AudioRoomsLobby() {
 
                     <div className="space-y-4 md:col-span-2">
                         <h2 className="mb-4 text-xl font-semibold">Active Stages</h2>
-                        {loading ? (
-                            <div className="animate-pulse p-8 text-center text-muted-foreground">Scanning frequencies...</div>
-                        ) : rooms.length === 0 ? (
-                            <Card className="border-dashed bg-muted/30 p-8 text-center">
-                                <p className="text-muted-foreground">It&apos;s quiet. Too quiet. Be the first to host a room!</p>
-                            </Card>
-                        ) : (
-                            rooms.map(room => (
+                        {(Array.isArray(rooms) ? rooms : []).map(room => (
                                 <Card key={room.id} className="cursor-pointer transition-colors hover:border-primary/50" onClick={() => router.push(`/audio-rooms/${room.id}`)}>
                                     <CardContent className="flex items-center justify-between p-4">
                                         <div className="space-y-1">
@@ -207,8 +200,19 @@ export default function AudioRoomsLobby() {
                                                     {Math.round((room.distance_meters / 100)) / 10} km away
                                                 </p>
                                             )}
-                                            {room.scene_signals?.headline && (
-                                                <p className="text-sm text-cyan-800">{room.scene_signals.headline}</p>
+                                            {room.scene_signals && (
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {(Array.isArray(room.scene_signals.matched_topics) ? room.scene_signals.matched_topics : []).slice(0, 2).map(topic => (
+                                                        <span key={topic.slug} className="rounded-full bg-cyan-100 px-2 py-0.5 text-[10px] font-medium text-cyan-700">
+                                                            {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
+                                                        </span>
+                                                    ))}
+                                                    {(Array.isArray(room.scene_signals.matched_tags) ? room.scene_signals.matched_tags : []).slice(0, 2).map(tag => (
+                                                        <span key={tag} className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
+                                                            #{tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-4">
@@ -220,8 +224,7 @@ export default function AudioRoomsLobby() {
                                         </div>
                                     </CardContent>
                                 </Card>
-                            ))
-                        )}
+                            ))}
                     </div>
                 </div>
             </div>

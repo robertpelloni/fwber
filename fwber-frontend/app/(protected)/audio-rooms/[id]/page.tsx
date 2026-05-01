@@ -225,7 +225,7 @@ export default function ActiveAudioRoom() {
                     <div>
                         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Speakers</h3>
                         <div className="flex flex-wrap gap-4">
-                            {speakers.map(speaker => (
+                            {(Array.isArray(speakers) ? speakers : []).map(speaker => (
                                 <div key={speaker.id} className="flex flex-col items-center gap-2 p-4 bg-muted/30 rounded-2xl w-24 text-center relative border border-secondary">
                                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary border-2 border-primary border-dashed">
                                         <UserIcon className="w-8 h-8" />
@@ -244,7 +244,7 @@ export default function ActiveAudioRoom() {
                         <div>
                             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Listening In</h3>
                             <div className="flex flex-wrap gap-3">
-                                {listeners.map(listener => (
+                                {(Array.isArray(listeners) ? listeners : []).map(listener => (
                                     <div key={listener.id} className="flex items-center gap-2 bg-muted/40 px-3 py-1.5 rounded-full">
                                         <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground">
                                             <UserIcon className="w-3 h-3" />

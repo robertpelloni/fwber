@@ -36,7 +36,7 @@ export function EventCard({ event }: EventCardProps) {
               <p className="mb-2 text-sm text-purple-900">{event.scene_signals.headline}</p>
             )}
             <div className="flex flex-wrap gap-2">
-              {event.scene_signals.matched_topics.map((topic) => (
+              {(Array.isArray(event.scene_signals.matched_topics) ? event.scene_signals.matched_topics : []).map((topic) => (
                 <span
                   key={`event-topic-${event.id}-${topic.slug}`}
                   className="rounded-full bg-white dark:bg-gray-800 px-2.5 py-1 text-xs font-medium text-purple-800"
@@ -44,7 +44,7 @@ export function EventCard({ event }: EventCardProps) {
                   {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                 </span>
               ))}
-              {event.scene_signals.matched_tags.map((tag) => (
+              {(Array.isArray(event.scene_signals.matched_tags) ? event.scene_signals.matched_tags : []).map((tag) => (
                 <span
                   key={`event-tag-${event.id}-${tag}`}
                   className="rounded-full bg-white dark:bg-gray-800/80 px-2.5 py-1 text-xs font-medium text-purple-700"

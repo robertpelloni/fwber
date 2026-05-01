@@ -208,7 +208,7 @@ function DealCard({ deal }: { deal: Deal }) {
               Verified merchant
             </span>
           )}
-          {deal.scene_signals?.matched_topics?.slice(0, 2).map(topic => (
+          {(Array.isArray(deal.scene_signals?.matched_topics) ? deal.scene_signals.matched_topics : []).slice(0, 2).map((topic: any) => (
             <span
               key={topic.slug}
               className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
@@ -216,7 +216,7 @@ function DealCard({ deal }: { deal: Deal }) {
               {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
             </span>
           ))}
-          {deal.scene_signals?.matched_tags?.slice(0, 2).map(tag => (
+          {(Array.isArray(deal.scene_signals?.matched_tags) ? deal.scene_signals.matched_tags : []).slice(0, 2).map((tag: string) => (
             <span
               key={tag}
               className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700"

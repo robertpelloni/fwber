@@ -280,7 +280,7 @@ export default function ProximityChatroomsPage() {
             </div>
           )}
 
-          {chatroomResults.map((chatroom) => (
+          {(Array.isArray(chatroomResults) ? chatroomResults : []).map((chatroom) => (
             <div key={chatroom.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">

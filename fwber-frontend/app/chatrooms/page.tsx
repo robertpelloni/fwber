@@ -304,9 +304,9 @@ export default function ChatroomsPage() {
                         <p className="text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{chatroom.description}</p>
                       )}
 
-                      {(chatroom.scene_signals?.matched_topics?.length || chatroom.scene_signals?.matched_tags?.length) ? (
+                      {(Array.isArray(chatroom.scene_signals?.matched_topics) && chatroom.scene_signals.matched_topics.length > 0) || (Array.isArray(chatroom.scene_signals?.matched_tags) && chatroom.scene_signals.matched_tags.length > 0) ? (
                         <div className="mb-3 flex flex-wrap gap-2">
-                          {chatroom.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
+                          {(Array.isArray(chatroom.scene_signals?.matched_topics) ? chatroom.scene_signals.matched_topics : []).slice(0, 2).map((topic) => (
                             <span
                               key={topic.slug}
                               className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800"
@@ -314,7 +314,7 @@ export default function ChatroomsPage() {
                               {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                             </span>
                           ))}
-                          {chatroom.scene_signals?.matched_tags?.slice(0, 2).map((tag) => (
+                          {(Array.isArray(chatroom.scene_signals?.matched_tags) ? chatroom.scene_signals.matched_tags : []).slice(0, 2).map((tag) => (
                             <span
                               key={tag}
                               className="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800"

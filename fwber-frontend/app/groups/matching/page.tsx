@@ -340,7 +340,7 @@ export default function GroupMatchingPage() {
                                     {tag}
                                   </span>
                                 ))}
-                                {match.scene_signals?.matched_topics?.slice(0, 2).map(topic => (
+                                {(Array.isArray(match.scene_signals?.matched_topics) ? match.scene_signals.matched_topics : []).slice(0, 2).map(topic => (
                                   <span
                                     key={`topic-${match.id}-${topic.slug}`}
                                     className="px-2 py-0.5 bg-pink-500/20 text-pink-200 text-xs rounded-full"

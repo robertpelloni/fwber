@@ -307,9 +307,9 @@ export default function NearbyPage() {
                         </p>
                       )}
 
-                      {(user.scene_signals?.matched_topics?.length || user.scene_signals?.matched_tags?.length) ? (
+                      {(Array.isArray(user.scene_signals?.matched_topics) && user.scene_signals.matched_topics.length > 0) || (Array.isArray(user.scene_signals?.matched_tags) && user.scene_signals.matched_tags.length > 0) ? (
                         <div className="mb-3 flex flex-wrap gap-2">
-                          {user.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
+                          {(Array.isArray(user.scene_signals?.matched_topics) ? user.scene_signals.matched_topics : []).slice(0, 2).map((topic: any) => (
                             <span
                               key={topic.slug}
                               className="rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-300"
@@ -317,7 +317,7 @@ export default function NearbyPage() {
                               {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                             </span>
                           ))}
-                          {user.scene_signals?.matched_tags?.slice(0, 2).map((tag) => (
+                          {(Array.isArray(user.scene_signals?.matched_tags) ? user.scene_signals.matched_tags : []).slice(0, 2).map((tag: string) => (
                             <span
                               key={tag}
                               className="rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-1 text-xs font-medium text-orange-700 dark:text-orange-300"

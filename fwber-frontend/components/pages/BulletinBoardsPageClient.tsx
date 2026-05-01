@@ -213,7 +213,7 @@ export default function BulletinBoardsPageClient() {
                     )}
                     {board.scene_signals && (
                       <div className="mt-2 flex flex-wrap gap-2">
-                        {board.scene_signals.matched_topics.slice(0, 2).map((topic) => (
+                        {(Array.isArray(board.scene_signals.matched_topics) ? board.scene_signals.matched_topics : []).slice(0, 2).map((topic) => (
                           <span
                             key={`board-topic-${board.id}-${topic.slug}`}
                             className="rounded-full bg-purple-100 dark:bg-purple-900/30 px-2 py-1 text-xs font-medium text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
@@ -221,7 +221,7 @@ export default function BulletinBoardsPageClient() {
                             {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                           </span>
                         ))}
-                        {board.scene_signals.matched_tags.slice(0, 2).map((tag) => (
+                        {(Array.isArray(board.scene_signals.matched_tags) ? board.scene_signals.matched_tags : []).slice(0, 2).map((tag) => (
                           <span
                             key={`board-tag-${board.id}-${tag}`}
                             className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"

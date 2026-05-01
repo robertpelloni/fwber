@@ -357,14 +357,14 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
                     <p className="text-gray-600 mt-2">Loading messages...</p>
                   </div>
-                ) : messages?.data?.length === 0 ? (
+                ) : (Array.isArray(messages?.data) && messages.data.length === 0) ? (
                   <div className="text-center py-8">
                     <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No messages yet</h3>
                     <p className="text-gray-600">Be the first to start the conversation!</p>
                   </div>
                 ) : (
-                  messages?.data?.map((message) => (
+                  (Array.isArray(messages?.data) ? messages.data : []).map((message) => (
                     <div key={message.id} className="flex items-start space-x-3">
                       <div className="flex-shrink-0">
                         <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -385,10 +385,9 @@ export default function ProximityChatroomPage(props: ProximityChatroomPageProps)
                         </div>
                         <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">{message.content}</p>
                         
-                        {/* Reactions */}
-                        {message.reactions && message.reactions.length > 0 && (
+                        {Array.isArray(message.reactions) && message.reactions.length > 0 && (
                           <div className="flex items-center space-x-2 mb-2">
-                            {message.reactions.map((reaction, index) => (
+                            {message.reactions.map((reaction: any, index: number) => (
                               <button
                                 key={index}
                                 onClick={() => handleReaction(message.id, reaction.emoji)}

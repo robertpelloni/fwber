@@ -19,7 +19,7 @@ export default function TopicsPage() {
   })
 
   const categories = useMemo(
-    () => Array.from(new Set(topics.map((topic) => topic.category).filter(Boolean))).sort(),
+    () => Array.from(new Set((Array.isArray(topics) ? topics : []).map((topic) => topic.category).filter(Boolean))).sort(),
     [topics]
   )
 

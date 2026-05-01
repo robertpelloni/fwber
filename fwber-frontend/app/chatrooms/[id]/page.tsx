@@ -359,21 +359,20 @@ export default function ChatroomPage() {
                     </div>
                     <p className="text-gray-900 dark:text-white dark:text-gray-200 whitespace-pre-wrap">{message.display_content}</p>
 
-                    {/* Reactions */}
-                    {message.reactions && message.reactions.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {Object.entries(message.reaction_summary || {}).map(([emoji, count]) => (
-                          <button
-                            key={emoji}
-                            onClick={() => handleReaction(message.id, emoji)}
-                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-200 rounded-full transition-colors border border-gray-200 dark:border-gray-700"
-                          >
-                            <span className="mr-1">{emoji}</span>
-                            <span>{count as number}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                      {(Array.isArray(message.reactions) && message.reactions.length > 0) && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {Object.entries(message.reaction_summary || {}).map(([emoji, count]) => (
+                            <button
+                              key={emoji}
+                              onClick={() => handleReaction(message.id, emoji)}
+                              className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white dark:text-gray-200 rounded-full transition-colors border border-gray-200 dark:border-gray-700"
+                            >
+                              <span className="mr-1">{emoji}</span>
+                              <span>{count as number}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 </div>
               ))

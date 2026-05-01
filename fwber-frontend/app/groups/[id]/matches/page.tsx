@@ -176,7 +176,7 @@ export default function GroupMatchesPage() {
                        {match.tags && match.tags.length > 3 && (
                            <Badge variant="secondary" className="text-xs">+{match.tags.length - 3}</Badge>
                        )}
-                      {match.scene_signals?.matched_topics?.slice(0, 2).map((topic) => (
+                      {(Array.isArray(match.scene_signals?.matched_topics) ? match.scene_signals.matched_topics : []).slice(0, 2).map((topic) => (
                         <Badge key={`topic-${match.id}-${topic.slug}`} variant="secondary" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-100">
                           {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                         </Badge>

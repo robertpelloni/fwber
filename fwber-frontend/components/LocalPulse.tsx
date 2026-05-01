@@ -171,7 +171,7 @@ const ArtifactCard = ({
               <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">{artifact.scene_signals.headline}</p>
             )}
             <div className="flex flex-wrap gap-2">
-              {artifact.scene_signals.matched_topics.map((topic) => (
+              {(Array.isArray(artifact.scene_signals.matched_topics) ? artifact.scene_signals.matched_topics : []).map((topic) => (
                 <span
                   key={`scene-topic-${artifact.id}-${topic.slug}`}
                   className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-800"
@@ -179,7 +179,7 @@ const ArtifactCard = ({
                   {topic.emoji ? `${topic.emoji} ` : ''}{topic.label}
                 </span>
               ))}
-              {artifact.scene_signals.matched_tags.map((tag) => (
+              {(Array.isArray(artifact.scene_signals.matched_tags) ? artifact.scene_signals.matched_tags : []).map((tag) => (
                 <span
                   key={`scene-tag-${artifact.id}-${tag}`}
                   className="rounded-full bg-gray-900/5 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-gray-300"
