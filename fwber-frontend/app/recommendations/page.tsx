@@ -545,7 +545,7 @@ export default function RecommendationsPage() {
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
               </div>
-            ) : currentItems.length > 0 ? (
+            ) : Array.isArray(currentItems) && currentItems.length > 0 ? (
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {currentItems.map((item, index) => renderCurrentCard(item, index))}
               </div>
