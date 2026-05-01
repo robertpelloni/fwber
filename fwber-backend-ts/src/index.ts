@@ -80,7 +80,18 @@ setupSocketIO(httpServer);
 
 // Middleware
 app.use(cors());
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({ 
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "blob:", "https://*.tile.openstreetmap.org", "https://unpkg.com", "https://*.fwber.me", "https://*.cloudinary.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "https://*.fwber.me", "https://openrouter.ai", "https://api.openai.com"],
+    },
+  },
+}));
 app.use(morgan('dev'));
 // Parse JSON bodies — skip for multipart/form-data (file uploads)
 app.use(express.json({ verify: (req, _res, buf) => {

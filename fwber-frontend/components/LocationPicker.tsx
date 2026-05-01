@@ -57,6 +57,26 @@ export default function LocationPicker({ value, onChange, radius = 100 }: Locati
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapEvents onChange={onChange} />
+        <div className="absolute top-4 right-4 z-[1000]">
+          <Button 
+            type="button"
+            size="sm" 
+            className="bg-white text-gray-900 hover:bg-gray-100 shadow-md font-bold"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                  const newPos = { lat: position.coords.latitude, lng: position.coords.longitude };
+                  onChange(newPos);
+                  if (map) map.setView(newPos, 15);
+                });
+              }
+            }}
+          >
+            Detect Location
+          </Button>
+        </div>
         {value && (
           <>
             <Marker position={value} />

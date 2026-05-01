@@ -46,7 +46,18 @@ router.delete('/promotions/:id', (_req, res) => {
 
 // GET /api/merchant-portal/analytics
 router.get('/analytics', (_req, res) => {
-  res.json({ views: 0, clicks: 0, conversions: 0, revenue: 0 });
+  res.json({
+    kpis: {
+      kFactor: 0,
+      totalReach: 0,
+      conversionRate: 0,
+      totalRevenue: 0,
+      revenueChange: 0,
+    },
+    retention: [],
+    promotions: [],
+    broadcasts: [],
+  });
 });
 
 // GET /api/merchant-portal/inventory
