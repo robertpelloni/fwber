@@ -230,30 +230,26 @@ export default function RecommendationsPage() {
 
   const mixedMetadata = activeTab === 'mixed' ? mixedRecommendations?.metadata : null;
   const currentRankingStrategy = useMemo(() => {
-    switch (activeTab) {
-      case 'mixed':
-        return mixedRecommendations?.metadata?.ranking_strategy ?? null;
-      case 'ai':
-        return aiRecommendations?.metadata?.ranking_strategy ?? null;
-      case 'location':
-        return locationRecommendations?.metadata?.ranking_strategy ?? null;
-      case 'collaborative':
-        return collaborativeRecommendations?.metadata?.ranking_strategy ?? null;
-      case 'content':
-        return contentRecommendations?.metadata?.ranking_strategy ?? null;
-      case 'feed':
-        return personalizedFeed?.metadata?.ranking_strategy ?? null;
-      default:
-        return null;
-    }
+    const metadata = (() => {
+      switch (activeTab) {
+        case 'mixed': return mixedRecommendations?.metadata;
+        case 'ai': return aiRecommendations?.metadata;
+        case 'location': return locationRecommendations?.metadata;
+        case 'collaborative': return collaborativeRecommendations?.metadata;
+        case 'content': return contentRecommendations?.metadata;
+        case 'feed': return personalizedFeed?.metadata;
+        default: return null;
+      }
+    })();
+    return metadata?.ranking_strategy ?? null;
   }, [
     activeTab,
-    aiRecommendations?.metadata?.ranking_strategy,
-    collaborativeRecommendations?.metadata?.ranking_strategy,
-    contentRecommendations?.metadata?.ranking_strategy,
-    locationRecommendations?.metadata?.ranking_strategy,
-    mixedRecommendations?.metadata?.ranking_strategy,
-    personalizedFeed?.metadata?.ranking_strategy,
+    aiRecommendations?.metadata,
+    collaborativeRecommendations?.metadata,
+    contentRecommendations?.metadata,
+    locationRecommendations?.metadata,
+    mixedRecommendations?.metadata,
+    personalizedFeed?.metadata,
   ]);
 
   const renderRecommendationCard = (recommendation: Recommendation, index: number) => {
