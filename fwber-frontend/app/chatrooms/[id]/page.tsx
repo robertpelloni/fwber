@@ -162,7 +162,7 @@ export default function ChatroomPage() {
   const handleReaction = async (messageId: number, emoji: string) => {
     try {
       // Check if user already reacted with this emoji
-      const message = messages.find((m: any) => m.id === messageId);
+      const message = Array.isArray(messages) ? messages.find((m: any) => m.id === messageId) : null;
       const userReaction = message?.reactions?.find((r: any) => r.user_id === user?.id && r.emoji === emoji);
 
       if (userReaction) {
@@ -339,7 +339,7 @@ export default function ChatroomPage() {
                 <div key={message.id} className="flex items-start space-x-3">
                   <div className="flex-shrink-0 relative">
                     <div className="w-8 h-8 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                      {message.user?.name?.charAt(0).toUpperCase() || '?'}
+                      {(message.user?.display_name || message.user?.name || '?').charAt(0).toUpperCase()}
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5">
                       <PresenceIndicator userId={String(message.user?.id || message.user_id)} size="sm" />
@@ -348,7 +348,7 @@ export default function ChatroomPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {message.display_user}
+                        {message.user?.display_name || message.display_user || 'User'}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-500">
                         {formatTime(message.created_at)}
