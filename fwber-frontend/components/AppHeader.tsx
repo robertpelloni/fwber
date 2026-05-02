@@ -207,8 +207,8 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
     }
   }, [showNav])
 
-  const userDisplayName = user?.name || user?.email || 'User'
-  const userInitial = userDisplayName.charAt(0).toUpperCase()
+  const userDisplayName = user?.display_name || user?.name || user?.email || 'User'
+  const userInitial = (userDisplayName?.[0] || 'U').toUpperCase()
   const homeHref = user ? '/dashboard' : '/'
   const shouldShowBackButton = pathname !== homeHref
   const exploreSections = getExploreSections(user as { role?: string; is_moderator?: boolean } | null)
@@ -218,6 +218,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
   }
 
   const navigateHome = () => {
+    if (!homeHref) return;
     if (shouldUseHardNavigation(homeHref)) {
       window.location.href = homeHref
       return

@@ -120,87 +120,116 @@ export default function PublicProfilePage() {
   if (error) return <div className="text-red-500 p-8">{error}</div>;
   if (!profile) return <div className="p-8">Profile not found</div>;
 
-  const p = profile.profile || { display_name: 'User' };
-  const photos = Array.isArray(p.photos) ? p.photos : [];
+	const p = profile.profile || ({ display_name: 'User' } as any);
+	const photos = Array.isArray(p.photos) ? p.photos : [];
 
-  return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          {/* Main Photo & Header */}
-          <div className="relative h-96 w-full bg-gray-200 dark:bg-gray-700 flex justify-center items-center">
-            {photos[0] ? (
-              <EvolvingAvatar
-                src={photos[0].url}
-                alt={p.display_name || 'User'}
-                size="2xl"
-                emotion={p.current_emotion as any || 'neutral'}
-                className="w-64 h-64 border-4 shadow-xl mb-4"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-4xl text-gray-400">
-                {p.display_name?.[0]}
-              </div>
-            )}
+	return (
+		<ProtectedRoute>
+			<div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+				<div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+					{/* Main Photo & Header */}
+					<div className="relative h-96 w-full bg-gray-200 dark:bg-gray-700 flex justify-center items-center">
+						{photos[0] ? (
+							<EvolvingAvatar
+								src={photos[0].url}
+								alt={p.display_name || 'User'}
+								size="2xl"
+								emotion={(p.current_emotion as any) || 'neutral'}
+								className="w-64 h-64 border-4 shadow-xl mb-4"
+							/>
+						) : (
+							<div className="flex items-center justify-center h-full text-4xl text-gray-400">
+								{(p.display_name?.[0] || '?').toUpperCase()}
+							</div>
+						)}
 
-            {wingmanId && (
-              <div className="absolute top-4 left-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg animate-bounce z-10">
-                🧚 Wingman Recommended!
-              </div>
-            )}
+						{wingmanId && (
+							<div className="absolute top-4 left-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg animate-bounce z-10">
+								🧚 Wingman Recommended!
+							</div>
+						)}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+						<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-              <div className="flex justify-between items-end">
-                <div>
-                  <h1 className="text-3xl font-bold flex items-center gap-2">
-                    {p.display_name}, {p.age}
-                    <PresenceIndicator userId={String(profile.id)} />
-                  </h1>
-                  <p className="text-gray-200 mt-1">
-                    {p.location?.city}, {p.location?.state}
-                  </p>
-                </div>
-                <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
-              </div>
-            </div>
-          </div>
+						<div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+							<div className="flex justify-between items-end">
+								<div>
+									<h1 className="text-3xl font-bold flex items-center gap-2">
+										{p.display_name || 'Anonymous'}, {p.age || '??'}
+										<PresenceIndicator userId={String(profile.id)} />
+									</h1>
+									<p className="text-gray-200 mt-1">
+										{p.location?.city || 'Unknown'}, {p.location?.state || 'Location'}
+									</p>
+								</div>
+								<TipButton
+									recipientId={profile.id}
+									recipientName={p.display_name || 'User'}
+								/>
+							</div>
+						</div>
+					</div>
 
-          {/* Body */}
-          <div className="p-8">
+					{/* Body */}
+					<div className="p-8">
+						{p.vouches && p.vouches.length > 0 && (
+							<div className="flex gap-2 mb-6 flex-wrap">
+								<VouchBadge
+									type="safe"
+									count={p.vouches.filter((v: any) => v.type === 'safe').length}
+								/>
+								<VouchBadge
+									type="fun"
+									count={p.vouches.filter((v: any) => v.type === 'fun').length}
+								/>
+								<VouchBadge
+									type="hot"
+									count={p.vouches.filter((v: any) => v.type === 'hot').length}
+								/>
+							</div>
+						)}
+						<div>
+							<div className="flex justify-between items-center w-full">
+								<div>
+									<h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+										{p.display_name || 'Anonymous'}, {p.age || '??'}
+										<PresenceIndicator userId={String(profile.id)} />
+									</h1>
 
-            {(p.vouches && p.vouches.length > 0) && (
-              <div className="flex gap-2 mb-6 flex-wrap">
-                <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
-                <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
-                <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
-              </div>
-            )}
-            <div>
-              <div className="flex justify-between items-center w-full">
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    {p.display_name}, {p.age}
-                    <PresenceIndicator userId={String(profile.id)} />
-                  </h1>
+									{/* Vouches Summary */}
+									{p.vouches && p.vouches.length > 0 && (
+										<div className="flex gap-2 mt-2 flex-wrap">
+											<VouchBadge
+												type="safe"
+												count={
+													p.vouches.filter((v: any) => v.type === 'safe').length
+												}
+											/>
+											<VouchBadge
+												type="fun"
+												count={
+													p.vouches.filter((v: any) => v.type === 'fun').length
+												}
+											/>
+											<VouchBadge
+												type="hot"
+												count={
+													p.vouches.filter((v: any) => v.type === 'hot').length
+												}
+											/>
+										</div>
+									)}
 
-                  {/* Vouches Summary */}
-                  {(p.vouches && p.vouches.length > 0) && (
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      <VouchBadge type="safe" count={p.vouches.filter((v: any) => v.type === 'safe').length} />
-                      <VouchBadge type="fun" count={p.vouches.filter((v: any) => v.type === 'fun').length} />
-                      <VouchBadge type="hot" count={p.vouches.filter((v: any) => v.type === 'hot').length} />
-                    </div>
-                  )}
-
-                  <p className="text-gray-600 dark:text-gray-400 mt-1">
-                    {p.location?.city}, {p.location?.state}
-                  </p>
-                </div>
-                <TipButton recipientId={profile.id} recipientName={p.display_name || 'User'} />
-              </div>
-            </div>
+									<p className="text-gray-600 dark:text-gray-400 mt-1">
+										{p.location?.city || 'Unknown'}, {p.location?.state || 'Location'}
+									</p>
+								</div>
+								<TipButton
+									recipientId={profile.id}
+									recipientName={p.display_name || 'User'}
+								/>
+							</div>
+						</div>
 
             <div className="prose dark:prose-invert mb-8">
               <h3 className="text-lg font-semibold mb-2">About</h3>
@@ -392,7 +421,7 @@ export default function PublicProfilePage() {
           isOpen={isGiftModalOpen}
           onClose={() => setIsGiftModalOpen(false)}
           receiverId={profile.id}
-          receiverName={profile.profile.display_name || 'User'}
+          receiverName={p?.display_name || 'User'}
         />
       )}
     </ProtectedRoute>

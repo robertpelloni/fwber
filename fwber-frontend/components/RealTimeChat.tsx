@@ -206,13 +206,13 @@ export default function RealTimeChat({
 	const router = useRouter();
 
 	const {
-		messages,
-		typingIndicators,
-		onlineUsers,
+		messages = [],
+		typingIndicators = [],
+		onlineUsers = [],
 		sendMessage,
 		handleTypingChange,
 		isTyping,
-		currentNudges,
+		currentNudges = [],
 	} = useWebSocketChat(recipientId);
 
 	const [activeNudge, setActiveNudge] = useState<any>(null);

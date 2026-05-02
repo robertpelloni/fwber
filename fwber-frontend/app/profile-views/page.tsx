@@ -166,10 +166,10 @@ export default function ProfileViewsPage() {
                     className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50 transition-colors group"
                   >
                     <div className="relative">
-                      {view.viewer.avatar_url ? (
+                      {view.viewer?.avatar_url ? (
                         <Image
                           src={view.viewer.avatar_url}
-                          alt={view.viewer.name}
+                          alt={view.viewer?.name || 'User'}
                           width={56}
                           height={56}
                           className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
@@ -184,15 +184,15 @@ export default function ProfileViewsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-gray-900 dark:text-white truncate">
-                          {view.viewer.name}
+                          {view.viewer?.name || 'Anonymous User'}
                         </h3>
-                        {view.viewer.age && (
+                        {view.viewer?.age && (
                           <span className="text-sm text-gray-500 dark:text-gray-400">
                             {view.viewer.age}
                           </span>
                         )}
                       </div>
-                      {view.viewer.city && (
+                      {view.viewer?.city && (
                         <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                           <MapPin className="w-3 h-3" />
                           {view.viewer.city}

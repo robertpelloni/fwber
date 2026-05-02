@@ -5,14 +5,28 @@
 
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY,
-  baseURL: process.env.OPENROUTER_API_KEY ? 'https://openrouter.ai/api/v1' : undefined,
-  defaultHeaders: process.env.OPENROUTER_API_KEY ? {
+/**
+ * Configure AI Providers
+ * Primary: NVIDIA NIM (Free tier)
+ * Fallback: OpenRouter (Free models)
+ */
+const nvidia = process.env.NVIDIA_API_KEY ? new OpenAI({
+  apiKey: process.env.NVIDIA_API_KEY,
+  baseURL: 'https://integrate.api.nvidia.com/v1',
+}) : null;
+
+const openrouter = process.env.OPENROUTER_API_KEY ? new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
+  defaultHeaders: {
     'HTTP-Referer': 'https://www.fwber.me',
     'X-Title': 'fwber',
-  } : undefined
-});
+  }
+}) : null;
+
+const legacyOpenai = process.env.OPENAI_API_KEY ? new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+}) : null;
 
 /** Fetch a user's profile as a plain summary string for prompts */
 async function getProfileSummary(userId: bigint): Promise<string> {
@@ -32,7 +46,6 @@ async function getProfileSummary(userId: bigint): Promise<string> {
     const dob = profile.date_of_birth || profile.birthdate;
     const age = dob ? Math.floor((Date.now() - new Date(dob as any).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
     if (age) parts.push(`Age: ${age}`);
-    parts.push(`Age: ${age}`);
   }
   if (profile.location_description) parts.push(`Location: ${profile.location_description}`);
   if (profile.occupation) parts.push(`Occupation: ${profile.occupation}`);
@@ -55,20 +68,63 @@ async function getProfileSummary(userId: bigint): Promise<string> {
   return parts.join('\n');
 }
 
-/** Generic OpenAI chat completion helper */
+/** Generic AI chat completion helper with multi-provider failover */
 async function ask(system: string, user: string, temperature = 0.9): Promise<string> {
-  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
-  
-  const resp = await openai.chat.completions.create({
-    model: model,
-    messages: [
-      { role: 'system', content: system },
-      { role: 'user', content: user },
-    ],
-    temperature,
-    max_tokens: 800,
-  });
-  return resp.choices[0]?.message?.content?.trim() || '';
+  // 1. Try NVIDIA NIM (Meta Llama 3.1 8B Instruct)
+  if (nvidia) {
+    try {
+      const resp = await nvidia.chat.completions.create({
+        model: 'meta/llama-3.1-8b-instruct',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+        temperature,
+        max_tokens: 800,
+      });
+      return resp.choices[0]?.message?.content?.trim() || '';
+    } catch (err: any) {
+      console.error('[AI] NVIDIA NIM failed, falling back...', err.message);
+    }
+  }
+
+  // 2. Try OpenRouter (Google Gemini 2.0 Flash Lite Free)
+  if (openrouter) {
+    try {
+      const resp = await openrouter.chat.completions.create({
+        model: 'google/gemini-2.0-flash-lite-preview-02-05:free',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+        temperature,
+        max_tokens: 800,
+      });
+      return resp.choices[0]?.message?.content?.trim() || '';
+    } catch (err: any) {
+      console.error('[AI] OpenRouter failed, falling back...', err.message);
+    }
+  }
+
+  // 3. Last Resort: Legacy OpenAI Key
+  if (legacyOpenai) {
+    try {
+      const resp = await legacyOpenai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+        temperature,
+        max_tokens: 800,
+      });
+      return resp.choices[0]?.message?.content?.trim() || '';
+    } catch (err: any) {
+      console.error('[AI] Legacy OpenAI failed.', err.message);
+    }
+  }
+
+  return '';
 }
 
 // ─── Roast ──────────────────────────────────────────────────────────────────

@@ -23,14 +23,15 @@ interface ProximityPresenceViewProps {
  * Shows real-time presence of nearby users
  */
 export function ProximityPresenceView({
-  nearbyUsers,
+  nearbyUsers = [],
   currentLocation,
   maxDisplay = 8,
   className = '',
 }: ProximityPresenceViewProps) {
-  const userIds = useMemo(() => (nearbyUsers || []).map(u => u.id), [nearbyUsers]);
-  const displayUsers = (nearbyUsers || []).slice(0, maxDisplay);
-  const remainingCount = (nearbyUsers || []).length - maxDisplay;
+  const safeNearbyUsers = Array.isArray(nearbyUsers) ? nearbyUsers : [];
+  const userIds = useMemo(() => safeNearbyUsers.map(u => u.id), [safeNearbyUsers]);
+  const displayUsers = safeNearbyUsers.slice(0, maxDisplay);
+  const remainingCount = Math.max(0, safeNearbyUsers.length - maxDisplay);
 
   if (!currentLocation) {
     return (
@@ -90,14 +91,14 @@ export function ProximityPresenceView({
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center text-white font-medium">
-                    {user.displayName.charAt(0).toUpperCase()}
+                    {(user.displayName?.[0] || '?').toUpperCase()}
                   </div>
                   <div className="absolute -bottom-0.5 -right-0.5">
                     <PresenceIndicator userId={user.id} size="sm" />
                   </div>
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white text-sm">{user.displayName}</p>
+                  <p className="font-medium text-gray-900 dark:text-white text-sm">{user.displayName || 'Nearby User'}</p>
                   {user.distance !== undefined && (
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {user.distance < 1
@@ -120,7 +121,7 @@ export function ProximityPresenceView({
                 prefetch={false}
                 className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700"
               >
-                View all {nearbyUsers.length} nearby →
+                View all {safeNearbyUsers.length} nearby →
               </Link>
             </div>
           )}
