@@ -206,32 +206,40 @@ router.get('/date-ideas/:matchId', async (req: any, res) => {
 // ─── Ice Breakers ───────────────────────────────────────────────────────────
 
 router.get('/ice-breakers/:matchId', async (req: any, res) => {
+  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
   try {
     const suggestion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: 'Generate one clever, unique dating ice breaker message. Just the message text, nothing else. Be specific and creative — avoid clichés.' }],
+      model: model,
+      messages: [{ role: 'user', content: 'Generate three clever, unique dating ice breaker messages. Be specific and creative — avoid clichés. Format as a JSON array of strings: ["suggestion1", "suggestion2", "suggestion3"]' }],
       temperature: 0.95,
-      max_tokens: 100,
+      max_tokens: 300,
     });
-    res.json({ suggestion: suggestion.choices[0]?.message?.content?.trim() || 'What\'s the most spontaneous thing you\'ve done this week?' });
+    const text = suggestion.choices[0]?.message?.content?.trim() || '';
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+    const suggestions = JSON.parse(cleaned);
+    res.json({ suggestions: Array.isArray(suggestions) ? suggestions : [suggestions] });
   } catch (err: any) {
-    res.json({ suggestion: 'Ask about their favorite local spot — it always sparks a great conversation.' });
+    res.json({ suggestions: ['What\'s the most spontaneous thing you\'ve done this week?', 'If you could have dinner with any historical figure, who would it be?', 'What\'s your favorite local spot?'] });
   }
 });
 
 // ─── Reply Suggestions ──────────────────────────────────────────────────────
 
 router.get('/replies/:matchId', async (req: any, res) => {
+  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
   try {
     const suggestion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: 'Generate one clever, flirty dating reply suggestion. Just the message text. Be witty and engaging.' }],
+      model: model,
+      messages: [{ role: 'user', content: 'Generate three clever, flirty dating reply suggestions. Be witty and engaging. Format as a JSON array of strings: ["reply1", "reply2", "reply3"]' }],
       temperature: 0.95,
-      max_tokens: 100,
+      max_tokens: 300,
     });
-    res.json({ suggestion: suggestion.choices[0]?.message?.content?.trim() || 'That\'s awesome! What made you choose that?' });
+    const text = suggestion.choices[0]?.message?.content?.trim() || '';
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+    const suggestions = JSON.parse(cleaned);
+    res.json({ suggestions: Array.isArray(suggestions) ? suggestions : [suggestions] });
   } catch (err: any) {
-    res.json({ suggestion: 'That\'s awesome! What made you choose that?' });
+    res.json({ suggestions: ['That\'s awesome! What made you choose that?', 'Tell me more about that!', 'I love your vibe!'] });
   }
 });
 

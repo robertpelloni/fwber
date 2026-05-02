@@ -235,25 +235,27 @@ export function ActivityFeed({
             >
               {/* User Avatar with Presence */}
               <div className="relative flex-shrink-0">
-                {activity.user.avatar_url ? (
+                {activity.user?.avatar_url ? (
                   <Image
                     src={activity.user.avatar_url}
-                    alt={activity.user.name}
+                    alt={activity.user.name || 'User'}
                     width={40}
                     height={40}
                     className="rounded-full object-cover"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white font-bold">
-                    {activity.user.name.charAt(0).toUpperCase()}
+                    {(activity.user?.name?.[0] || '?').toUpperCase()}
                   </div>
                 )}
                 {/* Presence Indicator */}
-                <PresenceIndicator 
-                  userId={String(activity.user.id)} 
-                  size="sm" 
-                  className="absolute -bottom-0.5 -right-0.5"
-                />
+                {activity.user?.id && (
+                  <PresenceIndicator 
+                    userId={String(activity.user.id)} 
+                    size="sm" 
+                    className="absolute -bottom-0.5 -right-0.5"
+                  />
+                )}
               </div>
 
               {/* Activity Content */}
@@ -261,9 +263,9 @@ export function ActivityFeed({
                 <div className="flex items-center gap-2 mb-0.5">
                   {getActivityIcon(activity.type)}
                   <span className="font-medium text-gray-900 dark:text-white truncate">
-                    {activity.user.name}
+                    {activity.user?.name || 'Anonymous User'}
                   </span>
-                  {onlineUserIds.has(String(activity.user.id)) && (
+                  {activity.user?.id && onlineUserIds.has(String(activity.user.id)) && (
                     <span className="px-1.5 py-0.5 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
                       Online
                     </span>

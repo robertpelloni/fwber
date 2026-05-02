@@ -90,7 +90,7 @@ export default function MessagesPage() {
 		// Use inline confirmation instead of native confirm()
 		confirmAction({
 			title: "Block User",
-			message: `Are you sure you want to block ${otherUser.name}? You will no longer see their messages or profile.`,
+			message: `Are you sure you want to block ${otherUser.profile?.display_name || otherUser.email || 'this user'}? You will no longer see their messages or profile.`,
 			confirmLabel: "Block",
 			variant: "destructive",
 			onConfirm: async () => {
@@ -281,8 +281,10 @@ export default function MessagesPage() {
 											<div className="flex items-center space-x-3">
 												<div className="relative">
 													<div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-														{conversation.other_user?.profile
-															?.display_name?.[0] || "?"}
+														{(conversation.other_user?.profile
+															?.display_name?.[0] || 
+														  conversation.other_user?.email?.[0] ||
+														  "?").toUpperCase()}
 													</div>
 													<div className="absolute -bottom-0.5 -right-0.5">
 														<PresenceIndicator

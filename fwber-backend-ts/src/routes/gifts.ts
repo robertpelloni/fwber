@@ -1,31 +1,95 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
+import prisma from '../lib/prisma.js';
 
 const router = Router();
 
 // GET /api/gifts - Get all gifts (summary)
 router.get('/', authenticate, async (req: any, res) => {
-  res.json({ received: [], sent: [], available: [] });
-});
+  try {
+    const userId = BigInt(req.user.id);
+    const received = await prisma.user_gifts.findMany({
+      where: { recipient_id: userId },
+      include: { gifts: true, users_user_gifts_sender_idTousers: { select: { name: true } } }
+    });
+    const sent = await prisma.user_gifts.findMany({
+      where: { sender_id: userId },
+      include: { gifts: true, users_user_gifts_recipient_idTousers: { select: { name: true } } }
+    });
+    const available = await prisma.gifts.findMany({ where: { is_active: true } });
 
-// GET /api/gifts/received - Get received gifts
-router.get('/received', authenticate, async (req: any, res) => {
-  res.json([]);
-});
-
-// GET /api/gifts/sent - Get sent gifts
-router.get('/sent', authenticate, async (req: any, res) => {
-  res.json([]);
+    res.json({
+      received: received.map(g => ({
+        id: Number(g.id),
+        gift: g.gifts,
+        from: g.users_user_gifts_sender_idTousers.name,
+        created_at: g.created_at
+      })),
+      sent: sent.map(g => ({
+        id: Number(g.id),
+        gift: g.gifts,
+        to: g.users_user_gifts_recipient_idTousers.name,
+        created_at: g.created_at
+      })),
+      available
+    });
+  } catch (err) {
+    res.json({ received: [], sent: [], available: [] });
+  }
 });
 
 // GET /api/gifts/available - Get available gifts to send
 router.get('/available', authenticate, async (req: any, res) => {
-  res.json({ gifts: [] });
+  try {
+    const gifts = await prisma.gifts.findMany({ where: { is_active: true } });
+    res.json({ gifts });
+  } catch (err) {
+    res.json({ gifts: [] });
+  }
 });
 
 // POST /api/gifts/send - Send a gift
 router.post('/send', authenticate, async (req: any, res) => {
-  res.json({ success: true, gift: req.body });
+  try {
+    const { recipient_id, gift_id, message } = req.body;
+    const senderId = BigInt(req.user.id);
+    const recipientId = BigInt(recipient_id);
+    const giftId = BigInt(gift_id);
+
+    const gift = await prisma.gifts.findUnique({ where: { id: giftId } });
+    if (!gift) return res.status(404).json({ error: 'Gift not found' });
+
+    // Check balance
+    const sender = await prisma.users.findUnique({ where: { id: senderId }, select: { token_balance: true } });
+    if (!sender || (sender.token_balance || 0) < gift.cost) {
+      return res.status(400).json({ error: 'Insufficient token balance' });
+    }
+
+    // Transactional send
+    const [userGift] = await prisma.$transaction([
+      prisma.user_gifts.create({
+        data: {
+          sender_id: senderId,
+          recipient_id: recipientId,
+          gift_id: giftId,
+          message: message || '',
+        }
+      }),
+      prisma.users.update({
+        where: { id: senderId },
+        data: { token_balance: { decrement: gift.cost } }
+      }),
+      prisma.users.update({
+        where: { id: recipientId },
+        data: { token_balance: { increment: Math.floor(gift.cost * 0.8) } } // Recipient gets 80% value
+      })
+    ]);
+
+    res.json({ success: true, gift: userGift });
+  } catch (error: any) {
+    console.error('[Gifts] Error sending:', error.message);
+    res.status(500).json({ error: 'Failed to send gift' });
+  }
 });
 
 export default router;

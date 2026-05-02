@@ -70,33 +70,58 @@ router.get('/activity', async (req: any, res) => {
     // Recent matches
     const recentMatches = await prisma.matches.findMany({
       where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' },
+      include: {
+        users_matches_user1_idTousers: { include: { user_profiles: true } },
+        users_matches_user2_idTousers: { include: { user_profiles: true } },
+      },
       orderBy: { created_at: 'desc' },
-      take: 3,
+      take: 5,
     });
     for (const m of recentMatches) {
-      const partnerId = m.user1_id === userId ? m.user2_id : m.user1_id;
-      const profile = await prisma.user_profiles.findFirst({ where: { user_id: partnerId }, select: { display_name: true } });
-      activities.push({ id: Number(m.id), type: 'match', description: 'New match with ' + (profile?.display_name || 'someone'), created_at: m.created_at?.toISOString() });
+      const isUser1 = m.user1_id === userId;
+      const partner = isUser1 ? m.users_matches_user2_idTousers : m.users_matches_user1_idTousers;
+      const profile = Array.isArray(partner.user_profiles) ? partner.user_profiles[0] : partner.user_profiles;
+      
+      activities.push({
+        id: `match-${m.id}`,
+        type: 'match',
+        user: {
+          id: Number(partner.id),
+          name: profile?.display_name || partner.name || 'Anonymous',
+          avatar_url: profile?.avatar_url || null,
+        },
+        timestamp: m.created_at?.toISOString(),
+      });
     }
 
-    // Recent messages
-    const recentMsgs = await prisma.messages.findMany({
-      where: { OR: [{ sender_id: userId }, { receiver_id: userId }] },
-      orderBy: { sent_at: 'desc' }, take: 3,
+    // Recent profile views
+    const views = await prisma.profile_views.findMany({
+      where: { viewed_user_id: userId },
+      include: { users_profile_views_viewer_user_idTousers: { include: { user_profiles: true } } },
+      orderBy: { created_at: 'desc' },
+      take: 5,
     });
-    const seenPartners = new Set<string>();
-    for (const msg of recentMsgs) {
-      const partnerId = msg.sender_id === userId ? Number(msg.receiver_id) : Number(msg.sender_id);
-      if (seenPartners.has(String(partnerId))) continue;
-      seenPartners.add(String(partnerId));
-      const profile = await prisma.user_profiles.findFirst({ where: { user_id: BigInt(partnerId) }, select: { display_name: true } });
-      activities.push({ id: Number(msg.id) + 100000, type: 'message', description: 'Message from ' + (profile?.display_name || 'someone'), created_at: msg.sent_at?.toISOString() });
+    for (const v of views) {
+      const viewer = v.users_profile_views_viewer_user_idTousers;
+      if (!viewer) continue;
+      const profile = Array.isArray(viewer.user_profiles) ? viewer.user_profiles[0] : viewer.user_profiles;
+      
+      activities.push({
+        id: `view-${v.id}`,
+        type: 'view',
+        user: {
+          id: Number(viewer.id),
+          name: profile?.display_name || viewer.name || 'Anonymous',
+          avatar_url: profile?.avatar_url || null,
+        },
+        timestamp: v.created_at?.toISOString(),
+      });
     }
 
-    activities.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    activities.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
     res.json(activities.slice(0, limit));
   } catch (error: any) {
-    console.error('[Dashboard] Activity error:', error.message);
+    console.error('[Dashboard] Activity error:', error.message, error.stack);
     res.json([]);
   }
 });
