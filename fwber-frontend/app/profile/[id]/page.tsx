@@ -91,8 +91,16 @@ export default function PublicProfilePage() {
   const handleAction = async (action: 'like' | 'pass') => {
     if (!token || !profile) return;
 
+    // Use Number(id) to ensure it's a numeric ID as expected by performMatchAction
+    const targetUserId = Number(id);
+
+    if (isNaN(targetUserId)) {
+      showError('Error', 'Invalid user ID.');
+      return;
+    }
+
     try {
-      await performMatchAction(profile.id, action);
+      await performMatchAction(targetUserId, action);
       setActionPerformed(true);
       if (action === 'like') {
         showSuccess('Liked!', 'If they like you back, it\'s a match!');
