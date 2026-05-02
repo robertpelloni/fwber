@@ -4,6 +4,7 @@ import prisma from '../lib/prisma.js';
 import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
+import { sendNotificationEmail } from '../lib/email.js';
 
 const router = Router();
 
@@ -193,8 +194,82 @@ router.get('/me', authenticate, async (req: any, res) => {
 });
 
 // POST /api/user/export - GDPR data export
-router.post('/export', authenticate, async (_req: any, res) => {
-  res.json({ message: 'Data export requested. You will receive a download link via email.', status: 'pending' });
+router.post('/export', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      include: {
+        user_profiles: true,
+        photos: true,
+        messages_sent: {
+          take: 100,
+          orderBy: { created_at: 'desc' }
+        },
+        matches_as_user1: {
+          take: 50,
+          include: { users_matches_user2_idTousers: { select: { name: true } } }
+        },
+        matches_as_user2: {
+          take: 50,
+          include: { users_matches_user1_idTousers: { select: { name: true } } }
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Structure the data for export
+    const exportData = {
+      account: {
+        id: user.id.toString(),
+        email: user.email,
+        created_at: user.created_at,
+        last_login: user.last_login_at
+      },
+      profile: user.user_profiles?.[0] || {},
+      photos: user.photos.map(p => ({
+        url: p.file_path || p.url,
+        is_primary: p.is_primary,
+        created_at: p.created_at
+      })),
+      recent_messages: user.messages_sent.map(m => ({
+        content: m.content,
+        timestamp: m.created_at
+      })),
+      recent_matches: [
+        ...user.matches_as_user1.map(m => ({ partner: m.users_matches_user2_idTousers?.name, date: m.created_at, status: m.status })),
+        ...user.matches_as_user2.map(m => ({ partner: m.users_matches_user1_idTousers?.name, date: m.created_at, status: m.status }))
+      ]
+    };
+
+    // In a real production environment, we'd generate a ZIP/JSON and upload to S3
+    // For now, we'll email the JSON summary to the user's registered email
+    const emailBody = `
+      <h1>Your FWBer Data Export</h1>
+      <p>Hello, you requested an export of your personal data.</p>
+      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+${JSON.stringify(exportData, null, 2)}
+      </pre>
+      <p>If you did not request this, please secure your account immediately.</p>
+    `;
+
+    await sendNotificationEmail(
+      user.email || '',
+      'FWBer Data Export Request',
+      emailBody
+    );
+
+    res.json({ 
+      message: 'Data export generated and sent to your email.', 
+      status: 'completed' 
+    });
+  } catch (err) {
+    console.error('[export] error:', err);
+    res.status(500).json({ message: 'Failed to process data export' });
+  }
 });
 
 // GET /api/user/export/status - Export status

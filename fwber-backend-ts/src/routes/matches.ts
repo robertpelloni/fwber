@@ -138,14 +138,15 @@ router.get('/', authenticate, async (req: any, res) => {
  */
 router.post('/action', authenticate, async (req: any, res) => {
   try {
+    // Standardize IDs
     const userId = BigInt(req.user.id);
-    const { target_user_id, action } = req.body;
+    const targetUserIdRaw = req.body.target_user_id || req.body.targetUserId;
 
-    if (!target_user_id || !action) {
+    if (!targetUserIdRaw || !action) {
       return res.status(400).json({ message: 'target_user_id and action are required' });
     }
 
-    const targetId = BigInt(target_user_id);
+    const targetId = BigInt(targetUserIdRaw);
 
     if (action === 'pass') {
       return res.json({ action: 'pass', is_match: false, message: 'Passed' });
