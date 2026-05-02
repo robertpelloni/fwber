@@ -217,7 +217,7 @@ export function ConnectionStatusBadge({
     }
   }, []);
 
-  const { connected, connecting, configured = true, reconnectAttempts } = context.connectionStatus;
+  const { connected, connecting, configured = true, reconnectAttempts } = context?.connectionStatus || { connected: false, connecting: false, configured: false, reconnectAttempts: 0 };
   const isReconnecting = !connected && reconnectAttempts > 0;
 
   if (!isOnline) {

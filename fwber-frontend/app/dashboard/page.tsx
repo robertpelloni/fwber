@@ -70,13 +70,15 @@ export default function DashboardPage() {
         if (data?.streak_just_updated) {
           setIsStreakModalOpen(true);
         }
-        return data;
+        return data || null;
       } catch (error) {
         console.error('Dashboard stats fetch failed:', error);
         return null;
       }
     },
   });
+
+  const dailyStreak = stats?.current_streak || 0;
 
   return (
     <ProtectedRoute>
@@ -85,7 +87,7 @@ export default function DashboardPage() {
 
         <DailyStreakModal
           isOpen={isStreakModalOpen}
-          currentStreak={stats?.current_streak || 0}
+          currentStreak={dailyStreak}
           onClose={() => setIsStreakModalOpen(false)}
         />
 
