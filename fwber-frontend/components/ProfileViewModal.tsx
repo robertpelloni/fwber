@@ -35,10 +35,11 @@ interface ProfileViewModalProps {
     }
   }
   messagesExchanged: number
-  matchId?: number
+  matchId?: number;
+  onAction?: (action: 'like' | 'pass' | 'super_like') => void;
 }
 
-export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId }: ProfileViewModalProps) {
+export default function ProfileViewModal({ isOpen, onClose, user, messagesExchanged, matchId, onAction }: ProfileViewModalProps) {
   const router = useRouter()
   const { user: currentUser } = useAuth()
   const [isVisible, setIsVisible] = useState(false)
@@ -452,9 +453,82 @@ export default function ProfileViewModal({ isOpen, onClose, user, messagesExchan
               <SimplePhotoGrid />
             )}
           </div>
+
+          {/* Floating Action Buttons */}
+          {onAction && (
+            <div className="sticky bottom-0 left-0 right-0 py-4 bg-gradient-to-t from-white dark:from-gray-900 via-white dark:via-gray-900 flex justify-center gap-6 z-30">
+              <button
+                className="h-14 w-14 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 bg-white dark:bg-gray-800"
+                onClick={() => {
+                  onAction('pass');
+                  onClose();
+                }}
+              >
+                <X className="h-8 w-8" />
+              </button>
+
+              <button
+                className="h-10 w-10 rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 flex items-center justify-center mt-2 shadow-lg transition-transform hover:scale-110 active:scale-95 bg-white dark:bg-gray-800"
+                onClick={() => {
+                  onAction('super_like');
+                  onClose();
+                }}
+              >
+                <Star className="h-5 w-5" />
+              </button>
+
+              <button
+                className="h-14 w-14 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 bg-white dark:bg-gray-800"
+                onClick={() => {
+                  onAction('like');
+                  onClose();
+                }}
+              >
+                <Heart className="h-8 w-8" />
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
     </div>
+  )
+}
+
+function Star(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  )
+}
+
+function Heart(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+    </svg>
   )
 }

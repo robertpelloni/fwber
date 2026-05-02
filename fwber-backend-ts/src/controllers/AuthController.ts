@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import prisma from '../lib/prisma.js';
 
+import { sendVerificationEmail } from '../lib/email.js';
+import crypto from 'crypto';
+
 const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
@@ -85,6 +88,14 @@ export class AuthController {
           display_name: user.name,
         }
       });
+
+      // Send verification email
+      try {
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        await sendVerificationEmail(user.email, verificationToken);
+      } catch (err) {
+        console.error('[Auth] Failed to send initial verification email:', err);
+      }
 
       const token = this.generateToken(user);
       const hydrated = await this.hydrateUser(user);

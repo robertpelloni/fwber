@@ -374,6 +374,7 @@ export default function MatchesPage() {
 						<ProfileViewModal
 							isOpen={isProfileOpen}
 							onClose={() => setIsProfileOpen(false)}
+							onAction={handleAction}
 							user={{
 								id: currentMatch.id,
 								profile: {

@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
+import emailRoutes from './routes/email.js';
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
 import dashboardRoutes from './routes/dashboard.js';
@@ -107,6 +108,7 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/email', emailRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/users', profileRoutes);
