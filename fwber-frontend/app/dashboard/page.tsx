@@ -65,11 +65,16 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats'],
     enabled: isAuthenticated && !!token,
     queryFn: async () => {
-      const data = await api.get<DashboardStats & { current_streak: number; streak_just_updated: boolean; reverb_healthy?: boolean }>('/dashboard/stats');
-      if (data.streak_just_updated) {
-        setIsStreakModalOpen(true);
+      try {
+        const data = await api.get<DashboardStats & { current_streak: number; streak_just_updated: boolean; reverb_healthy?: boolean }>('/dashboard/stats');
+        if (data?.streak_just_updated) {
+          setIsStreakModalOpen(true);
+        }
+        return data;
+      } catch (error) {
+        console.error('Dashboard stats fetch failed:', error);
+        return null;
       }
-      return data;
     },
   });
 

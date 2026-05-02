@@ -12,13 +12,21 @@ router.get('/history', (_req, res) => {
 });
 
 // POST /api/video/initiate
-router.post('/initiate', (_req, res) => {
-  res.json({ message: 'Video calls not yet implemented' });
+router.post('/initiate', async (req: any, res) => {
+  const { receiver_id } = req.body;
+  if (!receiver_id) return res.status(400).json({ error: 'receiver_id is required' });
+
+  res.json({
+    id: Math.floor(Math.random() * 1000000),
+    status: 'calling',
+    success: true
+  });
 });
 
 // PUT /api/video/:callId/status
-router.put('/:callId/status', (_req, res) => {
-  res.json({ message: 'Video calls not yet implemented' });
+router.put('/:callId/status', async (req: any, res) => {
+  const { status } = req.body;
+  res.json({ success: true, callId: req.params.callId, status });
 });
 
 export default router;

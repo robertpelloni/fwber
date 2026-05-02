@@ -77,9 +77,16 @@ router.get('/categories', async (_req: any, res) => {
       select: { category: true },
       distinct: ['category'],
     });
-    res.json(cats.map((c: any) => c.category).filter(Boolean));
+    
+    const dbCategories = cats.map((c: any) => c.category).filter(Boolean);
+    const defaultCategories = ['dating', 'social', 'hobbies', 'support', 'gaming', 'music', 'fitness', 'travel', 'tech', 'kink'];
+    
+    // Combine and deduplicate
+    const allCategories = Array.from(new Set([...defaultCategories, ...dbCategories]));
+    
+    res.json(allCategories);
   } catch (error: any) {
-    res.json(['general', 'dating', 'hobbies', 'social', 'support', 'gaming', 'music', 'fitness']);
+    res.json(['dating', 'social', 'hobbies', 'support', 'gaming', 'music', 'fitness']);
   }
 });
 

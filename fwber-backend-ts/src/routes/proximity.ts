@@ -7,10 +7,18 @@ const router = Router();
 router.get('/local-pulse', authenticate, async (req: any, res) => {
   res.json({
     artifacts: [],
+    candidates: [], // Matches frontend expectation for nearby matches
     profiles: [],
     venues: [],
     total: 0,
     radius: Number(req.query.radius) || 1000,
+    meta: {
+      artifacts_count: 0,
+      candidates_count: 0,
+      venues_count: 0,
+      radius: Number(req.query.radius) || 1000,
+      ranking_strategy: 'freshness'
+    }
   });
 });
 

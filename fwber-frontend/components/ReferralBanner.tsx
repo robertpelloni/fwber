@@ -16,7 +16,11 @@ export default function ReferralBanner() {
   useEffect(() => {
     if (refCode) {
       // Store referral code in local storage so it persists during registration
-      localStorage.setItem('fwber_referral_code', refCode)
+      try {
+        localStorage.setItem('fwber_referral_code', refCode)
+      } catch (e) {
+        console.error("Failed to store referral code", e)
+      }
 
       const checkCode = async () => {
         try {

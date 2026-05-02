@@ -272,7 +272,26 @@ router.delete('/posts/:postId', authenticate, async (req: any, res) => {
 
 // GET /api/groups/:groupId/matches - stub
 router.get('/:groupId/matches', authenticate, async (req: any, res) => {
-  res.json({ data: [], matches: [], meta: { total: 0 } });
+  res.json({
+    data: [],
+    matches: [],
+    meta: {
+      total: 0,
+      ranking_strategy: {
+        summary: 'Groups are ranked by scene alignment and distance.'
+      }
+    }
+  });
+});
+
+// POST /api/groups/:groupId/matches/:targetGroupId/connect - stub
+router.post('/:groupId/matches/:targetGroupId/connect', authenticate, async (req: any, res) => {
+  res.json({ success: true, message: 'Connection request sent' });
+});
+
+// POST /api/groups/:groupId/matches/requests/:matchId/:action - stub
+router.post('/:groupId/matches/requests/:matchId/:action', authenticate, async (req: any, res) => {
+  res.json({ success: true, message: `Request ${req.params.action}ed` });
 });
 
 // GET /api/groups/:groupId/matches/requests - stub

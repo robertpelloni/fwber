@@ -112,8 +112,9 @@ export function ActivityFeed({
       case 'mutual_like':
         return 'It\'s a mutual match! 💕';
       case 'message':
-        return activity.message 
-          ? `sent you a message: "${activity.message.substring(0, 50)}${activity.message.length > 50 ? '...' : ''}"`
+        const msg = activity.message || '';
+        return msg.length > 0 
+          ? `sent you a message: "${msg.substring(0, 50)}${msg.length > 50 ? '...' : ''}"`
           : 'sent you a message';
       case 'view':
         return 'viewed your profile';
