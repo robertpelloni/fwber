@@ -11,7 +11,7 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 
 // GET /api/premium/who-likes-you - Users who liked current user
 router.get('/who-likes-you', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   try {
     // Return people who liked us (match_actions with type 'like' where target is us)
     const likes = await prisma.match_actions.findMany({
@@ -25,16 +25,31 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
             id: true,
             name: true,
             avatar_url: true,
-            bio: true
+            user_profiles: {
+              select: {
+                bio: true,
+                avatar_url: true
+              }
+            }
           }
         }
       },
       take: 50
     });
 
-    const users = likes.map(l => l.users_match_actions_user_idTousers);
+    const users = likes.map(l => {
+      const u = l.users_match_actions_user_idTousers;
+      const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+      return {
+        id: Number(u.id),
+        name: u.name,
+        avatar_url: p?.avatar_url || u.avatar_url,
+        bio: p?.bio
+      };
+    });
     res.json({ users, total: users.length });
-  } catch (error) {
+  } catch (error: any) {
+    console.error('[Premium] Who-likes-you error:', error.message);
     res.status(500).json({ error: 'Failed to fetch likes' });
   }
 });
