@@ -781,7 +781,7 @@ router.get("/search", authenticate, async (req: any, res) => {
 		});
 
 		res.json(
-			users.map((u) => {
+			users.map((u: any) => {
 				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
 				return {
 					id: Number(u.id),
