@@ -762,19 +762,20 @@ router.get("/search", authenticate, async (req: any, res) => {
 		const users = await prisma.users.findMany({
 			where: {
 				OR: [
-					{ display_name: { contains: String(q) } },
+					{ name: { contains: String(q) } },
 					{ email: { contains: String(q) } },
 				],
 			},
 			take: 20,
 			select: {
 				id: true,
-				display_name: true,
+				name: true,
 				email: true,
 				user_profiles: {
 					select: {
 						bio: true,
 						location_description: true,
+						display_name: true,
 					},
 				},
 			},
@@ -782,12 +783,12 @@ router.get("/search", authenticate, async (req: any, res) => {
 
 		res.json(
 			users.map((u: any) => {
-				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : (u as any).user_profiles;
+				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
 				return {
 					id: Number(u.id),
 					email: u.email,
 					profile: {
-						display_name: u.display_name,
+						display_name: p?.display_name || u.name,
 						bio: p?.bio,
 						location: {
 							city: p?.location_description?.split(",")[0] || "",
