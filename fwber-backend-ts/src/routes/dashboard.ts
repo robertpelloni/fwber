@@ -46,13 +46,13 @@ async function calculateCompleteness(userId: bigint, profile: any) {
   if (birthDate) earned += 10;
   if (profile.location_description || profile.location_latitude) earned += 10;
   if (interestsArr.length >= 3) earned += 10;
-  if (profile.occupation || prefs.occupation) earned += 5;
-  if (profile.education || prefs.education) earned += 5;
+  if (profile.occupation || (prefs && prefs.occupation)) earned += 5;
+  if (profile.education || (prefs && prefs.education)) earned += 5;
   if (profile.height_cm) earned += 3;
   if (profile.religion) earned += 3;
   if (profile.political_views) earned += 3;
-  if (profile.drinking_status || prefs.drinking) earned += 3;
-  if (profile.smoking_status || prefs.smoking) earned += 3;
+  if (profile.drinking_status || (prefs && prefs.drinking)) earned += 3;
+  if (profile.smoking_status || (prefs && prefs.smoking)) earned += 3;
 
   return earned;
 }

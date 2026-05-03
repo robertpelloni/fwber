@@ -259,41 +259,24 @@ export default function ProfilePage() {
 		enabled: !isLoading && !!effectiveToken && autoSaveEnabled,
 	});
 
-	// Calculate completeness from current form data
-	const currentCompleteness = useMemo(() => {
-		// Use the backend's pre-calculated percentage if available and we haven't edited anything
-		if (profile?.profile?.completion_percentage != null && !autoSaveEnabled) {
-			return {
-				percentage: Number(profile.profile.completion_percentage),
-				completedFields: [],
-				missingFields: [],
-				requiredMissing: [],
-			};
-		}
-		return calculateProfileCompleteness({
-			displayName: formData.display_name,
-			age: formData.date_of_birth
-				? Math.floor(
-						(Date.now() - new Date(formData.date_of_birth).getTime()) /
-							31536000000,
-					)
-				: undefined,
-			location:
-				formData.location.city && formData.location.state
-					? `${formData.location.city}, ${formData.location.state}`
-					: undefined,
-			bio: formData.bio,
-			photos: photos.map((p) => p.url),
-			interests: getCombinedInterestValues(formData),
-			occupation: formData.preferences.occupation,
-			education: formData.preferences.education,
-			height: formData.height_cm,
-			religion: formData.religion,
-			politics: formData.political_views,
-			drinking: formData.drinking_status,
-			smoking: formData.smoking_status,
-		});
-	}, [formData, photos, getCombinedInterestValues, profile, autoSaveEnabled]);
+  // Calculate completeness from current form data
+  const currentCompleteness = useMemo(() => {
+    // We always calculate locally to ensure immediate UI feedback
+    return calculateProfileCompleteness({
+      photos: photos.map((p) => p.url),
+      bio: formData.bio,
+      age: formData.date_of_birth,
+      location: formData.location.city || formData.location.latitude ? 'set' : '',
+      interests: getCombinedInterestValues(formData),
+      occupation: formData.preferences.occupation || formData.occupation,
+      education: formData.preferences.education || formData.education,
+      height: formData.height_cm,
+      religion: formData.religion,
+      politics: formData.political_views,
+      drinking: formData.drinking_status || formData.preferences.drinking,
+      smoking: formData.smoking_status || formData.preferences.smoking,
+    });
+  }, [formData, photos, getCombinedInterestValues]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -340,122 +323,109 @@ export default function ProfilePage() {
 
 			// Populate form with existing data
 			if (profileData.profile) {
+				const p = profileData.profile;
 				setFormData({
-					display_name: profileData.profile.display_name || "",
-					bio: profileData.profile.bio || "",
-					date_of_birth: (profileData.profile as any).date_of_birth || "",
-					gender: profileData.profile.gender || "",
-					pronouns: profileData.profile.pronouns || "",
-					sexual_orientation: profileData.profile.sexual_orientation || "",
-					relationship_style: profileData.profile.relationship_style || "",
-					looking_for: profileData.profile.looking_for || [],
+					display_name: p.display_name || "",
+					bio: p.bio || "",
+					date_of_birth: p.date_of_birth || (p as any).birthdate || "",
+					gender: p.gender || "",
+					pronouns: p.pronouns || "",
+					sexual_orientation: p.sexual_orientation || "",
+					relationship_style: p.relationship_style || "",
+					looking_for: p.looking_for || [],
 					location: {
-						latitude: profileData.profile.location.latitude ?? undefined,
-						longitude: profileData.profile.location.longitude ?? undefined,
-						max_distance: profileData.profile.location.max_distance || 25,
-						match_scope: profileData.profile.location.match_scope || "local",
-						search_country: profileData.profile.location.search_country || "",
-						search_city: profileData.profile.location.search_city || "",
-						city: profileData.profile.location.city || "",
-						state: profileData.profile.location.state || "",
+						latitude: p.location.latitude ?? undefined,
+						longitude: p.location.longitude ?? undefined,
+						max_distance: p.location.max_distance || 25,
+						match_scope: p.location.match_scope || "local",
+						search_country: p.location.search_country || "",
+						search_city: p.location.search_city || "",
+						city: p.location.city || "",
+						state: p.location.state || "",
 					},
 					// New Optional Attributes
-					love_language: profileData.profile.love_language || "",
-					personality_type: profileData.profile.personality_type || "",
-					chronotype: profileData.profile.chronotype || "",
-					social_media: profileData.profile.social_media || {},
-					communication_style: profileData.profile.communication_style || "",
-					blood_type: profileData.profile.blood_type || "",
-					sti_status: profileData.profile.sti_status || {},
-					family_plans: profileData.profile.family_plans || "",
-					relationship_goals: profileData.profile.relationship_goals || "",
-					languages: profileData.profile.languages || [],
-					zodiac_sign: profileData.profile.zodiac_sign || "",
-					drinking_status: profileData.profile.drinking_status || "",
-					smoking_status: profileData.profile.smoking_status || "",
-					cannabis_status: profileData.profile.cannabis_status || "",
-					dietary_preferences: profileData.profile.dietary_preferences || "",
-					exercise_habits: profileData.profile.exercise_habits || "",
-					sleep_habits: profileData.profile.sleep_habits || "",
-					pets: profileData.profile.pets || [],
-					children: profileData.profile.children || "",
-					religion: profileData.profile.religion || "",
-					political_views: profileData.profile.political_views || "",
-					interests: profileData.profile.interests || [],
+					love_language: p.love_language || "",
+					personality_type: p.personality_type || "",
+					chronotype: p.chronotype || "",
+					social_media: p.social_media || {},
+					communication_style: p.communication_style || "",
+					blood_type: p.blood_type || "",
+					sti_status: p.sti_status || {},
+					family_plans: p.family_plans || "",
+					relationship_goals: p.relationship_goals || "",
+					languages: p.languages || [],
+					zodiac_sign: p.zodiac_sign || "",
+					drinking_status: p.drinking_status || "",
+					smoking_status: p.smoking_status || "",
+					cannabis_status: p.cannabis_status || "",
+					dietary_preferences: p.dietary_preferences || "",
+					exercise_habits: p.exercise_habits || "",
+					sleep_habits: p.sleep_habits || "",
+					pets: p.pets || [],
+					children: p.children || "",
+					religion: p.religion || "",
+					political_views: p.political_views || "",
+					interests: p.interests || [],
 					voice_intro: null,
-					height_cm: (profileData.profile as any).height_cm || null,
+					height_cm: p.height_cm || null,
 
 					// Physical attributes
-					body_type: (profileData.profile as any).body_type || "",
-					hair_color: (profileData.profile as any).hair_color || "",
-					eye_color: (profileData.profile as any).eye_color || "",
-					skin_tone: (profileData.profile as any).skin_tone || "",
-					ethnicity: (profileData.profile as any).ethnicity || "",
-					facial_hair: (profileData.profile as any).facial_hair || "",
-					fitness_level: (profileData.profile as any).fitness_level || "",
-					tattoos:
-						(profileData.profile as any).tattoos === "true" ||
-						(profileData.profile as any).tattoos === true,
-					piercings:
-						(profileData.profile as any).piercings === "true" ||
-						(profileData.profile as any).piercings === true,
-					clothing_style: (profileData.profile as any).clothing_style || "",
-					dominant_hand: (profileData.profile as any).dominant_hand || "",
+					body_type: p.body_type || "",
+					hair_color: p.hair_color || "",
+					eye_color: p.eye_color || "",
+					skin_tone: p.skin_tone || "",
+					ethnicity: p.ethnicity || "",
+					facial_hair: p.facial_hair || "",
+					fitness_level: p.fitness_level || "",
+					tattoos: p.tattoos === "true" || p.tattoos === true,
+					piercings: p.piercings === "true" || p.piercings === true,
+					clothing_style: p.clothing_style || "",
+					dominant_hand: p.dominant_hand || "",
 
 					// Intimate details
-					breast_size: (profileData.profile as any).breast_size || "",
-					penis_length_cm: (profileData.profile as any).penis_length_cm || null,
-					penis_girth_cm: (profileData.profile as any).penis_girth_cm || null,
-					fetishes: Array.isArray((profileData.profile as any).fetishes)
-						? (profileData.profile as any).fetishes
-						: [],
+					breast_size: p.breast_size || "",
+					penis_length_cm: p.penis_length_cm || null,
+					penis_girth_cm: p.penis_girth_cm || null,
+					fetishes: Array.isArray(p.fetishes) ? p.fetishes : [],
+
+					occupation: p.occupation || "",
+					education: p.education || "",
 
 					preferences: {
 						// Lifestyle preferences
-						smoking:
-							profileData.profile.preferences?.smoking ||
-							profileData.profile.smoking_status ||
-							"",
-						drinking:
-							profileData.profile.preferences?.drinking ||
-							profileData.profile.drinking_status ||
-							"",
-						cannabis:
-							profileData.profile.preferences?.cannabis ||
-							profileData.profile.cannabis_status ||
-							"",
-						psychedelics: profileData.profile.preferences?.psychedelics || "",
-						stimulants: profileData.profile.preferences?.stimulants || "",
-						opiates: profileData.profile.preferences?.opiates || "",
-						exercise: profileData.profile.preferences?.exercise || "",
-						diet: profileData.profile.preferences?.diet || "",
-						pets: profileData.profile.preferences?.pets || "",
-						children: profileData.profile.preferences?.children || "",
-						education: profileData.profile.preferences?.education || "",
-						occupation: profileData.profile.preferences?.occupation || "",
-						income: profileData.profile.preferences?.income || "",
+						smoking: p.preferences?.smoking || p.smoking_status || "",
+						drinking: p.preferences?.drinking || p.drinking_status || "",
+						cannabis: p.preferences?.cannabis || p.cannabis_status || "",
+						psychedelics: p.preferences?.psychedelics || "",
+						stimulants: p.preferences?.stimulants || "",
+						opiates: p.preferences?.opiates || "",
+						exercise: p.preferences?.exercise || "",
+						diet: p.preferences?.diet || "",
+						pets: p.preferences?.pets || "",
+						children: p.preferences?.children || "",
+						education: p.preferences?.education || p.education || "",
+						occupation: p.preferences?.occupation || p.occupation || "",
+						income: p.preferences?.income || "",
 						// Dating preferences
-						age_range_min: profileData.profile.preferences?.age_range_min || 18,
-						age_range_max: profileData.profile.preferences?.age_range_max || 99,
-						height_min: profileData.profile.preferences?.height_min || "",
-						height_max: profileData.profile.preferences?.height_max || "",
-						body_type: profileData.profile.preferences?.body_type || "",
-						ethnicity: profileData.profile.preferences?.ethnicity || [],
-						religion: profileData.profile.preferences?.religion || "",
-						politics: profileData.profile.preferences?.politics || "",
+						age_range_min: p.preferences?.age_range_min || 18,
+						age_range_max: p.preferences?.age_range_max || 99,
+						height_min: p.preferences?.height_min || "",
+						height_max: p.preferences?.height_max || "",
+						body_type: p.preferences?.body_type || "",
+						ethnicity: p.preferences?.ethnicity || [],
+						religion: p.preferences?.religion || "",
+						politics: p.preferences?.politics || "",
 						// Interests
-						hobbies: profileData.profile.preferences?.hobbies || [],
-						music: profileData.profile.preferences?.music || [],
-						movies: profileData.profile.preferences?.movies || [],
-						books: profileData.profile.preferences?.books || [],
-						sports: profileData.profile.preferences?.sports || [],
-						travel: profileData.profile.preferences?.travel || "",
+						hobbies: p.preferences?.hobbies || [],
+						music: p.preferences?.music || [],
+						movies: p.preferences?.movies || [],
+						books: p.preferences?.books || [],
+						sports: p.preferences?.sports || [],
+						travel: p.preferences?.travel || "",
 						// Communication
-						communication_style:
-							profileData.profile.preferences?.communication_style || "",
-						response_time: profileData.profile.preferences?.response_time || "",
-						meeting_preference:
-							profileData.profile.preferences?.meeting_preference || "",
+						communication_style: p.preferences?.communication_style || "",
+						response_time: p.preferences?.response_time || "",
+						meeting_preference: p.preferences?.meeting_preference || "",
 					},
 				});
 			}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { physicalProfileApi, type PhysicalProfile } from '@/lib/api/physical-profile';
 import { Ruler, User, Palette, Shirt, Activity, Wand2, Sparkles } from 'lucide-react';
@@ -123,6 +123,20 @@ export default function PhysicalProfileEditor() {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
+  const heightOptions = useMemo(() => {
+    const options = [];
+    for (let cm = 120; cm <= 220; cm++) {
+      const totalInches = cm / 2.54;
+      const feet = Math.floor(totalInches / 12);
+      const inches = Math.round(totalInches % 12);
+      options.push({
+        cm,
+        label: `${feet}'${inches}" (${cm} cm)`
+      });
+    }
+    return options;
+  }, []);
+
   if (isLoading) return <div className="p-4 text-center">Loading physical profile...</div>;
 
   return (
@@ -141,21 +155,22 @@ export default function PhysicalProfileEditor() {
         {/* Basic Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="height_cm" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Height (cm)</label>
+            <label htmlFor="height_cm" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Height</label>
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Ruler className="h-4 w-4 text-gray-400" />
               </div>
-              <input
-                type="number"
+              <select
                 id="height_cm"
-                min="80"
-                max="250"
                 value={profile.height_cm || ''}
                 onChange={(e) => handleChange('height_cm', parseInt(e.target.value) || undefined)}
                 className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 dark:border-gray-600 rounded-md"
-                placeholder="175"
-              />
+              >
+                <option value="">Select height...</option>
+                {heightOptions.map(opt => (
+                  <option key={opt.cm} value={opt.cm}>{opt.label}</option>
+                ))}
+              </select>
             </div>
           </div>
 

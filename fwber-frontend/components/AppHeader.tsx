@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import { Logo } from '@/components/Logo'
+import { ProfileSearch } from '@/components/ProfileSearch'
 import { ConnectionStatusBadge } from './realtime/PresenceComponents'
 import { NotificationBell } from './NotificationBell'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -295,6 +296,9 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
             <Link href={homeHref} className="flex items-center gap-2 pr-1 transition-opacity hover:opacity-90" aria-label="Go home">
               <Logo className="text-3xl" />
             </Link>
+            <div className="hidden md:flex ml-4 mr-2">
+              <ProfileSearch />
+            </div>
             <div className="min-w-0">
               <div className="flex items-center gap-3">
                 <ConnectionStatusBadge className="ml-5 shrink-0" />

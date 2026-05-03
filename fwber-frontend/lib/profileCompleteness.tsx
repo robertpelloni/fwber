@@ -80,6 +80,19 @@ function checkFieldComplete(key: string, value: any): boolean {
   if (!value) return false;
   
   switch (key) {
+    case 'age':
+      return !!value;
+    case 'location':
+      return !!value;
+    case 'height':
+      return value !== null && value !== undefined && value !== '';
+    case 'religion':
+    case 'politics':
+    case 'drinking':
+    case 'smoking':
+    case 'occupation':
+    case 'education':
+      return typeof value === 'string' && value.trim().length > 0;
     case 'photos':
       return Array.isArray(value) && value.length >= 3;
     case 'interests':

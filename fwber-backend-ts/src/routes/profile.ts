@@ -389,10 +389,10 @@ async function calculateProfileCompletenessSummary(userId: bigint, profile: any)
 	if (interestsArr.length >= 3) earned += 10;
 	else missing_optional.push("interests");
 
-	if (profile.occupation || prefs.occupation) earned += 5;
+	if (profile.occupation || (prefs && prefs.occupation)) earned += 5;
 	else missing_optional.push("occupation");
 
-	if (profile.education || prefs.education) earned += 5;
+	if (profile.education || (prefs && prefs.education)) earned += 5;
 	else missing_optional.push("education");
 
 	if (profile.height_cm) earned += 3;
@@ -404,10 +404,10 @@ async function calculateProfileCompletenessSummary(userId: bigint, profile: any)
 	if (profile.political_views) earned += 3;
 	else missing_optional.push("politics");
 
-	if (profile.drinking_status || prefs.drinking) earned += 3;
+	if (profile.drinking_status || (prefs && prefs.drinking)) earned += 3;
 	else missing_optional.push("drinking");
 
-	if (profile.smoking_status || prefs.smoking) earned += 3;
+	if (profile.smoking_status || (prefs && prefs.smoking)) earned += 3;
 	else missing_optional.push("smoking");
 
 	return {
