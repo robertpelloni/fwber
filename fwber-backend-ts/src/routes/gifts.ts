@@ -9,12 +9,12 @@ router.get('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const received = await prisma.user_gifts.findMany({
-      where: { recipient_id: userId },
+      where: { receiver_id: userId },
       include: { gifts: true, users_user_gifts_sender_idTousers: { select: { name: true } } }
     });
     const sent = await prisma.user_gifts.findMany({
       where: { sender_id: userId },
-      include: { gifts: true, users_user_gifts_recipient_idTousers: { select: { name: true } } }
+      include: { gifts: true, users_user_gifts_receiver_idTousers: { select: { name: true } } }
     });
     const available = await prisma.gifts.findMany({ where: { is_active: true } });
 
@@ -22,13 +22,13 @@ router.get('/', authenticate, async (req: any, res) => {
       received: received.map(g => ({
         id: Number(g.id),
         gift: g.gifts,
-        from: g.users_user_gifts_sender_idTousers.name,
+        from: (g as any).users_user_gifts_sender_idTousers?.name,
         created_at: g.created_at
       })),
       sent: sent.map(g => ({
         id: Number(g.id),
         gift: g.gifts,
-        to: g.users_user_gifts_recipient_idTousers.name,
+        to: (g as any).users_user_gifts_receiver_idTousers?.name,
         created_at: g.created_at
       })),
       available
@@ -53,7 +53,7 @@ router.post('/send', authenticate, async (req: any, res) => {
   try {
     const { recipient_id, gift_id, message } = req.body;
     const senderId = BigInt(req.user.id);
-    const recipientId = BigInt(recipient_id);
+    const receiverId = BigInt(recipient_id);
     const giftId = BigInt(gift_id);
 
     const gift = await prisma.gifts.findUnique({ where: { id: giftId } });
@@ -61,7 +61,7 @@ router.post('/send', authenticate, async (req: any, res) => {
 
     // Check balance
     const sender = await prisma.users.findUnique({ where: { id: senderId }, select: { token_balance: true } });
-    if (!sender || (sender.token_balance || 0) < gift.cost) {
+    if (!sender || Number(sender.token_balance || 0) < gift.cost) {
       return res.status(400).json({ error: 'Insufficient token balance' });
     }
 
@@ -70,9 +70,10 @@ router.post('/send', authenticate, async (req: any, res) => {
       prisma.user_gifts.create({
         data: {
           sender_id: senderId,
-          recipient_id: recipientId,
+          receiver_id: receiverId,
           gift_id: giftId,
           message: message || '',
+          cost_at_time: gift.cost,
         }
       }),
       prisma.users.update({
@@ -80,7 +81,7 @@ router.post('/send', authenticate, async (req: any, res) => {
         data: { token_balance: { decrement: gift.cost } }
       }),
       prisma.users.update({
-        where: { id: recipientId },
+        where: { id: receiverId },
         data: { token_balance: { increment: Math.floor(gift.cost * 0.8) } } // Recipient gets 80% value
       })
     ]);
