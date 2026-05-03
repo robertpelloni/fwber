@@ -781,17 +781,20 @@ router.get("/search", authenticate, async (req: any, res) => {
 		});
 
 		res.json(
-			users.map((u) => ({
-				id: Number(u.id),
-				email: u.email,
-				profile: {
-					display_name: u.display_name,
-					bio: u.user_profiles?.bio,
-					location: {
-						city: u.user_profiles?.location_description?.split(",")[0] || "",
+			users.map((u) => {
+				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+				return {
+					id: Number(u.id),
+					email: u.email,
+					profile: {
+						display_name: u.display_name,
+						bio: p?.bio,
+						location: {
+							city: p?.location_description?.split(",")[0] || "",
+						},
 					},
-				},
-			})),
+				};
+			}),
 		);
 	} catch (err) {
 		res.status(500).json({ message: "Search failed" });
