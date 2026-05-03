@@ -790,9 +790,9 @@ router.get("/search", authenticate, async (req: any, res) => {
 					email: u.email,
 					profile: {
 						display_name: displayName,
-						bio: p?.bio,
+						bio: (p as any)?.bio,
 						location: {
-							city: p?.location_description?.split(",")[0] || "",
+							city: (p as any)?.location_description?.split(",")[0] || "",
 						},
 					},
 				};
