@@ -783,12 +783,12 @@ router.get("/search", authenticate, async (req: any, res) => {
 
 		res.json(
 			users.map((u: any) => {
-				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : (u as any).user_profiles;
 				return {
 					id: Number(u.id),
 					email: u.email,
 					profile: {
-						display_name: p?.display_name || u.name,
+						display_name: p?.display_name || (u as any).display_name || u.name,
 						bio: p?.bio,
 						location: {
 							city: p?.location_description?.split(",")[0] || "",
