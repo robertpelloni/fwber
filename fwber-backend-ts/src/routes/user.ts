@@ -235,13 +235,13 @@ router.post('/export', authenticate, async (req: any, res) => {
         is_primary: p.is_primary,
         created_at: p.created_at
       })),
-      recent_messages: user.messages_sent.map(m => ({
+      recent_messages: (user as any).messages_sent?.map((m: any) => ({
         content: m.content,
         timestamp: m.created_at
-      })),
+      })) || [],
       recent_matches: [
-        ...user.matches_as_user1.map(m => ({ partner: m.users_matches_user2_idTousers?.name, date: m.created_at, status: m.status })),
-        ...user.matches_as_user2.map(m => ({ partner: m.users_matches_user1_idTousers?.name, date: m.created_at, status: m.status }))
+        ...((user as any).matches_as_user1?.map((m: any) => ({ partner: m.users_matches_user2_idTousers?.name, date: m.created_at, status: m.status })) || []),
+        ...((user as any).matches_as_user2?.map((m: any) => ({ partner: m.users_matches_user1_idTousers?.name, date: m.created_at, status: m.status })) || [])
       ]
     };
 
