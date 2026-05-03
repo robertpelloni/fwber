@@ -231,7 +231,7 @@ router.post('/export', authenticate, async (req: any, res) => {
       },
       profile: user.user_profiles?.[0] || {},
       photos: user.photos.map(p => ({
-        url: p.file_path || p.url,
+        url: p.file_path,
         is_primary: p.is_primary,
         created_at: p.created_at
       })),
