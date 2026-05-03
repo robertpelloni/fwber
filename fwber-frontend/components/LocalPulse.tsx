@@ -713,9 +713,11 @@ export default function LocalPulse({ initialTopicSlug, compact = false }: LocalP
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
                 <MessageCircle className="h-6 w-6" />
                 <span>{selectedTopic ? `${selectedTopic.label} Activity` : 'Nearby Activity'}</span>
-                <span className="text-sm font-normal text-gray-500">
-                  ({localPulse.meta.artifacts_count})
-                </span>
+                {localPulse?.meta && (
+                  <span className="text-sm font-normal text-gray-500">
+                    ({localPulse.meta.artifacts_count || 0})
+                  </span>
+                )}
               </h2>
             </div>
 
@@ -799,15 +801,15 @@ export default function LocalPulse({ initialTopicSlug, compact = false }: LocalP
       )}
 
       {/* Meta Info */}
-      {localPulse && (
+      {localPulse && localPulse.meta && (
         <div className="mt-8 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
             <div>
-              <div className="font-semibold text-gray-900 dark:text-white">{localPulse.meta.artifacts_count}</div>
+              <div className="font-semibold text-gray-900 dark:text-white">{localPulse.meta.artifacts_count || 0}</div>
               <div className="text-gray-600">Posts</div>
             </div>
             <div>
-              <div className="font-semibold text-gray-900 dark:text-white">{localPulse.meta.candidates_count}</div>
+              <div className="font-semibold text-gray-900 dark:text-white">{localPulse.meta.candidates_count || 0}</div>
               <div className="text-gray-600">Matches</div>
             </div>
             <div>

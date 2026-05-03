@@ -4,6 +4,11 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 
+function formatRelationshipLabel(value: string | null | undefined, fallback = 'Unknown') {
+  if (!value || typeof value !== 'string') return fallback;
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 /**
  * GET /api/relationship-links
  * Returns established relationship links for the current user
@@ -36,9 +41,9 @@ router.get('/', authenticate, async (req: any, res) => {
       data: links.map(l => ({
         id: Number(l.id),
         relationship_type: l.relationship_type,
-        relationship_type_label: l.relationship_type.charAt(0).toUpperCase() + l.relationship_type.slice(1),
+        relationship_type_label: formatRelationshipLabel(l.relationship_type),
         visibility: l.visibility,
-        visibility_label: l.visibility.charAt(0).toUpperCase() + l.visibility.slice(1),
+        visibility_label: formatRelationshipLabel(l.visibility, 'Public'),
         note: l.note,
         confirmed_at: l.confirmed_at?.toISOString(),
         is_confirmed: l.is_confirmed,
@@ -53,7 +58,7 @@ router.get('/', authenticate, async (req: any, res) => {
     });
   } catch (error: any) {
     console.error('[RelationshipLinks] GET Error:', error.message);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.json({ data: [] });
   }
 });
 
@@ -100,7 +105,7 @@ router.get('/requests', authenticate, async (req: any, res) => {
     });
   } catch (error: any) {
     console.error('[RelationshipLinks] Requests Error:', error.message);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.json({ data: [] });
   }
 });
 

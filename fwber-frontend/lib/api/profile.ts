@@ -49,6 +49,9 @@ export interface UserProfile {
       max_distance: number;
       city: string | null;
       state: string | null;
+      match_scope?: string;
+      search_country?: string;
+      search_city?: string;
     };
     interest_topics?: ProfileInterestTopic[];
     // Travel Mode
@@ -409,9 +412,9 @@ export async function updateUserProfile(
     // Add spoof _method to handle PUT with multipart
     formData.append('_method', 'PUT');
     
-    response = await apiClient.post('/profile', formData);
+    response = await apiClient.post<UserProfile>('/profile', formData);
   } else {
-    response = await apiClient.put('/profile', sanitizedPayload, {
+    response = await apiClient.put<UserProfile>('/profile', sanitizedPayload, {
       headers,
     });
   }

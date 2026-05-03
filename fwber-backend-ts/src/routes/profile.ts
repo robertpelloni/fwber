@@ -83,6 +83,7 @@ router.get("/", authenticate, async (req: any, res) => {
 
 		// Build the nested structure the frontend expects
 		const prefs = p.preferences || {};
+		const completeness = await calculateProfileCompletenessSummary(userId, profile);
 		res.json({
 			id: Number(userId),
 			email: user?.email || "",
@@ -175,8 +176,10 @@ router.get("/", authenticate, async (req: any, res) => {
 				penis_girth_cm: p.penis_girth_cm || null,
 				fetishes: p.fetishes || [],
 				preferences: prefs,
-				profile_complete: true,
-				completion_percentage: 0,
+				profile_complete: completeness.required_complete,
+				completion_percentage: completeness.percentage,
+				completion_percentage_required: completeness.percentage, // for consistency
+				completion_status: completeness,
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
 					url: ph.file_path || "",
@@ -330,6 +333,111 @@ function parseJsonField(val: any): any {
 		}
 	}
 	return val;
+}
+
+function getEmptyCompletenessSummary() {
+	return {
+		percentage: 0,
+		required_complete: false,
+		missing_required: ["profile"],
+		missing_optional: [],
+		sections: {
+			basic: false,
+			location: false,
+			preferences: false,
+			interests: false,
+			physical: false,
+			lifestyle: false,
+		},
+	};
+}
+
+async function calculateProfileCompletenessSummary(userId: bigint, profile: any) {
+	if (!profile) {
+		return getEmptyCompletenessSummary();
+	}
+
+	const photoCount = await prisma.photos.count({
+		where: { user_id: userId, is_private: false },
+	});
+	const interestsArr = Array.isArray(parseJsonField(profile.interests))
+		? parseJsonField(profile.interests)
+		: [];
+	const lookingForArr = Array.isArray(parseJsonField(profile.looking_for))
+		? parseJsonField(profile.looking_for)
+		: [];
+	const prefsRaw: any = parseJsonField(profile.preferences) || {};
+	const prefs = typeof prefsRaw === "object" && !Array.isArray(prefsRaw) ? prefsRaw : {};
+	const birthDate = profile.date_of_birth || profile.birthdate;
+
+	let earned = 0;
+	const missing_required: string[] = [];
+	const missing_optional: string[] = [];
+
+	if (photoCount >= 3) earned += 25;
+	else missing_required.push("Profile Photos (at least 3)");
+
+	if (profile.bio && String(profile.bio).trim().length >= 10) earned += 20;
+	else missing_required.push("Bio");
+
+	if (birthDate) earned += 10;
+	else missing_required.push("Date of birth");
+
+	if (profile.location_description || profile.location_latitude) earned += 10;
+	else missing_required.push("Location");
+
+	if (interestsArr.length >= 3) earned += 10;
+	else missing_optional.push("Interests (at least 3)");
+
+	if (profile.occupation || prefs.occupation) earned += 5;
+	else missing_optional.push("Occupation");
+
+	if (profile.education || prefs.education) earned += 5;
+	else missing_optional.push("Education");
+
+	if (profile.height_cm) earned += 3;
+	else missing_optional.push("Height");
+
+	if (profile.religion) earned += 3;
+	else missing_optional.push("Religion");
+
+	if (profile.political_views) earned += 3;
+	else missing_optional.push("Political Views");
+
+	if (profile.drinking_status || prefs.drinking) earned += 3;
+	else missing_optional.push("Drinking Preference");
+
+	if (profile.smoking_status || prefs.smoking) earned += 3;
+	else missing_optional.push("Smoking Preference");
+
+	return {
+		percentage: earned,
+		required_complete: missing_required.length === 0,
+		missing_required,
+		missing_optional,
+		sections: {
+			basic: !!(profile.display_name && profile.bio && birthDate && profile.gender),
+			location: !!(profile.location_description || profile.location_latitude),
+			preferences: !!(
+				lookingForArr.length > 0 ||
+				prefs.age_range_min ||
+				prefs.age_range_max ||
+				prefs.height_min ||
+				prefs.height_max
+			),
+			interests: interestsArr.length > 0,
+			physical: !!(profile.height_cm || profile.body_type),
+			lifestyle: !!(
+				profile.drinking_status ||
+				prefs.drinking ||
+				profile.smoking_status ||
+				prefs.smoking ||
+				profile.cannabis_status ||
+				prefs.cannabis ||
+				profile.occupation
+			),
+		},
+	};
 }
 
 // Known columns that exist in user_profiles table
@@ -624,157 +732,14 @@ router.get("/completeness", authenticate, async (req: any, res) => {
 		const profile = await prisma.user_profiles.findFirst({
 			where: { user_id: userId },
 		});
-		const user = await prisma.users.findUnique({ where: { id: userId } });
-		if (!profile)
-			return res.json({
-				percentage: 0,
-				required_complete: false,
-				missing_required: ["profile"],
-				missing_optional: [],
-				sections: {
-					basic: false,
-					location: false,
-					preferences: false,
-					interests: false,
-					physical: false,
-					lifestyle: false,
-				},
-			});
 
-		// Count photos
-		const photoCount = await prisma.photos.count({
-			where: { user_id: userId, is_private: false },
-		});
-
-		// Use same weighted formula as frontend (lib/profileCompleteness.tsx)
-		const interestsArr: any[] = (() => {
-			try {
-				const v = profile.interests;
-				return typeof v === "string"
-					? JSON.parse(v)
-					: Array.isArray(v)
-						? v
-						: [];
-			} catch {
-				return [];
-			}
-		})();
-		const prefsRaw: any = profile.preferences;
-		const prefs =
-			typeof prefsRaw === "string" ? JSON.parse(prefsRaw) : prefsRaw;
-
-		// Weighted fields matching frontend DEFAULT_PROFILE_FIELDS
-		let earned = 0;
-		const missing_required: string[] = [];
-		const missing_optional: string[] = [];
-
-		// Photos (weight 25) - needs 3+
-		if (photoCount >= 3) earned += 25;
-		else {
-			missing_required.push("Profile Photos (at least 3)");
-		}
-		// Bio (weight 20) - needs 10+ chars
-		if (profile.bio && profile.bio.trim().length >= 10) earned += 20;
-		else {
-			missing_required.push("Bio");
-		}
-		// Age (weight 10)
-		if (profile.date_of_birth) earned += 10;
-		else {
-			missing_required.push("Date of birth");
-		}
-		// Location (weight 10)
-		if (profile.location_description || profile.location_latitude) earned += 10;
-		else {
-			missing_required.push("Location");
-		}
-		// Interests (weight 10) - needs 3+
-		if (interestsArr.length >= 3) earned += 10;
-		else {
-			missing_optional.push("Interests (at least 3)");
-		}
-		// Occupation (weight 5)
-		if (profile.occupation || prefs?.occupation) earned += 5;
-		else {
-			missing_optional.push("Occupation");
-		}
-		// Education (weight 5)
-		if (prefs?.education) earned += 5;
-		else {
-			missing_optional.push("Education");
-		}
-		// Height (weight 3)
-		if (profile.height_cm) earned += 3;
-		else {
-			missing_optional.push("Height");
-		}
-		// Religion (weight 3)
-		if (profile.religion) earned += 3;
-		else {
-			missing_optional.push("Religion");
-		}
-		// Politics (weight 3)
-		if (profile.political_views) earned += 3;
-		else {
-			missing_optional.push("Political Views");
-		}
-		// Drinking (weight 3)
-		if (profile.drinking_status || prefs?.drinking) earned += 3;
-		else {
-			missing_optional.push("Drinking Preference");
-		}
-		// Smoking (weight 3)
-		if (profile.smoking_status || prefs?.smoking) earned += 3;
-		else {
-			missing_optional.push("Smoking Preference");
+		if (!profile) {
+			return res.json(getEmptyCompletenessSummary());
 		}
 
-		const percentage = earned; // already 0-100
-		const required_complete = missing_required.length === 0;
-
-		// Sections for dashboard
-		const sections = {
-			basic: !!(
-				profile.display_name &&
-				profile.bio &&
-				profile.date_of_birth &&
-				profile.gender
-			),
-			location: !!(profile.location_description || profile.location_latitude),
-			preferences: !!(prefs && (prefs.looking_for || prefs.age_range_min)),
-			interests: interestsArr.length > 0,
-			physical: !!(profile.height_cm || profile.body_type),
-			lifestyle: !!(
-				profile.drinking_status ||
-				prefs?.drinking ||
-				profile.smoking_status ||
-				prefs?.smoking ||
-				profile.occupation
-			),
-		};
-
-		res.json({
-			percentage,
-			required_complete,
-			missing_required,
-			missing_optional,
-			sections,
-		});
+		res.json(await calculateProfileCompletenessSummary(userId, profile));
 	} catch (err) {
-		res.json({
-			percentage: 0,
-			required_complete: false,
-			missing_required: ["profile"],
-			missing_optional: [],
-			sections: {
-				basic: false,
-				location: false,
-				preferences: false,
-				interests: false,
-				physical: false,
-				lifestyle: false,
-			},
-		});
+		res.json(getEmptyCompletenessSummary());
 	}
 });
 

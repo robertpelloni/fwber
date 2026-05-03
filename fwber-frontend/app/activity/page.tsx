@@ -83,7 +83,7 @@ export default function ActivityPage() {
       return '/friends'
     }
     if (activity.type === 'match' || activity.type === 'mutual_like') {
-      return '/matches'
+      return activity.user?.id ? `/profile/${activity.user.id}` : '/matches'
     }
     return `/profile/${activity.user.id}`
   }

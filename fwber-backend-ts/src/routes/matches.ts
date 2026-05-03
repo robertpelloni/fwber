@@ -15,6 +15,21 @@ router.get('/', authenticate, async (req: any, res) => {
     const offset = parseInt(req.query.offset as string) || 0;
     const userLat = req.query.latitude ? parseFloat(String(req.query.latitude)) : null;
     const userLng = req.query.longitude ? parseFloat(String(req.query.longitude)) : null;
+    const requestedFilters = {
+      smoking: typeof req.query.smoking === 'string' ? req.query.smoking : '',
+      drinking: typeof req.query.drinking === 'string' ? req.query.drinking : '',
+      body_type: typeof req.query.body_type === 'string' ? req.query.body_type : '',
+      height_min: req.query.height_min ? parseInt(String(req.query.height_min), 10) : null,
+      interests: parseCsvParam(req.query.interests),
+      cannabis: typeof req.query.cannabis === 'string' ? req.query.cannabis : '',
+      diet: typeof req.query.diet === 'string' ? req.query.diet : '',
+      has_pets: parseBooleanParam(req.query.has_pets),
+      has_children: parseBooleanParam(req.query.has_children),
+      wants_children: parseBooleanParam(req.query.wants_children),
+      politics: typeof req.query.politics === 'string' ? req.query.politics : '',
+      religion: typeof req.query.religion === 'string' ? req.query.religion : '',
+      zodiac: typeof req.query.zodiac === 'string' ? req.query.zodiac : '',
+    };
 
     // Exclude existing matches and self
     const existingMatches = await prisma.matches.findMany({
@@ -53,7 +68,12 @@ router.get('/', authenticate, async (req: any, res) => {
       skip: offset,
     });
 
-    let scored = candidates.map((u: any) => {
+    let scored = candidates
+      .filter((u: any) => {
+        const p = (Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles) || {};
+        return matchesRequestedFilters(p, requestedFilters);
+      })
+      .map((u: any) => {
       const p = (Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles) || {};
       const theirAge = p.date_of_birth
         ? new Date().getFullYear() - new Date(p.date_of_birth as any).getFullYear()
@@ -417,6 +437,70 @@ router.get('/insights/available', authenticate, async (req: any, res) => {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
+function normalizeValue(value: any): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function parseBooleanParam(value: any): boolean | null {
+  if (value === undefined || value === null || value === '') return null;
+  const normalized = normalizeValue(value);
+  if (['true', '1', 'yes'].includes(normalized)) return true;
+  if (['false', '0', 'no'].includes(normalized)) return false;
+  return null;
+}
+
+function parseCsvParam(value: any): string[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => parseCsvParam(entry));
+  }
+
+  if (typeof value !== 'string' || !value.trim()) {
+    return [];
+  }
+
+  return value
+    .split(',')
+    .map((entry) => normalizeValue(entry))
+    .filter(Boolean);
+}
+
+function matchesRequestedFilters(profile: any, filters: any): boolean {
+  const prefs = parseJson(profile?.preferences);
+  const interests = parseArr(profile?.interests).map(normalizeValue);
+  const smoking = normalizeValue(profile?.smoking_status || prefs?.smoking);
+  const drinking = normalizeValue(profile?.drinking_status || prefs?.drinking);
+  const cannabis = normalizeValue(profile?.cannabis_status || prefs?.cannabis);
+  const bodyType = normalizeValue(profile?.body_type);
+  const politics = normalizeValue(profile?.political_views || prefs?.politics);
+  const religion = normalizeValue(profile?.religion || prefs?.religion);
+  const zodiac = normalizeValue(profile?.zodiac_sign);
+  const diet = normalizeValue(profile?.dietary_preferences || prefs?.diet);
+  const hasPets = typeof profile?.has_pets === 'boolean' ? profile.has_pets : parseBooleanParam(profile?.has_pets);
+  const hasChildren = typeof profile?.has_children === 'boolean' ? profile.has_children : parseBooleanParam(profile?.has_children);
+  const wantsChildren = typeof profile?.wants_children === 'boolean' ? profile.wants_children : parseBooleanParam(profile?.wants_children);
+  const heightCm = profile?.height_cm != null ? Number(profile.height_cm) : null;
+
+  if (filters.smoking && smoking !== normalizeValue(filters.smoking)) return false;
+  if (filters.drinking && drinking !== normalizeValue(filters.drinking)) return false;
+  if (filters.body_type && bodyType !== normalizeValue(filters.body_type)) return false;
+  if (filters.height_min && (!heightCm || heightCm < filters.height_min)) return false;
+  if (filters.cannabis && cannabis !== normalizeValue(filters.cannabis)) return false;
+  if (filters.diet && diet !== normalizeValue(filters.diet)) return false;
+  if (filters.politics && politics !== normalizeValue(filters.politics)) return false;
+  if (filters.religion && religion !== normalizeValue(filters.religion)) return false;
+  if (filters.zodiac && zodiac !== normalizeValue(filters.zodiac)) return false;
+  if (filters.has_pets !== null && hasPets !== filters.has_pets) return false;
+  if (filters.has_children !== null && hasChildren !== filters.has_children) return false;
+  if (filters.wants_children !== null && wantsChildren !== filters.wants_children) return false;
+  if (filters.interests.length > 0 && !filters.interests.some((interest: string) => interests.includes(interest))) return false;
+
+  return true;
+}
+
 function parseJson(val: any): any {
   if (val && typeof val === 'object') return val;
   if (typeof val === 'string') { try { return JSON.parse(val); } catch { return {}; } }
@@ -425,7 +509,14 @@ function parseJson(val: any): any {
 
 function parseArr(val: any): string[] {
   if (Array.isArray(val)) return val;
-  if (typeof val === 'string') { try { return JSON.parse(val); } catch { return []; } }
+  if (typeof val === 'string') {
+    try {
+      const parsed = JSON.parse(val);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return val.split(',').map((entry) => entry.trim()).filter(Boolean);
+    }
+  }
   return [];
 }
 

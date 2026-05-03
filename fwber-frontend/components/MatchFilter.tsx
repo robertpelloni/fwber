@@ -44,6 +44,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
     drinking: '',
     body_type: '',
     height_min: '',
+    height_min_unit: 'cm',
     interests: [] as string[],
     // Premium
     cannabis: '',
@@ -109,7 +110,19 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
   }
 
   const handleApplyFilters = () => {
-    onFilterChange(filters);
+    const rawHeight = filters.height_min.trim();
+    const parsedHeight = rawHeight ? Number(rawHeight) : null;
+    const normalizedHeight =
+      parsedHeight && !Number.isNaN(parsedHeight)
+        ? filters.height_min_unit === 'in'
+          ? Math.round(parsedHeight * 2.54)
+          : Math.round(parsedHeight)
+        : '';
+
+    onFilterChange({
+      ...filters,
+      height_min: normalizedHeight,
+    });
   };
 
   const PremiumOverlay = () => (
@@ -187,14 +200,28 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
           </div>
 
           <div>
-            <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Min Height (cm)</label>
-            <input
-              type="number"
-              id="height_min"
-              value={filters.height_min}
-              onChange={(e) => handleInputChange('height_min', e.target.value)}
-              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
+            <label htmlFor="height_min" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Min Height</label>
+            <div className="mt-1 flex gap-2">
+              <input
+                type="number"
+                id="height_min"
+                min="0"
+                step="1"
+                value={filters.height_min}
+                onChange={(e) => handleInputChange('height_min', e.target.value)}
+                className="block min-w-0 flex-1 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder={filters.height_min_unit === 'in' ? '70' : '178'}
+              />
+              <select
+                id="height_min_unit"
+                value={filters.height_min_unit}
+                onChange={(e) => handleInputChange('height_min_unit', e.target.value)}
+                className="block w-24 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="cm">cm</option>
+                <option value="in">inch</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -291,6 +318,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
               <option value="liberal">Liberal</option>
               <option value="moderate">Moderate</option>
               <option value="conservative">Conservative</option>
+              <option value="liberal-conservative">Liberal-Conservative</option>
               <option value="apolitical">Apolitical</option>
               <option value="other">Other</option>
             </select>

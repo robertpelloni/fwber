@@ -951,6 +951,7 @@ export default function EnhancedProfileEditor() {
                 <option value="liberal">Liberal</option>
                 <option value="moderate">Moderate</option>
                 <option value="conservative">Conservative</option>
+                <option value="liberal-conservative">Liberal-Conservative</option>
                 <option value="apolitical">Apolitical</option>
                 <option value="other">Other</option>
               </select>

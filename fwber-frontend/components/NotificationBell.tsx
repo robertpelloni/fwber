@@ -18,6 +18,8 @@ interface Notification {
     user_id?: number;
     user_name?: string;
     match_id?: number;
+    matched_user_id?: number;
+    target_user_id?: number;
     conversation_id?: number;
     gift_id?: number;
     event_id?: number;
@@ -147,8 +149,10 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     switch (notification.type) {
       case 'message':
         return `/messages?user=${notification.data?.user_id}`;
-      case 'match':
-        return `/matches`;
+      case 'match': {
+        const userId = notification.data?.user_id ?? notification.data?.matched_user_id ?? notification.data?.target_user_id;
+        return userId ? `/profile/${userId}` : `/matches`;
+      }
       case 'friend_request':
         return `/friends`;
       case 'view':

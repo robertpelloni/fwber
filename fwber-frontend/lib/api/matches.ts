@@ -120,8 +120,8 @@ export async function getMatches(filters: any = {}): Promise<Match[]> {
         state: null,
       },
       photos: m.photos ?? (m.avatarUrl ? [{ id: 0, url: m.avatarUrl, is_private: false, is_primary: true }] : []),
-      profile_complete: true,
-      completion_percentage: 100,
+      profile_complete: Boolean(m.profile_complete ?? false),
+      completion_percentage: Number(m.completion_percentage ?? 0),
     }
   }));
 }
@@ -188,8 +188,8 @@ export async function getMutualMatches(): Promise<Match[]> {
           is_private: p.is_private,
           is_primary: p.is_primary
         })) : [],
-        profile_complete: true,
-        completion_percentage: 100,
+        profile_complete: Boolean(profile.profile_complete ?? false),
+        completion_percentage: Number(profile.completion_percentage ?? 0),
       }
     };
   });

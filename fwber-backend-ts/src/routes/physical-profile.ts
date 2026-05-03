@@ -11,6 +11,13 @@ const PHYSICAL_FIELDS = [
   'fitness_level', 'clothing_style', 'avatar_prompt', 'avatar_status',
 ] as const;
 
+const STRING_BOOLEAN_FIELDS = new Set(['tattoos', 'piercings']);
+const NUMERIC_FIELDS = new Set(['height_cm']);
+
+function coerceBooleanFlag(value: unknown): boolean {
+  return value === true || value === 'true' || value === 1 || value === '1';
+}
+
 function serialize(obj: any): any {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === 'bigint') return Number(obj);
@@ -35,7 +42,19 @@ router.get('/', authenticate, async (req: any, res) => {
 
     const data: Record<string, any> = {};
     for (const field of PHYSICAL_FIELDS) {
-      data[field] = (profile as any)[field] ?? null;
+      const rawValue = (profile as any)[field];
+
+      if (STRING_BOOLEAN_FIELDS.has(field)) {
+        data[field] = rawValue == null ? false : coerceBooleanFlag(rawValue);
+        continue;
+      }
+
+      if (NUMERIC_FIELDS.has(field) && rawValue != null && rawValue !== '') {
+        data[field] = Number(rawValue);
+        continue;
+      }
+
+      data[field] = rawValue ?? null;
     }
 
     res.json({ data });
@@ -52,9 +71,21 @@ router.put('/', authenticate, async (req: any, res) => {
 
     const data: Record<string, any> = {};
     for (const field of PHYSICAL_FIELDS) {
-      if (req.body[field] !== undefined) {
-        data[field] = req.body[field];
+      if (req.body[field] === undefined) continue;
+
+      const incomingValue = req.body[field];
+
+      if (STRING_BOOLEAN_FIELDS.has(field)) {
+        data[field] = coerceBooleanFlag(incomingValue) ? 'true' : 'false';
+        continue;
       }
+
+      if (NUMERIC_FIELDS.has(field)) {
+        data[field] = incomingValue === null || incomingValue === '' ? null : Number(incomingValue);
+        continue;
+      }
+
+      data[field] = incomingValue;
     }
 
     if (Object.keys(data).length === 0) {
@@ -77,7 +108,19 @@ router.put('/', authenticate, async (req: any, res) => {
 
     const out: Record<string, any> = {};
     for (const field of PHYSICAL_FIELDS) {
-      out[field] = (result as any)[field] ?? null;
+      const rawValue = (result as any)[field];
+
+      if (STRING_BOOLEAN_FIELDS.has(field)) {
+        out[field] = rawValue == null ? false : coerceBooleanFlag(rawValue);
+        continue;
+      }
+
+      if (NUMERIC_FIELDS.has(field) && rawValue != null && rawValue !== '') {
+        out[field] = Number(rawValue);
+        continue;
+      }
+
+      out[field] = rawValue ?? null;
     }
 
     res.json({ data: out });

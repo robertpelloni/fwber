@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { getUserProfile, updateUserProfile, type UserProfile } from '@/lib/api/profile';
-import { ArrowLeft, Save, Ruler, User, Palette, Sparkles, CheckCircle2 } from 'lucide-react';
+import { physicalProfileApi } from '@/lib/api/physical-profile';
+import { ArrowLeft, Save, Ruler, User, Palette, CheckCircle2 } from 'lucide-react';
 
 const BODY_TYPES = ['Slim', 'Athletic', 'Average', 'Curvy', 'Muscular', 'Plus Size', 'Dad Bod'];
 const HAIR_COLORS = ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White', 'Bald', 'Other'];
@@ -60,7 +60,7 @@ interface PhysicalData {
 }
 
 export default function PhysicalProfilePage() {
-  const { token, isAuthenticated } = useAuth();
+  const { token } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -84,26 +84,26 @@ export default function PhysicalProfilePage() {
     if (!token) return;
     try {
       setLoading(true);
-      const profileData = await getUserProfile(token);
-      const p = profileData.profile as any;
-      if (p) {
-        setData({
-          height_cm: p.height_cm || null,
-          body_type: p.body_type || '',
-          hair_color: p.hair_color || '',
-          eye_color: p.eye_color || '',
-          skin_tone: p.skin_tone || '',
-          ethnicity: p.ethnicity || '',
-          facial_hair: p.facial_hair || '',
-          fitness_level: p.fitness_level || '',
-          tattoos: p.tattoos || false,
-          piercings: p.piercings || false,
-          dominant_hand: p.dominant_hand || '',
-          clothing_style: p.clothing_style || '',
-        });
-      }
+      const response = await physicalProfileApi.get(token);
+      const p = response.data || {};
+
+      setData({
+        height_cm: typeof p.height_cm === 'number' ? p.height_cm : null,
+        body_type: p.body_type || '',
+        hair_color: p.hair_color || '',
+        eye_color: p.eye_color || '',
+        skin_tone: p.skin_tone || '',
+        ethnicity: p.ethnicity || '',
+        facial_hair: p.facial_hair || '',
+        fitness_level: p.fitness_level || '',
+        tattoos: Boolean(p.tattoos),
+        piercings: Boolean(p.piercings),
+        dominant_hand: p.dominant_hand || '',
+        clothing_style: p.clothing_style || '',
+      });
     } catch (err) {
-      console.error('Failed to load profile', err);
+      console.error('Failed to load physical profile', err);
+      setMessage({ type: 'error', text: 'Failed to load your physical attributes.' });
     } finally {
       setLoading(false);
     }
@@ -118,10 +118,11 @@ export default function PhysicalProfilePage() {
     try {
       setSaving(true);
       setMessage(null);
-      await updateUserProfile(token, data);
+      await physicalProfileApi.upsert(token, data);
       setMessage({ type: 'success', text: 'Physical attributes saved!' });
       setTimeout(() => setMessage(null), 3000);
     } catch (err) {
+      console.error('Failed to save physical profile', err);
       setMessage({ type: 'error', text: 'Failed to save. Please try again.' });
     } finally {
       setSaving(false);
@@ -199,7 +200,7 @@ export default function PhysicalProfilePage() {
                     const inch = totalIn % 12;
                     return (
                       <option key={cm} value={cm}>
-                        {cm} cm — {ft}'{inch}" ({ft} ft{inch > 0 ? ` ${inch} in` : ''})
+                        {cm} cm — {ft}&apos;{inch}&quot; ({ft} ft{inch > 0 ? ` ${inch} in` : ''})
                       </option>
                     );
                   })}

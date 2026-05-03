@@ -51,8 +51,12 @@ export function getNotificationRoute(notification: NotificationRoutePayload): st
         ? `/messages?user=${userId}`
         : '/messages'
     }
-    case 'match':
-      return '/matches'
+    case 'match': {
+      const userId = data.user_id ?? data.matched_user_id ?? data.target_user_id
+      return typeof userId === 'number' || typeof userId === 'string'
+        ? `/profile/${userId}`
+        : '/matches'
+    }
     case 'friend_request':
       return '/friends'
     case 'view':
@@ -77,7 +81,7 @@ export function getNotificationActionLabel(notification: NotificationRoutePayloa
     case 'message':
       return 'Reply'
     case 'match':
-      return 'View Match'
+      return 'View Profile'
     case 'friend_request':
       return 'Open Friends'
     case 'view':

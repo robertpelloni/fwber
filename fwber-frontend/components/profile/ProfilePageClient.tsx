@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useAutoSave } from "@/lib/useAutoSave";
@@ -9,7 +9,6 @@ import dynamic from "next/dynamic";
 import {
 	getUserProfile,
 	updateUserProfile,
-	getProfileCompleteness,
 	type UserProfile,
 	type ProfileUpdateData,
 } from "@/lib/api/profile";
@@ -50,7 +49,6 @@ export default function ProfilePage() {
 			: "";
 	const effectiveToken = token || localToken;
 	const [profile, setProfile] = useState<UserProfile | null>(null);
-	const [completeness, setCompleteness] = useState<number>(0);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
@@ -59,6 +57,7 @@ export default function ProfilePage() {
 	const [success, setSuccess] = useState<string | null>(null);
 	const [interestTopics, setInterestTopics] = useState<Topic[]>([]);
 	const [topicsLoading, setTopicsLoading] = useState(true);
+	const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
 
 	// Photo management
 	const { photos, uploadPhotos, deletePhoto, setPrimaryPhoto } = usePhotos();
@@ -109,21 +108,6 @@ export default function ProfilePage() {
 		voice_intro?: File | null;
 	};
 
-	// ─── Auto-save ─────────────────────────────────────────────────────────────
-	// We track a "snapshot" that only updates when the user stops typing.
-	// This avoids triggering saves on every keystroke intermediate.
-	const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const [autoSaveSnapshot, setAutoSaveSnapshot] =
-		useState<ProfileFormData | null>(null);
-
-	// Push a new snapshot after 800ms of calm (separate from the actual save debounce)
-	const scheduleAutoSave = useCallback((data: ProfileFormData) => {
-		if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-		autoSaveTimerRef.current = setTimeout(() => {
-			setAutoSaveSnapshot({ ...data });
-		}, 800);
-	}, []);
-
 	// ─── Interest combiner (must be defined before performAutoSave) ───
 	const getCombinedInterestValues = useCallback((data: ProfileFormData) => {
 		return Array.from(
@@ -173,17 +157,6 @@ export default function ProfilePage() {
 		},
 		[effectiveToken, getCombinedInterestValues],
 	);
-
-	const {
-		status: autoSaveStatus,
-		saveNow: flushAutoSave,
-		isDirty: hasUnsavedChanges,
-	} = useAutoSave({
-		data: autoSaveSnapshot,
-		onSave: performAutoSave,
-		debounceMs: 1200,
-		enabled: !isLoading && !!effectiveToken,
-	});
 
 	// Form state
 	const [formData, setFormData] = useState<ProfileFormData>({
@@ -275,8 +248,28 @@ export default function ProfilePage() {
 		voice_intro: null,
 	});
 
+	const {
+		status: autoSaveStatus,
+		saveNow: flushAutoSave,
+		isDirty: hasUnsavedChanges,
+	} = useAutoSave({
+		data: formData,
+		onSave: performAutoSave,
+		debounceMs: 1200,
+		enabled: !isLoading && !!effectiveToken && autoSaveEnabled,
+	});
+
 	// Calculate completeness from current form data
 	const currentCompleteness = useMemo(() => {
+		// Use the backend's pre-calculated percentage if available and we haven't edited anything
+		if (profile?.profile?.completion_percentage != null && !autoSaveEnabled) {
+			return {
+				percentage: Number(profile.profile.completion_percentage),
+				completedFields: [],
+				missingFields: [],
+				requiredMissing: [],
+			};
+		}
 		return calculateProfileCompleteness({
 			displayName: formData.display_name,
 			age: formData.date_of_birth
@@ -300,7 +293,7 @@ export default function ProfilePage() {
 			drinking: formData.drinking_status,
 			smoking: formData.smoking_status,
 		});
-	}, [formData, photos, getCombinedInterestValues]);
+	}, [formData, photos, getCombinedInterestValues, profile, autoSaveEnabled]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -340,13 +333,10 @@ export default function ProfilePage() {
 			setIsLoading(true);
 			setError(null);
 
-			const [profileData, completenessData] = await Promise.all([
-				getUserProfile(effectiveToken),
-				getProfileCompleteness(effectiveToken),
-			]);
+			const profileData = await getUserProfile(effectiveToken);
 
 			setProfile(profileData);
-			setCompleteness(completenessData.percentage);
+			setAutoSaveEnabled(false);
 
 			// Populate form with existing data
 			if (profileData.profile) {
@@ -577,7 +567,7 @@ export default function ProfilePage() {
 	const handleInputChange = (field: string, value: any) => {
 		setFormData((prev) => {
 			const next = { ...prev, [field]: value };
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -588,7 +578,7 @@ export default function ProfilePage() {
 				...prev,
 				location: { ...prev.location, [field]: value },
 			};
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -601,7 +591,7 @@ export default function ProfilePage() {
 					? [...prev.looking_for, value]
 					: prev.looking_for.filter((item) => item !== value),
 			};
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -628,7 +618,7 @@ export default function ProfilePage() {
 					? { [PREF_TO_DB_COLUMN[field]]: value }
 					: {}),
 			};
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -654,7 +644,7 @@ export default function ProfilePage() {
 							),
 				},
 			};
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -672,7 +662,7 @@ export default function ProfilePage() {
 				? [...currentArray, value]
 				: currentArray.filter((item: string) => item !== value);
 			const next = { ...prev, [field]: updatedArray };
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -685,7 +675,7 @@ export default function ProfilePage() {
 					? prev.interests.filter((item) => item !== slug)
 					: [...(prev.interests ?? []), slug],
 			};
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -693,7 +683,7 @@ export default function ProfilePage() {
 	const handleVoiceUpload = (file: File) => {
 		setFormData((prev) => {
 			const next = { ...prev, voice_intro: file };
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};
@@ -701,7 +691,7 @@ export default function ProfilePage() {
 	const handleVoiceDelete = () => {
 		setFormData((prev) => {
 			const next = { ...prev, voice_intro: null, voice_intro_url: null as any };
-			scheduleAutoSave(next);
+			setAutoSaveEnabled(true);
 			return next;
 		});
 	};

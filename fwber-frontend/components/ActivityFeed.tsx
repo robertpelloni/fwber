@@ -227,7 +227,9 @@ export function ActivityFeed({
                 activity.type === 'message' 
                   ? `/messages?user=${activity.user.id}` 
                   : activity.type === 'match' || activity.type === 'mutual_like'
-                    ? `/matches`
+                    ? activity.user?.id
+                      ? `/profile/${activity.user.id}`
+                      : `/matches`
                     : activity.type === 'friend'
                       ? `/friends`
                       : `/profile/${activity.user.id}`

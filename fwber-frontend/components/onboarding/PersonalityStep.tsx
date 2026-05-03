@@ -13,7 +13,7 @@ const PERSONALITY_TYPES = [
   'ISTP', 'ISFP', 'ESTP', 'ESFP',
   "Don't Know"
 ];
-const POLITICAL_VIEWS = ['Very Liberal', 'Liberal', 'Moderate', 'Conservative', 'Very Conservative', 'Libertarian', 'Apolitical', 'Other'];
+const POLITICAL_VIEWS = ['Very Liberal', 'Liberal', 'Moderate', 'Conservative', 'Very Conservative', 'Liberal-Conservative', 'Libertarian', 'Apolitical', 'Other'];
 const RELIGIONS = ['Agnostic', 'Atheist', 'Buddhist', 'Catholic', 'Christian', 'Hindu', 'Jewish', 'Muslim', 'Spiritual', 'Other', 'Prefer Not to Say'];
 const SLEEP_SCHEDULES = ['Early Bird', 'Night Owl', 'Flexible', 'Shift Worker', 'Insomniac'];
 const RELATIONSHIP_STYLES = ['Monogamous', 'Non-Monogamous', 'Polyamorous', 'Open', 'Ethically Non-Monogamous', 'Exploring'];
