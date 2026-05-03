@@ -135,7 +135,7 @@ router.post('/purchase', authenticate, async (req: any, res) => {
         where: { id: userId },
         data: {
           token_balance: { decrement: cost },
-          tier: 'premium',
+          tier: 'gold',
           unlimited_swipes: true,
           tier_expires_at: new Date(Date.now() + (planId === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000)
         }

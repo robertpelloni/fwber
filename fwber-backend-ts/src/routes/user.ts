@@ -227,7 +227,7 @@ router.post('/export', authenticate, async (req: any, res) => {
         id: user.id.toString(),
         email: user.email,
         created_at: user.created_at,
-        last_login: user.last_login_at
+        last_seen_at: user.last_seen_at
       },
       profile: user.user_profiles?.[0] || {},
       photos: user.photos.map(p => ({
