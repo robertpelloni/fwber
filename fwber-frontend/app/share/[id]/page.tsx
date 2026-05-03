@@ -47,7 +47,19 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
         break;
       case 'vibe':
         title = `${userName}'s Vibe Check 🚩`;
-        description = `Green flags, red flags, and everything in between.`;
+        description = `${data.content.green_flags?.length || 0} Green flags, ${data.content.red_flags?.length || 0} Red flags detected by AI.`;
+        break;
+      case 'quirk':
+        title = `${userName}'s Quirk Check 😜`;
+        description = `Quirk: "${data.content.quirk}". AI says: ${data.content.flag_type} - ${data.content.reason}`;
+        break;
+      case 'cosmic':
+        title = `Cosmic Match Prediction ✨`;
+        description = `The stars have spoken. Find out who is the perfect celestial match for ${userName}.`;
+        break;
+      case 'compatibility-audit':
+        title = `Compatibility Audit: ${data.content.overall_score}% 💖`;
+        description = `Deep dive into the connection between these two profiles. ${data.content.narrative}`;
         break;
     }
 

@@ -39,12 +39,25 @@ function buildProfileText(p: any): string {
 async function storeResult(userId: bigint, type: string, content: any): Promise<string> {
   const shareId = `${type.slice(0, 4)}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
   try {
+    // Get user details for metadata
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      include: { user_profiles: true }
+    });
+
+    const profile = Array.isArray(user?.user_profiles) ? user?.user_profiles[0] : user?.user_profiles;
+    const userName = profile?.display_name || user?.name || 'Someone';
+
     await prisma.viral_contents.create({
       data: {
         id: shareId,
         user_id: userId,
         type,
-        content: JSON.stringify(content),
+        content: JSON.stringify({
+          ...content,
+          user_name: userName,
+          profile_id: userId.toString()
+        }),
       },
     });
   } catch (err: any) {
@@ -62,7 +75,7 @@ router.post('/roast', async (req: any, res) => {
     const mode = req.body?.mode === 'hype' ? 'hype' : 'roast';
     const roast = await ai.generateRoast(BigInt(req.user.id), mode);
     const userId = BigInt(req.user.id);
-    const shareId = await storeResult(userId, mode, { text: roast, user_name: req.user?.name });
+    const shareId = await storeResult(userId, mode, { text: roast });
     res.json({ roast, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/roast]', err.message);
@@ -75,7 +88,7 @@ router.post('/roast', async (req: any, res) => {
 router.get('/vibe-check', async (req: any, res) => {
   try {
     const result = await ai.generateVibeCheck(BigInt(req.user.id));
-    const shareId = await storeResult(BigInt(req.user.id), 'vibe', { ...result, user_name: req.user?.name });
+    const shareId = await storeResult(BigInt(req.user.id), 'vibe', result);
     res.json({ ...result, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/vibe-check]', err.message);
@@ -90,7 +103,8 @@ router.post('/quirk-check', async (req: any, res) => {
     const quirk = req.body?.quirk || '';
     if (!quirk.trim()) { res.json({ flag_type: 'Beige Flag', reason: 'Tell us your quirk first!', emoji: '🤷' }); return; }
     const result = await ai.generateQuirkCheck(quirk);
-    res.json({ ...result, share_id: `quirk-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` });
+    const shareId = await storeResult(BigInt(req.user.id), 'quirk', { ...result, quirk });
+    res.json({ ...result, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/quirk-check]', err.message);
     res.json({ flag_type: 'Beige Flag', reason: "Our AI is having a moment. Try again.", emoji: '🤷' });
@@ -102,7 +116,7 @@ router.post('/quirk-check', async (req: any, res) => {
 router.get('/cosmic-match', async (req: any, res) => {
   try {
     const result = await ai.generateCosmicMatch(BigInt(req.user.id));
-    const shareId = await storeResult(BigInt(req.user.id), 'cosmic', { ...result, user_name: req.user?.name });
+    const shareId = await storeResult(BigInt(req.user.id), 'cosmic', result);
     res.json({ ...result, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/cosmic-match]', err.message);
@@ -115,7 +129,7 @@ router.get('/cosmic-match', async (req: any, res) => {
 router.get('/nemesis', async (req: any, res) => {
   try {
     const result = await ai.generateNemesis(BigInt(req.user.id));
-    const shareId = await storeResult(BigInt(req.user.id), 'nemesis', { ...result, user_name: req.user?.name });
+    const shareId = await storeResult(BigInt(req.user.id), 'nemesis', result);
     res.json({ ...result, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/nemesis]', err.message);
@@ -128,7 +142,7 @@ router.get('/nemesis', async (req: any, res) => {
 router.get('/fortune', async (req: any, res) => {
   try {
     const result = await ai.generateFortune(BigInt(req.user.id));
-    const shareId = await storeResult(BigInt(req.user.id), 'fortune', { text: result.fortune, user_name: req.user?.name });
+    const shareId = await storeResult(BigInt(req.user.id), 'fortune', { text: result.fortune });
     res.json({ ...result, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/fortune]', err.message);

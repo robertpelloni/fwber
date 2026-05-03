@@ -346,8 +346,8 @@ export async function generateAvatarImage(userId: bigint, style = 'realistic'): 
             sync_mode: true
           },
         });
-        if (result.images && result.images[0]) {
-          imageUrl = result.images[0].url;
+        if (result && (result as any).images && (result as any).images[0]) {
+          imageUrl = (result as any).images[0].url;
         }
       } catch (err: any) {
         console.error('[AI Avatar] fal.ai failed:', err.message);
@@ -390,7 +390,9 @@ export async function generateAvatarImage(userId: bigint, style = 'realistic'): 
         n: 1,
         size: "1024x1024",
       });
-      imageUrl = response.data[0].url;
+      if (response.data && response.data[0]) {
+        imageUrl = response.data[0].url;
+      }
     }
 
     if (imageUrl) {
@@ -411,7 +413,11 @@ export async function generateAvatarImage(userId: bigint, style = 'realistic'): 
           file_path: imageUrl,
           is_primary: true,
           is_private: false,
-          metadata: { source: 'ai', provider } as any
+          metadata: { source: 'ai', provider } as any,
+          filename: `avatar-${userId}-${Date.now()}.webp`,
+          original_filename: 'ai-avatar.webp',
+          mime_type: 'image/webp',
+          file_size: 0
         }
       });
 

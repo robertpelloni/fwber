@@ -543,14 +543,6 @@ router.put("/", authenticate, async (req: any, res) => {
 
 		// Map nested objects to flat DB columns
 		const data: any = {};
-		console.log(
-			"[PUT /api/profile] Received keys:",
-			Object.keys(raw).join(", "),
-			"drinking_status:",
-			raw.drinking_status,
-			"smoking_status:",
-			raw.smoking_status,
-		);
 		for (const [key, val] of Object.entries(raw)) {
 			if (val === undefined || val === null) continue;
 			if (key === "location") {
@@ -709,7 +701,6 @@ router.delete("/", authenticate, async (req: any, res) => {
 			prisma.blocks.deleteMany({ where: { blocker_id: userId } }),
 			prisma.blocks.deleteMany({ where: { blocked_id: userId } }),
 			prisma.reports.deleteMany({ where: { reporter_id: userId } }),
-			// likes model doesn't exist in schema
 			prisma.api_tokens.deleteMany({ where: { user_id: userId } }),
 		]);
 
@@ -784,12 +775,11 @@ router.get("/search", authenticate, async (req: any, res) => {
 		res.json(
 			(users as any).map((u: any) => {
 				const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : (u as any).user_profiles;
-				const displayName = p?.display_name || (u as any).display_name || u.name;
 				return {
 					id: Number(u.id),
 					email: u.email,
 					profile: {
-						display_name: displayName,
+						display_name: p?.display_name || u.name,
 						bio: (p as any)?.bio,
 						location: {
 							city: (p as any)?.location_description?.split(",")[0] || "",
@@ -814,7 +804,7 @@ router.get("/:id", authenticate, async (req: any, res) => {
 
 		if (!user) return res.status(404).json({ message: "User not found" });
 
-		const profile = user.user_profiles;
+		const profile = Array.isArray(user.user_profiles) ? user.user_profiles[0] : user.user_profiles;
 		const photos = await prisma.photos.findMany({
 			where: { user_id: targetUserId, is_private: false },
 			orderBy: { is_primary: "desc" },
@@ -861,7 +851,7 @@ router.get("/:id", authenticate, async (req: any, res) => {
 			created_at: user.created_at?.toISOString() || "",
 			last_online: user.last_seen_at?.toISOString() || "",
 			profile: {
-				display_name: p.display_name || user.display_name || "User",
+				display_name: p.display_name || user.name || "User",
 				bio: p.bio || "No bio yet.",
 				age:
 					p.date_of_birth || p.birthdate

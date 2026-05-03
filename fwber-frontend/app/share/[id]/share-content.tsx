@@ -170,13 +170,111 @@ export function ShareContent({ id }: { id: string }) {
             <h2 className="text-2xl font-bold text-center text-white">Scientific Nemesis 🧬</h2>
             <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-6 space-y-4">
               <div>
-                <h3 className="text-red-400 font-semibold">Nemesis Type</h3>
-                <p className="text-white text-lg">{data.content.nemesis_type}</p>
+                <h3 className="text-red-400 font-semibold text-sm uppercase tracking-wider mb-1">Nemesis Type</h3>
+                <p className="text-white text-lg font-bold">{data.content.nemesis_type}</p>
               </div>
-              <div>
-                <h3 className="text-red-400 font-semibold">Why It Would Fail</h3>
-                <p className="text-gray-300">{data.content.why_it_would_fail}</p>
+              <div className="pt-2 border-t border-red-500/20">
+                <h3 className="text-red-400 font-semibold text-xs uppercase tracking-wider mb-2">Scientific Explanation</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">{data.content.scientific_explanation}</p>
               </div>
+              <div className="pt-2 border-t border-red-500/20">
+                <h3 className="text-red-400 font-semibold text-xs uppercase tracking-wider mb-2">Clashing Traits</h3>
+                <div className="flex flex-wrap gap-2">
+                   {data.content.clashing_traits?.map((t: string, i: number) => (
+                      <span key={i} className="px-2 py-1 bg-red-900/40 border border-red-500/30 rounded text-[10px] text-red-200">
+                         {t}
+                      </span>
+                   ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'quirk':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-pink-500/20">
+                <span className="text-4xl">{data.content.emoji || '😜'}</span>
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center text-white">
+              {data.user_name ? `${data.user_name}'s Quirk Check` : 'Quirk Check Result'}
+            </h2>
+            <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 space-y-4">
+               <div>
+                <h4 className="text-zinc-500 text-xs font-black uppercase tracking-widest mb-1">The Quirk</h4>
+                <p className="text-white text-lg font-medium italic">&quot;{data.content.quirk}&quot;</p>
+              </div>
+              <div className="flex items-center gap-2">
+                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                    data.content.flag_type?.includes('Green') ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                    data.content.flag_type?.includes('Red') ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                    'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                 }`}>
+                    {data.content.flag_type}
+                 </span>
+              </div>
+              <p className="text-gray-300 leading-relaxed italic">
+                {data.content.reason}
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'cosmic':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <div className="p-4 rounded-full bg-indigo-500/20">
+                <Sparkles className="w-12 h-12 text-indigo-500" />
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-center text-white">
+              {data.user_name ? `${data.user_name}'s Cosmic Match` : 'Cosmic Match Oracle'}
+            </h2>
+            <div className="space-y-4">
+              <div className="bg-indigo-900/20 border border-indigo-500/30 rounded-lg p-5">
+                <h4 className="text-indigo-400 text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <Star className="w-3 h-3" /> Best Match
+                </h4>
+                <p className="text-white font-bold mb-1">{data.content.best_match}</p>
+                <p className="text-sm text-gray-300 italic">{data.content.best_reason}</p>
+              </div>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
+                <h4 className="text-zinc-500 text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2">
+                  <AlertTriangle className="w-3 h-3" /> Avoid
+                </h4>
+                <p className="text-zinc-300 font-bold mb-1">{data.content.worst_match}</p>
+                <p className="text-sm text-zinc-500 italic">{data.content.worst_reason}</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'compatibility-audit':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-center flex-col items-center">
+               <div className="text-6xl font-black italic tracking-tighter text-white mb-2">{data.content.overall_score}%</div>
+               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Compatibility Score</div>
+            </div>
+            <div className="space-y-4">
+               <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-xl shadow-inner">
+                  <p className="text-gray-300 italic text-sm leading-relaxed">&quot;{data.content.narrative}&quot;</p>
+               </div>
+               <div className="grid grid-cols-1 gap-3">
+                  {data.content.alignment_areas?.slice(0, 3).map((a: any, i: number) => (
+                    <div key={i} className="flex gap-3 p-3 bg-green-500/5 border border-green-500/10 rounded-lg">
+                       <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-1" />
+                       <div>
+                          <p className="text-xs font-black uppercase text-green-500">{a.area}</p>
+                          <p className="text-sm text-gray-300 leading-snug">{a.detail}</p>
+                       </div>
+                    </div>
+                  ))}
+               </div>
             </div>
           </div>
         );
@@ -265,6 +363,22 @@ export function ShareContent({ id }: { id: string }) {
             )}
 
             {renderContent()}
+
+            <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col items-center">
+              {data.content.profile_id && (
+                <Link href={`/profile/${data.content.profile_id}`}>
+                   <Button variant="ghost" className="text-primary hover:text-primary/80 transition-colors flex items-center gap-2 group mb-4 font-bold italic uppercase tracking-tighter">
+                      View {data.user_name || 'User'}&apos;s Profile
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                   </Button>
+                </Link>
+              )}
+              
+              <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest text-center">
+                Strictly for Entertainment Purposes <br/>
+                Powered by fwber AI &copy; {new Date().getFullYear()}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </main>

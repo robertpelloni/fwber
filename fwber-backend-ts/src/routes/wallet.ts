@@ -95,7 +95,8 @@ router.post('/top-up/confirm', authenticate, async (req: any, res) => {
     const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent_id);
 
     if (paymentIntent.status === 'succeeded' && paymentIntent.metadata.userId === userId.toString()) {
-      const amountUsd = parseInt(paymentIntent.metadata.amount_usd);
+      const amountUsdStr = paymentIntent.metadata.amount_usd || '0';
+      const amountUsd = parseInt(amountUsdStr);
       
       // Calculate token amount (matches AMOUNTS in frontend)
       let fwbAmount = amountUsd * 10;
