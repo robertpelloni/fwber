@@ -70,6 +70,17 @@ export class AuthController {
 
       const hashedPassword = await bcrypt.hash(validated.password, 10);
 
+      // Handle referral code
+      let referrerId: bigint | null = null;
+      if (validated.referral_code) {
+        const referrer = await prisma.users.findFirst({
+          where: { referral_code: validated.referral_code }
+        });
+        if (referrer) {
+          referrerId = referrer.id;
+        }
+      }
+
       const user = await prisma.users.create({
         data: {
           name: validated.name,
@@ -78,8 +89,19 @@ export class AuthController {
           role: 'user',
           tier: 'free',
           referral_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+          referrer_id: referrerId,
         },
       });
+
+      // Reward referrer with 50 tokens
+      if (referrerId) {
+        await prisma.users.update({
+          where: { id: referrerId },
+          data: {
+            token_balance: { increment: 50 }
+          }
+        });
+      }
 
       // Initialize profile
       await prisma.user_profiles.create({

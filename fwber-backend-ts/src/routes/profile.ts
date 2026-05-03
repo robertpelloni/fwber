@@ -375,40 +375,40 @@ async function calculateProfileCompletenessSummary(userId: bigint, profile: any)
 	const missing_optional: string[] = [];
 
 	if (photoCount >= 3) earned += 25;
-	else missing_required.push("Profile Photos (at least 3)");
+	else missing_required.push("photos");
 
 	if (profile.bio && String(profile.bio).trim().length >= 10) earned += 20;
-	else missing_required.push("Bio");
+	else missing_required.push("bio");
 
 	if (birthDate) earned += 10;
-	else missing_required.push("Date of birth");
+	else missing_required.push("age");
 
 	if (profile.location_description || profile.location_latitude) earned += 10;
-	else missing_required.push("Location");
+	else missing_required.push("location");
 
 	if (interestsArr.length >= 3) earned += 10;
-	else missing_optional.push("Interests (at least 3)");
+	else missing_optional.push("interests");
 
 	if (profile.occupation || prefs.occupation) earned += 5;
-	else missing_optional.push("Occupation");
+	else missing_optional.push("occupation");
 
 	if (profile.education || prefs.education) earned += 5;
-	else missing_optional.push("Education");
+	else missing_optional.push("education");
 
 	if (profile.height_cm) earned += 3;
-	else missing_optional.push("Height");
+	else missing_optional.push("height");
 
 	if (profile.religion) earned += 3;
-	else missing_optional.push("Religion");
+	else missing_optional.push("religion");
 
 	if (profile.political_views) earned += 3;
-	else missing_optional.push("Political Views");
+	else missing_optional.push("politics");
 
 	if (profile.drinking_status || prefs.drinking) earned += 3;
-	else missing_optional.push("Drinking Preference");
+	else missing_optional.push("drinking");
 
 	if (profile.smoking_status || prefs.smoking) earned += 3;
-	else missing_optional.push("Smoking Preference");
+	else missing_optional.push("smoking");
 
 	return {
 		percentage: earned,

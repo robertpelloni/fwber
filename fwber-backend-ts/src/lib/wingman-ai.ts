@@ -4,6 +4,9 @@
  */
 
 import OpenAI from 'openai';
+import Replicate from 'replicate';
+import * as fal from "@fal-ai/serverless-client";
+import prisma from './prisma.js';
 
 /**
  * Configure AI Providers
@@ -27,6 +30,15 @@ const openrouter = process.env.OPENROUTER_API_KEY ? new OpenAI({
 const legacyOpenai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 }) : null;
+
+const replicate = process.env.REPLICATE_API_TOKEN ? new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+}) : null;
+
+// Initialize fal.ai
+if (process.env.FAL_KEY) {
+  process.env.FAL_API_KEY = process.env.FAL_KEY;
+}
 
 /** Fetch a user's profile as a plain summary string for prompts */
 async function getProfileSummary(userId: bigint): Promise<string> {
@@ -276,4 +288,143 @@ export async function generateFortune(userId: bigint): Promise<{ fortune: string
     0.95
   );
   return { fortune: result || 'The stars are aligning in your favor. A surprise encounter awaits.' };
+}
+
+// ─── Avatar Generation ──────────────────────────────────────────────────────
+
+export async function generateAvatarPrompt(userId: bigint): Promise<string> {
+  const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+  if (!profile) return 'A mysterious and intriguing person.';
+
+  const system = `You are an expert prompt engineer for DALL-E 3 and Stable Diffusion.
+Given a user's physical profile and lifestyle, create a highly detailed, photorealistic prompt for an avatar image.
+The avatar should look like a high-end social media profile picture.
+Focus on lighting, clothing style, and physical features.
+Output ONLY the prompt text. No preamble.`;
+
+  const userPrompt = `
+Physical Attributes:
+- Height: ${profile.height_cm ? `${profile.height_cm}cm` : 'average'}
+- Body Type: ${profile.body_type || 'average'}
+- Hair: ${profile.hair_color || 'natural'} ${profile.facial_hair ? `with ${profile.facial_hair}` : ''}
+- Eyes: ${profile.eye_color || 'expressive'}
+- Tone: ${profile.skin_tone || 'natural'}
+- Ethnicity: ${profile.ethnicity || 'mixed'}
+- Style: ${profile.clothing_style || 'casual stylish'}
+- Vibe: ${profile.fitness_level || 'healthy'}
+
+Create a professional, attractive avatar prompt.`;
+
+  return ask(system, userPrompt, 0.7);
+}
+
+export async function generateAvatarImage(userId: bigint, style = 'realistic'): Promise<string> {
+  const prompt = await generateAvatarPrompt(userId);
+
+  // Mark as generating
+  await prisma.user_profiles.updateMany({
+    where: { user_id: userId },
+    data: { 
+      avatar_prompt: prompt,
+      avatar_status: 'generating'
+    }
+  });
+
+  try {
+    let imageUrl: string | undefined;
+
+    // 1. Try fal.ai (Flux Pro or Realism LoRA) - Fastest and extremely high quality
+    if (process.env.FAL_KEY || process.env.FAL_API_KEY) {
+      try {
+        console.log('[AI Avatar] Generating with fal.ai...');
+        const result: any = await fal.subscribe("fal-ai/flux-pro", {
+          input: {
+            prompt: `Photorealistic high-end profile picture. ${prompt} Style: ${style}. High resolution, 4k, professional lighting.`,
+            image_size: "square_hd",
+            num_images: 1,
+            enable_safety_checker: true,
+            sync_mode: true
+          },
+        });
+        if (result.images && result.images[0]) {
+          imageUrl = result.images[0].url;
+        }
+      } catch (err: any) {
+        console.error('[AI Avatar] fal.ai failed:', err.message);
+      }
+    }
+
+    // 2. Try Replicate (Flux Schnell) - Great value/speed ratio
+    if (!imageUrl && replicate) {
+      try {
+        console.log('[AI Avatar] Generating with Replicate...');
+        const output: any = await replicate.run(
+          "black-forest-labs/flux-schnell",
+          {
+            input: {
+              prompt: `Photorealistic high-end profile picture. ${prompt} Style: ${style}. High resolution, 4k, professional lighting.`,
+              num_outputs: 1,
+              aspect_ratio: "1:1",
+              output_format: "webp",
+              output_quality: 90
+            }
+          }
+        );
+        
+        if (Array.isArray(output) && output[0]) {
+          imageUrl = output[0];
+        } else if (typeof output === 'string') {
+          imageUrl = output;
+        }
+      } catch (err: any) {
+        console.error('[AI Avatar] Replicate failed:', err.message);
+      }
+    }
+
+    // 3. Fallback to OpenAI DALL-E 3
+    if (!imageUrl && legacyOpenai) {
+      console.log('[AI Avatar] Falling back to DALL-E 3...');
+      const response = await legacyOpenai.images.generate({
+        model: "dall-e-3",
+        prompt: `Photorealistic high-end profile picture. ${prompt} Style: ${style}. High resolution, 4k, professional lighting.`,
+        n: 1,
+        size: "1024x1024",
+      });
+      imageUrl = response.data[0].url;
+    }
+
+    if (imageUrl) {
+      const provider = imageUrl.includes('fal.ai') ? 'fal' : (imageUrl.includes('replicate') ? 'replicate' : 'openai');
+      
+      await prisma.user_profiles.updateMany({
+        where: { user_id: userId },
+        data: { 
+          avatar_url: imageUrl,
+          avatar_status: 'completed'
+        }
+      });
+
+      // Also add to photos table as a primary photo
+      await prisma.photos.create({
+        data: {
+          user_id: userId,
+          file_path: imageUrl,
+          is_primary: true,
+          is_private: false,
+          metadata: { source: 'ai', provider } as any
+        }
+      });
+
+      return imageUrl;
+    }
+    
+    throw new Error('No image generation provider available or generation failed');
+  } catch (err: any) {
+    console.error('[AI Avatar] Generation failed:', err.message);
+    await prisma.user_profiles.updateMany({
+      where: { user_id: userId },
+      data: { avatar_status: 'failed' }
+    });
+    return '';
+  }
 }

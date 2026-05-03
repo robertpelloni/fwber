@@ -31,6 +31,14 @@ const FALLBACK_INTEREST_OPTIONS: InterestOption[] = [
   { slug: 'nightlife', label: 'Nightlife' },
 ] as const
 
+const HAIR_COLORS = ['Black', 'Brown', 'Blonde', 'Red', 'Gray', 'White', 'Bald', 'Other'];
+const EYE_COLORS = ['Brown', 'Blue', 'Green', 'Hazel', 'Grey', 'Amber', 'Other'];
+const SKIN_TONES = ['Fair', 'Light', 'Medium', 'Olive', 'Tan', 'Brown', 'Dark', 'Other'];
+const ETHNICITIES = ['White', 'Black', 'Hispanic', 'Asian', 'Middle Eastern', 'Native American', 'Pacific Islander', 'Mixed', 'Other'];
+const FACIAL_HAIR = ['Clean-shaven', 'Stubble', 'Short Beard', 'Long Beard', 'Goatee', 'Mustache', 'Other'];
+const FITNESS_LEVELS = ['Sedentary', 'Occasionally Active', 'Active', 'Very Active', 'Athlete'];
+const CLOTHING_STYLES = ['Casual', 'Business', 'Formal', 'Sporty', 'Bohemian', 'Gothic', 'Alternative', 'Trendy', 'Minimalist', 'Vintage'];
+
 export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
   const { user } = useAuth();
   // Threshold for Premium Filters: 100 FWB tokens
@@ -55,6 +63,17 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
     politics: '',
     religion: '',
     zodiac: '',
+    // Additional Physical Attributes
+    hair_color: '',
+    eye_color: '',
+    skin_tone: '',
+    ethnicity: '',
+    facial_hair: '',
+    fitness_level: '',
+    clothing_style: '',
+    dominant_hand: '',
+    tattoos: '',
+    piercings: '',
   });
   const [topicOptions, setTopicOptions] = useState<InterestOption[]>([]);
 
@@ -367,7 +386,7 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
           </div>
 
            {/* Children */}
-           <div>
+          <div>
             <label htmlFor="has_children" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Has Children</label>
             <select
               id="has_children"
@@ -379,6 +398,143 @@ export default function MatchFilter({ onFilterChange }: MatchFilterProps) {
               <option value="">Any</option>
               <option value="yes">Yes</option>
               <option value="no">No</option>
+            </select>
+          </div>
+
+          {/* Hair Color */}
+          <div>
+            <label htmlFor="hair_color" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hair Color</label>
+            <select
+              id="hair_color"
+              value={filters.hair_color}
+              onChange={(e) => handleInputChange('hair_color', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {HAIR_COLORS.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Eye Color */}
+          <div>
+            <label htmlFor="eye_color" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Eye Color</label>
+            <select
+              id="eye_color"
+              value={filters.eye_color}
+              onChange={(e) => handleInputChange('eye_color', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {EYE_COLORS.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Skin Tone */}
+          <div>
+            <label htmlFor="skin_tone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Skin Tone</label>
+            <select
+              id="skin_tone"
+              value={filters.skin_tone}
+              onChange={(e) => handleInputChange('skin_tone', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {SKIN_TONES.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Ethnicity */}
+          <div>
+            <label htmlFor="ethnicity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Ethnicity</label>
+            <select
+              id="ethnicity"
+              value={filters.ethnicity}
+              onChange={(e) => handleInputChange('ethnicity', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {ETHNICITIES.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Facial Hair */}
+          <div>
+            <label htmlFor="facial_hair" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Facial Hair</label>
+            <select
+              id="facial_hair"
+              value={filters.facial_hair}
+              onChange={(e) => handleInputChange('facial_hair', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {FACIAL_HAIR.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Fitness Level */}
+          <div>
+            <label htmlFor="fitness_level" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fitness Level</label>
+            <select
+              id="fitness_level"
+              value={filters.fitness_level}
+              onChange={(e) => handleInputChange('fitness_level', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {FITNESS_LEVELS.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Clothing Style */}
+          <div>
+            <label htmlFor="clothing_style" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Clothing Style</label>
+            <select
+              id="clothing_style"
+              value={filters.clothing_style}
+              onChange={(e) => handleInputChange('clothing_style', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              {CLOTHING_STYLES.map(c => <option key={c} value={c.toLowerCase()}>{c}</option>)}
+            </select>
+          </div>
+
+          {/* Tattoos */}
+          <div>
+            <label htmlFor="tattoos" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tattoos</label>
+            <select
+              id="tattoos"
+              value={filters.tattoos}
+              onChange={(e) => handleInputChange('tattoos', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
+          {/* Piercings */}
+          <div>
+            <label htmlFor="piercings" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Piercings</label>
+            <select
+              id="piercings"
+              value={filters.piercings}
+              onChange={(e) => handleInputChange('piercings', e.target.value)}
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              disabled={!isPremium}
+            >
+              <option value="">Any</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
             </select>
           </div>
 

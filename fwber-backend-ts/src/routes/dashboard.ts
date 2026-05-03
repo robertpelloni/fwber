@@ -4,6 +4,59 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 
+/**
+ * Helper: Parse JSON fields that may already be objects or strings
+ */
+function parseJsonField(val: any): any {
+  if (!val) return val;
+  if (typeof val === "object") return val;
+  if (typeof val === "string") {
+    try {
+      return JSON.parse(val);
+    } catch {
+      return val;
+    }
+  }
+  return val;
+}
+
+/**
+ * Calculate Profile Completeness (Mirroring the profile.ts logic)
+ */
+async function calculateCompleteness(userId: bigint, profile: any) {
+  if (!profile) return 0;
+
+  const photoCount = await prisma.photos.count({
+    where: { user_id: userId, is_private: false },
+  });
+  
+  const interestsArr = Array.isArray(parseJsonField(profile.interests))
+    ? parseJsonField(profile.interests)
+    : [];
+    
+  const prefsRaw: any = parseJsonField(profile.preferences) || {};
+  const prefs = typeof prefsRaw === "object" && !Array.isArray(prefsRaw) ? prefsRaw : {};
+  const birthDate = profile.date_of_birth || profile.birthdate;
+
+  let earned = 0;
+
+  // Weights (Matching profile.ts)
+  if (photoCount >= 3) earned += 25;
+  if (profile.bio && String(profile.bio).trim().length >= 10) earned += 20;
+  if (birthDate) earned += 10;
+  if (profile.location_description || profile.location_latitude) earned += 10;
+  if (interestsArr.length >= 3) earned += 10;
+  if (profile.occupation || prefs.occupation) earned += 5;
+  if (profile.education || prefs.education) earned += 5;
+  if (profile.height_cm) earned += 3;
+  if (profile.religion) earned += 3;
+  if (profile.political_views) earned += 3;
+  if (profile.drinking_status || prefs.drinking) earned += 3;
+  if (profile.smoking_status || prefs.smoking) earned += 3;
+
+  return earned;
+}
+
 // All routes require authentication
 router.use(authenticate);
 
@@ -14,6 +67,7 @@ router.get('/stats', async (req: any, res) => {
 
     const [
       user,
+      profile,
       totalMatches,
       pendingMatches,
       acceptedMatches,
@@ -21,6 +75,7 @@ router.get('/stats', async (req: any, res) => {
       conversations,
     ] = await Promise.all([
       prisma.users.findUnique({ where: { id: userId } }),
+      prisma.user_profiles.findFirst({ where: { user_id: userId } }),
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }] } }),
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'pending' } }),
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' } }),
@@ -31,6 +86,8 @@ router.get('/stats', async (req: any, res) => {
     const daysActive = user?.created_at
       ? Math.max(1, Math.floor((Date.now() - new Date(user.created_at as any).getTime()) / 86400000))
       : 1;
+
+    const completionPercentage = await calculateCompleteness(userId, profile);
 
     res.json({
       total_matches: totalMatches,
@@ -47,6 +104,7 @@ router.get('/stats', async (req: any, res) => {
       streak_just_updated: false,
       reverb_healthy: true,
       token_balance: Number(user?.token_balance || 0),
+      completion_percentage: completionPercentage,
     });
   } catch (error: any) {
     console.error('[Dashboard] Stats error:', error.message);

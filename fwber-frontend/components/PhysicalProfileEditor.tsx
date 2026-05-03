@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { physicalProfileApi, type PhysicalProfile } from '@/lib/api/physical-profile';
-import { Ruler, User, Palette, Shirt, Activity, Wand2 } from 'lucide-react';
+import { Ruler, User, Palette, Shirt, Activity, Wand2, Sparkles } from 'lucide-react';
 
 export default function PhysicalProfileEditor() {
   const { token, user } = useAuth();
@@ -13,6 +13,7 @@ export default function PhysicalProfileEditor() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [avatarStyle, setAvatarStyle] = useState('realistic');
   const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
+  const [sexyBoost, setSexyBoost] = useState(true);
 
   // Auto-generate prompt from physical attributes
   const generatePromptFromAttributes = useCallback(() => {
@@ -348,10 +349,26 @@ export default function PhysicalProfileEditor() {
                 <option value="realistic">Realistic</option>
                 <option value="anime">Anime</option>
                 <option value="fantasy">Fantasy</option>
-                <option value="sci-fi">Sci-Fi</option>
-                <option value="cartoon">Cartoon</option>
-                <option value="pixel-art">Pixel Art</option>
+                <option value="glamour">Glamour</option>
+                <option value="neon">Neon Cyberpunk</option>
+                <option value="oil-painting">Oil Painting</option>
               </select>
+            </div>
+            <div className="flex flex-col gap-1 items-center mb-1">
+                <span className="text-[10px] uppercase font-bold text-pink-500 flex items-center gap-0.5">
+                    <Sparkles className="w-2.5 h-2.5" /> Boost
+                </span>
+                <button
+                    type="button"
+                    onClick={() => setSexyBoost(!sexyBoost)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    sexyBoost ? 'bg-pink-500' : 'bg-gray-300'
+                    }`}
+                >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                    sexyBoost ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                </button>
             </div>
             <button
               type="button"
@@ -359,7 +376,7 @@ export default function PhysicalProfileEditor() {
               disabled={isGeneratingAvatar || !profile.avatar_prompt}
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {isGeneratingAvatar ? 'Generating...' : 'Generate Avatar'}
+              {isGeneratingAvatar ? 'Generating...' : (sexyBoost ? '🔥 Generate' : 'Generate')}
             </button>
           </div>
           {profile.avatar_status && (

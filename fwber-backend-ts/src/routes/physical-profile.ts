@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { generateAvatarImage } from '../lib/wingman-ai.js';
 
 const router = Router();
 
@@ -145,7 +146,10 @@ router.post('/avatar/request', authenticate, async (req: any, res) => {
       });
     }
 
-    // TODO: Queue actual avatar generation job here when provider is wired up
+    // Trigger async generation (don't await it to avoid blocking response)
+    generateAvatarImage(userId, style || 'realistic').catch(err => {
+      console.error('[AvatarJob] Background generation failed:', err.message);
+    });
 
     res.json({ success: true, status: 'requested', style: style || 'realistic' });
   } catch (error: any) {

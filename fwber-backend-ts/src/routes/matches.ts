@@ -29,6 +29,16 @@ router.get('/', authenticate, async (req: any, res) => {
       politics: typeof req.query.politics === 'string' ? req.query.politics : '',
       religion: typeof req.query.religion === 'string' ? req.query.religion : '',
       zodiac: typeof req.query.zodiac === 'string' ? req.query.zodiac : '',
+      hair_color: typeof req.query.hair_color === 'string' ? req.query.hair_color : '',
+      eye_color: typeof req.query.eye_color === 'string' ? req.query.eye_color : '',
+      skin_tone: typeof req.query.skin_tone === 'string' ? req.query.skin_tone : '',
+      ethnicity: typeof req.query.ethnicity === 'string' ? req.query.ethnicity : '',
+      facial_hair: typeof req.query.facial_hair === 'string' ? req.query.facial_hair : '',
+      fitness_level: typeof req.query.fitness_level === 'string' ? req.query.fitness_level : '',
+      clothing_style: typeof req.query.clothing_style === 'string' ? req.query.clothing_style : '',
+      dominant_hand: typeof req.query.dominant_hand === 'string' ? req.query.dominant_hand : '',
+      tattoos: parseBooleanParam(req.query.tattoos),
+      piercings: parseBooleanParam(req.query.piercings),
     };
 
     // Exclude existing matches and self
@@ -483,6 +493,28 @@ function matchesRequestedFilters(profile: any, filters: any): boolean {
   const hasChildren = typeof profile?.has_children === 'boolean' ? profile.has_children : parseBooleanParam(profile?.has_children);
   const wantsChildren = typeof profile?.wants_children === 'boolean' ? profile.wants_children : parseBooleanParam(profile?.wants_children);
   const heightCm = profile?.height_cm != null ? Number(profile.height_cm) : null;
+
+  const hairColor = normalizeValue(profile?.hair_color);
+  const eyeColor = normalizeValue(profile?.eye_color);
+  const skinTone = normalizeValue(profile?.skin_tone);
+  const ethnicity = normalizeValue(profile?.ethnicity);
+  const facialHair = normalizeValue(profile?.facial_hair);
+  const fitnessLevel = normalizeValue(profile?.fitness_level);
+  const clothingStyle = normalizeValue(profile?.clothing_style);
+  const dominantHand = normalizeValue(profile?.dominant_hand);
+  const tattoos = typeof profile?.tattoos === 'boolean' ? profile.tattoos : parseBooleanParam(profile?.tattoos);
+  const piercings = typeof profile?.piercings === 'boolean' ? profile.piercings : parseBooleanParam(profile?.piercings);
+
+  if (filters.hair_color && hairColor !== normalizeValue(filters.hair_color)) return false;
+  if (filters.eye_color && eyeColor !== normalizeValue(filters.eye_color)) return false;
+  if (filters.skin_tone && skinTone !== normalizeValue(filters.skin_tone)) return false;
+  if (filters.ethnicity && ethnicity !== normalizeValue(filters.ethnicity)) return false;
+  if (filters.facial_hair && facialHair !== normalizeValue(filters.facial_hair)) return false;
+  if (filters.fitness_level && fitnessLevel !== normalizeValue(filters.fitness_level)) return false;
+  if (filters.clothing_style && clothingStyle !== normalizeValue(filters.clothing_style)) return false;
+  if (filters.dominant_hand && dominantHand !== normalizeValue(filters.dominant_hand)) return false;
+  if (filters.tattoos !== null && tattoos !== filters.tattoos) return false;
+  if (filters.piercings !== null && piercings !== filters.piercings) return false;
 
   if (filters.smoking && smoking !== normalizeValue(filters.smoking)) return false;
   if (filters.drinking && drinking !== normalizeValue(filters.drinking)) return false;
