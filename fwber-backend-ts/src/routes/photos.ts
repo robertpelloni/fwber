@@ -6,6 +6,7 @@ import fs from 'fs';
 import sharp from 'sharp';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { filePathToUrl, thumbPathToUrl } from '../lib/photos.js';
 
 const router = Router();
 
@@ -53,7 +54,7 @@ function serialize(photo: any) {
     id: String(photo.id),
     url: `${API_BASE}/uploads/${photo.filename}`,
     thumbnail_url: photo.thumbnail_path ? `${API_BASE}/uploads/thumbnails/${path.basename(photo.thumbnail_path)}` : null,
-    file_path: photo.file_path,
+    file_path: filePathToUrl(photo.file_path),
     original_path: photo.original_path,
     filename: photo.filename,
     original_filename: photo.original_filename,

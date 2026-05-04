@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { filePathToUrl } from '../lib/photos.js';
 
 const router = Router();
 
@@ -298,7 +299,7 @@ router.get('/feed', async (req: any, res) => {
           avatar_url: p.avatar_url || null,
           photos: (u.photos || []).map((ph: any) => ({
             id: Number(ph.id),
-            url: ph.file_path || ph.url || '',
+            url: filePathToUrl(ph.file_path || ph.url),
             is_private: ph.is_private || false,
             is_primary: ph.is_primary || false,
           })),
@@ -387,7 +388,7 @@ function buildRecommendation(u: any, p: any, myInterests: string[], myLookingFor
       avatar_url: p.avatar_url || null,
       photos: (u.photos || []).map((ph: any) => ({
         id: Number(ph.id),
-        url: ph.file_path || ph.url || '',
+        url: filePathToUrl(ph.file_path || ph.url),
         is_private: ph.is_private || false,
         is_primary: ph.is_primary || false,
       })),

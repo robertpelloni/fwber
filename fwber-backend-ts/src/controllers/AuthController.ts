@@ -44,16 +44,32 @@ export class AuthController {
     return obj;
   }
 
+  private SENSITIVE_FIELDS = [
+    'password', 'decoy_password', 'two_factor_secret',
+    'two_factor_recovery_codes', 'remember_token', 'merchant_secret',
+  ];
+
+  private sanitizeUser(obj: any): any {
+    if (!obj || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map((v: any) => this.sanitizeUser(v));
+    const out: any = {};
+    for (const key of Object.keys(obj)) {
+      if (this.SENSITIVE_FIELDS.includes(key)) continue;
+      out[key] = this.sanitizeUser(obj[key]);
+    }
+    return out;
+  }
+
   private async hydrateUser(user: any) {
     const referralsCount = await prisma.users.count({
       where: { referrer_id: user.id }
     });
 
-    return this.serialize({
+    return this.sanitizeUser(this.serialize({
       ...user,
       referrals_count: referralsCount,
       vouches_count: 0,
-    });
+    }));
   }
 
   register = async (req: Request, res: Response) => {

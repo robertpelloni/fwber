@@ -82,7 +82,16 @@ const httpServer = createServer(app);
 setupSocketIO(httpServer);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://www.fwber.me',
+    'https://fwber.me',
+    'http://localhost:3000',
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}));
 app.use(helmet({ 
   contentSecurityPolicy: {
     directives: {

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { filePathToUrl } from '../lib/photos.js';
 
 const router = Router();
 
@@ -144,7 +145,7 @@ router.get('/', authenticate, async (req: any, res) => {
         voice_intro_url: p.voice_intro_url || null,
         photos: (u.photos || []).map((photo: any) => ({
           id: Number(photo.id),
-          url: photo.file_path || photo.url || '',
+          url: filePathToUrl(photo.file_path || photo.url),
           is_private: photo.is_private || false,
           is_primary: photo.is_primary || false,
         })),
@@ -301,7 +302,7 @@ router.get('/established', authenticate, async (req: any, res) => {
           },
           photos: (otherUser?.photos || []).map((p: any) => ({
             id: Number(p.id),
-            url: p.file_path || p.url || '',
+            url: filePathToUrl(p.file_path || p.url),
             is_private: p.is_private || false,
             is_primary: p.is_primary || false,
           })),

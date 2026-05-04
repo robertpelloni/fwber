@@ -16,7 +16,11 @@ export function setupSocketIO(httpServer: any) {
     addTrailingSlash: true,
     transports: ['websocket', 'polling'],
     cors: {
-      origin: process.env.FRONTEND_URL || '*',
+      origin: [
+    'https://www.fwber.me',
+    'https://fwber.me',
+    'http://localhost:3000',
+  ],
       methods: ['GET', 'POST'],
       credentials: true,
     },

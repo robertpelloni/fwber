@@ -1,0 +1,17 @@
+{
+	"CHANGELOG.md": true,
+	"CONTRIBUTING.md": true,
+	"DEPLOY.md": true,
+	"GEMINI.md": true,
+	"GPT.md": true,
+	"HANDOFF.md": true,
+	"IDEAS.md": true,
+	"MEMORY.md": true,
+	"PROJECT_STATUS.md": true,
+	"README.md": true,
+	"ROADMAP.md": true,
+	"SECURITY.md": true,
+	"SUBMODULE_INVENTORY.md": true,
+	"TODO.md": true,
+	"VISION.md": true
+}

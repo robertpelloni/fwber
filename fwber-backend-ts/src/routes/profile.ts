@@ -1,5 +1,6 @@
 import { Router } from "express";
 import prisma from "../lib/prisma.js";
+import { filePathToUrl } from "../lib/photos.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
@@ -182,7 +183,7 @@ router.get("/", authenticate, async (req: any, res) => {
 				completion_status: completeness,
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
-					url: ph.file_path || "",
+					url: filePathToUrl(ph.file_path),
 					is_private: ph.is_private || false,
 					is_primary: ph.is_primary || false,
 				})),
@@ -870,7 +871,7 @@ router.get("/:id", authenticate, async (req: any, res) => {
 				interests: p.interests || [],
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
-					url: ph.file_path || "",
+					url: filePathToUrl(ph.file_path),
 					is_private: ph.is_private || false,
 					is_primary: ph.is_primary || false,
 				})),
