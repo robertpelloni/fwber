@@ -56,7 +56,7 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
 
 // GET /api/premium/status - Premium subscription status
 router.get('/status', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   try {
     const user = await prisma.users.findUnique({
       where: { id: userId },
@@ -80,7 +80,7 @@ router.get('/status', authenticate, async (req: any, res) => {
 
 // POST /api/premium/initiate - Initiate premium subscription via Stripe
 router.post('/initiate', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   const { planId } = req.body; // monthly, yearly
 
   if (!stripe) {
@@ -129,7 +129,7 @@ router.post('/initiate', authenticate, async (req: any, res) => {
 
 // POST /api/premium/purchase - Purchase premium with tokens
 router.post('/purchase', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   const { planId } = req.body;
 
   const tokenCosts = {
@@ -167,7 +167,7 @@ router.post('/purchase', authenticate, async (req: any, res) => {
 
 // POST /api/premium/cancel - Cancel premium
 router.post('/cancel', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   try {
     await prisma.users.update({
       where: { id: userId },

@@ -11,7 +11,7 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 
 // GET /api/wallet - Get user wallet balance
 router.get('/', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   try {
     const user = await prisma.users.findUnique({
       where: { id: userId },
@@ -30,7 +30,7 @@ router.get('/', authenticate, async (req: any, res) => {
 
 // GET /api/wallet/transactions - Transaction history
 router.get('/transactions', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   try {
     const transactions = await prisma.merchant_payments.findMany({
       where: { payer_id: userId },
@@ -48,7 +48,7 @@ router.get('/transactions', authenticate, async (req: any, res) => {
  * Creates a Stripe Payment Intent for a specific USD amount
  */
 router.post('/top-up/initiate', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   const { amount_usd } = req.body;
 
   if (!stripe) {
@@ -84,7 +84,7 @@ router.post('/top-up/initiate', authenticate, async (req: any, res) => {
  * Synchronous confirmation (optional, webhooks are better but this allows immediate UI update)
  */
 router.post('/top-up/confirm', authenticate, async (req: any, res) => {
-  const userId = req.user.id;
+  const userId = BigInt(req.user.id);
   const { payment_intent_id } = req.body;
 
   if (!stripe) {

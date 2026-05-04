@@ -19,7 +19,7 @@ router.post('/create-checkout-session', authenticate, async (req: any, res) => {
 
   try {
     const { priceId, successUrl, cancelUrl } = req.body;
-    const userId = req.user.id;
+    const userId = BigInt(req.user.id);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
