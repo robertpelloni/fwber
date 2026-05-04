@@ -802,7 +802,9 @@ router.get("/search", authenticate, async (req: any, res) => {
 // GET /api/users/:id - Get public profile
 router.get("/:id", authenticate, async (req: any, res) => {
 	try {
-		const targetUserId = BigInt(req.params.id);
+		const targetUserId = req.params.id === "me"
+      ? BigInt(req.user.id)
+      : (() => { try { return BigInt(req.params.id); } catch { return null as any; } })();
 		const user = await prisma.users.findUnique({
 			where: { id: targetUserId },
 			include: { user_profiles: true },
