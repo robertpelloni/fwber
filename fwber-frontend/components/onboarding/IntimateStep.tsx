@@ -8,7 +8,7 @@ const STI_STATUSES = ['HIV Negative', 'HIV Positive', 'HSV-1', 'HSV-2', 'HPV', '
 const FETISHES = [
   'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 
   'Dominant', 'Submissive', 'Feet', 'Leather', 'Latex',
-  'Group Play', 'Public', 'Threesomes', 'Swinging', 'Power Dynamics', 'Hotwife',
+  'Group Play', 'Public', 'Threesomes', 'Swinging', 'Power Dynamics', 'Open Play',
   'Sensory Play', 'Impact Play', 'Rope', 'Toys', 'Other'
 ];
 
