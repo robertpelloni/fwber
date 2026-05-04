@@ -76,10 +76,61 @@ router.get('/', async (req: any, res) => {
   }
 });
 
+// GET /api/messages/conversations — list all conversations for the user
+router.get('/conversations', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    // Get all accepted matches as conversations
+    const matches = await prisma.matches.findMany({
+      where: {
+        OR: [{ user1_id: userId }, { user2_id: userId }],
+        status: 'accepted',
+      },
+      include: {
+        users_matches_user1_idTousers: {
+          select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+        },
+        users_matches_user2_idTousers: {
+          select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+        },
+      },
+      take: 50,
+    });
+
+    const conversations = matches.map((m: any) => {
+      const otherUser = m.user1_id.toString() === userId.toString()
+        ? m.users_matches_user2_idTousers
+        : m.users_matches_user1_idTousers;
+      const profile = otherUser?.user_profiles?.[0];
+      return {
+        id: Number(otherUser?.id || 0),
+        other_user: {
+          id: Number(otherUser?.id || 0),
+          name: otherUser?.name || 'Unknown',
+          display_name: profile?.display_name || otherUser?.name || 'Unknown',
+          avatar_url: profile?.avatar_url || null,
+        },
+        last_message: null,
+        created_at: m.created_at?.toISOString() || null,
+      };
+    });
+
+    res.json(conversations);
+  } catch (error: any) {
+    console.error('[Messages] Conversations error:', error.message);
+    res.json([]);
+  }
+});
+
 // GET /api/messages/:id — get messages in conversation with user :id
 router.get('/:id', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
+    // Validate that :id is a number
+    const parsedId = Number(req.params.id);
+    if (isNaN(parsedId)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
     const partnerId = BigInt(req.params.id);
     const limit = parseInt(req.query.limit as string) || 50;
     const before = req.query.before as string;

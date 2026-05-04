@@ -17,7 +17,7 @@ router.get('/', authenticate, async (req: any, res) => {
       orderBy: { starts_at: 'asc' },
       take: 50,
       include: {
-        users: { select: { id: true, display_name: true } },
+        users: { select: { id: true, name: true, user_profiles: { select: { display_name: true }, take: 1 } } },
         _count: { select: { event_attendees: true } },
       },
     });
@@ -43,7 +43,7 @@ router.get('/', authenticate, async (req: any, res) => {
         created_by_user_id: Number(e.created_by_user_id),
         status: e.status,
         attendees_count: e._count?.event_attendees || 0,
-        creator: e.users ? { id: Number(e.users.id), display_name: e.users.display_name } : null,
+        creator: e.users ? { id: Number(e.users.id), display_name: e.users.user_profiles?.[0]?.display_name || e.users.name } : null,
       };
 
       if (userLat && userLng) {
@@ -209,9 +209,9 @@ router.get('/:id', authenticate, async (req: any, res) => {
     const event = await prisma.events.findUnique({
       where: { id: BigInt(req.params.id) },
       include: {
-        users: { select: { id: true, display_name: true } },
+        users: { select: { id: true, name: true, user_profiles: { select: { display_name: true }, take: 1 } } },
         event_attendees: {
-          include: { users: { select: { id: true, display_name: true } } },
+          include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true }, take: 1 } } } },
           take: 50,
         },
       },
@@ -234,11 +234,11 @@ router.get('/:id', authenticate, async (req: any, res) => {
       created_by_user_id: Number(event.created_by_user_id),
       status: event.status,
       attendees_count: event.event_attendees?.length || 0,
-      creator: event.users ? { id: Number(event.users.id), display_name: event.users.display_name } : null,
+      creator: event.users ? { id: Number(event.users.id), display_name: event.users.user_profiles?.[0]?.display_name || event.users.name } : null,
       attendees: event.event_attendees?.map((a: any) => ({
         id: Number(a.id),
         status: a.status,
-        user: a.users ? { id: Number(a.users.id), display_name: a.users.display_name } : null,
+        user: a.users ? { id: Number(a.users.id), display_name: a.users.user_profiles?.[0]?.display_name || a.users.name } : null,
       })),
     });
   } catch (err: any) {
