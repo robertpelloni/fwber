@@ -4,6 +4,50 @@ import { authenticate } from '../middleware/auth.js';
 
 const router = Router();
 
+// GET /api/onboarding/status - Check onboarding completion status
+router.get('/status', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { onboarding_completed_at: true },
+    });
+    const profile = await prisma.user_profiles.findFirst({
+      where: { user_id: userId },
+      select: {
+        gender: true,
+        bio: true,
+        date_of_birth: true,
+        location_description: true,
+        interests: true,
+      },
+    });
+
+    const isComplete = !!user?.onboarding_completed_at;
+    const missingSteps: string[] = [];
+    if (!profile?.gender) missingSteps.push('gender');
+    if (!profile?.bio) missingSteps.push('bio');
+    if (!profile?.date_of_birth) missingSteps.push('date_of_birth');
+    if (!profile?.location_description) missingSteps.push('location');
+
+    res.json({
+      completed: isComplete,
+      completed_at: user?.onboarding_completed_at?.toISOString() || null,
+      missing_steps: missingSteps,
+      profile: profile ? {
+        has_gender: !!profile.gender,
+        has_bio: !!profile.bio,
+        has_dob: !!profile.date_of_birth,
+        has_location: !!profile.location_description,
+        has_interests: !!(profile.interests),
+      } : null,
+    });
+  } catch (error: any) {
+    console.error('[GET /api/onboarding/status]', error.message);
+    res.json({ completed: false, missing_steps: [], profile: null });
+  }
+});
+
 // POST /api/onboarding/complete - Mark onboarding as completed
 router.post('/complete', authenticate, async (req: any, res) => {
   try {

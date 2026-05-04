@@ -16,7 +16,7 @@ router.use(authenticate);
  * Handles boost purchases via Tokens or Stripe
  */
 router.post('/purchase', async (req, res) => {
-  const userId = (req as any).user.id;
+  const userId = BigInt((req as any).user.id);
   const { type, paymentMethod } = req.body;
 
   // 1. Define pricing
@@ -110,7 +110,7 @@ router.post('/purchase', async (req, res) => {
  * GET /api/boosts/active
  */
 router.get('/active', async (req, res) => {
-  const userId = (req as any).user.id;
+  const userId = BigInt((req as any).user.id);
   try {
     const activeBoost = await prisma.boosts.findFirst({
       where: {
@@ -120,9 +120,9 @@ router.get('/active', async (req, res) => {
       },
       orderBy: { expires_at: 'desc' }
     });
-    res.json(activeBoost);
+    res.json(activeBoost || { active: false, boost: null });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch active boost' });
+    res.json({ active: false, boost: null });
   }
 });
 
@@ -130,7 +130,7 @@ router.get('/active', async (req, res) => {
  * GET /api/boosts/history
  */
 router.get('/history', async (req, res) => {
-  const userId = (req as any).user.id;
+  const userId = BigInt((req as any).user.id);
   try {
     const history = await prisma.boosts.findMany({
       where: { user_id: userId },
