@@ -6,7 +6,7 @@ export default function PrivacyPage() {
 
       <div className="prose dark:prose-invert prose-purple max-w-none">
         <h2 className="text-xl font-semibold mt-6 mb-2">1. The Privacy Paradigm</h2>
-        <p>At fwber, privacy is not an afterthought; it is our foundation. As a decentralized, proximity-based adult social network, we recognize the extreme sensitivity of the data you entrust to us. <strong>We do not sell your personal data or chat histories to third-party data brokers or advertisers.</strong></p>
+        <p>At fwber, privacy is not an afterthought; it is our foundation. As a decentralized, proximity-based social network, we recognize the extreme sensitivity of the data you entrust to us. <strong>We do not sell your personal data or chat histories to third-party data brokers or advertisers.</strong></p>
         <h2 className="text-xl font-semibold mt-6 mb-2">2. Information We Collect</h2>
         <ul>
           <li><strong>Location Data:</strong> To enable proximity matching, we collect real-time Geohashes. When you use &quot;Location Fuzzing&quot;, your precise GPS coordinates are obscured before touching our servers.</li>

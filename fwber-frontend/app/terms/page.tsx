@@ -6,7 +6,7 @@ export default function TermsPage() {
 
       <div className="prose dark:prose-invert prose-purple max-w-none">
         <h2 className="text-xl font-semibold mt-6 mb-2">1. Acceptance of Terms & Age Restriction</h2>
-        <p>By accessing and using fwber, you accept and agree to be bound by the terms and provision of this agreement. <strong>fwber is an adult social network. You must be at least 18 years of age (or the legal age of majority in your jurisdiction) to create an account or use this service.</strong></p>
+        <p>By accessing and using fwber, you accept and agree to be bound by the terms and provision of this agreement. <strong>fwber is a social network for adults (18+). You must be at least 18 years of age (or the legal age of majority in your jurisdiction) to create an account or use this service.</strong></p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2">2. User Conduct, Content, and Zero Tolerance</h2>
         <p>You are solely responsible for your interactions and the content you upload. We enforce a zero-tolerance policy against:</p>

@@ -6,9 +6,9 @@ import { Label } from '@/components/ui/label';
 const BREAST_SIZES = ['AA', 'A', 'B', 'C', 'D', 'DD', 'E', 'F', 'G+', 'N/A'];
 const STI_STATUSES = ['HIV Negative', 'HIV Positive', 'HSV-1', 'HSV-2', 'HPV', 'On PrEP', 'Regularly Tested', 'Prefer Not to Say'];
 const FETISHES = [
-  'BDSM', 'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 
+  'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 
   'Dominant', 'Submissive', 'Feet', 'Leather', 'Latex',
-  'Group Play', 'Public', 'Threesomes', 'Swinging', 'Cuckolding', 'Hotwife',
+  'Group Play', 'Public', 'Threesomes', 'Swinging', 'Power Dynamics', 'Hotwife',
   'Sensory Play', 'Impact Play', 'Rope', 'Toys', 'Other'
 ];
 

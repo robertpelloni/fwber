@@ -154,7 +154,7 @@ export function VouchClient({ code }: VouchClientProps) {
                         <Flame className="w-6 h-6 text-orange-600" />
                       </div>
                       <div className="text-left">
-                        <span className="block font-bold text-gray-900 dark:text-white">Hot & Sexy</span>
+                        <span className="block font-bold text-gray-900 dark:text-white">Hot & Attractive</span>
                         <span className="text-sm text-gray-500">Total catch</span>
                       </div>
                     </button>

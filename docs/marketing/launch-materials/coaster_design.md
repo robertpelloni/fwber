@@ -31,4 +31,4 @@ Real connections. Total privacy. No data mining.
 [QR Code leading to fwber.me/register]
 
 **Small Print:**
-fwber.me | The adult network that keeps its mouth shut.
+fwber.me | The social network that keeps its mouth shut.

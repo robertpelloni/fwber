@@ -709,7 +709,7 @@ export default function ProfilePage() {
 							</div>
 							<button
 								onClick={async () => {
-									const shareText = `💎 My dating profile is officially 100% complete on fwber! Come find me in Detroit's private-first adult network. #fwber #dating #detroit`;
+									const shareText = `💎 My dating profile is officially 100% complete on fwber! Come find me in Detroit's private-first social network. #fwber #dating #detroit`;
 									if (navigator.share) {
 										try {
 											await navigator.share({

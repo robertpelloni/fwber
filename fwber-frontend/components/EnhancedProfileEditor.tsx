@@ -1091,9 +1091,9 @@ export default function EnhancedProfileEditor() {
           </div>
 
           <div className="mt-4">
-            <FormField label="Fetishes & Kinks">
+            <FormField label="Lifestyle Interests">
               <div className="flex flex-wrap gap-2">
-                {['BDSM', 'Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 'Domination', 'Submission', 'Feet', 'Leather', 'Latex', 'Group Sex', 'Public', 'Orgies', 'Gangbangs', 'Threesomes', 'Swinging', 'Cuckolding', 'Hotwife'].map(fetish => (
+                {['Roleplay', 'Voyeurism', 'Exhibitionism', 'Bondage', 'Domination', 'Submission', 'Feet', 'Leather', 'Latex', 'Public', 'Threesomes', 'Swinging', 'Group Play', 'Power Dynamics', 'Open Play', 'Partner Sharing', 'Group Gatherings'].map(fetish => (
                   <ToggleChip
                     key={fetish}
                     label={fetish}

@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
 import type { ProximityArtifact, ProximityChatroom } from '@/types/proximity';
 import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
-import SexQuote from './SexQuote';
+import SexQuote from './InspireQuote';
 import ArtifactVoting from './proximity/ArtifactVoting';
 import ArtifactComments from './proximity/ArtifactComments';
 
@@ -181,7 +181,7 @@ export default function ProximityFeed() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <SexQuote />
+      <InspireQuote />
       {/* Post Input */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 mb-6">
         <form onSubmit={handlePost}>

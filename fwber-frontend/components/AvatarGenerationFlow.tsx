@@ -457,7 +457,7 @@ export default function AvatarGenerationFlow({
       {step === 'profile' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Create Your Sexy Avatar</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Create Your Stylized Avatar</h2>
             <p className="text-gray-600">
               Generate an attractive, stylized version of yourself from your saved physical traits or an uploaded photo.
             </p>
@@ -688,7 +688,7 @@ export default function AvatarGenerationFlow({
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-600 mb-3">Select a photo to transform into a sexy avatar:</p>
+                  <p className="text-sm text-gray-600 mb-3">Select a photo to transform into a stylized avatar:</p>
                   <div className="grid grid-cols-3 gap-3">
                     {userPhotos.map((photo) => (
                       <button
@@ -730,7 +730,7 @@ export default function AvatarGenerationFlow({
         </div>
       )}
 
-      {/* Step 2: Style Selection + Sexy Boost */}
+      {/* Step 2: Style Selection + Style Boost */}
       {step === 'style' && (
         <div className="space-y-6">
           <div>
@@ -740,13 +740,13 @@ export default function AvatarGenerationFlow({
             </p>
           </div>
 
-          {/* Sexy Boost Toggle */}
+          {/* Style Boost Toggle */}
           <div className="bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-200 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-pink-500" />
-                  Sexy Boost
+                  Style Boost
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">Maximize attractiveness — model-quality features, alluring gaze, perfect lighting</p>
               </div>
@@ -894,7 +894,7 @@ export default function AvatarGenerationFlow({
               onClick={handleGenerate}
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all font-medium shadow-lg"
             >
-              {sexyBoost ? '🔥 Generate Sexy Avatar' : 'Generate Avatar'}
+              {sexyBoost ? '🔥 Generate Stylized Avatar' : 'Generate Avatar'}
             </button>
           </div>
         </div>

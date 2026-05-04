@@ -20,7 +20,7 @@ Your dating data belongs to you, not a billionaire in Silicon Valley.
 ## Back Side (The Details)
 
 **Headline:**
-# DETROIT'S PRIVATE-FIRST ADULT NETWORK.
+# DETROIT'S PRIVATE-FIRST SOCIAL NETWORK.
 
 **Bullet Points:**
 *   **Proximity-First:** Find real people within blocks, not miles.

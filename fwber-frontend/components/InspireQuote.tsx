@@ -4,24 +4,24 @@ import { useState, useEffect } from 'react';
 import { Quote } from 'lucide-react';
 
 const QUOTES = [
-  "Everything in the world is about sex except sex. Sex is about power. — Oscar Wilde",
+  "The meeting of two personalities is like the contact of two chemical substances. — Carl Jung",
   "The power of love is a curious thing / Make a one man weep, make another man sing. — Huey Lewis & The News",
-  "Sex is the consolation you have when you can't have love. — Gabriel García Márquez",
-  "The bridge between soul and body is sex. — Anais Nin",
-  "Sex is emotion in motion. — Mae West",
+  "Where there is love there is life. — Mahatma Gandhi",
+  "The greatest thing you'll ever learn is just to love and be loved in return. — Eden Ahbez",
+  "Love is composed of a single soul inhabiting two bodies. — Aristotle",
   "Intimacy is the capacity to be rather weird with someone - and finding that that's ok with them. — Alain de Botton",
   "Sexuality is the most powerful force in the universe. — Unknown",
-  "Sex is a part of nature. I go along with nature. — Marilyn Monroe",
+  "We accept the love we think we deserve. — Stephen Chbosky",
   "The only way to get rid of a temptation is to yield to it. — Oscar Wilde",
   "Sexiness is a state of mind. — Priyanka Chopra",
   "I believe in long, slow, deep, soft, wet kisses that last three days. — Bull Durham",
-  "Love is the answer, but while you're waiting for the answer, sex raises some pretty interesting questions. — Woody Allen",
+  "Being deeply loved by someone gives you strength, while loving someone deeply gives you courage. — Lao Tzu",
   "Chemistry is you touching my arm and setting fire to my mind. — Nayyirah Waheed",
-  "Sex is the art of controlling lack of control. — Paulo Coelho",
-  "Sex is a conversation carried out by other means. — Peter Ustinov",
-  "Sex is the nature of the human being. — Marlon Brando",
+  "The best thing to hold onto in life is each other. — Audrey Hepburn",
+  "A great relationship doesn't happen because of the love you had in the beginning, but how well you continue building love until the end. — Unknown",
+  "To love and be loved is to feel the sun from both sides. — David Viscott",
   "My mother told me to be a lady. And for her, that meant be your own person, be independent. — Ruth Bader Ginsburg",
-  "Sex is one of the nine reasons for reincarnation. The other eight are unimportant. — Henry Miller",
+  "Love recognizes no barriers. — Maya Angelou",
   "Let's get it on. — Marvin Gaye",
   "Sexual healing is good for me. — Marvin Gaye",
   "You can leave your hat on. — Joe Cocker",
@@ -31,7 +31,7 @@ const QUOTES = [
   "Physical, physical, I wanna get physical. — Olivia Newton-John"
 ];
 
-export default function SexQuote() {
+export default function InspireQuote() {
   const [quote, setQuote] = useState<string>("");
 
   useEffect(() => {

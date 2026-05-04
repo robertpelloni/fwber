@@ -1,7 +1,7 @@
 {
-  "name": "fwber.me - Adult Dating Platform",
+  "name": "fwber.me - Social Dating Platform",
   "short_name": "FWBer",
-  "description": "A modern adult dating platform with advanced matching algorithms",
+  "description": "A modern social dating platform with advanced matching algorithms",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { Logo } from '@/components/Logo'
-import SexQuote from '@/components/SexQuote'
+import SexQuote from '@/components/InspireQuote'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Shield, Heart, Zap, MapPin, MessageCircle, Users, Menu, X, Lock, Ghost, Layers, FileText, Code, Building2, CheckCircle2, Sparkles, GitMerge, Shirt, RefreshCw, Flame, Link as LinkIcon, Rainbow, Video, Gift, Home, UserPlus, Star } from 'lucide-react'
 import { useState, Suspense } from 'react'
@@ -94,11 +94,11 @@ export default function HomePage() {
             </h2>
             
             <p className="text-lg md:text-xl font-medium text-slate-900 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-              The open-source adult network built on privacy. Meet locals, verify with AI, and chat with end-to-end encryption.
+              The open-source social network built on privacy. Meet locals, verify with AI, and chat with end-to-end encryption.
             </p>
             
             <div className="w-full max-w-2xl mx-auto mb-10 rounded-[28px] border border-white/70 bg-white dark:bg-gray-800/70 p-4 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/35">
-              <SexQuote />
+              <InspireQuote />
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
@@ -158,10 +158,10 @@ export default function HomePage() {
               <div className="flex flex-wrap justify-center gap-3">
                 {[
                   { name: 'Inclusive', icon: Users },
-                  { name: 'Kink-Friendly', icon: Flame },
-                  { name: 'Sex Positive', icon: CheckCircle2 },
-                  { name: 'Safer Sex Workers', icon: Shield },
-                  { name: 'Fetish Community Support', icon: LinkIcon },
+                  { name: 'Open-Minded', icon: Flame },
+                  { name: 'Body Positive', icon: CheckCircle2 },
+                  { name: 'Wellness Advocates', icon: Shield },
+                  { name: 'Lifestyle Community', icon: LinkIcon },
                 ].map((item) => (
                   <span 
                     key={item.name}
