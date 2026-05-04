@@ -5,30 +5,25 @@ import { Quote } from 'lucide-react';
 
 const QUOTES = [
   "The meeting of two personalities is like the contact of two chemical substances. — Carl Jung",
-  "The power of love is a curious thing / Make a one man weep, make another man sing. — Huey Lewis & The News",
   "Where there is love there is life. — Mahatma Gandhi",
   "The greatest thing you'll ever learn is just to love and be loved in return. — Eden Ahbez",
   "Love is composed of a single soul inhabiting two bodies. — Aristotle",
-  "Intimacy is the capacity to be rather weird with someone - and finding that that's ok with them. — Alain de Botton",
-  "Sexuality is the most powerful force in the universe. — Unknown",
+  "Intimacy is the capacity to be rather weird with someone — and finding that that's ok with them. — Alain de Botton",
   "We accept the love we think we deserve. — Stephen Chbosky",
-  "The only way to get rid of a temptation is to yield to it. — Oscar Wilde",
-  "Sexiness is a state of mind. — Priyanka Chopra",
-  "I believe in long, slow, deep, soft, wet kisses that last three days. — Bull Durham",
   "Being deeply loved by someone gives you strength, while loving someone deeply gives you courage. — Lao Tzu",
-  "Chemistry is you touching my arm and setting fire to my mind. — Nayyirah Waheed",
   "The best thing to hold onto in life is each other. — Audrey Hepburn",
-  "A great relationship doesn't happen because of the love you had in the beginning, but how well you continue building love until the end. — Unknown",
   "To love and be loved is to feel the sun from both sides. — David Viscott",
-  "My mother told me to be a lady. And for her, that meant be your own person, be independent. — Ruth Bader Ginsburg",
   "Love recognizes no barriers. — Maya Angelou",
-  "Let's get it on. — Marvin Gaye",
-  "Sexual healing is good for me. — Marvin Gaye",
-  "You can leave your hat on. — Joe Cocker",
-  "Like a virgin, touched for the very first time. — Madonna",
-  "Touch-a, Touch-a, Touch-a, Touch Me — The Rocky Horror Picture Show",
-  "Relax, don't do it, when you want to go to it. — Frankie Goes to Hollywood",
-  "Physical, physical, I wanna get physical. — Olivia Newton-John"
+  "A great relationship doesn't happen because of the love you had in the beginning, but how well you continue building love until the end. — Unknown",
+  "Chemistry is you touching my arm and setting fire to my mind. — Nayyirah Waheed",
+  "The power of love is a curious thing. — Huey Lewis & The News",
+  "The only way to get rid of a temptation is to yield to it. — Oscar Wilde",
+  "My mother told me to be a lady. And for her, that meant be your own person, be independent. — Ruth Bader Ginsburg",
+  "In all the world, there is no heart for me like yours. — Maya Angelou",
+  "You are my today and all of my tomorrows. — Leo Christopher",
+  "I have found the one whom my soul loves. — Song of Solomon 3:4",
+  "Whatever our souls are made of, his and mine are the same. — Emily Bronte",
+  "I would rather share one lifetime with you than face all the ages of this world alone. — J.R.R. Tolkien"
 ];
 
 export default function InspireQuote() {
