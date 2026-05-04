@@ -49,7 +49,9 @@ router.get("/", authenticate, async (req: any, res) => {
 			return;
 		}
 		// Fetch established relationship links
-		const relationshipLinks = await prisma.relationship_links.findMany({
+		let relationshipLinks: any[] = [];
+  try {
+    relationshipLinks = await prisma.relationship_links.findMany({
 			where: { user_id: userId, is_confirmed: true },
 			include: {
 				users_relationship_links_related_user_idTousers: {
@@ -66,6 +68,9 @@ router.get("/", authenticate, async (req: any, res) => {
 				},
 			},
 		});
+  } catch (e: any) {
+    console.warn('[Profile] relationship_links query skipped:', e.message);
+  }
 
 		const p = serialize(profile);
 		// Parse JSON fields back to objects
@@ -828,7 +833,9 @@ router.get("/:id", authenticate, async (req: any, res) => {
 		}
 
 		// Fetch relationship links
-		const relationshipLinks = await prisma.relationship_links.findMany({
+		let relationshipLinks: any[] = [];
+  try {
+    relationshipLinks = await prisma.relationship_links.findMany({
 			where: { user_id: targetUserId, is_confirmed: true, visibility: 'public' },
 			include: {
 				users_relationship_links_related_user_idTousers: {
@@ -845,6 +852,9 @@ router.get("/:id", authenticate, async (req: any, res) => {
 				},
 			},
 		});
+  } catch (e: any) {
+    console.warn('[Profile] relationship_links query skipped:', e.message);
+  }
 
 		res.json({
 			id: Number(targetUserId),
