@@ -5,6 +5,7 @@ import { z } from 'zod';
 import prisma from '../lib/prisma.js';
 
 import { sendVerificationEmail } from '../lib/email.js';
+import { createVerificationToken } from '../lib/verification-store.js';
 import crypto from 'crypto';
 
 const registerSchema = z.object({
@@ -129,7 +130,7 @@ export class AuthController {
 
       // Send verification email
       try {
-        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const verificationToken = createVerificationToken(user.id, user.email);
         await sendVerificationEmail(user.email, verificationToken);
       } catch (err) {
         console.error('[Auth] Failed to send initial verification email:', err);

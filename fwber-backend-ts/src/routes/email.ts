@@ -2,21 +2,9 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { sendVerificationEmail } from '../lib/email.js';
-import crypto from 'crypto';
+import { createVerificationToken, consumeVerificationToken } from '../lib/verification-store.js';
 
 const router = Router();
-
-// In-memory token store (resets on server restart; for production, use DB table)
-// Token -> { userId, email, expires }
-const verificationTokens = new Map<string, { userId: bigint; email: string; expires: number }>();
-
-// Clean expired tokens every 10 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, data] of verificationTokens) {
-    if (data.expires < now) verificationTokens.delete(token);
-  }
-}, 10 * 60 * 1000);
 
 /**
  * POST /api/email/verification-notification
@@ -36,12 +24,7 @@ router.post('/verification-notification', authenticate, async (req: any, res) =>
     }
 
     // Generate verification token (24h expiry)
-    const token = crypto.randomBytes(32).toString('hex');
-    verificationTokens.set(token, {
-      userId: user.id,
-      email: user.email!,
-      expires: Date.now() + 24 * 60 * 60 * 1000,
-    });
+    const token = createVerificationToken(user.id, user.email!);
 
     const sent = await sendVerificationEmail(user.email!, token);
 
@@ -75,15 +58,10 @@ router.post('/verify', async (req, res) => {
       return res.status(400).json({ message: 'Token is required' });
     }
 
-    const stored = verificationTokens.get(token);
+    const stored = consumeVerificationToken(token);
 
     if (!stored) {
       return res.status(400).json({ message: 'Invalid or expired verification token' });
-    }
-
-    if (stored.expires < Date.now()) {
-      verificationTokens.delete(token);
-      return res.status(400).json({ message: 'Verification token has expired' });
     }
 
     // Update the user's email_verified_at
@@ -92,15 +70,11 @@ router.post('/verify', async (req, res) => {
       data: { email_verified_at: new Date() },
     });
 
-    // Remove the used token
-    verificationTokens.delete(token);
-
     console.log('[Email Route] Email verified for user', stored.userId.toString());
-
     res.json({ success: true, message: 'Email verified successfully' });
   } catch (error: any) {
     console.error('[EmailRoute] Verify error:', error.message);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Server Error' });
   }
 });
 
