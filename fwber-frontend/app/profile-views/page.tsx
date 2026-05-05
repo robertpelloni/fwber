@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import UserAvatar from '@/components/UserAvatar';
 
 interface ProfileViewer {
   id: number
@@ -166,19 +167,13 @@ export default function ProfileViewsPage() {
                     className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50 transition-colors group"
                   >
                     <div className="relative">
-                      {view.viewer?.avatar_url ? (
-                        <Image
-                          src={view.viewer.avatar_url}
-                          alt={view.viewer?.name || 'User'}
-                          width={56}
-                          height={56}
-                          className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
-                        />
-                      ) : (
-                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                          <User className="w-6 h-6 text-white" />
-                        </div>
-                      )}
+                      <UserAvatar
+                      src={view.viewer?.avatar_url}
+                      name={view.viewer?.name}
+                      userId={view.viewer?.id}
+                      size={56}
+                      className="w-14 h-14 rounded-full ring-2 ring-gray-100 dark:ring-gray-800"
+                    />
                     </div>
 
                     <div className="flex-1 min-w-0">

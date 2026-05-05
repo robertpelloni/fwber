@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X, User, Loader2 } from 'lucide-react'
+import { Search, X, Loader2 } from 'lucide-react'
 import { api } from '@/lib/api/client'
-import Image from 'next/image'
 import Link from 'next/link'
+import UserAvatar from '@/components/UserAvatar'
 
 interface SearchResult {
   id: number
@@ -13,9 +13,7 @@ interface SearchResult {
   profile: {
     display_name: string
     bio?: string
-    location?: {
-      city: string
-    }
+    location?: { city: string }
     avatar_url?: string
   }
 }
@@ -56,7 +54,6 @@ export function ProfileSearch() {
         setIsOpen(false)
       }
     }, 300)
-
     return () => clearTimeout(timer)
   }, [query])
 
@@ -100,18 +97,13 @@ export function ProfileSearch() {
                   className="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className="relative h-10 w-10 flex-shrink-0">
-                    {result.profile.avatar_url ? (
-                      <Image
-                        src={result.profile.avatar_url}
-                        alt={result.profile.display_name}
-                        fill
-                        className="rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm">
-                        {result.profile.display_name[0].toUpperCase()}
-                      </div>
-                    )}
+                    <UserAvatar
+                      src={result.profile.avatar_url}
+                      name={result.profile.display_name}
+                      userId={result.id}
+                      fill
+                      className="rounded-full"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">

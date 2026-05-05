@@ -20,7 +20,7 @@ import AppHeader from "@/components/AppHeader";
 import MatchFilter from "@/components/MatchFilter";
 import Image from "next/image";
 import ProfileViewModal from "@/components/ProfileViewModal";
-import { getAvatarUrl } from "@/lib/utils/avatar";
+import UserAvatar from "@/components/UserAvatar";
 import CreateBountyModal from "@/components/CreateBountyModal";
 import BoostButton from "@/components/BoostButton";
 import type { Match } from "@/lib/api/matches";
@@ -213,21 +213,14 @@ export default function MatchesPage() {
 											</p>
 										)}
 									</div>
-								) : currentMatch.avatarUrl ? (
-									<Image
-										src={currentMatch.avatarUrl}
-										alt={currentMatch.name}
-										fill
-										className="object-cover"
-										priority
-									/>
 								) : (
-									<Image
-										src={getAvatarUrl(null, currentMatch.name || currentMatch.id)}
-										alt={currentMatch.name}
+									<UserAvatar
+										src={currentMatch.avatarUrl}
+										name={currentMatch.name}
+										userId={currentMatch.id}
 										fill
-										className="object-cover"
 										priority
+										className="object-cover"
 									/>
 								)}
 							</div>
