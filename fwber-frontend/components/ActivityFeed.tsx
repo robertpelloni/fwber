@@ -247,9 +247,13 @@ export function ActivityFeed({
                     className="rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white font-bold">
-                    {(activity.user?.name?.[0] || '?').toUpperCase()}
-                  </div>
+                  <Image
+                  	src={getAvatarUrl(null, activity.user?.name || activity.user?.id || "user")}
+                  	alt={activity.user?.name || "User"}
+                  	width={40}
+                  	height={40}
+                  	className="rounded-full object-cover"
+                  />
                 )}
                 {/* Presence Indicator */}
                 {activity.user?.id && (
