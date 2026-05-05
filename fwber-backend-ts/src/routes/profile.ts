@@ -98,6 +98,7 @@ router.get("/", authenticate, async (req: any, res) => {
 			last_online: user?.last_seen_at?.toISOString() || "",
 			profile: {
 				display_name: p.display_name,
+				avatar_url: p.avatar_url || photos.find((ph: any) => ph.is_primary)?.file_path ? filePathToUrl(photos.find((ph: any) => ph.is_primary)?.file_path) : null,
 				bio: p.bio,
 				date_of_birth: p.date_of_birth || p.birthdate,
 				age:
@@ -865,6 +866,7 @@ router.get("/:id", authenticate, async (req: any, res) => {
 			last_online: user.last_seen_at?.toISOString() || "",
 			profile: {
 				display_name: p.display_name || user.name || "User",
+				avatar_url: p.avatar_url || (photos.find((ph: any) => ph.is_primary) ? filePathToUrl(photos.find((ph: any) => ph.is_primary)!.file_path) : null),
 				bio: p.bio || "No bio yet.",
 				age:
 					p.date_of_birth || p.birthdate
