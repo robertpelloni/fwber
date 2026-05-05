@@ -81,7 +81,7 @@ async function getProfileSummary(userId: bigint): Promise<string> {
 }
 
 /** Generic AI chat completion helper with multi-provider failover */
-async function ask(system: string, user: string, temperature = 0.9): Promise<string> {
+export async function generateText(system: string, user: string, temperature = 0.9): Promise<string> {
   // 1. Try NVIDIA NIM (Meta Llama 3.1 8B Instruct)
   if (nvidia) {
     try {
@@ -149,7 +149,7 @@ export async function generateRoast(userId: bigint, mode: 'roast' | 'hype'): Pro
     ? `You are a savage, witty dating profile roaster. Be brutally funny, creative, and specific to their profile. Use clever metaphors and pop culture references. Keep it under 4 sentences. Never be mean-spirited — roast with love. Be unique every time.`
     : `You are an enthusiastic, hyped-up dating profile cheerleader. Be over-the-top positive, creative, and specific to their profile. Use superlatives, emojis, and energy. Keep it under 4 sentences. Be unique every time.`;
 
-  return ask(system, `Here's the dating profile:\n\n${profile}\n\n${isRoast ? 'Roast them!' : 'Hype them up!'}`);
+  return generateText(system, `Here's the dating profile:\n\n${profile}\n\n${isRoast ? 'Roast them!' : 'Hype them up!'}`);
 }
 
 export async function generatePublicRoast(name: string, job: string, trait: string, mode: 'roast' | 'hype'): Promise<string> {
@@ -158,14 +158,14 @@ export async function generatePublicRoast(name: string, job: string, trait: stri
     ? `You are a savage, witty dating profile roaster. Be brutally funny and creative. Keep it under 4 sentences. Never be mean-spirited. Be unique every time.`
     : `You are an enthusiastic hyped-up profile cheerleader. Be over-the-top positive with emojis and energy. Keep it under 4 sentences. Be unique every time.`;
 
-  return ask(system, `Name: ${name}, Job: ${job}, Trait: ${trait}\n\n${isRoast ? 'Roast them!' : 'Hype them up!'}`);
+  return generateText(system, `Name: ${name}, Job: ${job}, Trait: ${trait}\n\n${isRoast ? 'Roast them!' : 'Hype them up!'}`);
 }
 
 // ─── Vibe Check ─────────────────────────────────────────────────────────────
 
 export async function generateVibeCheck(userId: bigint): Promise<{ green_flags: string[]; red_flags: string[] }> {
   const profile = await getProfileSummary(userId);
-  const result = await ask(
+  const result = await generateText(
     `You are a witty dating profile analyst. Given a dating profile, generate 3-5 specific green flags and 2-4 specific red flags based on their actual profile data. Be clever, funny, and insightful. Each flag should be 3-8 words. Respond in JSON: { "green_flags": [...], "red_flags": [...] }`,
     `Profile:\n${profile}`,
     0.85
@@ -184,7 +184,7 @@ export async function generateVibeCheck(userId: bigint): Promise<{ green_flags: 
 // ─── Quirk Check ────────────────────────────────────────────────────────────
 
 export async function generateQuirkCheck(quirk: string): Promise<{ flag_type: string; reason: string; emoji: string }> {
-  const result = await ask(
+  const result = await generateText(
     `You are a witty dating profile analyst. Given a personal quirk, classify it as "Green Flag", "Red Flag", or "Beige Flag" and explain why in a funny, clever way (1-2 sentences). Respond in JSON: { "flag_type": "...", "reason": "...", "emoji": "..." }`,
     `Quirk: "${quirk}"`,
     0.9
@@ -206,7 +206,7 @@ export async function generateProfileAnalysis(userId: bigint): Promise<{
   tips: string[];
 }> {
   const profile = await getProfileSummary(userId);
-  const result = await ask(
+  const result = await generateText(
     `You are a dating profile expert. Analyze the profile and give a score 0-100, 2-3 strengths, 2-3 weaknesses, and 2-3 actionable tips. Be specific to their actual profile data. Respond in JSON: { "score": number, "strengths": [...], "weaknesses": [...], "tips": [...] }`,
     `Profile:\n${profile}`,
     0.7
@@ -233,7 +233,7 @@ export async function generateCosmicMatch(userId: bigint): Promise<{
   worst_reason: string;
 }> {
   const profile = await getProfileSummary(userId);
-  const result = await ask(
+  const result = await generateText(
     `You are a mystical dating oracle with cosmic energy. Given someone's profile, predict their best and worst match personality types. Be creative, funny, specific to their profile. Respond in JSON: { "best_match": "...", "best_reason": "...", "worst_match": "...", "worst_reason": "..." }`,
     `Profile:\n${profile}`,
     0.95
@@ -260,7 +260,7 @@ export async function generateNemesis(userId: bigint): Promise<{
   scientific_explanation: string;
 }> {
   const profile = await getProfileSummary(userId);
-  const result = await ask(
+  const result = await generateText(
     `You are a dating profile analyst with a dark sense of humor. Given someone's profile, describe their dating nemesis — the exact type of person who would be their worst match. Be specific, witty, and reference their actual traits. Respond in JSON: { "nemesis_type": "...", "clashing_traits": ["...", "..."], "why_it_would_fail": "...", "scientific_explanation": "..." }`,
     `Profile:\n${profile}`,
     0.95
@@ -282,7 +282,7 @@ export async function generateNemesis(userId: bigint): Promise<{
 
 export async function generateFortune(userId: bigint): Promise<{ fortune: string }> {
   const profile = await getProfileSummary(userId);
-  const result = await ask(
+  const result = await generateText(
     `You are a mystical dating fortune teller. Given someone's profile, generate a creative, personalized dating fortune — a prediction about their love life. Be specific to their profile, witty, and optimistic. 2-3 sentences max.`,
     `Profile:\n${profile}`,
     0.95
@@ -315,7 +315,7 @@ Physical Attributes:
 
 Create a professional, attractive avatar prompt.`;
 
-  return ask(system, userPrompt, 0.7);
+  return generateText(system, userPrompt, 0.7);
 }
 
 export async function generateAvatarImage(userId: bigint, style = 'realistic'): Promise<string> {
