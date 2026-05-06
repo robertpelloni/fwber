@@ -776,16 +776,6 @@ router.get("/completeness", authenticate, async (req: any, res) => {
 	}
 });
 
-// GET /api/profile/:id/views - Profile view history
-router.get("/:id/views", authenticate, async (req: any, res) => {
-	res.json({ views: [], total: 0 });
-});
-
-// GET /api/profile/:id/view-stats - Profile view statistics
-router.get("/:id/view-stats", authenticate, async (req: any, res) => {
-	res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
-});
-
 // GET /api/users/search - Search users
 router.get("/search", authenticate, async (req: any, res) => {
 	try {
@@ -834,6 +824,18 @@ router.get("/search", authenticate, async (req: any, res) => {
 		res.status(500).json({ message: "Search failed" });
 	}
 });
+
+// GET /api/profile/:id/views - Profile view history
+router.get("/:id/views", authenticate, async (req: any, res) => {
+	res.json({ views: [], total: 0 });
+});
+
+// GET /api/profile/:id/view-stats - Profile view statistics
+router.get("/:id/view-stats", authenticate, async (req: any, res) => {
+	res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
+});
+
+
 
 // GET /api/users/:id - Get public profile
 router.get("/:id", authenticate, async (req: any, res) => {
