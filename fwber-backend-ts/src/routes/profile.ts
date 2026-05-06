@@ -208,7 +208,7 @@ router.post("/", authenticate, async (req: any, res) => {
 	// Reuse PUT logic — same sanitization, column filtering, type coercion
 	try {
 		const userId = BigInt(req.user.id);
-		const raw = req.body;
+		const raw = req.body || {};
 
 		const data: any = {};
 		for (const [key, val] of Object.entries(raw)) {
@@ -548,7 +548,7 @@ const JSON_COLUMNS = new Set([
 router.put("/", authenticate, async (req: any, res) => {
 	try {
 		const userId = BigInt(req.user.id);
-		const raw = req.body;
+		const raw = req.body || {};
 
 		// Map nested objects to flat DB columns
 		const data: any = {};
