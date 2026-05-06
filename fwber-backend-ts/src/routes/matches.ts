@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { createNotification } from './notifications.js';
 import { filePathToUrl } from '../lib/photos.js';
 
 const router = Router();
@@ -213,6 +214,12 @@ router.post('/action', authenticate, async (req: any, res) => {
         where: { id: existingLike.id },
         data: { status: 'accepted', is_active: true },
       });
+
+      // Notify both users
+      const userName = (await prisma.users.findUnique({ where: { id: userId }, select: { name: true } }))?.name || 'Someone';
+      const targetName = (await prisma.users.findUnique({ where: { id: targetId }, select: { name: true } }))?.name || 'Someone';
+      await createNotification(targetId, 'New Match!', `You matched with ${userName}!`);
+      await createNotification(userId, 'New Match!', `You matched with ${targetName}!`);
 
       return res.json({
         action,
