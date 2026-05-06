@@ -71,7 +71,7 @@ router.get('/stats', async (req: any, res) => {
       totalMatches,
       pendingMatches,
       acceptedMatches,
-      profileViews,
+      profileViews, todayViews,
       conversations,
     ] = await Promise.all([
       prisma.users.findUnique({ where: { id: userId } }),
@@ -80,6 +80,12 @@ router.get('/stats', async (req: any, res) => {
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'pending' } }),
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' } }),
       prisma.profile_views.count({ where: { viewed_user_id: userId } }).catch(() => 0),
+      prisma.profile_views.count({
+        where: {
+          viewed_user_id: userId,
+          created_at: { gte: (() => { const d = new Date(); d.setUTCHours(0, 0, 0, 0); return d; })() }
+        }
+      }).catch(() => 0),
       prisma.chatrooms.count().catch(() => 0),
     ]);
 
@@ -95,7 +101,7 @@ router.get('/stats', async (req: any, res) => {
       accepted_matches: acceptedMatches,
       conversations,
       profile_views: typeof profileViews === 'number' ? profileViews : 0,
-      today_views: 0,
+      today_views: typeof todayViews === 'number' ? todayViews : 0,
       match_score_avg: 50,
       response_rate: 0,
       days_active: daysActive,
