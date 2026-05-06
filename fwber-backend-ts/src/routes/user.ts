@@ -160,24 +160,105 @@ router.delete('/two-factor-authentication', authenticate, async (req: any, res) 
   }
 });
 
-// GET /api/user/checkin - Daily check-in
+// GET /api/user/checkin - Daily check-in status
 router.get('/checkin', authenticate, async (req: any, res) => {
-  res.json({
-    checked_in: false,
-    streak: 0,
-    tokens_earned: 0,
-    message: 'Not yet checked in today',
-  });
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { current_streak: true, last_daily_bonus_at: true, token_balance: true },
+    });
+
+    if (!user) {
+      return res.json({ checked_in: false, streak: 0, tokens_earned: 0, message: 'User not found' });
+    }
+
+    // Check if already checked in today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const lastBonus = user.last_daily_bonus_at ? new Date(user.last_daily_bonus_at) : null;
+    const checkedIn = lastBonus ? lastBonus >= today : false;
+
+    res.json({
+      checked_in: checkedIn,
+      streak: Number(user.current_streak || 0),
+      tokens_earned: checkedIn ? 10 : 0,
+      token_balance: Number(user.token_balance || 0),
+      message: checkedIn ? 'Already checked in today!' : 'Not yet checked in today',
+    });
+  } catch (error: any) {
+    console.error('[Checkin] Status error:', error.message);
+    res.json({ checked_in: false, streak: 0, tokens_earned: 0, message: 'Error checking status' });
+  }
 });
 
 // POST /api/user/checkin - Perform daily check-in
 router.post('/checkin', authenticate, async (req: any, res) => {
-  res.json({
-    checked_in: true,
-    streak: 1,
-    tokens_earned: 10,
-    message: 'Check-in successful!',
-  });
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { current_streak: true, last_daily_bonus_at: true, token_balance: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if already checked in today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const lastBonus = user.last_daily_bonus_at ? new Date(user.last_daily_bonus_at) : null;
+
+    if (lastBonus && lastBonus >= today) {
+      return res.json({
+        checked_in: true,
+        streak: Number(user.current_streak || 0),
+        tokens_earned: 0,
+        token_balance: Number(user.token_balance || 0),
+        message: 'Already checked in today!',
+      });
+    }
+
+    // Calculate streak
+    let newStreak = 1;
+    if (lastBonus) {
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      if (lastBonus >= yesterday) {
+        // Consecutive day
+        newStreak = Number(user.current_streak || 0) + 1;
+      }
+    }
+
+    // Calculate tokens based on streak
+    const baseTokens = 10;
+    const streakBonus = Math.min(newStreak - 1, 10) * 2; // +2 per streak day, max +20
+    const totalTokens = baseTokens + streakBonus;
+
+    // Update user
+    await prisma.users.update({
+      where: { id: userId },
+      data: {
+        current_streak: newStreak,
+        last_daily_bonus_at: new Date(),
+        token_balance: { increment: totalTokens },
+      },
+    });
+
+    res.json({
+      checked_in: true,
+      streak: newStreak,
+      tokens_earned: totalTokens,
+      token_balance: Number(user.token_balance || 0) + totalTokens,
+      message: newStreak > 1
+        ? `${newStreak}-day streak! Earned ${totalTokens} tokens!`
+        : `Check-in successful! Earned ${totalTokens} tokens!`,
+    });
+  } catch (error: any) {
+    console.error('[Checkin] Error:', error.message);
+    res.status(500).json({ message: 'Failed to check in' });
+  }
 });
 
 // GET /api/user/me - Get current user info
