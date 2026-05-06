@@ -827,12 +827,119 @@ router.get("/search", authenticate, async (req: any, res) => {
 
 // GET /api/profile/:id/views - Profile view history
 router.get("/:id/views", authenticate, async (req: any, res) => {
-	res.json({ views: [], total: 0 });
+	try {
+		const targetUserId = BigInt(req.params.id);
+		const requestingUserId = BigInt(req.user.id);
+
+		// Users can only see their own profile views
+		if (targetUserId !== requestingUserId) {
+			return res.status(403).json({ message: 'You can only view your own profile views' });
+		}
+
+		const views = await prisma.profile_views.findMany({
+			where: { viewed_user_id: targetUserId },
+			take: 50,
+			orderBy: { created_at: 'desc' },
+			include: {
+				users_profile_views_viewer_user_idTousers: {
+					select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true } } },
+				},
+			},
+		});
+
+		const serializedViews = views.map((v: any) => {
+			const viewer = v.users_profile_views_viewer_user_idTousers;
+			const profile = Array.isArray(viewer?.user_profiles) ? viewer.user_profiles[0] : viewer?.user_profiles;
+			return {
+				id: Number(v.id),
+				viewer_name: profile?.display_name || viewer?.name || 'Anonymous',
+				viewer_avatar: profile?.avatar_url || null,
+				viewed_at: v.created_at,
+			};
+		});
+
+		res.json({ views: serializedViews, total: views.length });
+	} catch (err) {
+		res.json({ views: [], total: 0 });
+	}
 });
 
 // GET /api/profile/:id/view-stats - Profile view statistics
 router.get("/:id/view-stats", authenticate, async (req: any, res) => {
-	res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
+	try {
+		const targetUserId = BigInt(req.params.id);
+		const requestingUserId = BigInt(req.user.id);
+
+		if (targetUserId !== requestingUserId) {
+			return res.status(403).json({ message: 'You can only view your own stats' });
+		}
+
+		const totalViews = await prisma.profile_views.count({
+			where: { viewed_user_id: targetUserId },
+		});
+
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const viewsToday = await prisma.profile_views.count({
+			where: { viewed_user_id: targetUserId, created_at: { gte: today } },
+		});
+
+		const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+		const viewsThisWeek = await prisma.profile_views.count({
+			where: { viewed_user_id: targetUserId, created_at: { gte: weekAgo } },
+		});
+
+		const uniqueViewers = await prisma.profile_views.groupBy({
+			by: ['viewer_user_id'],
+			where: { viewed_user_id: targetUserId, viewer_user_id: { not: null } },
+		});
+
+		res.json({ total_views: totalViews, unique_viewers: uniqueViewers.length, today: viewsToday, this_week: viewsThisWeek });
+	} catch (err) {
+		res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
+	}
+});
+
+// POST /api/profile/:id/view - Record a profile view
+router.post("/:id/view", authenticate, async (req: any, res) => {
+	try {
+		const viewedUserId = BigInt(req.params.id);
+		const viewerUserId = BigInt(req.user.id);
+
+		// Don't record self-views
+		if (viewedUserId === viewerUserId) {
+			return res.json({ recorded: false });
+		}
+
+		// 24-hour deduplication
+		const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+		const existing = await prisma.profile_views.findFirst({
+			where: {
+				viewed_user_id: viewedUserId,
+				viewer_user_id: viewerUserId,
+				created_at: { gte: dayAgo },
+			},
+		});
+
+		if (existing) {
+			return res.json({ recorded: false, reason: 'already_viewed' });
+		}
+
+		await prisma.profile_views.create({
+			data: {
+				viewed_user_id: viewedUserId,
+				viewer_user_id: viewerUserId,
+				viewer_ip: req.ip || null,
+				user_agent: req.get('user-agent')?.substring(0, 255) || null,
+			},
+		});
+
+		res.json({ recorded: true });
+	} catch (err: any) {
+		// Non-critical - don't fail the profile load
+		console.error('[Profile View] Failed to record:', err.message);
+		res.json({ recorded: false, error: err.message });
+	}
 });
 
 
