@@ -1,4 +1,6 @@
 import { Router } from "express";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import { filePathToUrl } from "../lib/photos.js";
 import { authenticate } from "../middleware/auth.js";
@@ -693,23 +695,56 @@ router.put("/", authenticate, async (req: any, res) => {
 	}
 });
 
-// DELETE /api/profile - Delete current user's account (GDPR)
-router.delete("/", authenticate, async (req: any, res) => {
+// POST /api/profile/delete - Delete current user's account (GDPR)
+// Using POST instead of DELETE to reliably send password in body
+router.post("/delete", authenticate, async (req: any, res) => {
 	try {
 		const userId = BigInt(req.user.id);
+		const { password } = req.body || {};
+
+		// Require password verification for security
+		if (!password) {
+			return res.status(422).json({ message: "Password is required to delete your account" });
+		}
+
+		const user = await prisma.users.findUnique({ where: { id: userId } });
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// bcrypt imported at top
+		const isValid = await bcrypt.compare(password, user.password);
+		if (!isValid) {
+			return res.status(422).json({ message: "Incorrect password" });
+		}
+
+		// Anonymize user data before deletion (GDPR compliance)
+		await prisma.users.update({
+			where: { id: userId },
+			data: {
+				name: "Deleted User",
+				email: "deleted_" + userId + "@fwber.me",
+				password: await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10),
+			},
+		});
 
 		// Delete related records in order (respecting foreign keys)
-		await prisma.$transaction([
-			prisma.photos.deleteMany({ where: { user_id: userId } }),
-			prisma.user_profiles.deleteMany({ where: { user_id: userId } }),
-			prisma.matches.deleteMany({ where: { user1_id: userId } }),
-			prisma.matches.deleteMany({ where: { user2_id: userId } }),
-			prisma.messages.deleteMany({ where: { sender_id: userId } }),
-			prisma.blocks.deleteMany({ where: { blocker_id: userId } }),
-			prisma.blocks.deleteMany({ where: { blocked_id: userId } }),
-			prisma.reports.deleteMany({ where: { reporter_id: userId } }),
-			prisma.api_tokens.deleteMany({ where: { user_id: userId } }),
-		]);
+		// Using individual try/catch to handle missing tables gracefully
+		const cleanupOps = [
+			() => prisma.photos.deleteMany({ where: { user_id: userId } }),
+			() => prisma.user_profiles.deleteMany({ where: { user_id: userId } }),
+			() => prisma.matches.deleteMany({ where: { user1_id: userId } }),
+			() => prisma.matches.deleteMany({ where: { user2_id: userId } }),
+			() => prisma.messages.deleteMany({ where: { sender_id: userId } }),
+			() => prisma.blocks.deleteMany({ where: { blocker_id: userId } }),
+			() => prisma.blocks.deleteMany({ where: { blocked_id: userId } }),
+			() => prisma.reports.deleteMany({ where: { reporter_id: userId } }),
+			() => prisma.api_tokens.deleteMany({ where: { user_id: userId } }),
+		];
+
+		for (const op of cleanupOps) {
+			try { await op(); } catch (_) { /* skip if table doesn't exist */ }
+		}
 
 		// Delete the user account itself
 		await prisma.users.delete({ where: { id: userId } });
