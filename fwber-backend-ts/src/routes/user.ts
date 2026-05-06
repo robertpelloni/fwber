@@ -194,6 +194,45 @@ router.get('/me', authenticate, async (req: any, res) => {
   }
 });
 
+
+// GET /api/user/search — search users by name
+router.get('/search', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const q = String(req.query.q || '').trim();
+    if (!q || q.length < 2) {
+      return res.json([]);
+    }
+
+    const users = await prisma.users.findMany({
+      where: {
+        id: { not: userId },
+        name: { contains: q },
+      },
+      include: {
+        user_profiles: {
+          select: { display_name: true, avatar_url: true },
+          take: 1,
+        },
+      },
+      take: 20,
+    });
+
+    res.json(users.map((u: any) => {
+      const profile = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+      return {
+        id: Number(u.id),
+        name: u.name,
+        display_name: profile?.display_name || u.name,
+        avatar_url: profile?.avatar_url || null,
+      };
+    }));
+  } catch (error: any) {
+    console.error('[User] Search error:', error.message);
+    res.json([]);
+  }
+});
+
 // POST /api/user/export - GDPR data export
 router.post('/export', authenticate, async (req: any, res) => {
   try {
