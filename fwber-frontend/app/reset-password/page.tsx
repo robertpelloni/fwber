@@ -10,7 +10,6 @@ import { ArrowLeft, CheckCircle, Eye, EyeOff } from 'lucide-react';
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
-  const email = searchParams.get('email') || '';
 
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -50,7 +49,7 @@ export default function ResetPasswordPage() {
     }
   };
 
-  if (!token || !email) {
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
         <div className="max-w-md w-full text-center">
