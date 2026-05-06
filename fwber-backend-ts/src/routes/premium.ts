@@ -81,7 +81,7 @@ router.get('/status', authenticate, async (req: any, res) => {
 // POST /api/premium/initiate - Initiate premium subscription via Stripe
 router.post('/initiate', authenticate, async (req: any, res) => {
   const userId = BigInt(req.user.id);
-  const { planId } = req.body; // monthly, yearly
+  const { planId } = req.body || {}; // monthly, yearly
 
   if (!stripe) {
     return res.status(501).json({ error: 'Stripe is not configured on the server' });
