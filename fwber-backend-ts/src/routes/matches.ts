@@ -127,6 +127,19 @@ router.get('/', authenticate, async (req: any, res) => {
       // Bio bonus (+5)
       if (p.bio && p.bio.length > 20) score += 5;
 
+      // Photo bonus (+5 if has at least one photo)
+      const theirPhotos: any[] = Array.isArray(u.photos) ? u.photos : [];
+      if (theirPhotos.length > 0) score += 5;
+
+      // Profile completeness bonus (+5 if profile is well-filled)
+      let completeness = 0;
+      if (p.display_name) completeness++;
+      if (p.bio && p.bio.length > 20) completeness++;
+      if (p.date_of_birth) completeness++;
+      if (p.location_city) completeness++;
+      if (theirInterests.length >= 3) completeness++;
+      if (completeness >= 4) score += 5;
+
       score = Math.min(99, score);
 
       return {
