@@ -89,11 +89,30 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   ]);
 }
 
+// Cache provider failures to skip recently-failed providers
+const providerFailures = new Map<string, number>();
+const FAILURE_CACHE_MS = 5 * 60 * 1000; // Skip failed providers for 5 minutes
+
+function providerAvailable(name: string): boolean {
+  const lastFail = providerFailures.get(name);
+  if (!lastFail) return true;
+  if (Date.now() - lastFail > FAILURE_CACHE_MS) {
+    providerFailures.delete(name);
+    return true;
+  }
+  return false;
+}
+
+function markProviderFailed(name: string): void {
+  providerFailures.set(name, Date.now());
+}
+
 export async function generateText(system: string, user: string, temperature = 0.9): Promise<string> {
-  const TIMEOUT_MS = 15000; // 15 second timeout per provider
+  const TIMEOUT_MS = 10000; // 10 second overall timeout
+  const NVIDIA_TIMEOUT = 5000; // NVIDIA free tier is slow, shorter timeout
 
   // 1. Try NVIDIA NIM (Meta Llama 3.1 8B Instruct)
-  if (nvidia) {
+  if (nvidia && providerAvailable('nvidia')) {
     try {
       const resp = await withTimeout(nvidia.chat.completions.create({
         model: 'meta/llama-3.1-8b-instruct',
@@ -103,15 +122,16 @@ export async function generateText(system: string, user: string, temperature = 0
         ],
         temperature,
         max_tokens: 800,
-      }), TIMEOUT_MS, 'NVIDIA');
+      }), NVIDIA_TIMEOUT, 'NVIDIA');
       return resp.choices[0]?.message?.content?.trim() || '';
     } catch (err: any) {
       console.error('[AI] NVIDIA NIM failed, falling back...', err.message);
+      markProviderFailed('nvidia');
     }
   }
 
   // 2. Try OpenRouter (Google Gemini 2.0 Flash Lite Free)
-  if (openrouter) {
+  if (openrouter && providerAvailable('openrouter')) {
     try {
       const resp = await openrouter.chat.completions.create({
         model: 'google/gemini-2.0-flash-lite-preview-02-05:free',
@@ -125,11 +145,12 @@ export async function generateText(system: string, user: string, temperature = 0
       return resp.choices[0]?.message?.content?.trim() || '';
     } catch (err: any) {
       console.error('[AI] OpenRouter failed, falling back...', err.message);
+      markProviderFailed('openrouter');
     }
   }
 
   // 3. Last Resort: Legacy OpenAI Key
-  if (legacyOpenai) {
+  if (legacyOpenai && providerAvailable('openai')) {
     try {
       const resp = await withTimeout(legacyOpenai.chat.completions.create({
         model: 'gpt-4o-mini',
@@ -143,6 +164,7 @@ export async function generateText(system: string, user: string, temperature = 0
       return resp.choices[0]?.message?.content?.trim() || '';
     } catch (err: any) {
       console.error('[AI] Legacy OpenAI failed.', err.message);
+      markProviderFailed('openai');
     }
   }
 
