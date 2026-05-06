@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import { filePathToUrl } from "../lib/photos.js";
 import { authenticate } from "../middleware/auth.js";
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 

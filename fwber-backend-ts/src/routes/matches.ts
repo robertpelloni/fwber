@@ -3,6 +3,7 @@ import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { createNotification } from './notifications.js';
 import { filePathToUrl } from '../lib/photos.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -220,6 +221,10 @@ router.post('/action', authenticate, async (req: any, res) => {
       const targetName = (await prisma.users.findUnique({ where: { id: targetId }, select: { name: true } }))?.name || 'Someone';
       await createNotification(targetId, 'New Match!', `You matched with ${userName}!`);
       await createNotification(userId, 'New Match!', `You matched with ${targetName}!`);
+
+// Check achievements for both users (first match, etc.)
+        checkAndUnlockAchievements(userId).catch(() => {});
+        checkAndUnlockAchievements(targetId).catch(() => {});
 
       return res.json({
         action,

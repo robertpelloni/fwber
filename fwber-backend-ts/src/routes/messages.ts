@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 router.use(authenticate);
@@ -247,6 +248,9 @@ router.post('/', async (req: any, res) => {
         data: { last_message_at: new Date() },
       });
     } catch (_) {}
+
+    // Check achievements (first message, etc.)
+    checkAndUnlockAchievements(userId).catch(() => {});
 
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {
