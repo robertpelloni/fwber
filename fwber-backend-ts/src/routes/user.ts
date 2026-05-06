@@ -160,24 +160,105 @@ router.delete('/two-factor-authentication', authenticate, async (req: any, res) 
   }
 });
 
-// GET /api/user/checkin - Daily check-in
+// GET /api/user/checkin - Daily check-in status
 router.get('/checkin', authenticate, async (req: any, res) => {
-  res.json({
-    checked_in: false,
-    streak: 0,
-    tokens_earned: 0,
-    message: 'Not yet checked in today',
-  });
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { current_streak: true, last_daily_bonus_at: true, token_balance: true },
+    });
+
+    if (!user) {
+      return res.json({ checked_in: false, streak: 0, tokens_earned: 0, message: 'User not found' });
+    }
+
+    // Check if already checked in today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const lastBonus = user.last_daily_bonus_at ? new Date(user.last_daily_bonus_at) : null;
+    const checkedIn = lastBonus ? lastBonus >= today : false;
+
+    res.json({
+      checked_in: checkedIn,
+      streak: Number(user.current_streak || 0),
+      tokens_earned: checkedIn ? 10 : 0,
+      token_balance: Number(user.token_balance || 0),
+      message: checkedIn ? 'Already checked in today!' : 'Not yet checked in today',
+    });
+  } catch (error: any) {
+    console.error('[Checkin] Status error:', error.message);
+    res.json({ checked_in: false, streak: 0, tokens_earned: 0, message: 'Error checking status' });
+  }
 });
 
 // POST /api/user/checkin - Perform daily check-in
 router.post('/checkin', authenticate, async (req: any, res) => {
-  res.json({
-    checked_in: true,
-    streak: 1,
-    tokens_earned: 10,
-    message: 'Check-in successful!',
-  });
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { current_streak: true, last_daily_bonus_at: true, token_balance: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if already checked in today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const lastBonus = user.last_daily_bonus_at ? new Date(user.last_daily_bonus_at) : null;
+
+    if (lastBonus && lastBonus >= today) {
+      return res.json({
+        checked_in: true,
+        streak: Number(user.current_streak || 0),
+        tokens_earned: 0,
+        token_balance: Number(user.token_balance || 0),
+        message: 'Already checked in today!',
+      });
+    }
+
+    // Calculate streak
+    let newStreak = 1;
+    if (lastBonus) {
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      if (lastBonus >= yesterday) {
+        // Consecutive day
+        newStreak = Number(user.current_streak || 0) + 1;
+      }
+    }
+
+    // Calculate tokens based on streak
+    const baseTokens = 10;
+    const streakBonus = Math.min(newStreak - 1, 10) * 2; // +2 per streak day, max +20
+    const totalTokens = baseTokens + streakBonus;
+
+    // Update user
+    await prisma.users.update({
+      where: { id: userId },
+      data: {
+        current_streak: newStreak,
+        last_daily_bonus_at: new Date(),
+        token_balance: { increment: totalTokens },
+      },
+    });
+
+    res.json({
+      checked_in: true,
+      streak: newStreak,
+      tokens_earned: totalTokens,
+      token_balance: Number(user.token_balance || 0) + totalTokens,
+      message: newStreak > 1
+        ? `${newStreak}-day streak! Earned ${totalTokens} tokens!`
+        : `Check-in successful! Earned ${totalTokens} tokens!`,
+    });
+  } catch (error: any) {
+    console.error('[Checkin] Error:', error.message);
+    res.status(500).json({ message: 'Failed to check in' });
+  }
 });
 
 // GET /api/user/me - Get current user info
@@ -194,6 +275,45 @@ router.get('/me', authenticate, async (req: any, res) => {
   }
 });
 
+
+// GET /api/user/search — search users by name
+router.get('/search', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const q = String(req.query.q || '').trim();
+    if (!q || q.length < 2) {
+      return res.json([]);
+    }
+
+    const users = await prisma.users.findMany({
+      where: {
+        id: { not: userId },
+        name: { contains: q },
+      },
+      include: {
+        user_profiles: {
+          select: { display_name: true, avatar_url: true },
+          take: 1,
+        },
+      },
+      take: 20,
+    });
+
+    res.json(users.map((u: any) => {
+      const profile = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+      return {
+        id: Number(u.id),
+        name: u.name,
+        display_name: profile?.display_name || u.name,
+        avatar_url: profile?.avatar_url || null,
+      };
+    }));
+  } catch (error: any) {
+    console.error('[User] Search error:', error.message);
+    res.json([]);
+  }
+});
+
 // POST /api/user/export - GDPR data export
 router.post('/export', authenticate, async (req: any, res) => {
   try {
@@ -203,24 +323,44 @@ router.post('/export', authenticate, async (req: any, res) => {
       include: {
         user_profiles: true,
         photos: true,
-        messages_sent: {
-          take: 100,
-          orderBy: { created_at: 'desc' }
-        },
-        matches_as_user1: {
-          take: 50,
-          include: { users_matches_user2_idTousers: { select: { name: true } } }
-        },
-        matches_as_user2: {
-          take: 50,
-          include: { users_matches_user1_idTousers: { select: { name: true } } }
-        }
       }
     });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Fetch related data separately for resilience
+    let recentMessages: any[] = [];
+    let recentMatches: any[] = [];
+
+    try {
+      recentMessages = await prisma.messages.findMany({
+        where: { sender_id: userId },
+        take: 100,
+        orderBy: { created_at: 'desc' },
+        select: { content: true, created_at: true },
+      });
+    } catch (_) {}
+
+    try {
+      const m1 = await prisma.matches.findMany({
+        where: { user1_id: userId },
+        take: 25,
+        orderBy: { created_at: 'desc' },
+        select: { user2_id: true, status: true, created_at: true },
+      });
+      const m2 = await prisma.matches.findMany({
+        where: { user2_id: userId },
+        take: 25,
+        orderBy: { created_at: 'desc' },
+        select: { user1_id: true, status: true, created_at: true },
+      });
+      recentMatches = [
+        ...m1.map((m: any) => ({ partner_id: Number(m.user2_id), date: m.created_at, status: m.status })),
+        ...m2.map((m: any) => ({ partner_id: Number(m.user1_id), date: m.created_at, status: m.status })),
+      ];
+    } catch (_) {}
 
     // Structure the data for export
     const exportData = {
@@ -236,36 +376,43 @@ router.post('/export', authenticate, async (req: any, res) => {
         is_primary: p.is_primary,
         created_at: p.created_at
       })),
-      recent_messages: (user as any).messages_sent?.map((m: any) => ({
+      recent_messages: recentMessages.map((m: any) => ({
         content: m.content,
         timestamp: m.created_at
-      })) || [],
-      recent_matches: [
-        ...((user as any).matches_as_user1?.map((m: any) => ({ partner: m.users_matches_user2_idTousers?.name, date: m.created_at, status: m.status })) || []),
-        ...((user as any).matches_as_user2?.map((m: any) => ({ partner: m.users_matches_user1_idTousers?.name, date: m.created_at, status: m.status })) || [])
-      ]
+      })),
+      recent_matches: recentMatches,
     };
 
-    // In a real production environment, we'd generate a ZIP/JSON and upload to S3
-    // For now, we'll email the JSON summary to the user's registered email
-    const emailBody = `
-      <h1>Your FWBer Data Export</h1>
-      <p>Hello, you requested an export of your personal data.</p>
-      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
-${JSON.stringify(exportData, null, 2)}
-      </pre>
-      <p>If you did not request this, please secure your account immediately.</p>
-    `;
+    // Send email notification (lightweight summary, not full JSON)
+    try {
+      const summaryBody = `
+        <h1>Your FWBer Data Export</h1>
+        <p>Hello, you requested an export of your personal data.</p>
+        <p>Your data export includes:</p>
+        <ul>
+          <li>Account information</li>
+          <li>Profile data</li>
+          <li>${exportData.photos.length} photos</li>
+          <li>${exportData.recent_messages.length} recent messages</li>
+          <li>${exportData.recent_matches.length} matches</li>
+        </ul>
+        <p>You can download your full data from the Settings page.</p>
+        <p>If you did not request this, please secure your account immediately.</p>
+      `;
+      await sendNotificationEmail(
+        user.email || '',
+        'FWBer Data Export Request',
+        summaryBody
+      );
+    } catch (emailErr) {
+      console.error('[export] Failed to send email notification:', emailErr);
+    }
 
-    await sendNotificationEmail(
-      user.email || '',
-      'FWBer Data Export Request',
-      emailBody
-    );
-
-    res.json({ 
-      message: 'Data export generated and sent to your email.', 
-      status: 'completed' 
+    // Return the export data directly so the frontend can download it
+    res.json({
+      message: 'Data export generated successfully.',
+      status: 'completed',
+      data: exportData,
     });
   } catch (err) {
     console.error('[export] error:', err);

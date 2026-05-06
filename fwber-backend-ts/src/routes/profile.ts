@@ -1,4 +1,6 @@
 import { Router } from "express";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import { filePathToUrl } from "../lib/photos.js";
 import { authenticate } from "../middleware/auth.js";
@@ -98,6 +100,7 @@ router.get("/", authenticate, async (req: any, res) => {
 			last_online: user?.last_seen_at?.toISOString() || "",
 			profile: {
 				display_name: p.display_name,
+				avatar_url: p.avatar_url || photos.find((ph: any) => ph.is_primary)?.file_path ? filePathToUrl(photos.find((ph: any) => ph.is_primary)?.file_path) : null,
 				bio: p.bio,
 				date_of_birth: p.date_of_birth || p.birthdate,
 				age:
@@ -205,7 +208,7 @@ router.post("/", authenticate, async (req: any, res) => {
 	// Reuse PUT logic — same sanitization, column filtering, type coercion
 	try {
 		const userId = BigInt(req.user.id);
-		const raw = req.body;
+		const raw = req.body || {};
 
 		const data: any = {};
 		for (const [key, val] of Object.entries(raw)) {
@@ -545,7 +548,7 @@ const JSON_COLUMNS = new Set([
 router.put("/", authenticate, async (req: any, res) => {
 	try {
 		const userId = BigInt(req.user.id);
-		const raw = req.body;
+		const raw = req.body || {};
 
 		// Map nested objects to flat DB columns
 		const data: any = {};
@@ -692,23 +695,56 @@ router.put("/", authenticate, async (req: any, res) => {
 	}
 });
 
-// DELETE /api/profile - Delete current user's account (GDPR)
-router.delete("/", authenticate, async (req: any, res) => {
+// POST /api/profile/delete - Delete current user's account (GDPR)
+// Using POST instead of DELETE to reliably send password in body
+router.post("/delete", authenticate, async (req: any, res) => {
 	try {
 		const userId = BigInt(req.user.id);
+		const { password } = req.body || {};
+
+		// Require password verification for security
+		if (!password) {
+			return res.status(422).json({ message: "Password is required to delete your account" });
+		}
+
+		const user = await prisma.users.findUnique({ where: { id: userId } });
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// bcrypt imported at top
+		const isValid = await bcrypt.compare(password, user.password);
+		if (!isValid) {
+			return res.status(422).json({ message: "Incorrect password" });
+		}
+
+		// Anonymize user data before deletion (GDPR compliance)
+		await prisma.users.update({
+			where: { id: userId },
+			data: {
+				name: "Deleted User",
+				email: "deleted_" + userId + "@fwber.me",
+				password: await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10),
+			},
+		});
 
 		// Delete related records in order (respecting foreign keys)
-		await prisma.$transaction([
-			prisma.photos.deleteMany({ where: { user_id: userId } }),
-			prisma.user_profiles.deleteMany({ where: { user_id: userId } }),
-			prisma.matches.deleteMany({ where: { user1_id: userId } }),
-			prisma.matches.deleteMany({ where: { user2_id: userId } }),
-			prisma.messages.deleteMany({ where: { sender_id: userId } }),
-			prisma.blocks.deleteMany({ where: { blocker_id: userId } }),
-			prisma.blocks.deleteMany({ where: { blocked_id: userId } }),
-			prisma.reports.deleteMany({ where: { reporter_id: userId } }),
-			prisma.api_tokens.deleteMany({ where: { user_id: userId } }),
-		]);
+		// Using individual try/catch to handle missing tables gracefully
+		const cleanupOps = [
+			() => prisma.photos.deleteMany({ where: { user_id: userId } }),
+			() => prisma.user_profiles.deleteMany({ where: { user_id: userId } }),
+			() => prisma.matches.deleteMany({ where: { user1_id: userId } }),
+			() => prisma.matches.deleteMany({ where: { user2_id: userId } }),
+			() => prisma.messages.deleteMany({ where: { sender_id: userId } }),
+			() => prisma.blocks.deleteMany({ where: { blocker_id: userId } }),
+			() => prisma.blocks.deleteMany({ where: { blocked_id: userId } }),
+			() => prisma.reports.deleteMany({ where: { reporter_id: userId } }),
+			() => prisma.api_tokens.deleteMany({ where: { user_id: userId } }),
+		];
+
+		for (const op of cleanupOps) {
+			try { await op(); } catch (_) { /* skip if table doesn't exist */ }
+		}
 
 		// Delete the user account itself
 		await prisma.users.delete({ where: { id: userId } });
@@ -738,16 +774,6 @@ router.get("/completeness", authenticate, async (req: any, res) => {
 	} catch (err) {
 		res.json(getEmptyCompletenessSummary());
 	}
-});
-
-// GET /api/profile/:id/views - Profile view history
-router.get("/:id/views", authenticate, async (req: any, res) => {
-	res.json({ views: [], total: 0 });
-});
-
-// GET /api/profile/:id/view-stats - Profile view statistics
-router.get("/:id/view-stats", authenticate, async (req: any, res) => {
-	res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
 });
 
 // GET /api/users/search - Search users
@@ -798,6 +824,125 @@ router.get("/search", authenticate, async (req: any, res) => {
 		res.status(500).json({ message: "Search failed" });
 	}
 });
+
+// GET /api/profile/:id/views - Profile view history
+router.get("/:id/views", authenticate, async (req: any, res) => {
+	try {
+		const targetUserId = BigInt(req.params.id);
+		const requestingUserId = BigInt(req.user.id);
+
+		// Users can only see their own profile views
+		if (targetUserId !== requestingUserId) {
+			return res.status(403).json({ message: 'You can only view your own profile views' });
+		}
+
+		const views = await prisma.profile_views.findMany({
+			where: { viewed_user_id: targetUserId },
+			take: 50,
+			orderBy: { created_at: 'desc' },
+			include: {
+				users_profile_views_viewer_user_idTousers: {
+					select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true } } },
+				},
+			},
+		});
+
+		const serializedViews = views.map((v: any) => {
+			const viewer = v.users_profile_views_viewer_user_idTousers;
+			const profile = Array.isArray(viewer?.user_profiles) ? viewer.user_profiles[0] : viewer?.user_profiles;
+			return {
+				id: Number(v.id),
+				viewer_name: profile?.display_name || viewer?.name || 'Anonymous',
+				viewer_avatar: profile?.avatar_url || null,
+				viewed_at: v.created_at,
+			};
+		});
+
+		res.json({ views: serializedViews, total: views.length });
+	} catch (err) {
+		res.json({ views: [], total: 0 });
+	}
+});
+
+// GET /api/profile/:id/view-stats - Profile view statistics
+router.get("/:id/view-stats", authenticate, async (req: any, res) => {
+	try {
+		const targetUserId = BigInt(req.params.id);
+		const requestingUserId = BigInt(req.user.id);
+
+		if (targetUserId !== requestingUserId) {
+			return res.status(403).json({ message: 'You can only view your own stats' });
+		}
+
+		const totalViews = await prisma.profile_views.count({
+			where: { viewed_user_id: targetUserId },
+		});
+
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+		const viewsToday = await prisma.profile_views.count({
+			where: { viewed_user_id: targetUserId, created_at: { gte: today } },
+		});
+
+		const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+		const viewsThisWeek = await prisma.profile_views.count({
+			where: { viewed_user_id: targetUserId, created_at: { gte: weekAgo } },
+		});
+
+		const uniqueViewers = await prisma.profile_views.groupBy({
+			by: ['viewer_user_id'],
+			where: { viewed_user_id: targetUserId, viewer_user_id: { not: null } },
+		});
+
+		res.json({ total_views: totalViews, unique_viewers: uniqueViewers.length, today: viewsToday, this_week: viewsThisWeek });
+	} catch (err) {
+		res.json({ total_views: 0, unique_viewers: 0, today: 0, this_week: 0 });
+	}
+});
+
+// POST /api/profile/:id/view - Record a profile view
+router.post("/:id/view", authenticate, async (req: any, res) => {
+	try {
+		const viewedUserId = BigInt(req.params.id);
+		const viewerUserId = BigInt(req.user.id);
+
+		// Don't record self-views
+		if (viewedUserId === viewerUserId) {
+			return res.json({ recorded: false });
+		}
+
+		// 24-hour deduplication
+		const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+		const existing = await prisma.profile_views.findFirst({
+			where: {
+				viewed_user_id: viewedUserId,
+				viewer_user_id: viewerUserId,
+				created_at: { gte: dayAgo },
+			},
+		});
+
+		if (existing) {
+			return res.json({ recorded: false, reason: 'already_viewed' });
+		}
+
+		await prisma.profile_views.create({
+			data: {
+				viewed_user_id: viewedUserId,
+				viewer_user_id: viewerUserId,
+				viewer_ip: req.ip || null,
+				user_agent: req.get('user-agent')?.substring(0, 255) || null,
+			},
+		});
+
+		res.json({ recorded: true });
+	} catch (err: any) {
+		// Non-critical - don't fail the profile load
+		console.error('[Profile View] Failed to record:', err.message);
+		res.json({ recorded: false, error: err.message });
+	}
+});
+
+
 
 // GET /api/users/:id - Get public profile
 router.get("/:id", authenticate, async (req: any, res) => {
@@ -865,6 +1010,7 @@ router.get("/:id", authenticate, async (req: any, res) => {
 			last_online: user.last_seen_at?.toISOString() || "",
 			profile: {
 				display_name: p.display_name || user.name || "User",
+				avatar_url: p.avatar_url || (photos.find((ph: any) => ph.is_primary) ? filePathToUrl(photos.find((ph: any) => ph.is_primary)!.file_path) : null),
 				bio: p.bio || "No bio yet.",
 				age:
 					p.date_of_birth || p.birthdate

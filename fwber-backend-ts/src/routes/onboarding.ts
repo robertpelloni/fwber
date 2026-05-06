@@ -72,13 +72,15 @@ router.post('/complete', authenticate, async (req: any, res) => {
     // Get profile ID for upsert
     const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
 
-    // Use transaction to update both user and profile
+    // Use transaction to update user, profile, and grant starter tokens
+    const STARTER_TOKENS = 25;
     await prisma.$transaction([
       prisma.users.update({
         where: { id: userId },
         data: { 
           onboarding_completed_at: new Date(),
-          name: name || undefined
+          name: name || undefined,
+          token_balance: { increment: STARTER_TOKENS },
         },
       }),
       (profile ? 
@@ -95,7 +97,20 @@ router.post('/complete', authenticate, async (req: any, res) => {
       )
     ]);
 
-    res.json({ message: 'Onboarding completed and profile updated' });
+    // Record the starter bonus as a transaction
+    try {
+      await prisma.wallet_transactions.create({
+        data: {
+          user_id: userId,
+          amount: STARTER_TOKENS,
+          type: 'reward',
+          description: 'Welcome bonus — complete your profile to earn more!',
+          created_at: new Date(),
+        },
+      });
+    } catch (_) {}
+
+    res.json({ message: 'Onboarding completed and profile updated', tokens_awarded: STARTER_TOKENS });
   } catch (error: any) {
     console.error('[POST /api/onboarding/complete]', error.message);
     res.status(500).json({ message: error.message || 'Failed to complete onboarding' });

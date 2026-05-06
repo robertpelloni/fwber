@@ -9,6 +9,8 @@ const authController = new AuthController();
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.get('/me', authenticate, authController.me);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
 router.get('/referral/:code', async (req, res) => {
   try {
@@ -17,13 +19,10 @@ router.get('/referral/:code', async (req, res) => {
       where: { referral_code: code },
       include: { user_profiles: true }
     });
-
     if (!user) {
       return res.status(404).json({ valid: false, message: 'Invalid referral code' });
     }
-
     const profile = Array.isArray(user.user_profiles) ? user.user_profiles[0] : user.user_profiles;
-
     res.json({
       valid: true,
       referrer_name: profile?.display_name || user.name || 'A user',

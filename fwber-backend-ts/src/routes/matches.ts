@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { createNotification } from './notifications.js';
 import { filePathToUrl } from '../lib/photos.js';
 
 const router = Router();
@@ -127,6 +128,19 @@ router.get('/', authenticate, async (req: any, res) => {
       // Bio bonus (+5)
       if (p.bio && p.bio.length > 20) score += 5;
 
+      // Photo bonus (+5 if has at least one photo)
+      const theirPhotos: any[] = Array.isArray(u.photos) ? u.photos : [];
+      if (theirPhotos.length > 0) score += 5;
+
+      // Profile completeness bonus (+5 if profile is well-filled)
+      let completeness = 0;
+      if (p.display_name) completeness++;
+      if (p.bio && p.bio.length > 20) completeness++;
+      if (p.date_of_birth) completeness++;
+      if (p.location_city) completeness++;
+      if (theirInterests.length >= 3) completeness++;
+      if (completeness >= 4) score += 5;
+
       score = Math.min(99, score);
 
       return {
@@ -200,6 +214,12 @@ router.post('/action', authenticate, async (req: any, res) => {
         where: { id: existingLike.id },
         data: { status: 'accepted', is_active: true },
       });
+
+      // Notify both users
+      const userName = (await prisma.users.findUnique({ where: { id: userId }, select: { name: true } }))?.name || 'Someone';
+      const targetName = (await prisma.users.findUnique({ where: { id: targetId }, select: { name: true } }))?.name || 'Someone';
+      await createNotification(targetId, 'New Match!', `You matched with ${userName}!`);
+      await createNotification(userId, 'New Match!', `You matched with ${targetName}!`);
 
       return res.json({
         action,

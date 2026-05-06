@@ -84,7 +84,8 @@ router.get('/conversations', async (req: any, res) => {
     const matches = await prisma.matches.findMany({
       where: {
         OR: [{ user1_id: userId }, { user2_id: userId }],
-        status: 'accepted',
+        status: { in: ['accepted', 'pending'] },
+        is_active: true,
       },
       include: {
         users_matches_user1_idTousers: {
@@ -97,20 +98,56 @@ router.get('/conversations', async (req: any, res) => {
       take: 50,
     });
 
+    // Fetch last message for each match partner
+    const partnerIds = matches.map((m: any) => {
+      const isUser1 = m.user1_id.toString() === userId.toString();
+      return isUser1 ? m.user2_id : m.user1_id;
+    });
+
+    let lastMessages: Map<string, any> = new Map();
+    try {
+      for (const partnerId of partnerIds) {
+        const msg = await prisma.messages.findFirst({
+          where: {
+            OR: [
+              { sender_id: userId, receiver_id: partnerId },
+              { sender_id: partnerId, receiver_id: userId },
+            ],
+          },
+          orderBy: { id: 'desc' },
+          take: 1,
+        });
+        if (msg) {
+          lastMessages.set(partnerId.toString(), msg);
+        }
+      }
+    } catch (_) {}
+
     const conversations = matches.map((m: any) => {
-      const otherUser = m.user1_id.toString() === userId.toString()
+      const isUser1 = m.user1_id.toString() === userId.toString();
+      const otherUser = isUser1
         ? m.users_matches_user2_idTousers
         : m.users_matches_user1_idTousers;
       const profile = otherUser?.user_profiles?.[0];
+      const partnerId = isUser1 ? m.user2_id : m.user1_id;
+      const lastMsg = lastMessages.get(partnerId.toString());
+
       return {
         id: Number(otherUser?.id || 0),
+        match_id: Number(m.id),
         other_user: {
           id: Number(otherUser?.id || 0),
           name: otherUser?.name || 'Unknown',
           display_name: profile?.display_name || otherUser?.name || 'Unknown',
           avatar_url: profile?.avatar_url || null,
         },
-        last_message: null,
+        last_message: lastMsg ? {
+          content: lastMsg.content,
+          sender_id: Number(lastMsg.sender_id),
+          sent_at: lastMsg.sent_at || lastMsg.created_at || null,
+          is_read: lastMsg.is_read,
+        } : null,
+        match_status: m.status,
         created_at: m.created_at?.toISOString() || null,
       };
     });
@@ -178,6 +215,39 @@ router.post('/', async (req: any, res) => {
         sent_at: new Date(),
       },
     });
+
+    // Auto-accept the match when first message is sent
+    try {
+      const receiverBigId = BigInt(receiver_id);
+      await prisma.matches.updateMany({
+        where: {
+          OR: [
+            { user1_id: userId, user2_id: receiverBigId },
+            { user1_id: receiverBigId, user2_id: userId },
+          ],
+          status: 'pending',
+        },
+        data: {
+          status: 'accepted',
+          last_message_at: new Date(),
+        },
+      });
+    } catch (_) {}
+
+    // Also update last_message_at for the match
+    try {
+      const receiverBigId = BigInt(receiver_id);
+      await prisma.matches.updateMany({
+        where: {
+          OR: [
+            { user1_id: userId, user2_id: receiverBigId },
+            { user1_id: receiverBigId, user2_id: userId },
+          ],
+        },
+        data: { last_message_at: new Date() },
+      });
+    } catch (_) {}
+
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {
     console.error('[Messages] Send error:', error.message);

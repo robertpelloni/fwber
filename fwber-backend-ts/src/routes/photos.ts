@@ -180,6 +180,19 @@ router.post('/', authenticate, (req: any, _res, next) => {
       },
     });
 
+    // Sync primary photo to user_profiles.avatar_url
+    if (isPrimary) {
+      try {
+        const avatarUrl = `${API_BASE}/uploads/${file.filename}`;
+        await prisma.user_profiles.updateMany({
+          where: { user_id: userId },
+          data: { avatar_url: avatarUrl, updated_at: new Date() },
+        });
+      } catch (e) {
+        console.warn('[photos] Failed to sync avatar_url:', e);
+      }
+    }
+
     res.json({ success: true, data: serialize(photo) });
   } catch (err) {
     console.error('[photos] POST error:', err);
@@ -259,6 +272,22 @@ router.delete('/:id', authenticate, async (req: any, res: Response) => {
 
     await prisma.photos.delete({ where: { id: photoId } });
 
+    // If the deleted photo was primary, update avatar_url to the next primary (or null)
+    if (photo.is_primary) {
+      try {
+        const nextPrimary = await prisma.photos.findFirst({
+          where: { user_id: userId, is_primary: true },
+        });
+        const avatarUrl = nextPrimary ? `${API_BASE}/uploads/${nextPrimary.filename}` : null;
+        await prisma.user_profiles.updateMany({
+          where: { user_id: userId },
+          data: { avatar_url: avatarUrl, updated_at: new Date() },
+        });
+      } catch (e) {
+        console.warn('[photos] Failed to update avatar_url after delete:', e);
+      }
+    }
+
     res.json({ success: true, message: 'Photo deleted' });
   } catch (err) {
     console.error('[photos] DELETE error:', err);
@@ -319,6 +348,17 @@ router.post('/:id/set-primary', authenticate, async (req: any, res: Response) =>
       where: { id: photoId },
       data: { is_primary: true, updated_at: new Date() },
     });
+
+    // Sync primary photo URL to user_profiles.avatar_url
+    try {
+      const avatarUrl = `${API_BASE}/uploads/${photo.filename}`;
+      await prisma.user_profiles.updateMany({
+        where: { user_id: userId },
+        data: { avatar_url: avatarUrl, updated_at: new Date() },
+      });
+    } catch (e) {
+      console.warn('[photos] Failed to sync avatar_url on set-primary:', e);
+    }
 
     const photos = await prisma.photos.findMany({
       where: { user_id: userId },

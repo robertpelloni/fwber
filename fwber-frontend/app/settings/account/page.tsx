@@ -73,7 +73,7 @@ export default function AccountSettingsPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await apiClient.delete('/profile', { body: { password: deletePassword } });
+      await apiClient.post('/profile/delete', { password: deletePassword });
       await logout();
       router.push('/login');
     } catch (error: any) {

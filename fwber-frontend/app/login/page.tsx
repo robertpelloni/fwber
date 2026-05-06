@@ -28,15 +28,20 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      const user = localStorage.getItem('fwber_user')
+      const parsed = user ? JSON.parse(user) : {}
+      const needsOnboarding = !parsed.onboarding_completed_at
+      const destination = needsOnboarding ? '/onboarding' : '/dashboard'
+
       // Use setTimeout to avoid blocking the render cycle and ensure state is settled
       const timer = setTimeout(() => {
-        router.push('/dashboard')
+        router.push(destination)
       }, 100)
 
       // Safety fallback: if we are still here after 3s, force hard navigation
       const fallbackTimer = setTimeout(() => {
         console.warn('Router push stalled. Forcing hard navigation.');
-        window.location.href = '/dashboard';
+        window.location.href = destination;
       }, 3000);
 
       return () => {

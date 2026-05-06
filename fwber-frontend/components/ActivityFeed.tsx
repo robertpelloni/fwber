@@ -238,19 +238,12 @@ export function ActivityFeed({
             >
               {/* User Avatar with Presence */}
               <div className="relative flex-shrink-0">
-                {activity.user?.avatar_url ? (
-                  <Image
-                    src={activity.user.avatar_url}
-                    alt={activity.user.name || 'User'}
-                    width={40}
-                    height={40}
-                    className="rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-white font-bold">
-                    {(activity.user?.name?.[0] || '?').toUpperCase()}
-                  </div>
-                )}
+                <UserAvatar
+                        src={activity.user?.avatar_url}
+                        name={activity.user?.name}
+                        userId={activity.user?.id}
+                        size={40}
+                      />
                 {/* Presence Indicator */}
                 {activity.user?.id && (
                   <PresenceIndicator 
