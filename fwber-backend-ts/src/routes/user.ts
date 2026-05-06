@@ -203,24 +203,44 @@ router.post('/export', authenticate, async (req: any, res) => {
       include: {
         user_profiles: true,
         photos: true,
-        messages_sent: {
-          take: 100,
-          orderBy: { created_at: 'desc' }
-        },
-        matches_as_user1: {
-          take: 50,
-          include: { users_matches_user2_idTousers: { select: { name: true } } }
-        },
-        matches_as_user2: {
-          take: 50,
-          include: { users_matches_user1_idTousers: { select: { name: true } } }
-        }
       }
     });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    // Fetch related data separately for resilience
+    let recentMessages: any[] = [];
+    let recentMatches: any[] = [];
+
+    try {
+      recentMessages = await prisma.messages.findMany({
+        where: { sender_id: userId },
+        take: 100,
+        orderBy: { created_at: 'desc' },
+        select: { content: true, created_at: true },
+      });
+    } catch (_) {}
+
+    try {
+      const m1 = await prisma.matches.findMany({
+        where: { user1_id: userId },
+        take: 25,
+        orderBy: { created_at: 'desc' },
+        select: { user2_id: true, status: true, created_at: true },
+      });
+      const m2 = await prisma.matches.findMany({
+        where: { user2_id: userId },
+        take: 25,
+        orderBy: { created_at: 'desc' },
+        select: { user1_id: true, status: true, created_at: true },
+      });
+      recentMatches = [
+        ...m1.map((m: any) => ({ partner_id: Number(m.user2_id), date: m.created_at, status: m.status })),
+        ...m2.map((m: any) => ({ partner_id: Number(m.user1_id), date: m.created_at, status: m.status })),
+      ];
+    } catch (_) {}
 
     // Structure the data for export
     const exportData = {
@@ -236,36 +256,43 @@ router.post('/export', authenticate, async (req: any, res) => {
         is_primary: p.is_primary,
         created_at: p.created_at
       })),
-      recent_messages: (user as any).messages_sent?.map((m: any) => ({
+      recent_messages: recentMessages.map((m: any) => ({
         content: m.content,
         timestamp: m.created_at
-      })) || [],
-      recent_matches: [
-        ...((user as any).matches_as_user1?.map((m: any) => ({ partner: m.users_matches_user2_idTousers?.name, date: m.created_at, status: m.status })) || []),
-        ...((user as any).matches_as_user2?.map((m: any) => ({ partner: m.users_matches_user1_idTousers?.name, date: m.created_at, status: m.status })) || [])
-      ]
+      })),
+      recent_matches: recentMatches,
     };
 
-    // In a real production environment, we'd generate a ZIP/JSON and upload to S3
-    // For now, we'll email the JSON summary to the user's registered email
-    const emailBody = `
-      <h1>Your FWBer Data Export</h1>
-      <p>Hello, you requested an export of your personal data.</p>
-      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
-${JSON.stringify(exportData, null, 2)}
-      </pre>
-      <p>If you did not request this, please secure your account immediately.</p>
-    `;
+    // Send email notification (lightweight summary, not full JSON)
+    try {
+      const summaryBody = `
+        <h1>Your FWBer Data Export</h1>
+        <p>Hello, you requested an export of your personal data.</p>
+        <p>Your data export includes:</p>
+        <ul>
+          <li>Account information</li>
+          <li>Profile data</li>
+          <li>${exportData.photos.length} photos</li>
+          <li>${exportData.recent_messages.length} recent messages</li>
+          <li>${exportData.recent_matches.length} matches</li>
+        </ul>
+        <p>You can download your full data from the Settings page.</p>
+        <p>If you did not request this, please secure your account immediately.</p>
+      `;
+      await sendNotificationEmail(
+        user.email || '',
+        'FWBer Data Export Request',
+        summaryBody
+      );
+    } catch (emailErr) {
+      console.error('[export] Failed to send email notification:', emailErr);
+    }
 
-    await sendNotificationEmail(
-      user.email || '',
-      'FWBer Data Export Request',
-      emailBody
-    );
-
-    res.json({ 
-      message: 'Data export generated and sent to your email.', 
-      status: 'completed' 
+    // Return the export data directly so the frontend can download it
+    res.json({
+      message: 'Data export generated successfully.',
+      status: 'completed',
+      data: exportData,
     });
   } catch (err) {
     console.error('[export] error:', err);
