@@ -81,11 +81,21 @@ async function getProfileSummary(userId: bigint): Promise<string> {
 }
 
 /** Generic AI chat completion helper with multi-provider failover */
+// Helper: race an AI call against a timeout
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)),
+  ]);
+}
+
 export async function generateText(system: string, user: string, temperature = 0.9): Promise<string> {
+  const TIMEOUT_MS = 15000; // 15 second timeout per provider
+
   // 1. Try NVIDIA NIM (Meta Llama 3.1 8B Instruct)
   if (nvidia) {
     try {
-      const resp = await nvidia.chat.completions.create({
+      const resp = await withTimeout(nvidia.chat.completions.create({
         model: 'meta/llama-3.1-8b-instruct',
         messages: [
           { role: 'system', content: system },
@@ -93,7 +103,7 @@ export async function generateText(system: string, user: string, temperature = 0
         ],
         temperature,
         max_tokens: 800,
-      });
+      }), TIMEOUT_MS, 'NVIDIA');
       return resp.choices[0]?.message?.content?.trim() || '';
     } catch (err: any) {
       console.error('[AI] NVIDIA NIM failed, falling back...', err.message);
@@ -121,7 +131,7 @@ export async function generateText(system: string, user: string, temperature = 0
   // 3. Last Resort: Legacy OpenAI Key
   if (legacyOpenai) {
     try {
-      const resp = await legacyOpenai.chat.completions.create({
+      const resp = await withTimeout(legacyOpenai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: system },
@@ -129,7 +139,7 @@ export async function generateText(system: string, user: string, temperature = 0
         ],
         temperature,
         max_tokens: 800,
-      });
+      }), TIMEOUT_MS, 'OpenAI');
       return resp.choices[0]?.message?.content?.trim() || '';
     } catch (err: any) {
       console.error('[AI] Legacy OpenAI failed.', err.message);
