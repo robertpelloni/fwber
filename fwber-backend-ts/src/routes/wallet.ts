@@ -18,11 +18,19 @@ async function getWalletBalance(req: any, res: any) {
       where: { id: userId },
       select: { token_balance: true }
     });
+    let transactions: any[] = [];
+    try {
+      transactions = await prisma.wallet_transactions.findMany({
+        where: { user_id: userId },
+        orderBy: { created_at: 'desc' },
+        take: 5
+      });
+    } catch (_) {}
     res.json({
       balance: user?.token_balance || 0,
       tokens: user?.token_balance || 0,
       currency: 'FWB',
-      transactions: [],
+      transactions,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch wallet' });
@@ -36,14 +44,24 @@ router.get('/balance', authenticate, getWalletBalance);
 router.get('/transactions', authenticate, async (req: any, res) => {
   const userId = BigInt(req.user.id);
   try {
-    const transactions = await prisma.merchant_payments.findMany({
-      where: { payer_id: userId },
+    const transactions = await prisma.wallet_transactions.findMany({
+      where: { user_id: userId },
       orderBy: { created_at: 'desc' },
       take: 20
     });
     res.json({ transactions, total: transactions.length });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch transactions' });
+    // Fallback: if wallet_transactions not available, check merchant_payments
+    try {
+      const transactions = await prisma.merchant_payments.findMany({
+        where: { payer_id: userId },
+        orderBy: { created_at: 'desc' },
+        take: 20
+      });
+      res.json({ transactions, total: transactions.length });
+    } catch (e) {
+      res.json({ transactions: [], total: 0 });
+    }
   }
 });
 
