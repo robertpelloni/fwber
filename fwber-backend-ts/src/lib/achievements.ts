@@ -56,13 +56,11 @@ export async function checkAndUnlockAchievements(userId: bigint): Promise<string
           status: 'accepted',
         },
       }).catch(() => 0),
-      prisma.daily_checkins.count({
-        where: { user_id: userId },
-      }).catch(() => 0),
-      prisma.journal_entries.count({
-        where: { user_id: userId },
-      }).catch(() => 0),
-      prisma.user_profiles.findUnique({
+      // Check if user has ever checked in (last_daily_bonus_at is set)
+      prisma.users.findUnique({ where: { id: userId }, select: { last_daily_bonus_at: true } })
+        .then(u => u?.last_daily_bonus_at ? 1 : 0).catch(() => 0),
+      prisma.$queryRaw`SELECT COUNT(*) as count FROM journal_entries WHERE user_id = ${userId}`.then((r: any) => Number(r[0]?.count || 0)).catch(() => 0),
+      prisma.user_profiles.findFirst({
         where: { user_id: userId },
       }).catch(() => null as any),
       prisma.users.findUnique({

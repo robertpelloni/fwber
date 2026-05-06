@@ -750,7 +750,9 @@ router.post("/delete", authenticate, async (req: any, res) => {
 		// Delete the user account itself
 		await prisma.users.delete({ where: { id: userId } });
 
-		res.json({ message: "Account deleted successfully" });
+		
+    checkAndUnlockAchievements(userId).catch(() => {});
+res.json({ message: "Account deleted successfully" });
 	} catch (error: any) {
 		console.error("[DELETE /api/profile]", error);
 		res

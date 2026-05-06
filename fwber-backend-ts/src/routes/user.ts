@@ -6,6 +6,7 @@ import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import crypto from 'crypto';
 import { sendNotificationEmail } from '../lib/email.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -236,7 +237,7 @@ router.post('/checkin', authenticate, async (req: any, res) => {
     const streakBonus = Math.min(newStreak - 1, 10) * 2; // +2 per streak day, max +20
     const totalTokens = baseTokens + streakBonus;
 
-    // Update user
+    // Update user and record transaction
     await prisma.users.update({
       where: { id: userId },
       data: {
@@ -245,6 +246,22 @@ router.post('/checkin', authenticate, async (req: any, res) => {
         token_balance: { increment: totalTokens },
       },
     });
+
+    // Record wallet transaction
+    try {
+      await prisma.wallet_transactions.create({
+        data: {
+          user_id: userId,
+          amount: totalTokens,
+          type: 'reward',
+          description: newStreak > 1 ? `${newStreak}-day streak bonus` : 'Daily check-in reward',
+          created_at: new Date(),
+        },
+      });
+    } catch (_) {}
+
+    // Check achievements (daily checkin, streak milestones)
+    checkAndUnlockAchievements(userId).catch(() => {});
 
     res.json({
       checked_in: true,

@@ -87,6 +87,9 @@ router.post('/send', authenticate, async (req: any, res) => {
       })
     ]);
 
+    // Check achievements (first gift, gift milestones)
+    checkAndUnlockAchievements(senderId).catch(() => {});
+
     res.json({ success: true, gift: userGift });
   } catch (error: any) {
     console.error('[Gifts] Error sending:', error.message);

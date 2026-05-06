@@ -111,6 +111,9 @@ router.post('/complete', authenticate, async (req: any, res) => {
       });
     } catch (_) {}
 
+    // Check achievements (profile complete, verified email, etc.)
+    checkAndUnlockAchievements(userId).catch(() => {});
+
     res.json({ message: 'Onboarding completed and profile updated', tokens_awarded: STARTER_TOKENS });
   } catch (error: any) {
     console.error('[POST /api/onboarding/complete]', error.message);
