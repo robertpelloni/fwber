@@ -24,7 +24,7 @@ router.post('/verification-notification', authenticate, async (req: any, res) =>
     }
 
     // Generate verification token (24h expiry)
-    const token = createVerificationToken(user.id, user.email!);
+    const token = await createVerificationToken(user.id, user.email!);
 
     const sent = await sendVerificationEmail(user.email!, token);
 
@@ -58,7 +58,7 @@ router.post('/verify', async (req, res) => {
       return res.status(400).json({ message: 'Token is required' });
     }
 
-    const stored = consumeVerificationToken(token);
+    const stored = await consumeVerificationToken(token as string);
 
     if (!stored) {
       return res.status(400).json({ message: 'Invalid or expired verification token' });
