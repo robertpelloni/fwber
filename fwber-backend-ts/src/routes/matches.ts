@@ -244,6 +244,18 @@ router.post('/action', authenticate, async (req: any, res) => {
       },
     });
 
+    // Record the action in match_actions for who-likes-you tracking
+    try {
+      await prisma.match_actions.create({
+        data: {
+          user_id: userId,
+          target_user_id: targetId,
+          action: action as any,
+          created_at: new Date(),
+        },
+      });
+    } catch (_) {}
+
     res.json({
       action,
       is_match: false,

@@ -17,7 +17,7 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
     const likes = await prisma.match_actions.findMany({
       where: {
         target_user_id: userId,
-        action: 'like'
+        action: { in: ['like', 'super_like'] }
       },
       include: {
         users_match_actions_user_idTousers: {
