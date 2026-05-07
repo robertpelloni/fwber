@@ -28,7 +28,7 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
             user_profiles: {
               select: {
                 bio: true,
-                avatar_url: true
+          avatar_url: true, display_name: true, date_of_birth: true, gender: true
               }
             }
           }
@@ -37,14 +37,19 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
       take: 50
     });
 
-    const users = likes.map(l => {
+    const users = likes.map((l: any) => {
       const u = l.users_match_actions_user_idTousers;
       const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+      const age = p?.date_of_birth ? Math.floor((Date.now() - new Date(p.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
       return {
         id: Number(u.id),
-        name: u.name,
+        name: p?.display_name || u.name,
         avatar_url: p?.avatar_url || u.avatar_url,
-        bio: p?.bio
+        bio: p?.bio,
+        age,
+        action_type: l.action,
+        created_at: l.created_at?.toISOString(),
+        gender: p?.gender || null,
       };
     });
     res.json({ users, total: users.length });
