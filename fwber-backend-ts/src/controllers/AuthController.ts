@@ -128,6 +128,14 @@ export class AuthController {
         }
       });
 
+      // Seed default notification preferences
+      const notifTypes = ['new_match', 'new_message', 'friend_request', 'event_invitation', 'gift_received', 'profile_view', 'achievement_unlocked', 'daily_reminder', 'marketing', 'proximity_alert'];
+      try {
+        await prisma.notification_preferences.createMany({
+          data: notifTypes.map(type => ({ user_id: user.id, type, mail: true, push: true, database: true }))
+        });
+      } catch (_) {}
+
       // Send verification email
       try {
         const verificationToken = createVerificationToken(user.id, user.email);
