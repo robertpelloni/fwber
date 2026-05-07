@@ -46,7 +46,8 @@ router.post('/', async (req: any, res) => {
     const { user_id } = req.body;
     if (!user_id) return res.status(400).json({ error: 'user_id is required' });
 
-    const blockedId = BigInt(user_id);
+    let blockedId: bigint;
+    try { blockedId = BigInt(user_id); } catch { return res.status(400).json({ error: 'Invalid user_id' }); }
     if (blockedId === userId) return res.status(400).json({ error: 'Cannot block yourself' });
 
     // Check if already blocked

@@ -88,8 +88,27 @@ router.get('/conference-pulse', async (req: any, res) => {
       take: 10,
     });
 
+    // Find nearby professionals (users with occupations)
+    let professionals: any[] = [];
+    try {
+      const profs = await prisma.user_profiles.findMany({
+        where: { occupation: { not: null } },
+        select: {
+          display_name: true,
+          avatar_url: true,
+          occupation: true,
+        },
+        take: 10,
+      });
+      professionals = profs.map((p: any) => ({
+        name: p.display_name || 'Professional',
+        avatar: p.avatar_url || null,
+        occupation: p.occupation || null,
+      }));
+    } catch (_) {}
+
     res.json(serialize({
-      professionals: [],
+      professionals: professionals,
       chatrooms: rooms.map((r: any) => ({
         id: Number(r.id),
         name: r.name,
