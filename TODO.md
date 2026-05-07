@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.0.9
+> **Version:** 2.0.10
 > **Last Updated:** $(date +%Y-%m-%d)
 
 ---
@@ -12,7 +12,7 @@
 
 ## 🟡 High: Mobile & Notifications Polish
 - [x] **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
-- [ ] **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
+- [x] **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
 
 ## ✅ Completed (v2.0 Phase 8)
 - [x] **Event Map Frontend**: Built `EventMap.tsx` using `react-leaflet` to visualize attendee coordinates in real time on the `/events/[id]` page.

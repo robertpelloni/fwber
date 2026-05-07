@@ -10,7 +10,7 @@ I have successfully completed the next set of Action Items and brought the proje
 2. **Live Event Architecture**:
    - Updated the `EventMap.tsx` to subscribe to the `location_updated` socket channel. It now receives live coordinate broadcasts from other users in the same event room and updates their markers dynamically.
 3. **Documentation**:
-   - Updated `VERSION`, `TODO.md`, `CHANGELOG.md`, `ROADMAP.md`, and `PROJECT_STATUS.md` to `2.0.9` and marked these tasks as complete.
+   - Updated `VERSION`, `TODO.md`, `CHANGELOG.md`, `ROADMAP.md`, and `PROJECT_STATUS.md` to `2.0.10` and marked these tasks as complete.
 
 ## Outstanding Issues / Findings
 - **Prisma Schema**: The new schema additions (like `federation_follows` and the new columns on `users`) STILL require a live migration (`npx prisma migrate dev`) against the Hetzner staging database to become real. The mock testing suite bypasses this.
