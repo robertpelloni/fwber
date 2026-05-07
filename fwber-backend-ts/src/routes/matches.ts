@@ -270,8 +270,9 @@ router.post('/action', authenticate, async (req: any, res) => {
 
 /**
  * GET /api/matches/established - Get mutual/established matches
+ * GET /api/matches/accepted - Alias for established
  */
-router.get('/established', authenticate, async (req: any, res) => {
+router.get(['/established', '/accepted'], authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
 

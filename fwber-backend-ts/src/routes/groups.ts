@@ -372,7 +372,7 @@ router.get("/:groupId/events", authenticate, async (req: any, res) => {
     const group = await prisma.groups.findUnique({ where: { id: groupId } });
     if (!group) return res.status(404).json({ events: [], message: "Group not found" });
     const events = await prisma.events.findMany({
-      where: { is_public: true, starts_at: { gte: new Date() } },
+      where: { status: 'upcoming', starts_at: { gte: new Date() } },
       orderBy: { starts_at: "asc" }, take: 10,
     });
     res.json({ events: events.map((e: any) => ({ id: Number(e.id), title: e.title, description: e.description?.substring(0, 200), starts_at: e.starts_at?.toISOString(), location: e.location || null })) });
