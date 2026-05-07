@@ -55,4 +55,17 @@ router.post('/:token/scan', async (req: any, res) => {
   } catch (err: any) { res.status(500).json({ error: 'Failed to scan link' }); }
 });
 
+// POST /api/burner-links/:token/join - Alias for scan (frontend compat)
+router.post("/:token/join", async (req: any, res) => {
+  try {
+    const link = await prisma.burner_links.findUnique({ where: { token: req.params.token } });
+    if (!link) return res.status(404).json({ error: "Link not found" });
+    if (link.used_at) return res.status(410).json({ error: "Link already used" });
+    if (new Date() > link.expires_at) return res.status(410).json({ error: "Link expired" });
+    if (link.creator_id === BigInt(req.user.id)) return res.status(400).json({ error: "Cannot join your own link" });
+    await prisma.burner_links.update({ where: { id: link.id }, data: { scanner_id: BigInt(req.user.id), used_at: new Date() } });
+    res.json({ message: "Joined successfully!", chatroom_id: link.chatroom_id ? Number(link.chatroom_id) : undefined });
+  } catch (err: any) { res.status(500).json({ error: "Failed to join" }); }
+});
+
 export default router;

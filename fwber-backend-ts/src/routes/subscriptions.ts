@@ -22,7 +22,7 @@ router.get('/', async (req: any, res) => {
 router.get('/history', async (req: any, res) => {
   try {
     const payments = await prisma.payments.findMany({
-      where: { user_id: BigInt(req.user.id), type: { in: ['subscription', 'premium'] } },
+      where: { user_id: BigInt(req.user.id), description: { contains: 'Subscription' } },
       orderBy: { created_at: 'desc' }, take: 20
     });
     const data = payments.map((p: any) => ({
