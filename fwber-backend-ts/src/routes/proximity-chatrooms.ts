@@ -107,6 +107,60 @@ router.get('/conference-pulse', async (req: any, res) => {
   }
 });
 
+
+// GET /api/proximity-chatrooms/nearby — nearby proximity chatrooms (must be before /:id)
+router.get("/nearby", async (req: any, res) => {
+  try {
+    const { latitude, longitude, radius } = req.query;
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    const radiusM = Number(radius) || 5000;
+
+    const rooms = await prisma.proximity_chatrooms.findMany({
+      where: { is_active: true },
+      include: {
+        users: { select: { id: true, name: true } },
+        _count: { select: { proximity_chatroom_members: true } },
+      },
+      take: 30,
+    });
+
+    let results = rooms.map((r: any) => {
+      const roomLat = Number(r.lat);
+      const roomLng = Number(r.lng);
+      let distanceKm = Infinity;
+      if (!isNaN(lat) && !isNaN(lng)) {
+        distanceKm = Math.sqrt(
+          Math.pow((roomLat - lat) * 111, 2) +
+          Math.pow((roomLng - lng) * 111 * Math.cos(lat * Math.PI / 180), 2)
+        );
+      }
+      return {
+        id: Number(r.id),
+        name: r.name,
+        description: r.description,
+        lat: roomLat,
+        lng: roomLng,
+        radius_m: Number(r.radius_m),
+        created_by: Number(r.created_by),
+        creator_name: r.users?.name || "Unknown",
+        member_count: r._count?.proximity_chatroom_members || 0,
+        distance_km: Math.round(distanceKm * 10) / 10,
+      };
+    });
+
+    if (!isNaN(lat) && !isNaN(lng)) {
+      results = results.filter(r => r.distance_km <= radiusM / 1000);
+      results.sort((a, b) => a.distance_km - b.distance_km);
+    }
+
+    res.json(serialize(results));
+  } catch (error: any) {
+    console.error("[ProximityChatrooms] Nearby error:", error.message);
+    res.json([]);
+  }
+});
+
 // GET /api/proximity-chatrooms/:id
 router.get('/:id', async (req: any, res) => {
   try {
