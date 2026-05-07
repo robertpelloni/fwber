@@ -156,6 +156,19 @@ router.post('/purchase', authenticate, async (req: any, res) => {
         }
       });
 
+      // Record wallet transaction
+      try {
+        await tx.wallet_transactions.create({
+          data: {
+            user_id: userId,
+            amount: -cost,
+            type: 'spend',
+            description: `Premium ${planId === 'yearly' ? 'Yearly' : 'Monthly'} subscription`,
+            created_at: new Date(),
+          },
+        });
+      } catch (_) {}
+
       return { success: true };
     });
 
