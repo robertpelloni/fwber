@@ -125,8 +125,14 @@ export class AuthController {
         data: {
           user_id: user.id,
           display_name: user.name,
-        }
+        },
       });
+
+      // Welcome bonus: 50 FWB tokens
+      await prisma.users.update({ where: { id: user.id }, data: { token_balance: 50 } });
+      try {
+        await prisma.wallet_transactions.create({ data: { user_id: user.id, amount: 50, type: 'reward', description: 'Welcome bonus — 50 free tokens!', created_at: new Date() } });
+      } catch (_) {}
 
       // Seed default notification preferences
       const notifTypes = ['new_match', 'new_message', 'friend_request', 'event_invitation', 'gift_received', 'profile_view', 'achievement_unlocked', 'daily_reminder', 'marketing', 'proximity_alert'];
