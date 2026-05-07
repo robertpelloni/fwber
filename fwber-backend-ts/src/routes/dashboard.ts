@@ -149,6 +149,7 @@ router.get('/activity', async (req: any, res) => {
       activities.push({
         id: `match-${m.id}`,
         type: 'match',
+          description: 'You have a new match!',
         user: {
           id: Number(partner.id),
           name: profile?.display_name || partner.name || 'Anonymous',
@@ -173,6 +174,7 @@ router.get('/activity', async (req: any, res) => {
       activities.push({
         id: `view-${v.id}`,
         type: 'view',
+          description: `${profile?.display_name || viewer.name || 'Someone'} viewed your profile`,
         user: {
           id: Number(viewer.id),
           name: profile?.display_name || viewer.name || 'Anonymous',
