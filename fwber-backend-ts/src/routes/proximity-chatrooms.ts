@@ -164,7 +164,7 @@ router.get("/nearby", async (req: any, res) => {
 // GET /api/proximity-chatrooms/:id
 router.get('/:id', async (req: any, res) => {
   try {
-    const roomId = BigInt(req.params.id);
+    let roomId: bigint; try { roomId = BigInt(req.params.id); } catch { return res.status(400).json({ error: "Invalid room ID" }); }
 
     const room = await prisma.proximity_chatrooms.findUnique({
       where: { id: roomId },
