@@ -153,6 +153,22 @@ router.get('/conversations', async (req: any, res) => {
       };
     });
 
+
+    // Count unread per conversation for accurate badges
+    try {
+      for (const conv of conversations as any[]) {
+        const pid = Number(conv.other_user.id);
+        if (!isNaN(pid) && pid > 0) {
+          const partnerId = BigInt(pid);
+          const count = await prisma.messages.count({
+            where: { sender_id: partnerId, receiver_id: userId, is_read: false },
+          });
+          conv.unread_count = count;
+        }
+      }
+    } catch (e: any) {
+      console.warn("[Messages] Unread count error:", e.message);
+    }
     res.json(conversations);
   } catch (error: any) {
     console.error('[Messages] Conversations error:', error.message);
