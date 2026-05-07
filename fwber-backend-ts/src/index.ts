@@ -174,6 +174,7 @@ app.use('/api/burner-links', burnerLinksRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/journals', journalsRoutes);
 app.use('/api/proximity-chatrooms', proximityChatroomsRoutes);
+app.use('/api/conference-pulse', proximityChatroomsRoutes);  // alias for frontend compatibility
 app.use('/api/audio-rooms', audioRoomsRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/merchant-portal', merchantPortalRoutes);

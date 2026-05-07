@@ -41,7 +41,7 @@ router.get("/", authenticate, async (req: any, res) => {
 		});
 		if (!profile) {
 			res.json({
-				id: Number(userId),
+			id: Number(userId),
 				email: user?.email || "",
 				email_verified: !!user?.email_verified_at,
 				created_at: user?.created_at?.toISOString() || "",
@@ -92,7 +92,12 @@ router.get("/", authenticate, async (req: any, res) => {
 
 		// Build the nested structure the frontend expects
 		const prefs = p.preferences || {};
-		const completeness = await calculateProfileCompletenessSummary(userId, profile);
+		let completeness: any = { percentage: 0, required_complete: false, missing_required: [], missing_optional: [], sections: {} };
+  try {
+    completeness = await calculateProfileCompletenessSummary(userId, profile);
+  } catch (e: any) {
+    console.warn('[Profile] Completeness calculation error:', e.message);
+  }
 		res.json({
 			id: Number(userId),
 			email: user?.email || "",
@@ -186,8 +191,8 @@ router.get("/", authenticate, async (req: any, res) => {
 				penis_girth_cm: p.penis_girth_cm || null,
 				fetishes: p.fetishes || [],
 				preferences: prefs,
-				profile_complete: completeness.required_complete,
-				completion_percentage: completeness.percentage,
+				profile_complete: !!completeness?.required_complete,
+				completion_percentage: Number(completeness?.percentage) || 0,
 				completion_percentage_required: completeness.percentage, // for consistency
 				completion_status: completeness,
 				photos: photos.map((ph: any) => ({
@@ -1006,7 +1011,17 @@ router.get("/:id", authenticate, async (req: any, res) => {
     console.warn('[Profile] relationship_links query skipped:', e.message);
   }
 
-		res.json({
+// Calculate completeness for /me requests
+		let completenessData: any = { percentage: 0, required_complete: false, missing_required: [], missing_optional: [], sections: {} };
+		if (req.params.id === 'me' && profile) {
+		  try {
+		    completenessData = await calculateProfileCompletenessSummary(targetUserId, profile);
+		  } catch (e: any) {
+		    console.warn('[Profile /:id] Completeness error:', e.message);
+		  }
+		}
+
+				res.json({
 			id: Number(targetUserId),
 			email_verified: !!user.email_verified_at,
 			created_at: user.created_at?.toISOString() || "",
@@ -1080,6 +1095,9 @@ router.get("/:id", authenticate, async (req: any, res) => {
 				})),
 				scene_summary: null,
 				journals: [],
+        completion_percentage: completenessData.percentage || 0,
+        profile_complete: completenessData.required_complete || false,
+        completion_status: { percentage: 0, required_complete: false, missing_required: [], missing_optional: [], sections: {} },
 			},
 		});
 	} catch (error: any) {
