@@ -160,6 +160,35 @@ router.get('/conversations', async (req: any, res) => {
   }
 });
 
+// GET /api/messages/unread-count — get total unread message count
+router.get("/unread-count", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const count = await prisma.messages.count({
+      where: { receiver_id: userId, is_read: false },
+    });
+    res.json({ unread_count: count, count });
+  } catch (error: any) {
+    console.error("[Messages] Unread count error:", error.message);
+    res.json({ unread_count: 0, count: 0 });
+  }
+});
+
+// POST /api/messages/mark-all-read/:id — mark all from user :id as read
+router.post("/mark-all-read/:id", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const partnerId = BigInt(req.params.id);
+    const result = await prisma.messages.updateMany({
+      where: { sender_id: partnerId, receiver_id: userId, is_read: false },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true, marked_count: result.count });
+  } catch (error: any) {
+    res.json({ success: true, marked_count: 0 });
+  }
+});
+
 // GET /api/messages/:id â€” get messages in conversation with user :id
 router.get('/:id', async (req: any, res) => {
   try {
@@ -262,6 +291,44 @@ router.post('/', async (req: any, res) => {
 // POST /api/messages/:id/react
 router.post('/:id/react', async (req: any, res) => {
   res.json({ success: true });
+});
+
+// POST /api/messages/mark-all-read/:id — mark all messages from user :id as read
+router.post('/mark-all-read/:id', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const partnerId = BigInt(req.params.id);
+    const result = await prisma.messages.updateMany({
+      where: {
+        sender_id: partnerId,
+        receiver_id: userId,
+        is_read: false,
+      },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true, marked_count: result.count });
+  } catch (error: any) {
+    console.error('[Messages] Mark read error:', error.message);
+    res.json({ success: true, marked_count: 0 });
+  }
+});
+
+// POST /api/messages/read — mark a specific message as read
+router.post('/read', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { message_id } = req.body;
+    if (!message_id) {
+      return res.status(400).json({ message: 'message_id required' });
+    }
+    await prisma.messages.updateMany({
+      where: { id: BigInt(message_id), receiver_id: userId },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.json({ success: true });
+  }
 });
 
 export default router;
