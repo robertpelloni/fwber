@@ -21,14 +21,13 @@ export class FederationService {
 
       if (!parts.keyId || !parts.signature || !parts.headers) return false;
 
-      // Basic SSRF Mitigation: Ensure URL is HTTPS and not localhost
-      const remoteKeyUrl = new URL(parts.keyId);
-      if (remoteKeyUrl.protocol !== 'https:' || ['localhost', '127.0.0.1'].includes(remoteKeyUrl.hostname) || remoteKeyUrl.hostname.startsWith('10.') || remoteKeyUrl.hostname.startsWith('192.168.')) {
-         console.warn('[Federation] Blocked attempt to fetch key from invalid URL:', parts.keyId);
-         return false;
-      }
-
       // 1. Fetch remote actor public key
+      // SSRF Mitigation: Ensure URL is valid and not pointing to localhost/internal IPs
+      const url = new URL(parts.keyId);
+      if (['localhost', '127.0.0.1'].includes(url.hostname) || url.hostname.startsWith('10.') || url.hostname.startsWith('192.168.')) {
+        console.warn(`[Federation] Blocked SSRF attempt: ${parts.keyId}`);
+        return false;
+      }
       const remoteActor = await axios.get(parts.keyId, { headers: { Accept: 'application/activity+json' }});
       const publicKeyPem = remoteActor.data.publicKey.publicKeyPem;
 
@@ -41,25 +40,27 @@ export class FederationService {
         return `${header}: ${req.headers[header]}`;
       }).join('\n');
 
-      // 3. Verify signature
+      // 3. Verify
       const verifier = crypto.createVerify('RSA-SHA256');
       verifier.update(signedString);
+      const isVerified = verifier.verify(publicKeyPem, parts.signature, 'base64');
 
-      const isValid = verifier.verify(publicKeyPem, parts.signature, 'base64');
-
-      if (isValid) {
+      if (isVerified) {
         console.log(`[Federation] Successfully verified HTTP Signature for keyId: ${parts.keyId}`);
+        return true;
       } else {
         console.log(`[Federation] Invalid HTTP Signature for keyId: ${parts.keyId}`);
+        return false;
       }
-
-      return isValid;
     } catch (e) {
       console.error('[Federation] Signature verification failed:', e);
       return false;
     }
   }
 
+  /**
+   * Handle incoming ActivityPub messages
+   */
   async processInboxActivity(activity: any, targetUserId: bigint) {
     console.log(`[Federation] Processing ${activity.type} for user ${targetUserId}`);
 

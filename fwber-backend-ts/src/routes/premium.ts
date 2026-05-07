@@ -17,7 +17,7 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
     const likes = await prisma.match_actions.findMany({
       where: {
         target_user_id: userId,
-        action: 'like'
+        action: { in: ['like', 'super_like'] }
       },
       include: {
         users_match_actions_user_idTousers: {
@@ -155,6 +155,19 @@ router.post('/purchase', authenticate, async (req: any, res) => {
           tier_expires_at: new Date(Date.now() + (planId === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000)
         }
       });
+
+      // Record wallet transaction
+      try {
+        await tx.wallet_transactions.create({
+          data: {
+            user_id: userId,
+            amount: -cost,
+            type: 'spend',
+            description: `Premium ${planId === 'yearly' ? 'Yearly' : 'Monthly'} subscription`,
+            created_at: new Date(),
+          },
+        });
+      } catch (_) {}
 
       return { success: true };
     });

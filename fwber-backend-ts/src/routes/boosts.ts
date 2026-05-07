@@ -49,6 +49,19 @@ router.post('/purchase', async (req, res) => {
           data: { token_balance: { decrement: selectedPrice.tokens } }
         });
 
+        // Record wallet transaction
+        try {
+          await tx.wallet_transactions.create({
+            data: {
+              user_id: userId,
+              amount: -selectedPrice.tokens,
+              type: 'spend',
+              description: `${type === 'super' ? 'Super' : 'Standard'} Boost (${selectedPrice.durationMinutes} min)`,
+              created_at: new Date(),
+            },
+          });
+        } catch (_) {}
+
         const expiresAt = new Date();
         expiresAt.setMinutes(expiresAt.getMinutes() + selectedPrice.durationMinutes);
 

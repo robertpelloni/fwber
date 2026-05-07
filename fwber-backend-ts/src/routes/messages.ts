@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 router.use(authenticate);
@@ -152,10 +153,55 @@ router.get('/conversations', async (req: any, res) => {
       };
     });
 
+
+    // Count unread per conversation for accurate badges
+    try {
+      for (const conv of conversations as any[]) {
+        const pid = Number(conv.other_user.id);
+        if (!isNaN(pid) && pid > 0) {
+          const partnerId = BigInt(pid);
+          const count = await prisma.messages.count({
+            where: { sender_id: partnerId, receiver_id: userId, is_read: false },
+          });
+          conv.unread_count = count;
+        }
+      }
+    } catch (e: any) {
+      console.warn("[Messages] Unread count error:", e.message);
+    }
     res.json(conversations);
   } catch (error: any) {
     console.error('[Messages] Conversations error:', error.message);
     res.json([]);
+  }
+});
+
+// GET /api/messages/unread-count \x97 get total unread message count
+router.get("/unread-count", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const count = await prisma.messages.count({
+      where: { receiver_id: userId, is_read: false },
+    });
+    res.json({ unread_count: count, count });
+  } catch (error: any) {
+    console.error("[Messages] Unread count error:", error.message);
+    res.json({ unread_count: 0, count: 0 });
+  }
+});
+
+// POST /api/messages/mark-all-read/:id \x97 mark all from user :id as read
+router.post("/mark-all-read/:id", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const partnerId = BigInt(req.params.id);
+    const result = await prisma.messages.updateMany({
+      where: { sender_id: partnerId, receiver_id: userId, is_read: false },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true, marked_count: result.count });
+  } catch (error: any) {
+    res.json({ success: true, marked_count: 0 });
   }
 });
 
@@ -248,6 +294,9 @@ router.post('/', async (req: any, res) => {
       });
     } catch (_) {}
 
+    // Check achievements (first message, etc.)
+    checkAndUnlockAchievements(userId).catch(() => {});
+
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {
     console.error('[Messages] Send error:', error.message);
@@ -258,6 +307,44 @@ router.post('/', async (req: any, res) => {
 // POST /api/messages/:id/react
 router.post('/:id/react', async (req: any, res) => {
   res.json({ success: true });
+});
+
+// POST /api/messages/mark-all-read/:id \x97 mark all messages from user :id as read
+router.post('/mark-all-read/:id', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const partnerId = BigInt(req.params.id);
+    const result = await prisma.messages.updateMany({
+      where: {
+        sender_id: partnerId,
+        receiver_id: userId,
+        is_read: false,
+      },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true, marked_count: result.count });
+  } catch (error: any) {
+    console.error('[Messages] Mark read error:', error.message);
+    res.json({ success: true, marked_count: 0 });
+  }
+});
+
+// POST /api/messages/read \x97 mark a specific message as read
+router.post('/read', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { message_id } = req.body;
+    if (!message_id) {
+      return res.status(400).json({ message: 'message_id required' });
+    }
+    await prisma.messages.updateMany({
+      where: { id: BigInt(message_id), receiver_id: userId },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.json({ success: true });
+  }
 });
 
 export default router;

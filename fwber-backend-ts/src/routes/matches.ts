@@ -3,6 +3,7 @@ import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { createNotification } from './notifications.js';
 import { filePathToUrl } from '../lib/photos.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -221,6 +222,10 @@ router.post('/action', authenticate, async (req: any, res) => {
       await createNotification(targetId, 'New Match!', `You matched with ${userName}!`);
       await createNotification(userId, 'New Match!', `You matched with ${targetName}!`);
 
+// Check achievements for both users (first match, etc.)
+        checkAndUnlockAchievements(userId).catch(() => {});
+        checkAndUnlockAchievements(targetId).catch(() => {});
+
       return res.json({
         action,
         is_match: true,
@@ -238,6 +243,18 @@ router.post('/action', authenticate, async (req: any, res) => {
         match_score: action === 'super_like' ? 100 : 50,
       },
     });
+
+    // Record the action in match_actions for who-likes-you tracking
+    try {
+      await prisma.match_actions.create({
+        data: {
+          user_id: userId,
+          target_user_id: targetId,
+          action: action as any,
+          created_at: new Date(),
+        },
+      });
+    } catch (_) {}
 
     res.json({
       action,

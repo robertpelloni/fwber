@@ -261,7 +261,8 @@ export class AuthController {
         console.error('[Auth] Failed to send password reset email:', err);
       }
       // Always log the reset URL for development/debugging
-      console.log(`[Auth] Password reset requested for user ${user.id}`);
+      console.log('[Auth] Password reset URL: %s/reset-password?token=%s',
+        process.env.FRONTEND_URL || 'https://www.fwber.me', token);
 
       res.json({ message: 'If an account with that email exists, a reset link has been sent.' });
     } catch (error: any) {

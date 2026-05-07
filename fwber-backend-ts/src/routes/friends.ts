@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { createNotification } from './notifications.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -251,7 +252,11 @@ router.post('/accept/:id', authenticate, async (req: any, res) => {
     await createNotification(friendRequest.user_id, 'Friend Request Accepted',
       `${(await prisma.users.findUnique({ where: { id: userId }, select: { name: true } }))?.name || 'Someone'} accepted your friend request!`);
 
-    res.json({ success: true, message: 'Friend request accepted' });
+
+    // Check achievements (first friend)
+    checkAndUnlockAchievements(userId).catch(() => {});
+    checkAndUnlockAchievements(BigInt(req.params.id)).catch(() => {});
+res.json({ success: true, message: 'Friend request accepted' });
   } catch (error: any) {
     console.error('[Friends] Accept error:', error.message);
     res.status(500).json({ success: false, message: 'Failed to accept friend request' });

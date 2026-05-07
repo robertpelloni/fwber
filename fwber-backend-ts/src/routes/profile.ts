@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import { filePathToUrl } from "../lib/photos.js";
 import { authenticate } from "../middleware/auth.js";
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -749,7 +750,9 @@ router.post("/delete", authenticate, async (req: any, res) => {
 		// Delete the user account itself
 		await prisma.users.delete({ where: { id: userId } });
 
-		res.json({ message: "Account deleted successfully" });
+
+    checkAndUnlockAchievements(userId).catch(() => {});
+res.json({ message: "Account deleted successfully" });
 	} catch (error: any) {
 		console.error("[DELETE /api/profile]", error);
 		res
@@ -1027,6 +1030,21 @@ router.get("/:id", authenticate, async (req: any, res) => {
 				},
 				looking_for: p.looking_for || [],
 				interests: p.interests || [],
+				occupation: p.occupation || null,
+				education: p.education || null,
+				height_cm: p.height_cm ? Number(p.height_cm) : null,
+				zodiac_sign: p.zodiac_sign || null,
+				drinking_status: p.drinking_status || null,
+				smoking_status: p.smoking_status || null,
+				religion: p.religion || null,
+				political_views: p.political_views || null,
+				relationship_status: p.relationship_status || null,
+				body_type: p.body_type || null,
+				fitness_level: p.fitness_level || null,
+				languages: p.languages || [],
+				is_verified: p.is_verified || false,
+				is_id_verified: p.is_id_verified || false,
+				date_of_birth: p.date_of_birth || p.birthdate || null,
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
 					url: filePathToUrl(ph.file_path),

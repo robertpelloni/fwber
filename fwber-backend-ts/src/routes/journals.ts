@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 router.use(authenticate);
@@ -48,6 +49,9 @@ router.post('/', async (req: any, res) => {
       'INSERT INTO journal_entries (user_id, title, content, mood, is_private, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
       userId.toString(), title || null, content, mood || null, is_private !== false ? 1 : 0
     );
+
+    // Check achievements after journal creation (dear diary)
+    checkAndUnlockAchievements(userId).catch(() => {});
 
     res.json({ success: true });
   } catch (error: any) {

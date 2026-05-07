@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -85,6 +86,9 @@ router.post('/send', authenticate, async (req: any, res) => {
         data: { token_balance: { increment: Math.floor(gift.cost * 0.8) } } // Recipient gets 80% value
       })
     ]);
+
+    // Check achievements (first gift, gift milestones)
+    checkAndUnlockAchievements(senderId).catch(() => {});
 
     res.json({ success: true, gift: userGift });
   } catch (error: any) {

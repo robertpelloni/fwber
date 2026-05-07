@@ -11,14 +11,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 type Achievement = {
   id: number
+  slug: string
   name: string
   description: string
   icon: string
   category: string
-  reward_tokens: number
-  is_unlocked: boolean
-  unlocked_at: string | null
-  is_hidden: boolean
+  token_reward: number
+  earned: boolean
+  earned_at: string | null
 }
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -51,15 +51,15 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
   }
 
   return (
-    <Card className={`relative overflow-hidden transition-all duration-300 ${achievement.is_unlocked ? 'border-primary/50 bg-primary/5' : 'opacity-70 grayscale'}`}>
+    <Card className={`relative overflow-hidden transition-all duration-300 ${achievement.earned ? 'border-primary/50 bg-primary/5' : 'opacity-70 grayscale'}`}>
       <CardHeader className="flex flex-row items-center gap-4 pb-2">
-        <div className={`p-3 rounded-full ${achievement.is_unlocked ? 'bg-primary/20 text-primary' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
+        <div className={`p-3 rounded-full ${achievement.earned ? 'bg-primary/20 text-primary' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
           {achievement.is_hidden ? <Lock className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
         </div>
         <div className="flex-1">
           <CardTitle className="text-lg flex items-center justify-between">
             {achievement.is_hidden ? 'Secret Achievement' : achievement.name}
-            {achievement.is_unlocked && (
+            {achievement.earned && (
               <button 
                 onClick={(e) => {
                   e.preventDefault();
@@ -76,7 +76,7 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
             {achievement.is_hidden ? 'Keep playing to discover this achievement.' : achievement.description}
           </CardDescription>
         </div>
-        {achievement.is_unlocked && (
+        {achievement.earned && (
           <Badge variant="default" className="bg-green-500 hover:bg-green-600">
             Unlocked
           </Badge>
@@ -87,18 +87,18 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
           <div className="flex items-center gap-1 text-amber-500 font-medium">
             <span className="text-xs uppercase tracking-wider text-muted-foreground mr-2">Reward:</span>
             <Zap className="w-4 h-4" />
-            <span>{achievement.reward_tokens} Tokens</span>
+            <span>{achievement.token_reward} Tokens</span>
           </div>
-          {achievement.unlocked_at && (
+          {achievement.earned_at && (
             <span className="text-xs text-muted-foreground">
-              {new Date(achievement.unlocked_at).toLocaleDateString()}
+              {new Date(achievement.earned_at).toLocaleDateString()}
             </span>
           )}
         </div>
       </CardContent>
 
       {/* Shine effect for unlocked cards */}
-      {achievement.is_unlocked && (
+      {achievement.earned && (
         <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-yellow-400/20 to-transparent rounded-full blur-xl pointer-events-none" />
       )}
     </Card>
@@ -129,8 +129,8 @@ export default function AchievementsPage() {
     return acc
   }, {} as Record<string, Achievement[]>)
 
-  const totalPoints = achievements?.reduce((sum, a) => sum + (a.is_unlocked ? a.reward_tokens : 0), 0) || 0
-  const unlockedCount = achievements?.filter(a => a.is_unlocked).length || 0
+  const totalPoints = achievements?.reduce((sum, a) => sum + (a.earned ? a.token_reward : 0), 0) || 0
+  const unlockedCount = achievements?.filter(a => a.earned).length || 0
   const totalCount = achievements?.length || 0
 
   return (

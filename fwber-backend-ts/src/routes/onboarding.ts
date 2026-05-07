@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 
@@ -109,6 +110,9 @@ router.post('/complete', authenticate, async (req: any, res) => {
         },
       });
     } catch (_) {}
+
+    // Check achievements (profile complete, verified email, etc.)
+    checkAndUnlockAchievements(userId).catch(() => {});
 
     res.json({ message: 'Onboarding completed and profile updated', tokens_awarded: STARTER_TOKENS });
   } catch (error: any) {

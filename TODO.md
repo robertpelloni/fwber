@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.0.8
+> **Version:** 2.0.9
 > **Last Updated:** $(date +%Y-%m-%d)
 
 ---
@@ -11,7 +11,7 @@
 - [ ] **Fediverse Interop Testing**: Spin up a local Mastodon/Pleroma dev instance and attempt to search for a local `fwber` user handle to test the `webfinger` and `actor` endpoints end-to-end.
 
 ## 🟡 High: Mobile & Notifications Polish
-- [ ] **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
+- [x] **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 - [ ] **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
 
 ## ✅ Completed (v2.0 Phase 8)
