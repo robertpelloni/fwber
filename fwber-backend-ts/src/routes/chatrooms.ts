@@ -31,7 +31,7 @@ router.get('/', async (req: any, res) => {
       type: c.type,
       category: c.category,
       is_public: c.is_public,
-      member_count: c._count?.chatroom_members || c.member_count,
+      member_count: c.member_count || c._count?.chatroom_members || 0,
       message_count: c.message_count,
       created_by: Number(c.created_by),
       creator_name: c.users?.name || 'Unknown',
@@ -103,6 +103,31 @@ router.post('/', async (req: any, res) => {
   } catch (error: any) {
     console.error('[Chatrooms] Create error:', error.message);
     res.status(500).json({ message: 'Failed to create' });
+  }
+});
+
+
+// GET /api/chatrooms/popular — most active public chatrooms
+router.get('/popular', async (req: any, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit as string) || 10, 20);
+    const chatrooms = await prisma.chatrooms.findMany({
+      where: { is_active: true, is_public: true },
+      orderBy: [{ member_count: 'desc' as const }, { message_count: 'desc' as const }],
+      take: limit,
+      include: { users: { select: { id: true, name: true } } }
+    });
+    const data = chatrooms.map((c: any) => ({
+      id: Number(c.id), name: c.name, description: c.description,
+      type: c.type, category: c.category, is_public: c.is_public,
+      member_count: c.member_count || 0, message_count: c.message_count || 0,
+      created_by: Number(c.created_by), creator_name: c.users?.name || 'Unknown',
+      last_activity_at: c.last_activity_at?.toISOString(),
+    }));
+    res.json({ chatrooms: data });
+  } catch (err: any) {
+    console.error('[chatrooms] popular error:', err.message);
+    res.json({ chatrooms: [] });
   }
 });
 
