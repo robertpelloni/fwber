@@ -98,8 +98,7 @@ router.get("/", authenticate, async (req: any, res) => {
   } catch (e: any) {
     console.warn('[Profile] Completeness calculation error:', e.message);
   }
-		console.log('[Profile] BUILDING RESPONSE. completeness=' + completeness?.percentage + ' prefs=' + typeof prefs);
-    res.json({
+		res.json({
 			id: Number(userId),
 			email: user?.email || "",
 			email_verified: !!user?.email_verified_at,
