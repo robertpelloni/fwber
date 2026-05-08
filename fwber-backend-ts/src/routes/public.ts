@@ -4,6 +4,15 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 
+// GET /api/public/roast — Return a default roast (no auth, for landing pages)
+router.get('/roast', (_req, res) => {
+  res.json({
+    roast: 'Your profile gives off "I still use Internet Explorer" energy. But hey, at least you showed up! Create a profile for a personalized roast.',
+    is_preview: true,
+    cta: 'Create a profile at fwber.me for a personalized roast',
+  });
+});
+
 // POST /api/public/roast — Guest roast/hype (no auth required)
 router.post('/roast', async (req, res) => {
   try {
