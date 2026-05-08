@@ -70,3 +70,51 @@
 {"timestamp":1778268421307,"action":"TOOL_END","params":{"tool":"set_capacity","error":"this.terminalService.getTools is not a function","duration":5},"level":"ERROR"}
 {"timestamp":1778268432976,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
 {"timestamp":1778268432979,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269088846,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269088850,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269091932,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269091936,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269092434,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269092437,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269107500,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269107504,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269162480,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269162484,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269165330,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269165333,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269165784,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269165788,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269181197,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269181201,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269237070,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269237073,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269239996,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269239999,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269240415,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269240418,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269255211,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269255214,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269865715,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269865719,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269868777,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269868781,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778269869184,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269869187,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269884070,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269884072,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":2},"level":"ERROR"}
+{"timestamp":1778269948287,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269948290,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269950990,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269950993,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269951390,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269951393,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778269966226,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778269966228,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":2},"level":"ERROR"}
+{"timestamp":1778270514330,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778270514333,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778270516998,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778270517002,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":4},"level":"ERROR"}
+{"timestamp":1778270517411,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778270517414,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":3},"level":"ERROR"}
+{"timestamp":1778270532324,"action":"TOOL_START","params":{"tool":"search_tools","args":{"query":""}},"level":"INFO"}
+{"timestamp":1778270532326,"action":"TOOL_END","params":{"tool":"search_tools","error":"this.terminalService.getTools is not a function","duration":2},"level":"ERROR"}
