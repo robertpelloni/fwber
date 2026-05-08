@@ -474,14 +474,50 @@ router.post('/:matchId/insights/unlock', authenticate, async (req: any, res) => 
  * GET /api/matches/insights/unlocked - Get unlocked insights
  */
 router.get('/insights/unlocked', authenticate, async (req: any, res) => {
-  res.json({ data: [] });
+  try {
+    const userId = BigInt(req.user.id);
+    // Return default unlocked insights (available to all matched users)
+    const matchCount = await prisma.matches.count({
+      where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' },
+    });
+    const unlocked = [
+      { type: 'match_count', title: 'Match Count', value: matchCount, description: `You have ${matchCount} mutual matches` },
+      { type: 'compatibility', title: 'Compatibility Score', message: 'Unlock detailed compatibility insights for 25 tokens', token_cost: 25 },
+      { type: 'interest_overlap', title: 'Interest Overlap', message: 'See shared interests with your matches for 15 tokens', token_cost: 15 },
+      { type: 'activity_pattern', title: 'Activity Pattern', message: 'Learn when your matches are most active for 20 tokens', token_cost: 20 },
+    ];
+    res.json({ data: unlocked });
+  } catch (error: any) {
+    console.error('[MatchInsights] Unlocked error:', error.message);
+    res.json({ data: [] });
+  }
 });
 
 /**
  * GET /api/matches/insights/available - Get available insights
  */
 router.get('/insights/available', authenticate, async (req: any, res) => {
-  res.json({ data: [] });
+  try {
+    const userId = BigInt(req.user.id);
+    const balance = await prisma.users.findUnique({
+      where: { id: userId },
+      select: { token_balance: true },
+    });
+    const tokens = Number(balance?.token_balance || 0);
+    res.json({
+      data: [
+        { id: 'compatibility_report', name: 'Compatibility Report', description: 'Detailed analysis of why you matched', token_cost: 25, affordable: tokens >= 25 },
+        { id: 'interest_overlap', name: 'Interest Overlap', description: 'See all shared interests with a match', token_cost: 15, affordable: tokens >= 15 },
+        { id: 'activity_pattern', name: 'Activity Pattern', description: 'Best times to message your match', token_cost: 20, affordable: tokens >= 20 },
+        { id: 'profile_strength', name: 'Profile Strength', description: 'How your profile scores with a match', token_cost: 10, affordable: tokens >= 10 },
+        { id: 'conversation_starter', name: 'Conversation Starter', description: 'AI-generated opener based on shared interests', token_cost: 30, affordable: tokens >= 30 },
+      ],
+      token_balance: tokens,
+    });
+  } catch (error: any) {
+    console.error('[MatchInsights] Available error:', error.message);
+    res.json({ data: [] });
+  }
 });
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
