@@ -29,12 +29,9 @@ router.get('/', async (req: any, res) => {
       orderBy: { follower_count: 'desc' },
       skip: (page - 1) * perPage,
       take: perPage,
-      include: {
-        _count: { select: { topic_user_follows: true } },
-      },
+      include: { _count: { select: { topic_user_follows: true } } },
     });
 
-    // Check which topics the user follows
     const follows = await prisma.topic_user_follows.findMany({
       where: { user_id: userId },
       select: { topic_id: true },
@@ -52,10 +49,7 @@ router.get('/', async (req: any, res) => {
       is_followed: followedIds.has(t.id.toString()),
     }));
 
-    res.json({
-      boards,
-      meta: { total: topics.length, page, per_page: perPage },
-    });
+    res.json({ boards, meta: { total: topics.length, page, per_page: perPage } });
   } catch (error: any) {
     console.error('[BulletinBoards] List error:', error.message);
     res.json({ boards: [], meta: { total: 0 } });
@@ -68,25 +62,31 @@ router.get('/:slug', async (req: any, res) => {
     const userId = BigInt(req.user.id);
     const slug = req.params.slug;
 
-    const topic = await prisma.topics.findUnique({
-      where: { slug },
-    });
-
+    const topic = await prisma.topics.findUnique({ where: { slug } });
     if (!topic) {
       return res.status(404).json({ message: 'Topic not found' });
     }
 
-    // Get proximity artifacts of type 'board_post' related to this topic
-    const posts = await prisma.proximity_artifacts.findMany({
-      where: { type: 'board_post', meta: { path: ['topic_slug'], equals: slug } },
-      include: {
-        users: {
-          select: { id: true, name: true },
-        },
-      },
-      orderBy: { created_at: 'desc' },
-      take: 20,
-    });
+    // Use raw SQL for JSON field filtering (Prisma JSON path is unreliable with MySQL)
+    const postsRaw: any[] = await prisma.$queryRawUnsafe(
+      `SELECT pa.id, pa.content, pa.created_at, pa.user_id, u.name as author_name
+       FROM proximity_artifacts pa
+       LEFT JOIN users u ON pa.user_id = u.id
+       WHERE pa.type = 'board_post'
+         AND JSON_EXTRACT(pa.meta, '$.topic_slug') = ?
+         AND pa.moderation_status = 'clean'
+         AND pa.expires_at > NOW()
+       ORDER BY pa.created_at DESC
+       LIMIT 20`,
+      slug
+    );
+
+    const posts = postsRaw.map((p: any) => ({
+      id: Number(p.id),
+      content: p.content,
+      created_at: p.created_at,
+      users: { id: Number(p.user_id), name: p.author_name || 'Unknown' },
+    }));
 
     const isFollowed = await prisma.topic_user_follows.findFirst({
       where: { user_id: userId, topic_id: topic.id },
@@ -96,9 +96,9 @@ router.get('/:slug', async (req: any, res) => {
       ...topic,
       is_followed: !!isFollowed,
       posts: posts.map((p: any) => ({
-        id: Number(p.id),
+        id: p.id,
         content: p.content,
-        author: { id: Number(p.users?.id || 0), name: p.users?.name || 'Unknown' },
+        author: { id: p.users?.id || 0, name: p.users?.name || 'Unknown' },
         created_at: p.created_at,
       })),
     }));
@@ -113,21 +113,17 @@ router.post('/:slug/follow', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const slug = req.params.slug;
-
     const topic = await prisma.topics.findUnique({ where: { slug } });
     if (!topic) {
       return res.status(404).json({ message: 'Topic not found' });
     }
 
     await prisma.topic_user_follows.upsert({
-      where: {
-        topic_id_user_id: { topic_id: topic.id, user_id: userId },
-      },
+      where: { topic_id_user_id: { topic_id: topic.id, user_id: userId } },
       create: { topic_id: topic.id, user_id: userId },
       update: {},
     });
 
-    // Increment follower count
     await prisma.topics.update({
       where: { id: topic.id },
       data: { follower_count: { increment: 1 } },
@@ -145,7 +141,6 @@ router.delete('/:slug/follow', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const slug = req.params.slug;
-
     const topic = await prisma.topics.findUnique({ where: { slug } });
     if (!topic) {
       return res.json({ success: true });

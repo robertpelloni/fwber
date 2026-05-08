@@ -73,6 +73,7 @@ function attachListeners(socket: Socket, userId: string | undefined) {
       from_user_id: String(data.senderId),
       to_user_id: String(userId),
       is_typing: true,
+      timestamp: new Date().toISOString(),
     };
     // Remove existing indicator for this user, then add new one
     const idx = _typingIndicators.findIndex(i => i.from_user_id === indicator.from_user_id);

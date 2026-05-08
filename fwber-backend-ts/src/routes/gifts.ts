@@ -20,6 +20,7 @@ router.get('/', authenticate, async (req: any, res) => {
     const available = await prisma.gifts.findMany({ where: { is_active: true } });
 
     res.json({
+      data: available,
       received: received.map(g => ({
         id: Number(g.id),
         gift: g.gifts,
@@ -52,9 +53,9 @@ router.get('/available', authenticate, async (req: any, res) => {
 // POST /api/gifts/send - Send a gift
 router.post('/send', authenticate, async (req: any, res) => {
   try {
-    const { recipient_id, gift_id, message } = req.body;
+    const { recipient_id, receiver_id, gift_id, message } = req.body;
     const senderId = BigInt(req.user.id);
-    const receiverId = BigInt(recipient_id);
+    const receiverId = BigInt(recipient_id || receiver_id);
     const giftId = BigInt(gift_id);
 
     const gift = await prisma.gifts.findUnique({ where: { id: giftId } });

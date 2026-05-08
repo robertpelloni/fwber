@@ -24,7 +24,7 @@ export async function runEncryptionBenchmark(iterations = 100, payloadSize = 100
         await window.crypto.subtle.encrypt(
             { name: 'AES-GCM', iv },
             key,
-            new TextEncoder().encode(message)
+            new TextEncoder().encode(message) as unknown as BufferSource
         );
     }
     const jsTime = performance.now() - jsStart;

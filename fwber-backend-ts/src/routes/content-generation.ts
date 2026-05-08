@@ -150,6 +150,17 @@ router.get('/history', async (req: any, res) => {
   res.json({ success: true, data: [] });
 });
 
+// GET /api/content-generation/status - AI content generation status
+router.get('/status', (_req, res) => {
+  res.json({
+    available: true,
+    providers: ['nvidia-nim', 'openrouter', 'openai'],
+    features: ['bio-generation', 'content-optimization', 'conversation-starters'],
+    daily_limit: 10,
+    remaining: 10,
+  });
+});
+
 // GET /api/content-generation/optimization-stats
 router.get('/optimization-stats', (_req, res) => {
   res.json({ success: true, data: { optimization_score: 0, suggestions: [] } });

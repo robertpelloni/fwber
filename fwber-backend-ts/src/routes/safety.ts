@@ -272,17 +272,14 @@ router.post('/block', authenticate, async (req: any, res) => {
       return res.status(400).json({ message: 'Cannot block yourself' });
     }
 
-    // Upsert block
-    await prisma.blocks.upsert({
-      where: {
-        blocker_id_blocked_id: { blocker_id: userId, blocked_id: blockedId },
-      },
-      create: {
-        blocker_id: userId,
-        blocked_id: blockedId,
-      },
-      update: {},
-    });
+    // Create block (ignore if already exists)
+    try {
+      await prisma.blocks.create({
+        data: { blocker_id: userId, blocked_id: blockedId },
+      });
+    } catch (e: any) {
+      // Already blocked — that's fine
+    }
 
     res.json({ success: true });
   } catch (error: any) {
