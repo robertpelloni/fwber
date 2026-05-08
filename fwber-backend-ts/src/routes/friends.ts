@@ -148,13 +148,13 @@ router.get('/requests', authenticate, async (req: any, res) => {
 router.post('/request', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { friend_id } = req.body || {};
+    const { friend_id, user_id } = req.body || {};
 
-    if (!friend_id) {
-      return res.status(400).json({ message: 'friend_id is required' });
+    if (!friend_id && !user_id) {
+      return res.status(400).json({ message: 'friend_id or user_id is required' });
     }
 
-    const friendId = BigInt(friend_id);
+    const friendId = BigInt(friend_id || user_id);
 
     if (userId === friendId) {
       return res.status(400).json({ message: 'Cannot send friend request to yourself' });
@@ -208,6 +208,96 @@ router.post('/request', authenticate, async (req: any, res) => {
   } catch (error: any) {
     console.error('[Friends] Request error:', error.message);
     res.status(500).json({ success: false, message: 'Failed to send friend request' });
+  }
+});
+
+// POST /api/friends/requests — alias for frontend compatibility (send request via POST /friends/requests)
+router.post('/requests', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { friend_id, user_id, status, request_id } = req.body || {};
+    
+    // If status is provided, this is a respond-to-request action
+    if (status && request_id) {
+      const reqId = BigInt(request_id);
+      const friendReq = await prisma.friend_requests.findUnique({ where: { id: reqId } });
+      if (!friendReq) return res.status(404).json({ message: 'Friend request not found' });
+      if (friendReq.friend_id !== userId) return res.status(403).json({ message: 'Not authorized' });
+      
+      if (status === 'accepted') {
+        await prisma.friend_requests.update({ where: { id: reqId }, data: { status: 'accepted' } });
+        await prisma.friends.create({ data: { user_id: friendReq.user_id, friend_id: friendReq.friend_id, status: 'accepted' } });
+        await createNotification(friendReq.user_id, 'Friend Request Accepted', `Someone accepted your friend request!`);
+        checkAndUnlockAchievements(userId).catch(() => {});
+        return res.json({ success: true, message: 'Friend request accepted' });
+      } else {
+        await prisma.friend_requests.update({ where: { id: reqId }, data: { status: 'rejected' } });
+        return res.json({ success: true, message: 'Friend request declined' });
+      }
+    }
+    
+    // Otherwise, send a new friend request
+    const targetId = friend_id || user_id;
+    if (!targetId) return res.status(400).json({ message: 'friend_id or user_id is required' });
+    const friendId = BigInt(targetId);
+    if (userId === friendId) return res.status(400).json({ message: 'Cannot send friend request to yourself' });
+    
+    const targetUser = await prisma.users.findUnique({ where: { id: friendId } });
+    if (!targetUser) return res.status(404).json({ message: 'User not found' });
+    
+    const existingFriend = await prisma.friends.findFirst({
+      where: { OR: [{ user_id: userId, friend_id: friendId }, { user_id: friendId, friend_id: userId }] },
+    });
+    if (existingFriend) return res.status(400).json({ message: 'Already friends' });
+    
+    const existingRequest = await prisma.friend_requests.findFirst({
+      where: { OR: [{ user_id: userId, friend_id: friendId }, { user_id: friendId, friend_id: userId }], status: 'pending' },
+    });
+    if (existingRequest) return res.status(400).json({ message: 'Friend request already pending' });
+    
+    await prisma.friend_requests.create({ data: { user_id: userId, friend_id: friendId, status: 'pending' } });
+    await createNotification(friendId, 'New Friend Request', `${(await prisma.users.findUnique({ where: { id: userId }, select: { name: true } }))?.name || 'Someone'} wants to be your friend!`);
+    res.json({ success: true, message: 'Friend request sent' });
+  } catch (error: any) {
+    console.error('[Friends] POST /requests error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to process friend request' });
+  }
+});
+
+// POST /api/friends/requests/:id — respond to friend request (frontend compat)
+router.post('/requests/:id', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const targetUserId = BigInt(req.params.id);
+    const { status } = req.body || {};
+    
+    if (!status) return res.status(400).json({ message: 'status is required' });
+    
+    // Find the pending request between these users
+    const friendReq = await prisma.friend_requests.findFirst({
+      where: {
+        OR: [
+          { user_id: targetUserId, friend_id: userId, status: 'pending' },
+          { user_id: userId, friend_id: targetUserId, status: 'pending' },
+        ],
+      },
+    });
+    
+    if (!friendReq) return res.status(404).json({ message: 'No pending friend request found' });
+    
+    if (status === 'accepted' || status === 'accept') {
+      await prisma.friend_requests.update({ where: { id: friendReq.id }, data: { status: 'accepted' } });
+      await prisma.friends.create({ data: { user_id: friendReq.user_id, friend_id: friendReq.friend_id, status: 'accepted' } });
+      await createNotification(friendReq.user_id, 'Friend Request Accepted', 'Your friend request was accepted!');
+      checkAndUnlockAchievements(userId).catch(() => {});
+      return res.json({ success: true, message: 'Friend request accepted' });
+    } else {
+      await prisma.friend_requests.update({ where: { id: friendReq.id }, data: { status: 'rejected' } });
+      return res.json({ success: true, message: 'Friend request declined' });
+    }
+  } catch (error: any) {
+    console.error('[Friends] Respond error:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to respond to friend request' });
   }
 });
 
