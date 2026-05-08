@@ -186,8 +186,8 @@ router.post('/action', authenticate, async (req: any, res) => {
   try {
     // Standardize IDs
     const userId = BigInt(req.user.id);
-    const targetUserIdRaw = req.body.target_user_id || req.body.targetUserId;
-    const action = req.body.action as string;
+    const targetUserIdRaw = (req.body || {}).target_user_id || (req.body || {}).targetUserId;
+    const action = ((req.body || {}).action || "") as string;
 
     if (!targetUserIdRaw || !action) {
       return res.status(400).json({ message: 'target_user_id and action are required' });
