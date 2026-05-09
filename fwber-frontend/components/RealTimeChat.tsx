@@ -246,7 +246,7 @@ export default function RealTimeChat({
 	useEffect(() => {
 		if (recipientId && user?.id) {
 			setLoadingHistory(true);
-			loadConversationHistory(recipientId).finally(() => {
+			loadConversationHistory().finally(() => {
 				setLoadingHistory(false);
 			});
 		}
@@ -348,6 +348,17 @@ export default function RealTimeChat({
 					}
 
 					sendMessage(payload);
+				}
+
+				// REST fallback when WebSocket is disconnected
+				if (!isConnected) {
+					try {
+						await api.post("/messages", {
+							receiver_id: parseInt(recipientId),
+							content: messageContent,
+							message_type: "text",
+						});
+					} catch (_) { /* optimistic already queued */ }
 				}
 
 				setMessage("");

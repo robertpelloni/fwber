@@ -449,7 +449,7 @@ function FeatureSurfaceCard({
   title: string;
   description: string;
   icon: React.ReactNode;
-  accent: 'yellow' | 'green' | 'orange' | 'purple' | 'pink' | 'blue' | 'slate';
+  accent: 'yellow' | 'green' | 'orange' | 'purple' | 'pink' | 'blue' | 'slate' | 'red';
 }) {
   const accentClasses = {
     yellow: 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
