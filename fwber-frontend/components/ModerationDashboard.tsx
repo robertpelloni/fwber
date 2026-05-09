@@ -109,7 +109,7 @@ export default function ModerationDashboard() {
       <div className="bg-white dark:bg-gray-800 border rounded-lg shadow-sm">
         {activeTab === 'flagged' && (
           <FlaggedContentPanel
-            data={flagged.data}
+            data={flagged.data as any}
             isLoading={flagged.isLoading}
             page={flaggedPage}
             setPage={setFlaggedPage}
@@ -122,7 +122,7 @@ export default function ModerationDashboard() {
         )}
         {activeTab === 'spoofs' && (
           <SpoofDetectionsPanel
-            data={spoofs.data}
+            data={spoofs.data as any}
             isLoading={spoofs.isLoading}
             page={spoofsPage}
             setPage={setSpoofsPage}
@@ -135,7 +135,7 @@ export default function ModerationDashboard() {
         )}
         {activeTab === 'throttles' && (
           <ThrottlesPanel
-            data={throttles.data}
+            data={throttles.data as any}
             isLoading={throttles.isLoading}
             page={throttlesPage}
             setPage={setThrottlesPage}

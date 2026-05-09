@@ -30,7 +30,7 @@ export function useLocalPulseRealtime() {
     if (messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
 
-    if (['artifact_created', 'artifact_flagged', 'artifact_removed'].includes(lastMsg.type)) {
+    if (['artifact_created', 'artifact_flagged', 'artifact_removed'].includes(lastMsg.type || '')) {
         invalidate();
     }
   }, [messages, invalidate]);

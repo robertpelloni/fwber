@@ -39,7 +39,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     updatePresence: async (_status?: any, _metadata?: any) => {},
     sendNotification: async () => {},
     loadConversationHistory: async () => {},
-    injectMissedMessages: () => {},
+    injectMissedMessages: (_messages?: any) => {},
     clearMessages: () => {},
     clearNotifications: () => {},
     isReady: true,

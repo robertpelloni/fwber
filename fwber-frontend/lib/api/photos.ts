@@ -218,7 +218,7 @@ class PhotoAPI {
   // Get original photo blob
   async getOriginalPhoto(photoId: string): Promise<Blob> {
     const response: any = await apiClient.get(`/photos/${photoId}/original`, {
-      responseType: 'blob',
+      // responseType: 'blob',
     })
 
     return response.data

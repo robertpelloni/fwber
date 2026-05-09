@@ -68,12 +68,7 @@ function WebSocketPageContent() {
 
   const handleSendNotification = () => {
     if (selectedRecipient) {
-      sendNotification(selectedRecipient, {
-        title: 'Test Notification',
-        body: 'This is a test notification from WebSocket',
-        type: 'test',
-        data: { timestamp: new Date().toISOString() },
-      });
+      sendNotification();
     }
   };
 

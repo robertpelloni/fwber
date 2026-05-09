@@ -23,7 +23,7 @@ export interface VideoCallLog {
 }
 
 export const initiateCall = async (token: string, recipientId: string): Promise<VideoCallLog> => {
-  const response = await apiClient.post(
+  const response: any = await apiClient.post(
     `/video/initiate`,
     { recipient_id: recipientId },
     {
@@ -41,7 +41,7 @@ export const updateCallStatus = async (
   status: 'connected' | 'missed' | 'rejected' | 'ended',
   duration?: number
 ): Promise<VideoCallLog> => {
-  const response = await apiClient.put(
+  const response: any = await apiClient.put(
     `/video/${callId}/status`,
     { status, duration },
     {
