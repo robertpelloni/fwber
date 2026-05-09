@@ -54,7 +54,7 @@ export const updateCallStatus = async (
 };
 
 export const getCallHistory = async (token: string): Promise<VideoCallLog[]> => {
-  const response = await apiClient.get(`/video/history`, {
+  const response: any = await apiClient.get(`/video/history`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

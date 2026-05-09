@@ -46,7 +46,7 @@ export const proximityApi = {
    * Create a new proximity artifact
    */
   createArtifact: async (data: CreateArtifactRequest, token: string): Promise<{ artifact: ProximityArtifact }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts`,
       data,
       {
@@ -70,7 +70,7 @@ export const proximityApi = {
    * Flag an artifact for moderation
    */
   flagArtifact: async (id: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts/${id}/flag`,
       {},
       {
@@ -110,7 +110,7 @@ export const proximityApi = {
    * Join a proximity chatroom
    */
   joinChatroom: async (id: number, lat: number, lng: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity-chatrooms/${id}/join`,
       { latitude: lat, longitude: lng },
       {
@@ -124,7 +124,7 @@ export const proximityApi = {
    * Leave a proximity chatroom
    */
   leaveChatroom: async (id: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity-chatrooms/${id}/leave`,
       {},
       {
@@ -138,7 +138,7 @@ export const proximityApi = {
    * Add a comment to an artifact
    */
   commentArtifact: async (id: number, content: string, parent_id?: string, token?: string): Promise<{ message: string; comment: any }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts/${id}/comments`,
       { content, parent_id },
       {
@@ -165,7 +165,7 @@ export const proximityApi = {
    * Vote on an artifact
    */
   voteArtifact: async (id: number, value: number, token: string): Promise<{ message: string; vote: any }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts/${id}/vote`,
       { value },
       {

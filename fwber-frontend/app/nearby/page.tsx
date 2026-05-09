@@ -55,7 +55,7 @@ export default function NearbyPage() {
         setUserLocation(location)
 
         // Fetch nearby users
-        const response = await getNearbyUsers(token, {
+        const response: any = await getNearbyUsers(token, {
           latitude: location.latitude,
           longitude: location.longitude,
           radius: radius,
@@ -89,7 +89,7 @@ export default function NearbyPage() {
     // Trigger re-fetch
     if (token && userLocation) {
       try {
-        const response = await getNearbyUsers(token, {
+        const response: any = await getNearbyUsers(token, {
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,
           radius: radius,

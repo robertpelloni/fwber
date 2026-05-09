@@ -79,13 +79,13 @@ function WebSocketPageContent() {
 
   const handleStartTyping = () => {
     if (selectedRecipient) {
-      sendTypingIndicator(selectedRecipient, true);
+      sendTypingIndicator(selectedRecipient);
     }
   };
 
   const handleStopTyping = () => {
     if (selectedRecipient) {
-      sendTypingIndicator(selectedRecipient, false);
+      sendTypingIndicator(selectedRecipient);
     }
   };
 

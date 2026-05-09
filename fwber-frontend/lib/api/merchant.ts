@@ -88,7 +88,7 @@ export async function registerMerchant(token: string, data: MerchantRegistration
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.user?.merchant_profile || result.user?.merchantProfile || result.profile || result.data || result;
 }
 
@@ -102,7 +102,7 @@ export async function getMerchantProfile(token: string): Promise<MerchantProfile
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.profile || result.data || result;
 }
 
@@ -116,7 +116,7 @@ export async function updateMerchantProfile(token: string, data: Partial<Merchan
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.profile || result.data || result;
 }
 
@@ -130,7 +130,7 @@ export async function getPromotions(token: string): Promise<Promotion[]> {
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.data || result; // Assuming Laravel Resource returns { data: [...] }
 }
 
@@ -144,7 +144,7 @@ export async function createPromotion(token: string, data: CreatePromotionData):
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.promotion || result.data || result;
 }
 
@@ -155,7 +155,7 @@ export async function getPromotionDetail(token: string, promotionId: number | st
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
 
   return {
     promotion: result.promotion || result.data || result,
@@ -175,7 +175,7 @@ export async function updatePromotion(token: string, promotionId: number | strin
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.promotion || result.data || result;
 }
 
@@ -186,6 +186,6 @@ export async function deletePromotion(token: string, promotionId: number | strin
     },
   });
 
-  const result = response.data;
+  const result: any = response.data;
   return result.promotion || result.data || result;
 }
