@@ -298,14 +298,19 @@ router.get('/search', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const q = String(req.query.q || '').trim();
-    if (!q || q.length < 2) {
+    if (!q || q.length < 1) {
       return res.json([]);
     }
 
     const users = await prisma.users.findMany({
       where: {
         id: { not: userId },
-        name: { contains: q },
+        OR: [
+          { name: { contains: q } },
+          { user_profiles: { some: { display_name: { contains: q } } } },
+          { user_profiles: { some: { bio: { contains: q } } } },
+          { user_profiles: { some: { occupation: { contains: q } } } },
+        ],
       },
       include: {
         user_profiles: {
