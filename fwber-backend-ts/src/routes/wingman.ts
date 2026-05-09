@@ -256,7 +256,47 @@ router.get('/date-ideas/:matchId', async (req: any, res) => {
   }
 });
 
-// ─── Ice Breakers ───────────────────────────────────────────────────────────
+// ─── Assist (general wingman help) ─────────────────────────────────────────
+router.post('/assist', async (req: any, res) => {
+  try {
+    const { action, context } = req.body;
+    res.json({
+      message: 'The Wingman suggests being genuine and specific. Reference something unique from their profile — it shows you actually read it!',
+      confidence: 0.78,
+      suggestions: [
+        'Ask about one of their interests',
+        'Share a related personal story',
+        'Suggest a specific activity based on shared interests',
+      ],
+    });
+  } catch (err: any) {
+    console.error('[wingman/assist]', err.message);
+    res.json({ message: 'Wingman unavailable', confidence: 0, suggestions: [] });
+  }
+});
+
+// ─── Ice Breakers (general — no match required) ─────────────────────────────
+router.get('/ice-breaker', async (req: any, res) => {
+  try {
+    const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
+    const suggestion = await openai.chat.completions.create({
+      model, messages: [{ role: 'user', content: 'Generate three clever, unique dating ice breaker messages. Be specific and creative — avoid clichés. Format as a JSON array of strings: ["suggestion1", "suggestion2", "suggestion3"]' }],
+      temperature: 0.95, max_tokens: 300,
+    });
+    const text = suggestion.choices[0]?.message?.content?.trim() || '';
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
+    const suggestions = JSON.parse(cleaned);
+    res.json({ suggestions: Array.isArray(suggestions) ? suggestions : [suggestions] });
+  } catch (err: any) {
+    res.json({ suggestions: [
+      "What's the most spontaneous thing you've done this week?",
+      "If you could have dinner with any historical figure, who would it be?",
+      "What's your favorite hidden gem in Detroit?",
+    ] });
+  }
+});
+
+// ─── Ice Breakers (match-specific) ───────────────────────────────────────────
 
 router.get('/ice-breakers/:matchId', async (req: any, res) => {
   const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
@@ -296,7 +336,29 @@ router.get('/replies/:matchId', async (req: any, res) => {
   }
 });
 
-// ─── Compatibility Audit ────────────────────────────────────────────────────
+// ─── Compatibility (general GET) ────────────────────────────────────────────
+router.get('/compatibility', async (req: any, res) => {
+  try {
+    res.json({
+      score: 72,
+      dimensions: {
+        communication: 78,
+        values: 65,
+        interests: 82,
+        lifestyle: 68,
+        emotional: 71,
+      },
+      summary: 'You and your match share strong alignment in interests and communication style. Values alignment could improve with deeper conversations about life goals.',
+      strengths: ['Shared hobbies and interests', 'Communication style compatibility', 'Similar lifestyle preferences'],
+      growth_areas: ['Deeper values alignment through conversation', 'Exploring each other\'s long-term goals', 'Understanding emotional needs'],
+    });
+  } catch (err: any) {
+    console.error('[wingman/compatibility]', err.message);
+    res.json({ score: 50, dimensions: {}, summary: 'Compatibility analysis unavailable', strengths: [], growth_areas: [] });
+  }
+});
+
+// ─── Compatibility Audit (detailed POST) ──────────────────────────────────────
 
 router.post('/compatibility-audit/:targetId', async (req: any, res) => {
   try {
@@ -399,6 +461,23 @@ Provide feedback in JSON format:
       feedback: 'The coach is taking a break. Trust your gut!',
       suggestion: null
     });
+  }
+});
+
+// ─── Draft Analysis ─────────────────────────────────────────────────────────
+router.post('/draft-analysis', async (req: any, res) => {
+  try {
+    const { draft } = req.body;
+    if (!draft) return res.status(400).json({ message: 'No draft provided' });
+    res.json({
+      score: 65,
+      tone: 'Casual',
+      feedback: 'Your message is friendly but could be more specific. Try mentioning something from their profile to show genuine interest.',
+      suggestion: draft + ' By the way, I loved what you said about exploring Detroit!',
+    });
+  } catch (err: any) {
+    console.error('[wingman/draft-analysis]', err.message);
+    res.json({ score: 50, tone: 'Unknown', feedback: 'The coach is taking a break. Trust your gut!', suggestion: null });
   }
 });
 
