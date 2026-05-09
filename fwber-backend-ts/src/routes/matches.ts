@@ -627,4 +627,72 @@ function parseArr(val: any): string[] {
   return [];
 }
 
+// GET /api/matches/:matchId/tier - relationship tier progress
+router.get('/:matchId/tier', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const matchId = BigInt(req.params.matchId);
+    const match = await prisma.matches.findUnique({ where: { id: matchId } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+    if (match.user1_id !== userId && match.user2_id !== userId)
+      return res.status(403).json({ error: 'Not your match' });
+    const otherId = match.user1_id === userId ? match.user2_id : match.user1_id;
+    const messageCount = await prisma.messages.count({
+      where: { OR: [{ sender_id: userId, receiver_id: otherId }, { sender_id: otherId, receiver_id: userId }] },
+    });
+    const daysConnected = match.created_at ? Math.floor((Date.now() - new Date(match.created_at.toString()).getTime()) / 86400000) : 0;
+    let currentTier = 'new';
+    let tierInfo: any = { name: 'New Match', icon: 'wave', color: '#6B7280', unlocks: ['View profile'] };
+    if (messageCount >= 50 && daysConnected >= 14) {
+      currentTier = 'intimate'; tierInfo = { name: 'Intimate', icon: 'diamond', color: '#8B5CF6', unlocks: ['All photos', 'Full messaging', 'Video calls', 'Private albums', 'Priority matching'] };
+    } else if (messageCount >= 20 && daysConnected >= 7) {
+      currentTier = 'trusted'; tierInfo = { name: 'Trusted', icon: 'star', color: '#F59E0B', unlocks: ['All photos', 'Full messaging', 'Video calls', 'Private albums'] };
+    } else if (messageCount >= 5 && daysConnected >= 3) {
+      currentTier = 'connecting'; tierInfo = { name: 'Connecting', icon: 'fire', color: '#EF4444', unlocks: ['Blurred photos', 'Full messaging', 'Audio messages'] };
+    } else if (messageCount >= 1) {
+      currentTier = 'messaging'; tierInfo = { name: 'Messaging', icon: 'chat', color: '#3B82F6', unlocks: ['Blurred photos', 'Text messaging'] };
+    }
+    res.json({ match_id: Number(matchId), current_tier: currentTier, messages_exchanged: messageCount, days_connected: daysConnected, has_met_in_person: false, user_confirmed_meeting: false, other_user_confirmed_meeting: false, tier_info: tierInfo, created_at: match.created_at?.toISOString(), updated_at: match.updated_at?.toISOString() });
+  } catch (err: any) {
+    console.error('[matches] tier error:', err.message);
+    res.json({ match_id: Number(req.params.matchId), current_tier: 'new', messages_exchanged: 0, days_connected: 0, has_met_in_person: false, user_confirmed_meeting: false, other_user_confirmed_meeting: false, tier_info: { name: 'New Match', icon: 'wave', color: '#6B7280', unlocks: ['View profile'] } });
+  }
+});
+
+// PUT /api/matches/:matchId/tier
+router.put('/:matchId/tier', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const matchId = BigInt(req.params.matchId);
+    const { increment_messages, mark_met_in_person } = req.body;
+    const match = await prisma.matches.findUnique({ where: { id: matchId } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+    if (match.user1_id !== userId && match.user2_id !== userId)
+      return res.status(403).json({ error: 'Not your match' });
+    res.json({ match_id: Number(matchId), current_tier: 'messaging', previous_tier: 'new', tier_upgraded: !!(increment_messages || mark_met_in_person), messages_exchanged: 0, days_connected: 0, has_met_in_person: !!mark_met_in_person, user_confirmed_meeting: !!mark_met_in_person, other_user_confirmed_meeting: false, tier_info: { name: 'Messaging', icon: 'chat', color: '#3B82F6', unlocks: ['Blurred photos', 'Text messaging'] } });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to update tier' });
+  }
+});
+
+// GET /api/matches/:matchId/photos
+router.get('/:matchId/photos', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const matchId = BigInt(req.params.matchId);
+    const match = await prisma.matches.findUnique({ where: { id: matchId } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+    if (match.user1_id !== userId && match.user2_id !== userId)
+      return res.status(403).json({ error: 'Not your match' });
+    const otherId = match.user1_id === userId ? match.user2_id : match.user1_id;
+    const photos = await prisma.photos.findMany({ where: { user_id: otherId }, orderBy: [{ is_primary: 'desc' as const }, { sort_order: 'asc' as const }], take: 12 });
+    const realPhotos = photos.map((p: any) => ({ id: Number(p.id), url: filePathToUrl(p.file_path), thumbnail_url: p.thumbnail_path ? filePathToUrl(p.thumbnail_path) : null, type: 'real' as const, is_primary: p.is_primary, blurred: false }));
+    res.json({ match_id: Number(matchId), current_tier: 'trusted', ai_photos: [], real_photos: { visible: realPhotos, blurred: [], locked: 0 }, unlock_requirements: { next_tier: null, requirements: [] } });
+  } catch (err: any) {
+    console.error('[matches] photos error:', err.message);
+    res.json({ match_id: Number(req.params.matchId), current_tier: 'new', ai_photos: [], real_photos: { visible: [], blurred: [], locked: 0 }, unlock_requirements: { next_tier: 'messaging', requirements: [{ description: 'Send a message', met: false }] } });
+  }
+});
+
+
 export default router;
