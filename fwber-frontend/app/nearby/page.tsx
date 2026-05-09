@@ -21,7 +21,7 @@ export default function NearbyPage() {
   const [error, setError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null)
   const [rankingSummary, setRankingSummary] = useState<string | null>(null)
-  const [radius, setRadius] = useState(1000) // 1km default
+  const [radius, setRadius] = useState(5000) // 5km default
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [isRefreshing, setIsRefreshing] = useState(false)
 

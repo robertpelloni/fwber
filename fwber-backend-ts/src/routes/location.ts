@@ -31,7 +31,7 @@ router.get('/nearby', authenticate, async (req: any, res) => {
     const userId = BigInt(req.user.id);
     const latitude = parseFloat(req.query.latitude as string);
     const longitude = parseFloat(req.query.longitude as string);
-    const radius = parseInt(req.query.radius as string) || 1000;
+    const radius = parseInt(req.query.radius as string) || 5000;
     const limit = parseInt(req.query.limit as string) || 50;
 
     if (isNaN(latitude) || isNaN(longitude)) {
@@ -82,6 +82,7 @@ router.get('/nearby', authenticate, async (req: any, res) => {
         ? new Date().getFullYear() - new Date(row.date_of_birth).getFullYear()
         : null;
       const distMeters = Number(row.distance_meters) || 0;
+    const distMiles = parseFloat((distMeters / 1609.34).toFixed(1));
       let distanceStr: string;
       if (distMeters < 1000) {
         distanceStr = Math.round(distMeters) + 'm';
@@ -102,6 +103,7 @@ router.get('/nearby', authenticate, async (req: any, res) => {
         location: {
           distance: distanceStr,
           distance_meters: distMeters,
+          distance_miles: distMiles,
           last_updated: row.last_updated ? new Date(row.last_updated).toISOString() : new Date().toISOString(),
         },
         scene_signals: null,
@@ -119,7 +121,7 @@ router.get('/nearby', authenticate, async (req: any, res) => {
     });
   } catch (error: any) {
     console.error('[Location] Nearby error:', error.message);
-    res.json({ success: true, data: [], meta: { total: 0, radius: Number(req.query.radius) || 1000 } });
+    res.json({ success: true, data: [], meta: { total: 0, radius: Number(req.query.radius) || 5000 } });
   }
 });
 
