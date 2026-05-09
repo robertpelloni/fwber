@@ -151,7 +151,8 @@ router.get('/', authenticate, async (req: any, res) => {
         avatarUrl: p.avatar_url || null,
         bio: p.bio || null,
         locationDescription: p.location_description || null,
-        distance: distanceMeters,
+        distance: Math.round(distanceMeters * 0.000621371 * 10) / 10, // miles with 1 decimal
+      distanceMeters,
         compatibilityScore: score,
         lastSeenAt: u.last_seen_at?.toISOString() || null,
         age: theirAge,
