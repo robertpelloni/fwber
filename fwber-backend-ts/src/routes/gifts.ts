@@ -6,6 +6,19 @@ import { checkAndUnlockAchievements } from '../lib/achievements.js';
 const router = Router();
 
 // GET /api/gifts - Get all gifts (summary)
+const GIFT_EMOJIS: Record<string, string> = {
+  coffee: '☕', rose: '🌹', cocktail: '🍹', teddy: '🧸',
+  rocket: '🚀', diamond: '💎', default: '🎁',
+};
+
+function giftEmoji(gift: any): string {
+  const name = (gift.name || '').toLowerCase();
+  for (const [key, emoji] of Object.entries(GIFT_EMOJIS)) {
+    if (name.includes(key)) return emoji as string;
+  }
+  return GIFT_EMOJIS.default!;
+}
+
 router.get('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
@@ -44,7 +57,14 @@ router.get('/', authenticate, async (req: any, res) => {
 router.get('/available', authenticate, async (req: any, res) => {
   try {
     const gifts = await prisma.gifts.findMany({ where: { is_active: true } });
-    res.json({ gifts });
+    res.json({
+      gifts: gifts.map((g: any) => ({
+        ...g,
+        id: Number(g.id),
+        cost: Number(g.cost),
+        emoji: giftEmoji(g),
+      })),
+    });
   } catch (err) {
     res.json({ gifts: [] });
   }
