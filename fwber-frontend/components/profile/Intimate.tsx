@@ -113,7 +113,7 @@ export default function Intimate({ formData, handleInputChange, handleArrayChang
           <div className="grid grid-cols-2 gap-2">
             {STI_STATUSES.map(status => {
               const val = status.toLowerCase().replace(/ /g, '_');
-              const stiArr = Array.isArray(formData.sti_status) ? formData.sti_status : (formData.sti_status?.status ? (Array.isArray(formData.sti_status.status) ? formData.sti_status.status : []) : []);
+              const stiArr: any = Array.isArray(formData.sti_status) ? formData.sti_status : ((formData.sti_status as any)?.status ? (Array.isArray((formData.sti_status as any).status) ? (formData.sti_status as any).status : []) : []);
               const isSelected = stiArr.includes(val);
               return (
                 <button

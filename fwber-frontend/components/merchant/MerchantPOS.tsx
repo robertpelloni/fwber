@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { marketplaceApi, InventoryItem } from '@/lib/api/marketplace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Smartphone, Zap, Loader2, CheckCircle2, AlertTriangle, Coins, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';

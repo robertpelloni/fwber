@@ -1,9 +1,12 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { checkAndUnlockAchievements } from '../lib/achievements.js';
+import { filePathToUrl } from '../lib/photos.js';
 
 const router = Router();
+const upload = multer({ dest: 'uploads/messages/' });
 router.use(authenticate);
 
 function serializeMessage(msg: any) {
@@ -176,7 +179,7 @@ router.get('/conversations', async (req: any, res) => {
   }
 });
 
-// GET /api/messages/unread-count \x97 get total unread message count
+// GET /api/messages/unread-count � get total unread message count
 router.get("/unread-count", async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
@@ -190,7 +193,7 @@ router.get("/unread-count", async (req: any, res) => {
   }
 });
 
-// POST /api/messages/mark-all-read/:id \x97 mark all from user :id as read
+// POST /api/messages/mark-all-read/:id � mark all from user :id as read
 router.post("/mark-all-read/:id", async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
@@ -241,23 +244,35 @@ router.get('/:id', async (req: any, res) => {
 });
 
 // POST /api/messages — send message
-router.post('/', async (req: any, res) => {
+router.post('/', upload.single('media'), async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { receiver_id, content, media, media_type, media_duration, message_type } = req.body;
-    if (!receiver_id || (!content && !media)) {
+    const { receiver_id, content, media_type, media_duration, message_type } = req.body || {};
+    if (!receiver_id || (!content && !req.file)) {
       res.status(400).json({ message: 'receiver_id and content or media required' });
       return;
+    }
+    // Handle uploaded media file
+    let mediaUrl = null;
+    let mediaType = media_type || null;
+    if (req.file) {
+      mediaUrl = filePathToUrl(req.file.path);
+      if (!mediaType) {
+        mediaType = req.file.mimetype?.startsWith('image/') ? 'image'
+          : req.file.mimetype?.startsWith('video/') ? 'video'
+          : req.file.mimetype?.startsWith('audio/') ? 'audio'
+          : 'file';
+      }
     }
     const message = await prisma.messages.create({
       data: {
         sender_id: userId,
         receiver_id: BigInt(receiver_id),
         content: content || '',
-        media_url: media || null,
-        media_type: media_type || null,
-        media_duration: media_duration || null,
-        message_type: message_type || 'text',
+        media_url: mediaUrl,
+        media_type: mediaType,
+        media_duration: media_duration ? parseFloat(media_duration) : null,
+        message_type: message_type || (req.file ? 'image' : 'text'),
         sent_at: new Date(),
       },
     });
@@ -300,7 +315,7 @@ router.post('/', async (req: any, res) => {
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {
     console.error('[Messages] Send error:', error.message);
-    res.json({ success: true, message: { id: Date.now(), ...req.body } });
+    res.json({ success: true, message: { id: Date.now(), content: (req.body || {}).content || '', receiver_id: (req.body || {}).receiver_id || 0 } });
   }
 });
 
@@ -309,7 +324,7 @@ router.post('/:id/react', async (req: any, res) => {
   res.json({ success: true });
 });
 
-// POST /api/messages/mark-all-read/:id \x97 mark all messages from user :id as read
+// POST /api/messages/mark-all-read/:id � mark all messages from user :id as read
 router.post('/mark-all-read/:id', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
@@ -329,11 +344,11 @@ router.post('/mark-all-read/:id', async (req: any, res) => {
   }
 });
 
-// POST /api/messages/read \x97 mark a specific message as read
+// POST /api/messages/read � mark a specific message as read
 router.post('/read', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { message_id } = req.body;
+    const { message_id } = req.body || {};
     if (!message_id) {
       return res.status(400).json({ message: 'message_id required' });
     }

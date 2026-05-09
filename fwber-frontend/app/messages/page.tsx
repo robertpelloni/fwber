@@ -32,7 +32,7 @@ export default function MessagesPage() {
 	const { token, isAuthenticated } = useAuth();
 	const { connected } = useSocketLogic({ autoConnect: true });
 	const { showError } = useToast();
-	const { videoSignals } = useWebSocket();
+	const { videoSignals }: { videoSignals: any[] } = useWebSocket();
 	const { confirmAction, ConfirmDialog } = useConfirmDialog();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [selectedConversation, setSelectedConversation] =

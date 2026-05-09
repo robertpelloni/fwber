@@ -14,7 +14,7 @@ export const proximityApi = {
    */
   getLocalPulse: async (params: LocalPulseParams, token: string): Promise<LocalPulseResponse> => {
     const { lat, lng, radius = 1000, topic_slug } = params;
-    const response = await apiClient.get<LocalPulseResponse>(
+    const response: any = await apiClient.get<LocalPulseResponse>(
       `/proximity/local-pulse`,
       {
         params: { lat, lng, radius, topic_slug },
@@ -35,7 +35,7 @@ export const proximityApi = {
     topic_slug?: string,
     token?: string
   ): Promise<{ artifacts: ProximityArtifact[] }> => {
-    const response = await apiClient.get(`/proximity/feed`, {
+    const response: any = await apiClient.get<any>(`/proximity/feed`, {
       params: { lat, lng, radius, type, topic_slug },
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
@@ -46,7 +46,7 @@ export const proximityApi = {
    * Create a new proximity artifact
    */
   createArtifact: async (data: CreateArtifactRequest, token: string): Promise<{ artifact: ProximityArtifact }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts`,
       data,
       {
@@ -60,7 +60,7 @@ export const proximityApi = {
    * Get single artifact by ID
    */
   getArtifact: async (id: number, token?: string): Promise<{ artifact: ProximityArtifact }> => {
-    const response = await apiClient.get(`/proximity/artifacts/${id}`, {
+    const response: any = await apiClient.get<any>(`/proximity/artifacts/${id}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     return response.data;
@@ -70,7 +70,7 @@ export const proximityApi = {
    * Flag an artifact for moderation
    */
   flagArtifact: async (id: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts/${id}/flag`,
       {},
       {
@@ -84,7 +84,7 @@ export const proximityApi = {
    * Delete (remove) an artifact (owner only)
    */
   deleteArtifact: async (id: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.delete(`/proximity/artifacts/${id}`, {
+    const response: any = await apiClient.delete(`/proximity/artifacts/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -99,7 +99,7 @@ export const proximityApi = {
     radius: number = 1000,
     token: string
   ): Promise<{ chatrooms: ProximityChatroom[] }> => {
-    const response = await apiClient.get(`/proximity-chatrooms/nearby`, {
+    const response: any = await apiClient.get<any>(`/proximity-chatrooms/nearby`, {
       params: { lat, lng, radius },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -110,7 +110,7 @@ export const proximityApi = {
    * Join a proximity chatroom
    */
   joinChatroom: async (id: number, lat: number, lng: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity-chatrooms/${id}/join`,
       { latitude: lat, longitude: lng },
       {
@@ -124,7 +124,7 @@ export const proximityApi = {
    * Leave a proximity chatroom
    */
   leaveChatroom: async (id: number, token: string): Promise<{ message: string }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity-chatrooms/${id}/leave`,
       {},
       {
@@ -138,7 +138,7 @@ export const proximityApi = {
    * Add a comment to an artifact
    */
   commentArtifact: async (id: number, content: string, parent_id?: string, token?: string): Promise<{ message: string; comment: any }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts/${id}/comments`,
       { content, parent_id },
       {
@@ -152,7 +152,7 @@ export const proximityApi = {
    * Get comments for an artifact
    */
   getComments: async (id: number, token?: string): Promise<{ data: any[] }> => {
-    const response = await apiClient.get(
+    const response: any = await apiClient.get(
       `/proximity/artifacts/${id}/comments`,
       {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -165,7 +165,7 @@ export const proximityApi = {
    * Vote on an artifact
    */
   voteArtifact: async (id: number, value: number, token: string): Promise<{ message: string; vote: any }> => {
-    const response = await apiClient.post(
+    const response: any = await apiClient.post(
       `/proximity/artifacts/${id}/vote`,
       { value },
       {

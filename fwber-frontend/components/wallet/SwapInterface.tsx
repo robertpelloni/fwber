@@ -115,7 +115,7 @@ export function SwapInterface() {
                                 <SelectTrigger className="bg-black/20 border-indigo-500/50 text-white font-bold h-12">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-zinc-900 border-indigo-500/50 text-white">
+                                <SelectContent>
                                     <SelectItem value="SOL">Solana (SOL)</SelectItem>
                                     <SelectItem value="USDC">Circle (USDC)</SelectItem>
                                     <SelectItem value="PEER_TOKEN">Federated Voucher</SelectItem>

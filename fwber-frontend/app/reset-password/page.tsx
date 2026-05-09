@@ -10,6 +10,7 @@ import { ArrowLeft, CheckCircle, Eye, EyeOff } from 'lucide-react';
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
+  const email = searchParams.get('email') || '';
 
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');

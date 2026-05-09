@@ -55,6 +55,57 @@ router.get('/followed', authenticate, async (req: any, res) => {
   }
 });
 
+// GET /api/topics/trending — trending topics by follower count
+router.get('/trending', authenticate, async (req: any, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 20, 50);
+    const topics = await prisma.topics.findMany({
+      orderBy: { follower_count: 'desc' as const },
+      take: limit,
+    });
+    res.json({
+      topics: topics.map((t: any) => ({
+        id: Number(t.id), slug: t.slug, label: t.label,
+        emoji: t.emoji, category: t.category,
+        description: t.description, follower_count: Number(t.follower_count),
+      })),
+      total: topics.length,
+    });
+  } catch (err: any) {
+    console.error('[topics] trending error:', err.message);
+    res.json({ topics: [], total: 0 });
+  }
+});
+
+// GET /api/topics/search — search topics
+router.get('/search', authenticate, async (req: any, res) => {
+  try {
+    const q = String(req.query.q || '');
+    if (!q) return res.json({ topics: [], total: 0 });
+    const topics = await prisma.topics.findMany({
+      where: {
+        OR: [
+          { label: { contains: q } },
+          { slug: { contains: q } },
+          { category: { contains: q } },
+        ],
+      },
+      orderBy: { follower_count: 'desc' as const },
+      take: 20,
+    });
+    res.json({
+      topics: topics.map((t: any) => ({
+        id: Number(t.id), slug: t.slug, label: t.label,
+        emoji: t.emoji, category: t.category, follower_count: Number(t.follower_count),
+      })),
+      total: topics.length,
+    });
+  } catch (err: any) {
+    console.error('[topics] search error:', err.message);
+    res.json({ topics: [], total: 0 });
+  }
+});
+
 // GET /api/topics/:slug — single topic
 router.get('/:slug', authenticate, async (req: any, res) => {
   try {

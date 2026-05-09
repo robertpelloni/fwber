@@ -172,7 +172,7 @@ export function usePusherLogic(options: { autoConnect?: boolean } = {}) {
     setStatus(prev => ({ ...prev, connecting: true, error: null }));
 
     try {
-      const echo = initEcho(token);
+      const echo: any = initEcho(token);
       if (!echo) {
         setStatus({ connected: false, connecting: false, error: null });
         return;

@@ -129,9 +129,9 @@ export async function encryptWithRsa(text: string, publicKey: CryptoKey): Promis
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
 
-  const ciphertext = await window.crypto.subtle.encrypt(
+  const ciphertext = await (window.crypto.subtle as any).encrypt(
     {
-      name: 'RSA-OAEP',
+      name: 'RSA-OAEP', hash: 'SHA-256',
     },
     publicKey,
     data
@@ -177,7 +177,7 @@ export async function encryptMessage(
 ): Promise<string> {
   // Attempt WASM offload for large payloads
   if (text.length > 5000) {
-    const wasm = await loadWasm();
+    const wasm: any = await loadWasm();
     if (wasm) {
       try {
         const rawKey = await window.crypto.subtle.exportKey('raw', sharedKey);
@@ -198,7 +198,7 @@ export async function encryptMessage(
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
 
-  const ciphertext = await window.crypto.subtle.encrypt(
+  const ciphertext = await (window.crypto.subtle as any).encrypt(
     {
       name: 'AES-GCM',
       iv: iv,
@@ -228,7 +228,7 @@ export async function decryptMessage(
 
     // Check if was encrypted via WASM
     if (payload.wasm) {
-        const wasm = await loadWasm();
+        const wasm: any = await loadWasm();
         if (wasm) {
             const rawKey = await window.crypto.subtle.exportKey('raw', sharedKey);
             const keyHex = Array.from(new Uint8Array(rawKey)).map(b => b.toString(16).padStart(2, '0')).join('');

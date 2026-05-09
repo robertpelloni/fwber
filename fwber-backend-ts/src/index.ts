@@ -69,6 +69,10 @@ import federationRoutes from './routes/federation.js';
 import paymentsRoutes from './routes/payments.js';
 import shareUnlocksRoutes from './routes/share-unlocks.js';
 import viralContentRoutes from './routes/viral-content.js';
+import configRoutes from './routes/config.js';
+import healthRoutes from './routes/health.js';
+import iceBreakersRoutes from './routes/ice-breakers.js';
+import settingsRoutes from './routes/settings.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -181,6 +185,10 @@ app.use('/api/merchant-portal', merchantPortalRoutes);
 app.use('/api/moderation', moderationRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/federation', federationRoutes);
+app.use('/api/config', configRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/ice-breakers', iceBreakersRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/share-unlocks', shareUnlocksRoutes);
 app.use('/api/payments', paymentsRoutes);
 

@@ -19,6 +19,8 @@ type Achievement = {
   token_reward: number
   earned: boolean
   earned_at: string | null
+  is_hidden?: boolean
+  is_unlocked?: boolean
 }
 
 const CATEGORY_ICONS: Record<string, any> = {

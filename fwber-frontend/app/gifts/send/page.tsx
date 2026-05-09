@@ -47,6 +47,7 @@ export default function GiftsSendPage() {
 
           {isShopOpen && (
             <GiftShopModal
+          isOpen={isShopOpen}
               receiverId={Number(receiverId) || 0}
               receiverName={receiverName}
               onClose={() => setIsShopOpen(false)}

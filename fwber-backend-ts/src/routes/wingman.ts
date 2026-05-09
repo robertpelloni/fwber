@@ -70,6 +70,28 @@ router.use(authenticate);
 
 // ─── Roast / Hype ───────────────────────────────────────────────────────────
 
+// GET /wingman/roast — return a fallback roast (for GET requests)
+router.get("/roast", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    let roast = await ai.generateRoast(userId, "roast");
+    if (!roast || roast.trim() === "") {
+      const fallbacks = [
+        "Your profile is like a parking ticket - technically valid but nobody wants to deal with it.",
+        "Your bio reads like a Terms of Service agreement - long, boring, and nobody reads it.",
+        "You have the energy of a LinkedIn connection request at 3 AM.",
+        "Your profile pic screams I let my mom pick my outfit today.",
+        "You are giving main character energy in a movie nobody asked for.",
+      ];
+      roast = fallbacks[Math.floor(Math.random() * fallbacks.length)] || "Your profile is a mystery.";
+    }
+    const shareId = await storeResult(userId, "roast", { text: roast });
+    res.json({ roast, share_id: shareId });
+  } catch (err: any) {
+    res.json({ roast: "Your profile is a mystery wrapped in an enigma.", share_id: "err-" + Date.now() });
+  }
+});
+
 router.post('/roast', async (req: any, res) => {
   try {
     const mode = req.body?.mode === 'hype' ? 'hype' : 'roast';
