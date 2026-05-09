@@ -119,7 +119,12 @@ router.get('/invitations', authenticate, async (req: any, res) => {
 router.get('/my-events', authenticate, async (req: any, res) => {
   try {
     const events = await prisma.events.findMany({
-      where: { created_by_user_id: BigInt(req.user.id) },
+      where: {
+        OR: [
+          { created_by_user_id: BigInt(req.user.id) },
+          { event_attendees: { some: { user_id: BigInt(req.user.id), status: 'attending' } } },
+        ],
+      },
       orderBy: { starts_at: 'desc' },
       include: {
         _count: { select: { event_attendees: true } },
