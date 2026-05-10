@@ -64,8 +64,8 @@ router.get('/', authenticate, async (req: any, res) => {
       : null;
 
     // Preference ranges
-    const prefMinAge = myPrefs?.age_range_min || 18;
-    const prefMaxAge = myPrefs?.age_range_max || 99;
+    const prefMinAge = myPrefs?.age_min || 18;
+    const prefMaxAge = myPrefs?.age_max || 99;
 
     // Fetch more candidates than needed so we can score/filter
     const candidates = await prisma.users.findMany({
