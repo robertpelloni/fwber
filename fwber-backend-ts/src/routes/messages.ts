@@ -142,8 +142,11 @@ router.get('/conversations', async (req: any, res) => {
         other_user: {
           id: Number(otherUser?.id || 0),
           name: otherUser?.name || 'Unknown',
-          display_name: profile?.display_name || otherUser?.name || 'Unknown',
-          avatar_url: profile?.avatar_url || null,
+          profile: {
+            display_name: profile?.display_name || otherUser?.name || 'Unknown',
+            age: null,
+            photos: profile?.avatar_url ? [{ id: 0, url: profile.avatar_url, is_private: false, is_primary: true }] : [],
+          },
         },
         last_message: lastMsg ? {
           content: lastMsg.content,
