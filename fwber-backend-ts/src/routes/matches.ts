@@ -703,4 +703,39 @@ router.get('/:matchId/photos', authenticate, async (req: any, res) => {
 });
 
 
+
+// GET /api/matches/tiers-summary — summary of all relationship tiers for user
+router.get('/tiers-summary', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const tiers = await prisma.relationship_tiers.findMany({
+      where: {
+        matches: {
+          OR: [{ user1_id: userId }, { user2_id: userId }],
+          status: 'accepted',
+        },
+      },
+      take: 50,
+    });
+    const summary = tiers.map((t: any) => ({
+      match_id: Number(t.match_id),
+      current_tier: t.current_tier,
+      messages_exchanged: t.messages_exchanged || 0,
+      days_connected: t.days_connected || 0,
+      has_met_in_person: t.has_met_in_person || false,
+    }));
+    const tierCounts: Record<string, number> = {};
+    for (const t of summary) {
+      tierCounts[t.current_tier] = (tierCounts[t.current_tier] || 0) + 1;
+    }
+    res.json({
+      tiers: summary,
+      total: summary.length,
+      tier_counts: tierCounts,
+    });
+  } catch (err: any) {
+    res.json({ tiers: [], total: 0, tier_counts: {} });
+  }
+});
+
 export default router;

@@ -138,6 +138,7 @@ app.use('/api/telemetry', telemetryRoutes);
 app.use('/api/physical-profile', physicalProfileRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/relationship-links', relationshipLinksRoutes);
+app.use('/api/relationship-tiers', matchesRoutes); // alias - tiers served from matches route
 app.use('/api/vouch', vouchRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/location', locationRoutes);
@@ -158,6 +159,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/proximity', proximityRoutes);
 app.use('/api/onboarding', onboardingRoutes);
 app.use('/api/video', videoRoutes);
+app.use('/api/video-calls', videoRoutes); // alias for frontend compatibility
 app.use('/api/referrals', referralsRoutes);
 app.use('/api/boosts', boostsRoutes);
 app.use('/api/content', contentGenerationRoutes);
