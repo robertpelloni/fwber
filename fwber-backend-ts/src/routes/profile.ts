@@ -1095,9 +1095,16 @@ router.get("/:id", authenticate, async (req: any, res) => {
 				})),
 				scene_summary: null,
 				journals: [],
-        completion_percentage: completenessData.percentage || 0,
-        profile_complete: completenessData.required_complete || false,
-        completion_status: { percentage: 0, required_complete: false, missing_required: [], missing_optional: [], sections: {} },
+      preferences: parseJsonField(p.preferences) || {},
+      completion_percentage: completenessData.percentage || 0,
+      profile_complete: completenessData.required_complete || false,
+      completion_status: completenessData,
+      verification: {
+        email_verified: !!user.email_verified_at,
+        is_verified: p.is_verified || false,
+        is_id_verified: p.is_id_verified || false,
+        verification_level: p.is_id_verified ? "full" : (p.is_verified ? "basic" : "none"),
+      },
 			},
 		});
 	} catch (error: any) {

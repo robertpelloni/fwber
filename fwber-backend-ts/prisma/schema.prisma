@@ -2175,6 +2175,7 @@ model video_calls {
 
 model viral_contents {
   id             String    @id @db.Char(36)
+  share_id  String?  @unique @db.VarChar(36)
   user_id        BigInt    @db.UnsignedBigInt
   type           String    @db.VarChar(255)
   content        Json
