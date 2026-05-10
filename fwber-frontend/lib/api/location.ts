@@ -31,6 +31,7 @@ export interface NearbyUser {
   age?: number;
   gender?: string;
   distance_meters?: number | null;
+  distance_miles?: number | null;
   ranking_score?: number | null;
   scene_signals?: {
     headline?: string;
@@ -49,6 +50,7 @@ export interface NearbyUser {
     accuracy?: number;
     distance: string;
     distance_meters?: number | null;
+    distance_miles?: number | null;
     last_updated: string;
   };
   privacy_level: 'public' | 'friends' | 'private';

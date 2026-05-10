@@ -208,7 +208,7 @@ export default function NearbyPage() {
 
             <div className="mb-6">
               <label htmlFor="radius" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Search Radius: {radius}m
+                Search Radius: {(radius / 1609.34).toFixed(1)}mi
               </label>
               <input
                 type="range"
@@ -335,7 +335,7 @@ export default function NearbyPage() {
                         {user.gender && (
                           <p><strong>Gender:</strong> {user.gender}</p>
                         )}
-                        <p><strong>Distance:</strong> {user.location.distance}</p>
+                        <p><strong>Distance:</strong> {user.distance_miles ?? user.location.distance_miles ? `${user.distance_miles ?? user.location.distance_miles} mi` : user.location.distance}</p>
                         <p><strong>Last seen:</strong> {formatLastSeen(user.location.last_updated)}</p>
                       </div>
                     </div>
@@ -359,7 +359,7 @@ export default function NearbyPage() {
 
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Found {nearbyUsers.length} people within {radius}m of your location
+                Found {nearbyUsers.length} people within {(radius / 1609.34).toFixed(1)}mi of your location
               </p>
             </div>
           </div>
