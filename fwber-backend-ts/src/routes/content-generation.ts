@@ -166,4 +166,57 @@ router.get('/optimization-stats', (_req, res) => {
   res.json({ success: true, data: { optimization_score: 0, suggestions: [] } });
 });
 
+// POST /api/content-generation/generate-starters
+// POST /api/content/generate-starters (alias)
+router.post('/generate-starters', async (req: any, res) => {
+  const userId = BigInt(req.user.id);
+  const { match_name, match_interests, context, content_type } = req.body;
+  try {
+    const systemPrompt = `You are a dating conversation expert. Generate 5 creative conversation starters. Always respond with valid JSON: { "suggestions": [{ "content": "the starter text", "provider": "ai", "confidence": 0.9 }] }`;
+    const userPrompt = `Generate conversation starters for someone messaging ${match_name || 'a match'}. Their interests: ${Array.isArray(match_interests) ? match_interests.join(', ') : match_interests || 'various'}. Context: ${context || 'first message'}`;
+
+    const result = await ai.generateText(systemPrompt, userPrompt);
+    if (!result) {
+      // Fallback starters
+      const fallbackStarters = [
+        `So I noticed you're into ${Array.isArray(match_interests) ? match_interests[0] || 'interesting things' : 'interesting things'}! What got you into that?`,
+        "What's the best thing that happened to you this week?",
+        "I've been meaning to try something new in the city — any recommendations?",
+        `If you could only do one activity this weekend, what would it be?`,
+        "What's a hobby you've always wanted to pick up but haven't yet?",
+      ];
+      return res.json({
+        success: true,
+        data: {
+          suggestions: fallbackStarters.map((s, i) => ({
+            content: s,
+            provider: 'fallback',
+            confidence: 0.5,
+            safety_score: 0.99,
+            type: content_type || 'conversation_starter',
+          })),
+        },
+        user_id: req.user.id,
+        generated_at: new Date().toISOString(),
+      });
+    }
+    let parsed;
+    try { parsed = JSON.parse(result); } catch {
+      parsed = { suggestions: [{ content: result, provider: 'ai', confidence: 0.8, safety_score: 0.99 }] };
+    }
+    res.json({ success: true, data: parsed, user_id: req.user.id, generated_at: new Date().toISOString() });
+  } catch (error: any) {
+    console.error('[GENERATE_STARTERS_ERROR]', error.message);
+    res.json({
+      success: true,
+      data: { suggestions: [{ content: "Hey! What brings you to the app today?", provider: 'fallback', confidence: 0.3, safety_score: 0.99 }] },
+      user_id: req.user.id,
+      generated_at: new Date().toISOString(),
+    });
+  }
+});
+
+// POST /api/content/generate-starters (alias without content-generation prefix)
+// Note: This is registered as a separate route in the main app
+
 export default router;
