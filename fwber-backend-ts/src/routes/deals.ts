@@ -38,6 +38,7 @@ router.get('/', authenticate, async (req: any, res) => {
         original_price: Math.round(originalPrice * 100) / 100,
         deal_price: dealPrice,
         discount_percent: Math.round((1 - dealPrice / originalPrice) * 100),
+        discount: Math.round((1 - dealPrice / originalPrice) * 100) + '% off',
         merchant_name: item.merchant_profiles?.business_name || 'Unknown',
         merchant_address: item.merchant_profiles?.address || null,
         category: item.merchant_profiles?.category || 'general',
