@@ -144,7 +144,7 @@ export class AuthController {
 
       // Send verification email
       try {
-        const verificationToken = createVerificationToken(user.id, user.email);
+        const verificationToken = await createVerificationToken(user.id, user.email);
         await sendVerificationEmail(user.email, verificationToken);
       } catch (err) {
         console.error('[Auth] Failed to send initial verification email:', err);
