@@ -52,4 +52,63 @@ router.post('/submit', authenticate, async (req: any, res) => {
   }
 });
 
+// GET /api/vouch — list vouches for current user (received and given)
+router.get('/', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const [received, given] = await Promise.all([
+      prisma.vouches.findMany({
+        where: { to_user_id: userId },
+        include: {
+          users_vouches_from_user_idTousers: {
+            select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          },
+        },
+        orderBy: { id: 'desc' },
+        take: 50,
+      }),
+      prisma.vouches.findMany({
+        where: { from_user_id: userId },
+        include: {
+          users_vouches_to_user_idTousers: {
+            select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          },
+        },
+        orderBy: { id: 'desc' },
+        take: 50,
+      }),
+    ]);
+
+    const serializeVouch = (v: any, direction: 'received' | 'given') => {
+      const relatedUser = direction === 'received'
+        ? v.users_vouches_from_user_idTousers
+        : v.users_vouches_to_user_idTousers;
+      const profile = relatedUser?.user_profiles?.[0];
+      return {
+        id: Number(v.id),
+        type: v.type,
+        comment: v.comment,
+        voucher_name: v.voucher_name || profile?.display_name || relatedUser?.name || 'Anonymous',
+        direction,
+        user: {
+          id: Number(relatedUser?.id || 0),
+          name: profile?.display_name || relatedUser?.name || 'Unknown',
+          avatar_url: profile?.avatar_url || null,
+        },
+        created_at: v.created_at?.toISOString(),
+      };
+    };
+
+    res.json({
+      received: received.map((v: any) => serializeVouch(v, 'received')),
+      given: given.map((v: any) => serializeVouch(v, 'given')),
+      total_received: received.length,
+      total_given: given.length,
+    });
+  } catch (error: any) {
+    console.error('[Vouch] GET error:', error.message);
+    res.json({ received: [], given: [], total_received: 0, total_given: 0 });
+  }
+});
+
 export default router;

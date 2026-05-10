@@ -201,4 +201,51 @@ router.post('/cancel', authenticate, async (req: any, res) => {
   }
 });
 
+
+// GET /api/premium/plans — list available premium plans
+router.get('/plans', async (req: any, res) => {
+  res.json({
+    plans: [
+      {
+        id: 'gold',
+        name: 'Gold',
+        price: 19.99,
+        currency: 'USD',
+        interval: 'month',
+        token_price: 200,
+        features: ['unlimited_swipes', 'who_likes_you', 'boost_multiplier', 'advanced_filters', 'travel_mode', 'incognito_mode'],
+        feature_labels: {
+          unlimited_swipes: 'Unlimited Likes',
+          who_likes_you: 'See Who Likes You',
+          boost_multiplier: 'Boost Multiplier',
+          advanced_filters: 'Advanced Filters',
+          travel_mode: 'Travel Mode',
+          incognito_mode: 'Incognito Mode',
+        },
+        popular: true,
+      },
+      {
+        id: 'platinum',
+        name: 'Platinum',
+        price: 39.99,
+        currency: 'USD',
+        interval: 'month',
+        token_price: 400,
+        features: ['unlimited_swipes', 'who_likes_you', 'boost_multiplier', 'advanced_filters', 'travel_mode', 'incognito_mode', 'priority_likes', 'message_before_match'],
+        feature_labels: {
+          unlimited_likes: 'Unlimited Likes',
+          who_likes_you: 'See Who Likes You',
+          boost_multiplier: 'Boost Multiplier',
+          advanced_filters: 'Advanced Filters',
+          travel_mode: 'Travel Mode',
+          incognito_mode: 'Incognito Mode',
+          priority_likes: 'Priority Likes',
+          message_before_match: 'Message Before Match',
+        },
+        popular: false,
+      },
+    ],
+  });
+});
+
 export default router;
