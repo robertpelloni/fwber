@@ -10,13 +10,28 @@ const router = Router();
 function serialize(obj: any): any {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === 'bigint') return Number(obj);
-  if (obj instanceof Date) return obj;
-  if (Array.isArray(obj)) return obj.map((v: any) => serialize(v));
+  if (Array.isArray(obj)) return obj.map(serialize);
   if (typeof obj === 'object') {
-    const out: any = {};
-    for (const key of Object.keys(obj)) {
-      out[key] = serialize(obj[key]);
+    // Detect Prisma Decimal by {s, e, d} signature
+    if (obj.s !== undefined && obj.e !== undefined && Array.isArray(obj.d)) {
+      try {
+        const parts: string[] = [];
+        for (let i = 0; i < obj.d.length; i++) {
+          const d = String(obj.d[i]);
+          parts.push(i === 0 ? d : d.padStart(7, '0'));
+        }
+        const digitStr = parts.join('');
+        const intDigits = obj.e + 1;
+        const sign = obj.s === -1 ? '-' : '';
+        if (digitStr.length <= intDigits) {
+          return parseFloat(sign + digitStr + '0'.repeat(intDigits - digitStr.length));
+        }
+        return parseFloat(sign + digitStr.slice(0, intDigits) + '.' + digitStr.slice(intDigits));
+      } catch { return 0; }
     }
+    if (obj instanceof Date) return obj.toISOString();
+    const out: any = {};
+    for (const key of Object.keys(obj)) out[key] = serialize(obj[key]);
     return out;
   }
   return obj;

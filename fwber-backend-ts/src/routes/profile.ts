@@ -334,18 +334,37 @@ router.post("/", authenticate, async (req: any, res) => {
 
 // Helper: recursively convert BigInt to Number for JSON serialization
 function serialize(obj: any): any {
-	if (obj === null || obj === undefined) return obj;
-	if (typeof obj === "bigint") return Number(obj);
-	if (obj instanceof Date) return obj;
-	if (Array.isArray(obj)) return obj.map((v: any) => serialize(v));
-	if (typeof obj === "object") {
-		const out: any = {};
-		for (const key of Object.keys(obj)) {
-			out[key] = serialize(obj[key]);
-		}
-		return out;
-	}
-	return obj;
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === "bigint") return Number(obj);
+  if (typeof obj === "number" && isNaN(obj)) return null;
+  if (obj instanceof Date) return obj;
+  if (Array.isArray(obj)) return obj.map((v: any) => serialize(v));
+  if (typeof obj === "object") {
+    // Detect Prisma Decimal by {s, e, d} signature
+    if (obj.s !== undefined && obj.e !== undefined && Array.isArray(obj.d)) {
+      try {
+        // First digit group is unpadded, subsequent are zero-padded to 7 digits
+        const parts: string[] = [];
+        for (let i = 0; i < obj.d.length; i++) {
+          const d = String(obj.d[i]);
+          parts.push(i === 0 ? d : d.padStart(7, '0'));
+        }
+        const digitStr = parts.join('');
+        const intDigits = obj.e + 1;
+        const sign = obj.s === -1 ? '-' : '';
+        if (digitStr.length <= intDigits) {
+          return parseFloat(sign + digitStr + '0'.repeat(intDigits - digitStr.length));
+        }
+        return parseFloat(sign + digitStr.slice(0, intDigits) + '.' + digitStr.slice(intDigits));
+      } catch { return 0; }
+    }
+    const out: any = {};
+    for (const key of Object.keys(obj)) {
+      out[key] = serialize(obj[key]);
+    }
+    return out;
+  }
+  return obj;
 }
 
 // Helper: safely parse JSON fields that may already be objects or strings
