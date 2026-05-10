@@ -57,13 +57,16 @@ router.get('/', async (req: any, res) => {
 
       conversations.push({
         id: key,
-        other_user: {
-          id: partnerId,
-          profile: {
-            display_name: partner?.display_name || 'Unknown',
-            photos: partner?.avatar_url ? [{ url: partner.avatar_url }] : [],
+          other_user: {
+            id: partnerId,
+            email: '',
+            profile: {
+              display_name: partner?.display_name || 'Unknown',
+              age: null,
+              current_emotion: null,
+              photos: partner?.avatar_url ? [{ "id": 0, "url": partner.avatar_url, "is_private": false, "is_primary": true }] : [],
+            },
           },
-        },
         last_message: {
           content: msg.content,
           created_at: msg.sent_at?.toISOString(),
@@ -93,10 +96,10 @@ router.get('/conversations', async (req: any, res) => {
       },
       include: {
         users_matches_user1_idTousers: {
-          select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
         },
         users_matches_user2_idTousers: {
-          select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
         },
       },
       take: 50,
@@ -142,10 +145,12 @@ router.get('/conversations', async (req: any, res) => {
         other_user: {
           id: Number(otherUser?.id || 0),
           name: otherUser?.name || 'Unknown',
+          email: otherUser?.email || '',
           profile: {
             display_name: profile?.display_name || otherUser?.name || 'Unknown',
             age: null,
-            photos: profile?.avatar_url ? [{ id: 0, url: profile.avatar_url, is_private: false, is_primary: true }] : [],
+            current_emotion: null,
+            photos: profile?.avatar_url ? [{ "id": 0, "url": profile.avatar_url, "is_private": false, "is_primary": true }] : [],
           },
         },
         last_message: lastMsg ? {
