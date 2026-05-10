@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { createNotification } from './notifications.js';
+import { pushMatchNotification, pushNotification } from '../socket.js';
 import { filePathToUrl } from '../lib/photos.js';
 import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
@@ -222,6 +223,12 @@ router.post('/action', authenticate, async (req: any, res) => {
       const targetName = (await prisma.users.findUnique({ where: { id: targetId }, select: { name: true } }))?.name || 'Someone';
       await createNotification(targetId, 'New Match!', `You matched with ${userName}!`);
       await createNotification(userId, 'New Match!', `You matched with ${targetName}!`);
+      // Push real-time match notification via Socket.io
+      pushMatchNotification(Number(userId), Number(targetId), {
+        type: 'new_match',
+        message: "It's a match!",
+        match_id: Number(existingLike.id),
+      });
 
 // Check achievements for both users (first match, etc.)
         checkAndUnlockAchievements(userId).catch(() => {});
