@@ -4,6 +4,56 @@ import prisma from '../lib/prisma.js';
 
 const router = Router();
 router.use(authenticate);
+// GET /api/settings/privacy — get all privacy settings
+router.get('/privacy', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const profile = await prisma.user_profiles.findFirst({
+      where: { user_id: userId },
+      select: {
+        journal_circle_group_id: true,
+        is_federated: true,
+        is_travel_mode: true,
+        is_incognito: true,
+      },
+    });
+    res.json({
+      is_incognito: profile?.is_incognito || false,
+      is_travel_mode: profile?.is_travel_mode || false,
+      is_federated: profile?.is_federated || false,
+      journal_privacy: profile?.journal_circle_group_id ? 'circle' : 'private',
+      profile_visibility: 'all',
+      show_online_status: true,
+      show_distance: true,
+      show_last_seen: true,
+      allow_message_requests: true,
+      allow_profile_views: true,
+      data_export_enabled: true,
+    });
+  } catch (error: any) {
+    console.error('[Settings] Privacy error:', error.message);
+    res.json({});
+  }
+});
+
+// PUT /api/settings/privacy — update privacy settings
+router.put('/privacy', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { is_incognito, is_travel_mode, show_online_status, show_distance, allow_message_requests } = req.body;
+    const updates: any = {};
+    if (is_incognito !== undefined) updates.is_incognito = Boolean(is_incognito);
+    if (is_travel_mode !== undefined) updates.is_travel_mode = Boolean(is_travel_mode);
+    if (Object.keys(updates).length > 0) {
+      await prisma.user_profiles.updateMany({ where: { user_id: userId }, data: updates });
+    }
+    res.json({ success: true, updated: Object.keys(req.body) });
+  } catch (error: any) {
+    console.error('[Settings] Privacy update error:', error.message);
+    res.json({ success: false });
+  }
+});
+
 
 // GET /api/settings/privacy/journals — get journal privacy settings
 router.get('/privacy/journals', async (req: any, res) => {
