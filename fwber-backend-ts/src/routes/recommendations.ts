@@ -360,12 +360,22 @@ function buildRecommendation(u: any, p: any, myInterests: string[], myLookingFor
     distanceMeters = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 1000);
   }
 
-  // Score: base 30 + shared interests (15 each) + distance bonus + verified bonus
+  // Score: base 30 + shared interests (12 each, max 48) + distance + verified + looking_for + profile completeness
   let score = 30;
-  score += shared.length * 15;
-  if (distanceMeters > 0 && distanceMeters < 5000) score += 10;
+  score += Math.min(shared.length * 12, 48); // shared interests
+  if (distanceMeters > 0 && distanceMeters < 5000) score += 8;
   if (distanceMeters > 0 && distanceMeters < 1000) score += 5;
   if (p.is_verified) score += 5;
+  if (p.is_id_verified) score += 3;
+  // Looking-for overlap bonus
+  const theirLookingFor: string[] = parseJsonArray(p.looking_for);
+  const lookingOverlap = myLookingFor.filter(lf => theirLookingFor.includes(lf));
+  if (lookingOverlap.length > 0) score += 8;
+  // Profile completeness bonus
+  if (p.bio && p.bio.length > 20) score += 3;
+  if (p.avatar_url) score += 3;
+  // Activity bonus (recently active)
+  if (u.last_seen_at && (Date.now() - new Date(u.last_seen_at).getTime()) < 86400000) score += 3;
   score = Math.min(99, score);
 
   let reason = 'Recommended for you';
