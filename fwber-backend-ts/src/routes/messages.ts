@@ -277,39 +277,45 @@ router.post('/', upload.single('media'), async (req: any, res) => {
       },
     });
 
-    // Auto-accept the match when first message is sent
-    try {
-      const receiverBigId = BigInt(receiver_id);
-      await prisma.matches.updateMany({
-        where: {
-          OR: [
-            { user1_id: userId, user2_id: receiverBigId },
-            { user1_id: receiverBigId, user2_id: userId },
-          ],
-          status: 'pending',
-        },
+
+  // Auto-accept or create the match when first message is sent
+  try {
+    const receiverBigId = BigInt(receiver_id);
+    // Check if a match exists between these users
+    const existingMatch = await prisma.matches.findFirst({
+      where: {
+        OR: [
+          { user1_id: userId, user2_id: receiverBigId },
+          { user1_id: receiverBigId, user2_id: userId },
+        ],
+      },
+    });
+    if (existingMatch) {
+      // Auto-accept if pending, update last_message_at
+      await prisma.matches.update({
+        where: { id: existingMatch.id },
         data: {
-          status: 'accepted',
+          status: existingMatch.status === 'pending' ? 'accepted' : existingMatch.status,
           last_message_at: new Date(),
         },
       });
-    } catch (_) {}
-
-    // Also update last_message_at for the match
-    try {
-      const receiverBigId = BigInt(receiver_id);
-      await prisma.matches.updateMany({
-        where: {
-          OR: [
-            { user1_id: userId, user2_id: receiverBigId },
-            { user1_id: receiverBigId, user2_id: userId },
-          ],
+    } else {
+      // No match exists — create one so the conversation is visible
+      await prisma.matches.create({
+        data: {
+          user1_id: userId < receiverBigId ? userId : receiverBigId,
+          user2_id: userId < receiverBigId ? receiverBigId : userId,
+          match_score: 50,
+          status: 'accepted',
+          is_active: true,
+          last_message_at: new Date(),
         },
-        data: { last_message_at: new Date() },
       });
-    } catch (_) {}
+    }
+  } catch (matchErr: any) {
+    console.warn('[Messages] Match auto-create error:', matchErr.message);
+  }
 
-    // Check achievements (first message, etc.)
     checkAndUnlockAchievements(userId).catch(() => {});
 
     res.json({ success: true, message: serializeMessage(message) });
