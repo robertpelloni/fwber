@@ -145,6 +145,9 @@ router.get('/conversations', async (req: any, res) => {
         other_user: {
           id: Number(otherUser?.id || 0),
           name: otherUser?.name || 'Unknown',
+        display_name: profile?.display_name || otherUser?.name || 'Unknown',
+        avatar_url: profile?.avatar_url || null,
+        is_online: otherUser?.last_seen_at ? (Date.now() - new Date(otherUser.last_seen_at).getTime() < 5 * 60 * 1000) : false,
           email: otherUser?.email || '',
           profile: {
             display_name: profile?.display_name || otherUser?.name || 'Unknown',
