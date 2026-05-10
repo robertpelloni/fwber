@@ -34,7 +34,49 @@ router.get('/count', authenticate, async (req: any, res) => {
   }
 });
 
-// GET /api/notifications
+
+
+// GET /api/notifications/unread-count — alias for /count
+router.get('/unread-count', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const unread = await prisma.notifications.count({
+      where: { user_id: userId, read_at: null },
+    });
+    res.json({ count: Number(unread), unread_count: Number(unread) });
+  } catch {
+    res.json({ count: 0, unread_count: 0 });
+  }
+});
+
+// PUT /api/notifications/mark-read — PUT variant (frontend may use PUT)
+router.put('/mark-read', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    await prisma.notifications.updateMany({
+      where: { user_id: userId, read_at: null },
+      data: { read_at: new Date() },
+    });
+    res.json({ success: true });
+  } catch {
+    res.json({ success: true });
+  }
+});
+
+// GET /api/notifications/preferences — alias for notification-preferences
+router.get('/preferences', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const prefs = await prisma.notification_preferences.findMany({
+      where: { user_id: userId },
+    });
+    res.json({ preferences: prefs.map((p: any) => serialize(p)) });
+  } catch {
+    res.json({ preferences: [] });
+  }
+});
+
+// GET /api/notifications/:id — get single notification
 router.get('/', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);

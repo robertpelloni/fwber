@@ -40,18 +40,19 @@ router.get('/', async (req: any, res) => {
 router.post('/', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { accused_id, reason, details, message_id } = req.body;
+    const { accused_id, reported_user_id, reason, details, description, message_id } = req.body;
 
-    if (!accused_id || !reason) {
+    const targetId = accused_id || reported_user_id;
+    if (!targetId || !reason) {
       return res.status(400).json({ message: 'accused_id and reason are required' });
     }
 
     const report = await prisma.reports.create({
       data: {
         reporter_id: userId,
-        accused_id: BigInt(accused_id),
+        accused_id: BigInt(targetId),
         reason,
-        details: details || null,
+        details: details || description || null,
         message_id: message_id ? BigInt(message_id) : null,
         status: 'open',
       },

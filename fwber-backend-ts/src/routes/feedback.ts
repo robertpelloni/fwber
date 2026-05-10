@@ -34,17 +34,18 @@ router.get('/', async (req: any, res) => {
 router.post('/', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { category, message, page_url, metadata } = req.body;
+    const { category, message, content, type, page_url, metadata } = req.body;
 
-    if (!message) {
+    const feedbackMessage = message || content || '';
+    if (!feedbackMessage) {
       return res.status(400).json({ message: 'Message is required' });
     }
 
     const feedback = await prisma.feedback.create({
       data: {
         user_id: userId,
-        category: category || 'general',
-        message,
+        category: category || type || 'general',
+        message: feedbackMessage,
         page_url: page_url || null,
         metadata: metadata || null,
         status: 'new',

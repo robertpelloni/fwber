@@ -53,6 +53,80 @@ router.get('/', authenticate, async (req: any, res) => {
   }
 });
 
+// GET /api/gifts/received - Get gifts received by current user
+router.get('/received', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const received = await prisma.user_gifts.findMany({
+      where: { receiver_id: userId },
+      include: {
+        gifts: true,
+        users_user_gifts_sender_idTousers: {
+          select: { name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+        },
+      },
+      orderBy: { created_at: 'desc' },
+      take: 50,
+    });
+    res.json(received.map((g: any) => {
+      const sender = g.users_user_gifts_sender_idTousers;
+      const senderProfile = Array.isArray(sender?.user_profiles) ? sender.user_profiles[0] : sender?.user_profiles;
+      return {
+        id: Number(g.id),
+        gift_id: Number(g.gift_id),
+        gift_name: g.gifts?.name || 'Gift',
+        gift_emoji: giftEmoji(g.gifts),
+        cost_at_time: Number(g.cost_at_time) || 0,
+        message: g.message || '',
+        from_user_id: Number(g.sender_id),
+        from_name: senderProfile?.display_name || sender?.name || 'Anonymous',
+        from_avatar_url: senderProfile?.avatar_url || null,
+        created_at: g.created_at ? new Date(g.created_at).toISOString() : null,
+      };
+    }));
+  } catch (error: any) {
+    console.error('[Gifts] Received error:', error.message);
+    res.json([]);
+  }
+});
+
+// GET /api/gifts/sent - Get gifts sent by current user
+router.get('/sent', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const sent = await prisma.user_gifts.findMany({
+      where: { sender_id: userId },
+      include: {
+        gifts: true,
+        users_user_gifts_receiver_idTousers: {
+          select: { name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+        },
+      },
+      orderBy: { created_at: 'desc' },
+      take: 50,
+    });
+    res.json(sent.map((g: any) => {
+      const receiver = g.users_user_gifts_receiver_idTousers;
+      const receiverProfile = Array.isArray(receiver?.user_profiles) ? receiver.user_profiles[0] : receiver?.user_profiles;
+      return {
+        id: Number(g.id),
+        gift_id: Number(g.gift_id),
+        gift_name: g.gifts?.name || 'Gift',
+        gift_emoji: giftEmoji(g.gifts),
+        cost_at_time: Number(g.cost_at_time) || 0,
+        message: g.message || '',
+        to_user_id: Number(g.receiver_id),
+        to_name: receiverProfile?.display_name || receiver?.name || 'Anonymous',
+        to_avatar_url: receiverProfile?.avatar_url || null,
+        created_at: g.created_at ? new Date(g.created_at).toISOString() : null,
+      };
+    }));
+  } catch (error: any) {
+    console.error('[Gifts] Sent error:', error.message);
+    res.json([]);
+  }
+});
+
 // GET /api/gifts/available - Get available gifts to send
 router.get('/available', authenticate, async (req: any, res) => {
   try {
