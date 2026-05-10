@@ -73,12 +73,23 @@ router.get('/available', authenticate, async (req: any, res) => {
 // POST /api/gifts/send - Send a gift
 router.post('/send', authenticate, async (req: any, res) => {
   try {
-    const { recipient_id, receiver_id, gift_id, message } = req.body;
+    const { recipient_id, receiver_id, gift_id, gift_type, message } = req.body;
     const senderId = BigInt(req.user.id);
     const receiverId = BigInt(recipient_id || receiver_id);
-    const giftId = BigInt(gift_id);
 
-    const gift = await prisma.gifts.findUnique({ where: { id: giftId } });
+    // Find gift by ID or by type/name
+    let gift: any;
+    if (gift_id) {
+      gift = await prisma.gifts.findUnique({ where: { id: BigInt(gift_id) } });
+    } else if (gift_type) {
+      const nameMap: Record<string, string> = {
+        coffee: "Coffee", rose: "Rose", cocktail: "Cocktail",
+        teddy: "Teddy Bear", teddy_bear: "Teddy Bear",
+        rocket: "Rocket", diamond: "Diamond",
+      };
+      const giftName = nameMap[gift_type.toLowerCase()] || gift_type;
+      gift = await prisma.gifts.findFirst({ where: { name: giftName } });
+    }
     if (!gift) return res.status(404).json({ error: 'Gift not found' });
 
     // Check balance
@@ -93,7 +104,7 @@ router.post('/send', authenticate, async (req: any, res) => {
         data: {
           sender_id: senderId,
           receiver_id: receiverId,
-          gift_id: giftId,
+          gift_id: gift.id,
           message: message || '',
           cost_at_time: gift.cost,
         }
