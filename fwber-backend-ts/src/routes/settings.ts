@@ -160,4 +160,129 @@ router.get('/', async (req: any, res) => {
   }
 });
 
+
+// GET /api/settings/account
+router.get('/account', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: {
+        name: true, email: true, email_verified_at: true,
+        two_factor_secret: true, two_factor_confirmed_at: true,
+        is_moderator: true, created_at: true, last_seen_at: true,
+      },
+    });
+    res.json({
+      name: user?.name || '',
+      email: user?.email || '',
+      email_verified: !!user?.email_verified_at,
+      two_factor_enabled: !!user?.two_factor_confirmed_at,
+      is_moderator: user?.is_moderator || false,
+      created_at: user?.created_at?.toISOString() || null,
+      last_seen_at: user?.last_seen_at?.toISOString() || null,
+      phone_number: null,
+      linked_accounts: [],
+    });
+  } catch (error: any) {
+    res.json({ name: '', email: '', email_verified: false });
+  }
+});
+
+// PUT /api/settings/account
+router.put('/account', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { name, email } = req.body || {};
+    const data: any = {};
+    if (name) data.name = name;
+    if (email) data.email = email;
+    if (Object.keys(data).length > 0) {
+      await prisma.users.update({ where: { id: userId }, data });
+    }
+    res.json({ success: true, updated: Object.keys(data) });
+  } catch (error: any) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/settings/security
+router.get('/security', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: {
+        two_factor_secret: true, two_factor_confirmed_at: true,
+        email: true, email_verified_at: true,
+      },
+    });
+    res.json({
+      two_factor_enabled: !!user?.two_factor_confirmed_at,
+      two_factor_method: user?.two_factor_confirmed_at ? 'app' : null,
+      email_verified: !!user?.email_verified_at,
+      password_set: true,
+      login_notifications: true,
+      session_timeout_minutes: 60,
+      active_sessions: [],
+      recovery_codes_generated: false,
+    });
+  } catch (error: any) {
+    res.json({ two_factor_enabled: false, email_verified: false, password_set: true });
+  }
+});
+
+// GET /api/settings/notifications
+router.get('/notifications', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const prefs = await prisma.notification_preferences.findMany({
+      where: { user_id: userId },
+    });
+    res.json({
+      preferences: prefs.map((p: any) => ({
+        type: p.type || p.notification_type,
+        mail: !!p.mail,
+        push: !!p.push,
+        in_app: (p.in_app !== false),
+      })),
+      quiet_hours_start: null,
+      quiet_hours_end: null,
+      digest_frequency: 'daily',
+    });
+  } catch (error: any) {
+    res.json({ preferences: [], digest_frequency: 'daily' });
+  }
+});
+
+// GET /api/settings/subscription
+router.get('/subscription', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const subs = await prisma.subscriptions.findMany({
+      where: { user_id: userId },
+      take: 1,
+      orderBy: { created_at: 'desc' },
+    });
+    const sub = subs[0] as any;
+    const planType = sub?.name?.toLowerCase() || 'free';
+    const isActive = !!sub && sub.stripe_status === 'active';
+    res.json({
+      is_premium: isActive,
+      plan: planType,
+      status: isActive ? 'active' : (sub ? 'expired' : 'none'),
+      started_at: sub?.created_at?.toISOString() || null,
+      expires_at: sub?.ends_at?.toISOString() || null,
+      auto_renew: sub?.trial_ends_at ? true : false,
+      features: planType.includes('gold')
+        ? ['who_liked_you', 'unlimited_likes', 'boost_monthly', 'see_admirers', 'advanced_filters', 'read_receipts', 'undo_pass']
+        : planType.includes('silver')
+        ? ['who_liked_you', 'boost_monthly', 'advanced_filters']
+        : [],
+    });
+  } catch (error: any) {
+    res.json({ is_premium: false, plan: 'free', status: 'none', features: [] });
+  }
+});
+
 export default router;
