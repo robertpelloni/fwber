@@ -839,6 +839,72 @@ router.get("/search", authenticate, async (req: any, res) => {
 	}
 });
 
+// POST /api/profile/:id/view - Record a profile view
+router.post("/:id/view", authenticate, async (req: any, res) => {
+  try {
+    const targetUserId = BigInt(req.params.id);
+    const viewerUserId = BigInt(req.user.id);
+    const viewerIp: string = ((req.headers["x-forwarded-for"] as string) || (req.socket as any)?.remoteAddress || "unknown" || "").toString().split(",")[0].trim();
+
+    if (targetUserId === viewerUserId) {
+      return res.json({ recorded: false, message: "Self-views not recorded" });
+    }
+
+    // Record the profile view
+    try {
+      await prisma.profile_views.create({
+        data: {
+          viewed_user_id: targetUserId,
+          viewer_user_id: viewerUserId,
+          viewer_ip: viewerIp,
+          user_agent: String(req.headers["user-agent"] || "").substring(0, 255),
+        },
+      });
+    } catch {
+      // Already viewed (unique constraint) — silently ignore
+    }
+
+    res.json({ recorded: true });
+  } catch (error: any) {
+    console.error("[POST /api/profile/:id/view]", error.message);
+    res.json({ recorded: false });
+  }
+});
+
+// GET /api/profile/views - Current user's profile view history (shortcut)
+router.get("/views", authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const views = await prisma.profile_views.findMany({
+      where: { viewed_user_id: userId },
+      orderBy: { created_at: "desc" },
+      take: 50,
+      include: {
+        users_profile_views_viewer_user_idTousers: {
+          select: { name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+        },
+      },
+    });
+    const serializedViews = views.map((v: any) => {
+      const viewer = v.users_profile_views_viewer_user_idTousers;
+      const profile = Array.isArray(viewer?.user_profiles) ? viewer.user_profiles[0] : viewer?.user_profiles;
+      return {
+        id: Number(v.id),
+        viewer_user_id: Number(v.viewer_user_id),
+        viewed_user_id: Number(v.viewed_user_id),
+        viewer_name: profile?.display_name || viewer?.name || "Anonymous",
+        viewer_avatar_url: profile?.avatar_url || null,
+        viewed_at: v.created_at ? new Date(v.created_at).toISOString() : null,
+        viewer_ip: v.viewer_ip || null,
+      };
+    });
+    res.json({ views: serializedViews, total: serializedViews.length });
+  } catch (error: any) {
+    console.error("[GET /api/profile/views]", error.message);
+    res.json({ views: [], total: 0 });
+  }
+});
+
 // GET /api/profile/:id/views - Profile view history
 router.get("/:id/views", authenticate, async (req: any, res) => {
 	try {
