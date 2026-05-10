@@ -73,6 +73,7 @@ import configRoutes from './routes/config.js';
 import healthRoutes from './routes/health.js';
 import iceBreakersRoutes from './routes/ice-breakers.js';
 import settingsRoutes from './routes/settings.js';
+import trustScoreRoutes from './routes/trust-score.js';
 import prisma from './lib/prisma.js';
 import { setupSocketIO } from './socket.js';
 
@@ -139,6 +140,7 @@ app.use('/api/physical-profile', physicalProfileRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/relationship-links', relationshipLinksRoutes);
 app.use('/api/relationship-tiers', matchesRoutes); // alias - tiers served from matches route
+app.use('/api/trust-score', trustScoreRoutes);
 app.use('/api/vouch', vouchRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/location', locationRoutes);

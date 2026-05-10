@@ -2199,6 +2199,18 @@ model viral_contents {
   @@index([user_id], map: "viral_contents_user_id_foreign")
 }
 
+model trust_scores {
+  user_id    BigInt   @id @db.UnsignedBigInt
+  score      Decimal  @db.Decimal(5, 2)
+  level      String   @db.VarChar(32)
+  factors    Json?
+  updated_at DateTime @updatedAt @db.Timestamp(0)
+
+
+  @@index([score])
+  @@index([level])
+}
+
 model vouches {
   id                                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   to_user_id                        BigInt    @db.UnsignedBigInt
