@@ -95,6 +95,28 @@ router.get('/stats', async (req: any, res) => {
 
     const completionPercentage = await calculateCompleteness(userId, profile);
 
+  // Calculate match score average and response rate
+  let matchScoreAvg = 50;
+  let responseRate = 0;
+  try {
+    const totalMatchCount = typeof totalMatches === 'number' ? totalMatches : 0;
+    const acceptedCount = typeof acceptedMatches === 'number' ? acceptedMatches : 0;
+    if (totalMatchCount > 0 && acceptedCount > 0) {
+      const acceptRate = (acceptedCount / totalMatchCount) * 100;
+      matchScoreAvg = Math.round(Math.min(99, (completionPercentage * 0.6) + (acceptRate * 0.4)));
+    } else {
+      matchScoreAvg = Math.round(completionPercentage * 0.8);
+    }
+    const receivedCount = await prisma.messages.count({ where: { receiver_id: userId } });
+    const sentCount = await prisma.messages.count({ where: { sender_id: userId } });
+    if (sentCount > 0) {
+      responseRate = Math.min(100, Math.round((receivedCount / sentCount) * 100));
+    } else if (receivedCount > 0) {
+      responseRate = 100;
+    }
+  } catch (_) {}
+
+
     res.json({
       total_matches: totalMatches,
       pending_matches: pendingMatches,
@@ -102,8 +124,8 @@ router.get('/stats', async (req: any, res) => {
       conversations,
       profile_views: typeof profileViews === 'number' ? profileViews : 0,
       today_views: typeof todayViews === 'number' ? todayViews : 0,
-      match_score_avg: 50,
-      response_rate: 0,
+      match_score_avg: matchScoreAvg,
+      response_rate: responseRate,
       days_active: daysActive,
       last_login: user?.last_seen_at?.toISOString() || new Date().toISOString(),
       current_streak: user?.current_streak || 0,
