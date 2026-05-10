@@ -43,7 +43,7 @@ router.get('/', async (req: any, res) => {
 router.post('/', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const rawId = req.body.user_id || req.body.blocked_id;
+    const rawId = req.body.user_id || req.body.blocked_id || req.body.blocked_user_id;
     if (!rawId) return res.status(400).json({ error: 'user_id or blocked_id is required' });
 
     let blockedId: bigint;

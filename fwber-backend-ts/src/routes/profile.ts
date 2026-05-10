@@ -1083,9 +1083,9 @@ router.get("/:id", authenticate, async (req: any, res) => {
     console.warn('[Profile] relationship_links query skipped:', e.message);
   }
 
-// Calculate completeness for /me requests
+// Calculate completeness for all profiles
 		let completenessData: any = { percentage: 0, required_complete: false, missing_required: [], missing_optional: [], sections: {} };
-		if (req.params.id === 'me' && profile) {
+		if (profile) {
 		  try {
 		    completenessData = await calculateProfileCompletenessSummary(targetUserId, profile);
 		  } catch (e: any) {
