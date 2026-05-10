@@ -326,16 +326,20 @@ router.get(['/established', '/accepted'], authenticate, async (req: any, res) =>
 
       return {
         id: Number(match.id),
+        status: match.status || 'accepted',
+        is_active: match.is_active || true,
         other_user: {
           id: Number(otherUser?.id),
           name: otherUser?.name || 'Anonymous',
           email: otherUser?.email || null,
           last_seen_at: otherUser?.last_seen_at?.toISOString() || null,
+          is_verified: profile.is_verified || false,
           profile: {
             display_name: profile.display_name || otherUser?.name || 'Anonymous',
             bio: profile.bio || null,
             date_of_birth: profile.date_of_birth?.toISOString() || null,
             gender: profile.gender || null,
+            age: profile.date_of_birth ? new Date().getFullYear() - new Date(profile.date_of_birth as any).getFullYear() : null,
             looking_for: profile.looking_for || [],
             location_latitude: profile.location_latitude
               ? Number(profile.location_latitude)
@@ -345,6 +349,8 @@ router.get(['/established', '/accepted'], authenticate, async (req: any, res) =>
               : null,
             location_description: profile.location_description || null,
             avatar_url: profile.avatar_url || null,
+            occupation: profile.occupation || null,
+            interests: profile.interests || [],
           },
           photos: (otherUser?.photos || []).map((p: any) => ({
             id: Number(p.id),
@@ -353,7 +359,7 @@ router.get(['/established', '/accepted'], authenticate, async (req: any, res) =>
             is_primary: p.is_primary || false,
           })),
         },
-        match_score: match.match_score,
+        match_score: match.match_score ? Number(match.match_score) : null,
         created_at: match.created_at?.toISOString() || null,
         last_message_at: match.last_message_at?.toISOString() || null,
       };
