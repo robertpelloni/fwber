@@ -65,6 +65,22 @@ router.get('/', async (req: any, res) => {
     const recommendations = results.slice(0, limit).map((r: any) => ({
       id: String(r.id),
       type: r.type || 'ai',
+      // Flat fields for easy frontend access
+      display_name: r.user?.name || r.user?.display_name || 'Anonymous',
+      name: r.user?.name || 'Anonymous',
+      bio: r.user?.bio || null,
+      gender: r.user?.gender || null,
+      age: r.user?.age || null,
+      location_description: r.user?.location_description || null,
+      is_verified: r.user?.is_verified || false,
+      avatar_url: r.user?.avatar_url || null,
+      distance: r.distance_meters || 0,
+      distance_miles: Math.round((r.distance_meters || 0) / 1609.34 * 10) / 10,
+      distance_meters: r.distance_meters || 0,
+      shared_interests: r.shared_interests || [],
+      photos: r.user?.photos || [],
+      compatibility_score: r.compatibility_score || 0,
+      // Nested content for backward compat
       content: {
         id: String(r.id),
         name: r.user?.name || 'Anonymous',

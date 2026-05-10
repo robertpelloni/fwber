@@ -148,6 +148,7 @@ router.get('/', authenticate, async (req: any, res) => {
       return {
         id: Number(u.id),
         name: p.display_name || u.name || 'Anonymous',
+        display_name: p.display_name || u.name || 'Anonymous',
         email: null,
         avatarUrl: p.avatar_url || null,
         bio: p.bio || null,
@@ -155,6 +156,7 @@ router.get('/', authenticate, async (req: any, res) => {
         distance: Math.round(distanceMeters * 0.000621371 * 10) / 10, // miles with 1 decimal
       distanceMeters,
         compatibilityScore: score,
+        score: score,
         lastSeenAt: u.last_seen_at?.toISOString() || null,
         age: theirAge,
         gender: theirGender,
@@ -409,6 +411,7 @@ router.get('/history', authenticate, async (req: any, res) => {
         avatarUrl: profile.avatar_url || null,
         bio: profile.bio || null,
         compatibilityScore: match.match_score,
+        score: match.match_score,
         status: match.status,
         createdAt: match.created_at?.toISOString() || null,
       };
