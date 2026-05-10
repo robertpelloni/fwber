@@ -89,9 +89,10 @@ router.get('/', async (req, res) => {
  */
 router.post('/purchase', async (req, res) => {
   const userId = BigInt((req as any).user.id);
-  const { type, paymentMethod } = req.body;
+  const { type, boost_type, paymentMethod } = req.body;
 
-  const selectedPrice = BOOST_TYPES.find(b => b.id === type);
+  const boostType = type || boost_type;
+    const selectedPrice = BOOST_TYPES.find(b => b.id === boostType);
   if (!selectedPrice) {
     return res.status(400).json({ error: 'Invalid boost type' });
   }
@@ -131,7 +132,7 @@ router.post('/purchase', async (req, res) => {
         return await tx.boosts.create({
           data: {
             user_id: userId,
-            boost_type: type as any,
+            boost_type: boostType as any,
             status: 'active',
             started_at: new Date(),
             expires_at: expiresAt,

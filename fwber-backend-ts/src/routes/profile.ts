@@ -201,6 +201,12 @@ router.get("/", authenticate, async (req: any, res) => {
 					is_id_verified: p.is_id_verified || false,
 					verification_level: p.is_id_verified ? "full" : (p.is_verified ? "basic" : "none"),
 				},
+    // Top-level convenience fields (frontend expects these flat)
+    is_verified: p.is_verified || false,
+    is_id_verified: p.is_id_verified || false,
+    location_description: p.location_description || null,
+    token_balance: user?.token_balance ? Number(user.token_balance) : 0,
+    verification_level: p.is_id_verified ? "full" : (p.is_verified ? "basic" : "none"),
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
 					url: filePathToUrl(ph.file_path),
@@ -1131,6 +1137,9 @@ router.get("/:id", authenticate, async (req: any, res) => {
 				languages: p.languages || [],
 				is_verified: p.is_verified || false,
 				is_id_verified: p.is_id_verified || false,
+      location_description: p.location_description || null,
+      token_balance: user?.token_balance ? Number(user.token_balance) : 0,
+      verification_level: p.is_id_verified ? "full" : (p.is_verified ? "basic" : "none"),
 				date_of_birth: p.date_of_birth || p.birthdate || null,
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
