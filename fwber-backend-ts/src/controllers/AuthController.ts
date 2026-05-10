@@ -33,6 +33,7 @@ export class AuthController {
   private serialize(obj: any): any {
     if (obj === null || obj === undefined) return obj;
     if (typeof obj === 'bigint') return Number(obj);
+    if (obj && typeof obj === 'object' && typeof obj.toFixed === 'function' && 'd' in obj && 'e' in obj) return Number(obj.toString());
     if (obj instanceof Date) return obj;
     if (Array.isArray(obj)) return obj.map((v: any) => this.serialize(v));
     if (typeof obj === 'object') {
@@ -120,11 +121,23 @@ export class AuthController {
         });
       }
 
-      // Initialize profile
+      // Initialize profile with default preferences
       await prisma.user_profiles.create({
         data: {
           user_id: user.id,
           display_name: user.name,
+          preferences: JSON.stringify({
+            age_min: 21,
+            age_max: 45,
+            distance_max: 25,
+            show_me: 'all',
+            drinking: 'any',
+            smoking: 'any',
+            education: 'any',
+          }),
+          looking_for: JSON.stringify(['dating', 'friendship']),
+          interests: JSON.stringify([]),
+          languages: JSON.stringify(['English']),
         },
       });
 
@@ -151,7 +164,9 @@ export class AuthController {
       }
 
       const token = this.generateToken(user);
-      const hydrated = await this.hydrateUser(user);
+      // Re-fetch user to get updated token_balance
+      const freshUser = await prisma.users.findUnique({ where: { id: user.id } });
+      const hydrated = await this.hydrateUser(freshUser || user);
 
       res.status(201).json({
         access_token: token,
