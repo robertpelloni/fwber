@@ -293,34 +293,126 @@ router.get('/me', authenticate, async (req: any, res) => {
 });
 
 
-// GET /api/user/search — search users by name
+// GET /api/user/search — search users with filters
 router.get('/search', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
     const q = String(req.query.q || '').trim();
-    if (!q || q.length < 1) {
-      return res.json([]);
+    const gender = String(req.query.gender || '').trim();
+    const ageMin = parseInt(String(req.query.age_min || '0')) || 0;
+    const ageMax = parseInt(String(req.query.age_max || '0')) || 0;
+    const verified = req.query.verified === 'true';
+    const online = req.query.online === 'true';
+    const hasPhotos = req.query.has_photos === 'true';
+    const limit = Math.min(parseInt(String(req.query.limit || '20')) || 20, 50);
+
+    // Build profile-level filters
+    const profileFilters: any[] = [];
+    if (gender) profileFilters.push({ gender });
+    // Age filters handled via raw SQL since age is computed from date_of_birth
+    // profileFilters is used only for gender and verified which Prisma supports
+    if (verified) profileFilters.push({ is_verified: true });
+
+    // Build where clause
+    const where: any = { id: { not: userId } };
+
+    // Text search OR conditions
+    if (q.length >= 1) {
+      where.OR = [
+        { name: { contains: q } },
+        { user_profiles: { some: { display_name: { contains: q } } } },
+        { user_profiles: { some: { bio: { contains: q } } } },
+        { user_profiles: { some: { occupation: { contains: q } } } },
+      ];
+    }
+
+    // Profile filters combined with text search — use raw SQL for MySQL compatibility
+    if ((profileFilters.length > 0 || ageMin > 0 || ageMax > 0) && q.length >= 1) {
+      const ageMinSql = ageMin > 0 ? `AND TIMESTAMPDIFF(YEAR, p.date_of_birth, NOW()) >= ${ageMin}` : '';
+      const ageMaxSql = ageMax > 0 ? `AND TIMESTAMPDIFF(YEAR, p.date_of_birth, NOW()) <= ${ageMax}` : '';
+      const genderSql = gender ? `AND p.gender = '${gender.replace(/'/g, "")}'` : '';
+      const verifiedSql = verified ? 'AND p.is_verified = 1' : '';
+      const qEscaped = q.replace(/'/g, "").replace(/%/g, "").replace(/_/g, "");
+      const qSql = `AND (u.name LIKE '%${qEscaped}%' OR p.display_name LIKE '%${qEscaped}%' OR p.bio LIKE '%${qEscaped}%' OR p.occupation LIKE '%${qEscaped}%')`;
+      const onlineSql = online ? 'AND u.last_active > DATE_SUB(NOW(), INTERVAL 15 MINUTE)' : '';
+      const photosSql = hasPhotos ? 'AND EXISTS (SELECT 1 FROM photos ph WHERE ph.user_id = u.id)' : '';
+
+      const rows: any[] = await prisma.$queryRawUnsafe(`
+        SELECT u.id, u.name, p.display_name, p.avatar_url,
+               TIMESTAMPDIFF(YEAR, p.date_of_birth, NOW()) as age,
+               p.gender, p.bio, p.occupation,
+               p.is_verified, p.is_id_verified
+        FROM users u
+        LEFT JOIN user_profiles p ON p.user_id = u.id
+        WHERE u.id != ?
+          ${qSql} ${genderSql} ${ageMinSql} ${ageMaxSql} ${verifiedSql} ${onlineSql} ${photosSql}
+        ORDER BY p.is_verified DESC, u.name ASC
+        LIMIT ?
+      `, userId.toString(), limit);
+
+      const results = rows.map((r: any) => ({
+        id: Number(r.id),
+        name: r.name,
+        display_name: r.display_name || r.name,
+        avatar_url: r.avatar_url || null,
+        age: r.age ? Number(r.age) : null,
+        gender: r.gender || null,
+        bio: r.bio || null,
+        occupation: r.occupation || null,
+        is_verified: Boolean(r.is_verified),
+        is_id_verified: Boolean(r.is_id_verified),
+      }));
+      return res.json(results);
+    }
+
+    // No text search — use Prisma for gender/verified, or raw SQL for age filters
+    if (ageMin > 0 || ageMax > 0) {
+      // Age requires raw SQL since age is computed from date_of_birth
+      const ageMinSql = ageMin > 0 ? `AND TIMESTAMPDIFF(YEAR, p.date_of_birth, NOW()) >= ${ageMin}` : '';
+      const ageMaxSql = ageMax > 0 ? `AND TIMESTAMPDIFF(YEAR, p.date_of_birth, NOW()) <= ${ageMax}` : '';
+      const genderSql = gender ? `AND p.gender = '${gender.replace(/'/g, "")}'` : '';
+      const verifiedSql = verified ? 'AND p.is_verified = 1' : '';
+      const onlineSql = online ? 'AND u.last_active > DATE_SUB(NOW(), INTERVAL 15 MINUTE)' : '';
+      const photosSql = hasPhotos ? 'AND EXISTS (SELECT 1 FROM photos ph WHERE ph.user_id = u.id)' : '';
+
+      const rows: any[] = await prisma.$queryRawUnsafe(`
+        SELECT u.id, u.name, p.display_name, p.avatar_url,
+               TIMESTAMPDIFF(YEAR, p.date_of_birth, NOW()) as age,
+               p.gender, p.bio, p.occupation, p.is_verified, p.is_id_verified
+        FROM users u
+        LEFT JOIN user_profiles p ON p.user_id = u.id
+        WHERE u.id != ?
+          ${genderSql} ${ageMinSql} ${ageMaxSql} ${verifiedSql} ${onlineSql} ${photosSql}
+        ORDER BY p.is_verified DESC, u.name ASC
+        LIMIT ?
+      `, userId.toString(), limit);
+
+      const results = rows.map((r: any) => ({
+        id: Number(r.id),
+        name: r.name,
+        display_name: r.display_name || r.name,
+        avatar_url: r.avatar_url || null,
+        age: r.age ? Number(r.age) : null,
+        gender: r.gender || null,
+        bio: r.bio || null,
+        occupation: r.occupation || null,
+        is_verified: Boolean(r.is_verified),
+        is_id_verified: Boolean(r.is_id_verified),
+      }));
+      return res.json(results);
+    }
+    if (profileFilters.length > 0) {
+      where.user_profiles = { some: { AND: profileFilters } };
     }
 
     const users = await prisma.users.findMany({
-      where: {
-        id: { not: userId },
-        OR: [
-          { name: { contains: q } },
-          { user_profiles: { some: { display_name: { contains: q } } } },
-          { user_profiles: { some: { bio: { contains: q } } } },
-          { user_profiles: { some: { occupation: { contains: q } } } },
-        ],
-      },
+      where,
       include: {
-        user_profiles: {
-          select: { display_name: true, avatar_url: true },
-          take: 1,
-        },
+        user_profiles: { select: { display_name: true, avatar_url: true, date_of_birth: true, gender: true, bio: true, occupation: true, is_verified: true, is_id_verified: true }, take: 1 },
       },
-      take: 20,
+      take: limit,
+      orderBy: { created_at: 'desc' },
     });
-
     res.json(users.map((u: any) => {
       const profile = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
       return {
@@ -328,6 +420,12 @@ router.get('/search', authenticate, async (req: any, res) => {
         name: u.name,
         display_name: profile?.display_name || u.name,
         avatar_url: profile?.avatar_url || null,
+        age: profile?.date_of_birth ? Math.floor((Date.now() - new Date(profile.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+        gender: profile?.gender || null,
+        bio: profile?.bio || null,
+        occupation: profile?.occupation || null,
+        is_verified: profile?.is_verified || false,
+        is_id_verified: profile?.is_id_verified || false,
       };
     }));
   } catch (error: any) {
@@ -335,6 +433,7 @@ router.get('/search', authenticate, async (req: any, res) => {
     res.json([]);
   }
 });
+
 
 // POST /api/user/export - GDPR data export
 router.post('/export', authenticate, async (req: any, res) => {
