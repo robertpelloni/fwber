@@ -69,15 +69,18 @@ router.get('/:slug', async (req: any, res) => {
 
     // Use raw SQL for JSON field filtering (Prisma JSON path is unreliable with MySQL)
     const postsRaw: any[] = await prisma.$queryRawUnsafe(
-      `SELECT pa.id, pa.content, pa.created_at, pa.user_id, u.name as author_name
-       FROM proximity_artifacts pa
-       LEFT JOIN users u ON pa.user_id = u.id
-       WHERE pa.type = 'board_post'
-         AND JSON_EXTRACT(pa.meta, '$.topic_slug') = ?
-         AND pa.moderation_status = 'clean'
-         AND pa.expires_at > NOW()
-       ORDER BY pa.created_at DESC
-       LIMIT 20`,
+      `SELECT pa.id, pa.content, pa.created_at, pa.user_id,
+      COALESCE(up.display_name, u.name) as author_name,
+      up.avatar_url as author_avatar
+      FROM proximity_artifacts pa
+      LEFT JOIN users u ON pa.user_id = u.id
+      LEFT JOIN user_profiles up ON up.user_id = pa.user_id
+      WHERE pa.type = 'board_post'
+        AND JSON_EXTRACT(pa.meta, '$.topic_slug') = ?
+        AND pa.moderation_status = 'clean'
+        AND pa.expires_at > NOW()
+      ORDER BY pa.created_at DESC
+      LIMIT 20`,
       slug
     );
 
@@ -85,7 +88,7 @@ router.get('/:slug', async (req: any, res) => {
       id: Number(p.id),
       content: p.content,
       created_at: p.created_at,
-      users: { id: Number(p.user_id), name: p.author_name || 'Unknown' },
+      author: { id: typeof p.user_id === 'bigint' ? Number(p.user_id) : (parseInt(String(p.user_id)) || 0), name: p.author_name || 'Unknown', avatar_url: p.author_avatar || null },
     }));
 
     const isFollowed = await prisma.topic_user_follows.findFirst({
@@ -98,7 +101,7 @@ router.get('/:slug', async (req: any, res) => {
       posts: posts.map((p: any) => ({
         id: p.id,
         content: p.content,
-        author: { id: p.users?.id || 0, name: p.users?.name || 'Unknown' },
+      author: p.author || { id: 0, name: 'Unknown' },
         created_at: p.created_at,
       })),
     }));
