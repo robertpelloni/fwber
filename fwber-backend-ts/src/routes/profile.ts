@@ -195,6 +195,12 @@ router.get("/", authenticate, async (req: any, res) => {
 				completion_percentage: Number(completeness?.percentage) || 0,
 				completion_percentage_required: completeness.percentage, // for consistency
 				completion_status: completeness,
+				verification: {
+					email_verified: !!user?.email_verified_at,
+					is_verified: p.is_verified || false,
+					is_id_verified: p.is_id_verified || false,
+					verification_level: p.is_id_verified ? "full" : (p.is_verified ? "basic" : "none"),
+				},
 				photos: photos.map((ph: any) => ({
 					id: Number(ph.id),
 					url: filePathToUrl(ph.file_path),
