@@ -250,16 +250,18 @@ router.get('/:groupId/posts', authenticate, async (req: any, res) => {
   try {
     const posts = await prisma.group_posts.findMany({
       where: { group_id: BigInt(req.params.groupId) },
-      include: {
-        users: { select: { id: true, name: true } },
-      },
+      include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } } } },
       orderBy: { created_at: 'desc' },
       take: 50,
     });
     res.json(posts.map((p: any) => ({
       id: Number(p.id),
       content: p.content,
-      author: { id: Number(p.users?.id), name: p.users?.name },
+      author: {
+        id: Number(p.users?.id),
+        name: p.users?.user_profiles?.[0]?.display_name || p.users?.name || 'Unknown',
+        avatar_url: p.users?.user_profiles?.[0]?.avatar_url || null,
+      },
       created_at: p.created_at?.toISOString(),
     })));
   } catch (err: any) {
