@@ -107,6 +107,9 @@ router.get('/nearby', authenticate, async (req: any, res) => {
           last_updated: row.last_updated ? new Date(row.last_updated).toISOString() : new Date().toISOString(),
         },
         scene_signals: null,
+      distance: distanceStr,
+      distance_miles: distMiles,
+      distance_meters: distMeters,
       };
     });
 
