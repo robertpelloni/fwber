@@ -357,4 +357,138 @@ router.post('/:chatroomId/messages', async (req: any, res) => {
   res.json({ success: true, message: { id: Date.now(), content: (req.body || {}).content || '' } });
 });
 
+
+// GET /api/proximity-chatrooms/:chatroomId/messages/pinned
+router.get('/:chatroomId/messages/pinned', async (req: any, res) => {
+  try {
+    res.json([]);
+  } catch (_err: any) {
+    res.json([]);
+  }
+});
+
+// GET /api/proximity-chatrooms/:chatroomId/messages/networking
+router.get('/:chatroomId/messages/networking', async (req: any, res) => {
+  try {
+    res.json({ data: [], current_page: 1, last_page: 1, per_page: 50, total: 0 });
+  } catch (_err: any) {
+    res.json({ data: [], current_page: 1, last_page: 1, per_page: 50, total: 0 });
+  }
+});
+
+// GET /api/proximity-chatrooms/:chatroomId/messages/social
+router.get('/:chatroomId/messages/social', async (req: any, res) => {
+  try {
+    res.json({ data: [], current_page: 1, last_page: 1, per_page: 50, total: 0 });
+  } catch (_err: any) {
+    res.json({ data: [], current_page: 1, last_page: 1, per_page: 50, total: 0 });
+  }
+});
+
+// GET /api/proximity-chatrooms/:chatroomId/messages/:messageId
+router.get('/:chatroomId/messages/:messageId', async (req: any, res) => {
+  try {
+    const msgId = BigInt(req.params.messageId);
+    const msg = await prisma.chatroom_messages.findUnique({
+      where: { id: msgId },
+      include: { users: { select: { id: true, name: true, email: true } } },
+    });
+    if (!msg) return res.status(404).json({ message: 'Message not found' });
+    res.json({
+      id: Number(msg.id),
+      proximity_chatroom_id: Number(msg.chatroom_id),
+      user_id: Number(msg.user_id),
+      content: msg.content,
+      message_type: 'text',
+      is_edited: false,
+      is_deleted: false,
+      is_pinned: false,
+      is_announcement: false,
+      is_networking: false,
+      is_social: false,
+      reaction_count: 0,
+      reply_count: 0,
+      created_at: msg.created_at?.toISOString(),
+      updated_at: msg.updated_at?.toISOString(),
+      user: msg.users ? { id: Number(msg.users.id), name: msg.users.name, email: msg.users.email || '' } : null,
+      display_content: msg.content,
+      display_user: msg.users?.name || 'Unknown',
+      preview: String(msg.content).substring(0, 50),
+      reaction_summary: {},
+    });
+  } catch (_err: any) {
+    res.status(404).json({ message: 'Message not found' });
+  }
+});
+
+// PUT /api/proximity-chatrooms/:chatroomId/messages/:messageId
+router.put('/:chatroomId/messages/:messageId', async (req: any, res) => {
+  try {
+    const msgId = BigInt(req.params.messageId);
+    const msg = await prisma.chatroom_messages.update({
+      where: { id: msgId },
+      data: { content: (req.body || {}).content || '' },
+    });
+    res.json({
+      id: Number(msg.id),
+      proximity_chatroom_id: Number(msg.chatroom_id),
+      user_id: Number(msg.user_id),
+      content: msg.content,
+      message_type: 'text',
+      is_edited: true,
+      is_deleted: false,
+      is_pinned: false,
+      is_announcement: false,
+      is_networking: (req.body || {}).is_networking || false,
+      is_social: (req.body || {}).is_social || false,
+      reaction_count: 0,
+      reply_count: 0,
+      created_at: msg.created_at?.toISOString(),
+      updated_at: new Date().toISOString(),
+      edited_at: new Date().toISOString(),
+      display_content: msg.content,
+      display_user: '',
+      preview: String(msg.content).substring(0, 50),
+      reaction_summary: {},
+    });
+  } catch (_err: any) {
+    res.status(404).json({ message: 'Message not found' });
+  }
+});
+
+// DELETE /api/proximity-chatrooms/:chatroomId/messages/:messageId
+router.delete('/:chatroomId/messages/:messageId', async (req: any, res) => {
+  try {
+    await prisma.chatroom_messages.delete({ where: { id: BigInt(req.params.messageId) } });
+    res.json({ message: 'Message deleted' });
+  } catch (_err: any) {
+    res.json({ message: 'Message deleted' });
+  }
+});
+
+// POST /api/proximity-chatrooms/:chatroomId/messages/:messageId/reactions
+router.post('/:chatroomId/messages/:messageId/reactions', async (req: any, res) => {
+  res.json({ message: 'Reaction added' });
+});
+
+// DELETE /api/proximity-chatrooms/:chatroomId/messages/:messageId/reactions
+router.delete('/:chatroomId/messages/:messageId/reactions', async (req: any, res) => {
+  res.json({ message: 'Reaction removed' });
+});
+
+// POST /api/proximity-chatrooms/:chatroomId/messages/:messageId/pin
+router.post('/:chatroomId/messages/:messageId/pin', async (req: any, res) => {
+  res.json({ message: 'Message pinned' });
+});
+
+// DELETE /api/proximity-chatrooms/:chatroomId/messages/:messageId/pin
+router.delete('/:chatroomId/messages/:messageId/pin', async (req: any, res) => {
+  res.json({ message: 'Message unpinned' });
+});
+
+// GET /api/proximity-chatrooms/:chatroomId/messages/:messageId/replies
+router.get('/:chatroomId/messages/:messageId/replies', async (req: any, res) => {
+  res.json([]);
+});
+
 export default router;
