@@ -67,40 +67,4 @@ router.get('/keys', async (req: any, res) => {
   }
 });
 
-// GET /api/security/keys/me — get current user's key (alias for frontend compat)
-router.get('/keys/me', async (req: any, res) => {
-  try {
-    const userId = BigInt(req.user.id);
-    const key = await prisma.user_public_keys.findFirst({
-      where: { user_id: userId },
-      orderBy: { created_at: 'desc' as const }
-    });
-    res.json({
-      public_key: key?.public_key || null,
-      key_type: key?.key_type || null,
-      device_id: key?.device_id || null,
-    });
-  } catch (err: any) {
-    res.json({ public_key: null });
-  }
-});
-
-// GET /api/security/keys/:userId — get another user's public key
-router.get('/keys/:userId', async (req: any, res) => {
-  try {
-    const targetUserId = BigInt(req.params.userId);
-    const key = await prisma.user_public_keys.findFirst({
-      where: { user_id: targetUserId },
-      orderBy: { created_at: 'desc' as const }
-    });
-    res.json({
-      user_id: Number(targetUserId),
-      public_key: key?.public_key || null,
-      key_type: key?.key_type || null,
-    });
-  } catch (err: any) {
-    res.json({ user_id: Number(req.params.userId), public_key: null });
-  }
-});
-
 export default router;

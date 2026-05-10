@@ -29,7 +29,7 @@ export function VouchClient({ code }: VouchClientProps) {
     if (code) {
       const checkCode = async () => {
         try {
-          const res: any = await apiClient.get(`/auth/referral/${code}`)
+          const res = await apiClient.get(`/auth/referral/${code}`)
           if (res.data.valid) {
              setReferrer({
                name: res.data.referrer_name,

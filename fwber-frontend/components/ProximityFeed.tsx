@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { proximityApi } from '@/lib/api/proximity';
 import type { ProximityArtifact, ProximityChatroom } from '@/types/proximity';
 import { MapPin, Send, AlertTriangle, Trash2, Clock, User, MessageSquare, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
-import InspireQuote from './InspireQuote';
+import SexQuote from './InspireQuote';
 import ArtifactVoting from './proximity/ArtifactVoting';
 import ArtifactComments from './proximity/ArtifactComments';
 

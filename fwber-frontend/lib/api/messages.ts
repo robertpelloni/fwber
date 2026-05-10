@@ -95,36 +95,33 @@ export async function sendMessage(
 	media?: File | null,
 	messageType?: "text" | "image" | "video" | "audio" | "file",
 ): Promise<Message> {
-	// For text-only messages, send as JSON (backend expects JSON)
-	if (!media) {
-		const data = await api.post<any>("/messages", {
-			receiver_id: receiverId,
-			content,
-			message_type: messageType || "text",
-		}, {
-			headers: { Authorization: `Bearer ${token}` },
-		});
-		const result = data?.message ?? data?.data ?? data;
-		return result;
-	}
-
-	// For media messages, use FormData
 	const formData = new FormData();
 	formData.append("receiver_id", receiverId.toString());
 	formData.append("content", content);
-	formData.append("media", media);
+
+	if (media) {
+		formData.append("media", media);
+	}
+
 	if (messageType) {
 		formData.append("message_type", messageType);
-	} else {
-		if (media.type.startsWith("image/")) formData.append("message_type", "image");
-		else if (media.type.startsWith("video/")) formData.append("message_type", "video");
-		else if (media.type.startsWith("audio/")) formData.append("message_type", "audio");
+	} else if (media) {
+		// Auto-detect simple types if not provided
+		if (media.type.startsWith("image/"))
+			formData.append("message_type", "image");
+		else if (media.type.startsWith("video/"))
+			formData.append("message_type", "video");
+		else if (media.type.startsWith("audio/"))
+			formData.append("message_type", "audio");
 		else formData.append("message_type", "file");
+	} else {
+		formData.append("message_type", "text");
 	}
 
 	const data = await api.post<any>("/messages", formData, {
 		headers: { Authorization: `Bearer ${token}` },
 	});
+
 	const result = data?.message ?? data?.data ?? data;
 	return result;
 }

@@ -118,7 +118,7 @@ export default function PhysicalProfilePage() {
     try {
       setSaving(true);
       setMessage(null);
-      await physicalProfileApi.upsert(token, data as any);
+      await physicalProfileApi.upsert(token, data);
       setMessage({ type: 'success', text: 'Physical attributes saved!' });
       setTimeout(() => setMessage(null), 3000);
     } catch (err) {

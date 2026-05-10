@@ -8,15 +8,15 @@ export type ModerationStats = {
 };
 
 export const moderationApi = {
-  dashboard: async (token: string): Promise<{ stats: any; recent_actions: any[] }> => {
-    const res: any = await apiClient.get('/moderation/dashboard', {
+  dashboard: async (token: string): Promise<{ stats: ModerationStats; recent_actions: any[] }> => {
+    const res = await apiClient.get('/moderation/dashboard', {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;
   },
 
   flaggedContent: async (token: string, page: number = 1) => {
-    const res: any = await apiClient.get('/moderation/flagged-content', {
+    const res = await apiClient.get('/moderation/flagged-content', {
       params: { page },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -35,7 +35,7 @@ export const moderationApi = {
   },
 
   spoofDetections: async (token: string, page: number = 1) => {
-    const res: any = await apiClient.get('/moderation/spoof-detections', {
+    const res = await apiClient.get('/moderation/spoof-detections', {
       params: { page },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -54,7 +54,7 @@ export const moderationApi = {
   },
 
   throttles: async (token: string, page: number = 1) => {
-    const res: any = await apiClient.get('/moderation/throttles', {
+    const res = await apiClient.get('/moderation/throttles', {
       params: { page },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -69,7 +69,7 @@ export const moderationApi = {
   },
 
   actions: async (token: string, page: number = 1) => {
-    const res: any = await apiClient.get('/moderation/actions', {
+    const res = await apiClient.get('/moderation/actions', {
       params: { page },
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -77,7 +77,7 @@ export const moderationApi = {
   },
 
   userProfile: async (userId: number, token: string) => {
-    const res: any = await apiClient.get(`/moderation/users/${userId}`, {
+    const res = await apiClient.get(`/moderation/users/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return res.data;

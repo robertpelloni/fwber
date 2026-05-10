@@ -154,7 +154,7 @@ export default function NotificationListener() {
       const message = handler.getMessage(latest);
       const action = handler.getAction(latest, router);
 
-      showMatch(title, message, (action || {}) as any);
+      showMatch(title, message, action || {});
     } else {
       // Generic fallback for untyped notifications
       const title = latest.title || 'Notification';

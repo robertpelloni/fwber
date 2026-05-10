@@ -162,7 +162,7 @@ export default function AvatarGenerationFlow({
         );
 
         if (avatarMsg) {
-            const data = (avatarMsg as any).data?.notification || (avatarMsg as any).data;
+            const data = avatarMsg.data?.notification || avatarMsg.data;
             if (data?.url) {
                 setGeneratedAvatar(data.url);
                 setGeneratedPhotoId(data.photo_id);

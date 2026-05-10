@@ -41,7 +41,7 @@ export interface PhotoReorderRequest {
 class PhotoAPI {
   // Get all photos for the current user
   async getPhotos(): Promise<Photo[]> {
-    const response: any = await apiClient.get<{ success: boolean; data: Photo[]; count: number }>('/photos')
+    const response = await apiClient.get<{ success: boolean; data: Photo[]; count: number }>('/photos')
     // Backend returns { success, data, count } format
     return response.data.data || []
   }
@@ -183,7 +183,7 @@ class PhotoAPI {
     compression_quality: number
   }> {
     try {
-      const response: any = await apiClient.get<{
+      const response = await apiClient.get<{
         max_photos: number
         max_file_size: number
         allowed_formats: string[]
@@ -217,8 +217,8 @@ class PhotoAPI {
 
   // Get original photo blob
   async getOriginalPhoto(photoId: string): Promise<Blob> {
-    const response: any = await apiClient.get(`/photos/${photoId}/original`, {
-      // responseType: 'blob',
+    const response = await apiClient.get(`/photos/${photoId}/original`, {
+      responseType: 'blob',
     })
 
     return response.data

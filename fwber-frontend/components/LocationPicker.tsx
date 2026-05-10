@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Circle, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { Button } from './ui/button'
 
 // Fix for Leaflet default marker icon missing in Webpack/Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;

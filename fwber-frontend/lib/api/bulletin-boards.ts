@@ -84,16 +84,15 @@ export class BulletinBoardAPI {
   }
 
   private async request(endpoint: string, options: any = {}) {
-    const method = options.method || 'GET';
-    const response: any = await (apiClient as any)[method.toLowerCase()](
-      endpoint,
-      options.body ? JSON.parse(options.body) : undefined,
-      {
-        headers: {
-          'Authorization': `Bearer ${this.token}`,
-          ...options.headers,
-        },
-        params: options.params,
+    const response = await apiClient({
+      url: endpoint,
+      method: options.method || 'GET',
+      data: options.body ? JSON.parse(options.body) : undefined,
+      headers: {
+        'Authorization': `Bearer ${this.token}`,
+        ...options.headers,
+      },
+      params: options.params,
     });
 
     return response.data;

@@ -68,19 +68,24 @@ function WebSocketPageContent() {
 
   const handleSendNotification = () => {
     if (selectedRecipient) {
-      sendNotification();
+      sendNotification(selectedRecipient, {
+        title: 'Test Notification',
+        body: 'This is a test notification from WebSocket',
+        type: 'test',
+        data: { timestamp: new Date().toISOString() },
+      });
     }
   };
 
   const handleStartTyping = () => {
     if (selectedRecipient) {
-      sendTypingIndicator(selectedRecipient);
+      sendTypingIndicator(selectedRecipient, true);
     }
   };
 
   const handleStopTyping = () => {
     if (selectedRecipient) {
-      sendTypingIndicator(selectedRecipient);
+      sendTypingIndicator(selectedRecipient, false);
     }
   };
 

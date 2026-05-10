@@ -15,7 +15,6 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import UserAvatar from './UserAvatar';
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents';
 import { api } from '@/lib/api/client';
 

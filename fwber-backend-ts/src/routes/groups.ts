@@ -41,39 +41,6 @@ router.get('/', authenticate, async (req: any, res) => {
   }
 });
 
-// GET /api/groups/my — alias for my-groups
-router.get('/my', authenticate, async (req: any, res) => {
-  try {
-    const memberships = await prisma.group_members.findMany({
-      where: { user_id: BigInt(req.user.id), is_banned: false },
-      include: {
-        groups: {
-          include: {
-            users: { select: { id: true, name: true } },
-          },
-        },
-      },
-    });
-    const data = memberships.map((m: any) => ({
-      id: Number(m.groups.id),
-      name: m.groups.name,
-      description: m.groups.description,
-      icon: m.groups.icon,
-      privacy: m.groups.privacy,
-      member_count: m.groups.member_count,
-      created_by_user_id: Number(m.groups.created_by_user_id),
-      created_at: m.groups.created_at?.toISOString(),
-      updated_at: m.groups.updated_at?.toISOString(),
-      user_role: m.role,
-      is_member: true,
-    }));
-    res.json({ data });
-  } catch (err: any) {
-    console.error('[GET /groups/my]', err.message);
-    res.json({ data: [] });
-  }
-});
-
 // GET /api/groups/my-groups
 router.get('/my-groups', authenticate, async (req: any, res) => {
   try {

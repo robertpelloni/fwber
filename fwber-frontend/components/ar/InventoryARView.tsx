@@ -34,8 +34,8 @@ export default function InventoryARView({ onClose }: InventoryARViewProps) {
         );
 
         const handleOrientation = (e: DeviceOrientationEvent) => {
-            if ((e as any).webkitCompassHeading) {
-                setHeading((e as any).webkitCompassHeading);
+            if (e.webkitCompassHeading) {
+                setHeading(e.webkitCompassHeading);
             } else if (e.alpha) {
                 setHeading(360 - e.alpha);
             }

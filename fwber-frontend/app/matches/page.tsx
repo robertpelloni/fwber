@@ -23,7 +23,6 @@ import ProfileViewModal from "@/components/ProfileViewModal";
 import UserAvatar from "@/components/UserAvatar";
 import CreateBountyModal from "@/components/CreateBountyModal";
 import BoostButton from "@/components/BoostButton";
-import MatchModal from "@/components/MatchModal";
 import type { Match } from "@/lib/api/matches";
 
 export default function MatchesPage() {
@@ -31,8 +30,6 @@ export default function MatchesPage() {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
-  const [matchedUser, setMatchedUser] = useState<{id: number; name: string; photoUrl: string} | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const { success, error, ToastContainer } = useToast();
@@ -99,8 +96,7 @@ export default function MatchesPage() {
 				success(
 					`You matched with ${matches[currentIndex].name || "Voice Only Profile"}!`,
 				);
-				setIsMatchModalOpen(true);
-          setMatchedUser({ id: targetUserId, name: matches[currentIndex].name || "Voice Only Profile", photoUrl: matches[currentIndex].avatarUrl || "" });
+				// Optionally show match modal
 			}
 		} catch (err) {
 			console.error("Error performing match action:", err);

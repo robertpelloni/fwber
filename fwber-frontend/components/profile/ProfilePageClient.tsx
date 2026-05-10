@@ -367,29 +367,29 @@ export default function ProfilePage() {
 					political_views: p.political_views || "",
 					interests: p.interests || [],
 					voice_intro: null,
-					height_cm: (p as any).height_cm || null,
+					height_cm: p.height_cm || null,
 
 					// Physical attributes
-					body_type: (p as any).body_type || "",
-					hair_color: (p as any).hair_color || "",
-					eye_color: (p as any).eye_color || "",
-					skin_tone: (p as any).skin_tone || "",
-					ethnicity: (p as any).ethnicity || "",
-					facial_hair: (p as any).facial_hair || "",
-					fitness_level: (p as any).fitness_level || "",
-					tattoos: (p as any).tattoos === "true" || (p as any).tattoos === true,
-					piercings: (p as any).piercings === "true" || (p as any).piercings === true,
-					clothing_style: (p as any).clothing_style || "",
-					dominant_hand: (p as any).dominant_hand || "",
+					body_type: p.body_type || "",
+					hair_color: p.hair_color || "",
+					eye_color: p.eye_color || "",
+					skin_tone: p.skin_tone || "",
+					ethnicity: p.ethnicity || "",
+					facial_hair: p.facial_hair || "",
+					fitness_level: p.fitness_level || "",
+					tattoos: p.tattoos === "true" || p.tattoos === true,
+					piercings: p.piercings === "true" || p.piercings === true,
+					clothing_style: p.clothing_style || "",
+					dominant_hand: p.dominant_hand || "",
 
 					// Intimate details
-					breast_size: (p as any).breast_size || "",
-					penis_length_cm: (p as any).penis_length_cm || null,
-					penis_girth_cm: (p as any).penis_girth_cm || null,
-					fetishes: Array.isArray((p as any).fetishes) ? (p as any).fetishes : [],
+					breast_size: p.breast_size || "",
+					penis_length_cm: p.penis_length_cm || null,
+					penis_girth_cm: p.penis_girth_cm || null,
+					fetishes: Array.isArray(p.fetishes) ? p.fetishes : [],
 
-					occupation: (p as any).occupation || "",
-					education: (p as any).education || "",
+					occupation: p.occupation || "",
+					education: p.education || "",
 
 					preferences: {
 						// Lifestyle preferences
@@ -403,8 +403,8 @@ export default function ProfilePage() {
 						diet: p.preferences?.diet || "",
 						pets: p.preferences?.pets || "",
 						children: p.preferences?.children || "",
-						education: p.preferences?.education || (p as any).education || "",
-						occupation: p.preferences?.occupation || (p as any).occupation || "",
+						education: p.preferences?.education || p.education || "",
+						occupation: p.preferences?.occupation || p.occupation || "",
 						income: p.preferences?.income || "",
 						// Dating preferences
 						age_range_min: p.preferences?.age_range_min || 18,

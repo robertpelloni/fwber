@@ -111,10 +111,3 @@ fwber-backend-ts/dist/
 fwber-backend-ts/node_modules/
 fwber-frontend/node_modules/
 mobile/node_modules/
-
-fwber-frontend/.next
-fwber-backend-ts/dist
-fwber-backend-ts/coverage
-fwber-frontend/node_modules
-fwber-backend-ts/node_modules
-node_modules

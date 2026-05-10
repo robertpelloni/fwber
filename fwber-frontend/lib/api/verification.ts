@@ -17,15 +17,13 @@ export interface VerificationResult {
 
 export const verificationApi = {
   getStatus: async (): Promise<VerificationStatus> => {
-    const res: any = await apiClient.get('/verification/status');
-    return res.data || res;
+    return await apiClient.get<VerificationStatus>('/verification/status');
   },
 
   verify: async (photo: File): Promise<VerificationResult> => {
     const formData = new FormData();
     formData.append('photo', photo);
 
-    const res: any = await apiClient.post('/verification/verify', formData);
-    return res.data || res;
+    return await apiClient.post<VerificationResult>('/verification/verify', formData);
   },
 };

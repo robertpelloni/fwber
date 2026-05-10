@@ -15,8 +15,8 @@ export default function SearchPage() {
     queryKey: ['user-search', query],
     enabled: isAuthenticated && !!token && query.length >= 2,
     queryFn: async () => {
-      const data: any = await api.get(`/user/search?q=${encodeURIComponent(query)}`);
-      return Array.isArray(data) ? data : (data as any).users || (data as any).data || [];
+      const data = await api.get<any[]>(`/user/search?q=${encodeURIComponent(query)}`);
+      return Array.isArray(data) ? data : data.users || data.data || [];
     },
   });
 

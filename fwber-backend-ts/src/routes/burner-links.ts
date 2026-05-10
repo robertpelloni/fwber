@@ -32,14 +32,14 @@ router.get('/', async (req: any, res) => {
 // POST /api/burner-links
 router.post('/', async (req: any, res) => {
   try {
-    const hours = Math.min(parseInt((req.body || {}).expires_in_hours as string) || 24, 72);
+    const hours = Math.min(parseInt(req.body.expires_in_hours as string) || 24, 72);
     const token = crypto.randomBytes(16).toString('hex');
     const link = await prisma.burner_links.create({
       data: { creator_id: BigInt(req.user.id), token, expires_at: new Date(Date.now() + hours * 3600000) }
     });
     const fe = process.env.FRONTEND_URL || 'https://www.fwber.me';
     res.status(201).json({ id: Number(link.id), token: link.token, url: `${fe}/burner/join/${link.token}`, expires_at: link.expires_at, created_at: link.created_at, message: 'Share this link for a private conversation' });
-  } catch (err: any) { res.status(500).json({ error: "Failed to create burner link", details: err.message }); }
+  } catch (err: any) { res.status(500).json({ error: 'Failed to create burner link' }); }
 });
 
 // POST /api/burner-links/:token/scan
@@ -52,7 +52,7 @@ router.post('/:token/scan', async (req: any, res) => {
     if (link.creator_id === BigInt(req.user.id)) return res.status(400).json({ error: 'Cannot scan your own link' });
     await prisma.burner_links.update({ where: { id: link.id }, data: { scanner_id: BigInt(req.user.id), used_at: new Date() } });
     res.json({ message: 'Link scanned! You can now chat.' });
-  } catch (err: any) { res.status(500).json({ error: "Failed to scan link", details: err.message }); }
+  } catch (err: any) { res.status(500).json({ error: 'Failed to scan link' }); }
 });
 
 // POST /api/burner-links/:token/join - Alias for scan (frontend compat)
@@ -65,7 +65,7 @@ router.post("/:token/join", async (req: any, res) => {
     if (link.creator_id === BigInt(req.user.id)) return res.status(400).json({ error: "Cannot join your own link" });
     await prisma.burner_links.update({ where: { id: link.id }, data: { scanner_id: BigInt(req.user.id), used_at: new Date() } });
     res.json({ message: "Joined successfully!", chatroom_id: link.chatroom_id ? Number(link.chatroom_id) : undefined });
-  } catch (err: any) { res.status(500).json({ error: "Failed to join", details: err.message }); }
+  } catch (err: any) { res.status(500).json({ error: "Failed to join" }); }
 });
 
 export default router;

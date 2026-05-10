@@ -16,13 +16,8 @@ async function getWalletBalance(req: any, res: any) {
   try {
     const user = await prisma.users.findUnique({
       where: { id: userId },
-      select: {
-        token_balance: true,
-        wallet_address: true,
-        referral_code: true,
-      }
+      select: { token_balance: true }
     });
-
     let transactions: any[] = [];
     try {
       transactions = await prisma.wallet_transactions.findMany({
@@ -31,26 +26,11 @@ async function getWalletBalance(req: any, res: any) {
         take: 5
       });
     } catch (_) {}
-
-    // Referral count
-    let referral_count = 0;
-    try {
-      const refs = await prisma.$queryRawUnsafe(
-        'SELECT COUNT(*) AS cnt FROM referral_rewards WHERE referrer_id = ?',
-        userId.toString()
-      ) as any[];
-      referral_count = Number(refs?.[0]?.cnt || 0);
-    } catch (_) {}
-
     res.json({
       balance: user?.token_balance || 0,
       tokens: user?.token_balance || 0,
       currency: 'FWB',
       transactions,
-      wallet_address: user?.wallet_address || null,
-      referral_code: user?.referral_code || null,
-      referral_count,
-      golden_tickets_remaining: 0,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch wallet' });
@@ -159,99 +139,6 @@ router.post('/top-up/confirm', authenticate, async (req: any, res) => {
     res.status(400).json({ error: 'Payment not successful' });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// POST /api/wallet/deposit — deposit FWB tokens (internal transfer)
-router.post('/deposit', authenticate, async (req: any, res) => {
-  const userId = BigInt(req.user.id);
-  const { amount } = req.body;
-  const depositAmount = Number(amount);
-  if (!depositAmount || depositAmount <= 0) {
-    return res.status(400).json({ error: 'Valid amount is required' });
-  }
-  try {
-    await prisma.users.update({
-      where: { id: userId },
-      data: { token_balance: { increment: depositAmount } },
-    });
-    await prisma.wallet_transactions.create({
-      data: {
-        user_id: userId,
-        type: 'deposit',
-        amount: depositAmount,
-        description: `Deposited ${depositAmount} FWB`,
-        created_at: new Date(),
-      },
-    });
-    const user = await prisma.users.findUnique({
-      where: { id: userId },
-      select: { token_balance: true },
-    });
-    res.json({ success: true, balance: user?.token_balance || 0 });
-  } catch (error: any) {
-    console.error('[WALLET_DEPOSIT_ERROR]', error.message);
-    res.status(500).json({ error: 'Failed to deposit' });
-  }
-});
-
-// POST /api/wallet/withdraw — withdraw FWB tokens
-router.post('/withdraw', authenticate, async (req: any, res) => {
-  const userId = BigInt(req.user.id);
-  const { amount, wallet_address } = req.body;
-  const withdrawAmount = Number(amount);
-  if (!withdrawAmount || withdrawAmount <= 0) {
-    return res.status(400).json({ error: 'Valid amount is required' });
-  }
-  try {
-    const user = await prisma.users.findUnique({
-      where: { id: userId },
-      select: { token_balance: true },
-    });
-    const currentBalance = Number(user?.token_balance || 0);
-    if (withdrawAmount > currentBalance) {
-      return res.status(400).json({ error: 'Insufficient balance' });
-    }
-    await prisma.users.update({
-      where: { id: userId },
-      data: { token_balance: { decrement: withdrawAmount } },
-    });
-    await prisma.wallet_transactions.create({
-      data: {
-        user_id: userId,
-        type: 'withdrawal',
-        amount: -withdrawAmount,
-        description: `Withdrew ${withdrawAmount} FWB${wallet_address ? ` to ${wallet_address.slice(0, 8)}...` : ''}`,
-        created_at: new Date(),
-      },
-    });
-    const updatedUser = await prisma.users.findUnique({
-      where: { id: userId },
-      select: { token_balance: true },
-    });
-    res.json({ success: true, balance: updatedUser?.token_balance || 0 });
-  } catch (error: any) {
-    console.error('[WALLET_WITHDRAW_ERROR]', error.message);
-    res.status(500).json({ error: 'Failed to withdraw' });
-  }
-});
-
-// POST /api/wallet/address — save external wallet address
-router.post('/address', authenticate, async (req: any, res) => {
-  const userId = BigInt(req.user.id);
-  const { wallet_address } = req.body;
-  if (!wallet_address) {
-    return res.status(400).json({ error: 'Wallet address is required' });
-  }
-  try {
-    await prisma.users.update({
-      where: { id: userId },
-      data: { wallet_address },
-    });
-    res.json({ success: true, wallet_address });
-  } catch (error: any) {
-    console.error('[WALLET_ADDRESS_ERROR]', error.message);
-    res.status(500).json({ error: 'Failed to update wallet address' });
   }
 });
 
