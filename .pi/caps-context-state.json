@@ -2,6 +2,8 @@
 	"CHANGELOG.md": true,
 	"CONTRIBUTING.md": true,
 	"DEPLOY.md": true,
+	"DNS_SETUP.md": true,
+	"EMAIL_SETUP.md": true,
 	"GEMINI.md": true,
 	"GPT.md": true,
 	"HANDOFF.md": true,
