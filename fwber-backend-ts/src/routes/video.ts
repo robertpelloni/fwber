@@ -25,7 +25,9 @@ router.get('/history', async (req: any, res) => {
         id: Number(call.id), direction: isCaller ? 'outgoing' : 'incoming',
         status: call.status, duration: call.duration || 0,
         started_at: call.started_at, ended_at: call.ended_at, created_at: call.created_at,
-        other_user: { id: Number(otherUser?.id), name: otherProfile?.display_name || otherUser?.name || 'Unknown', avatar_url: otherProfile?.avatar_url || null }
+        other_user: { id: Number(otherUser?.id), name: otherProfile?.display_name || otherUser?.name || 'Unknown', display_name: otherProfile?.display_name || otherUser?.name || 'Unknown', avatar_url: otherProfile?.avatar_url || null },
+          partner_name: otherProfile?.display_name || otherUser?.name || 'Unknown',
+          partner_avatar: otherProfile?.avatar_url || null,
       };
     });
     res.json({ data, total: data.length });

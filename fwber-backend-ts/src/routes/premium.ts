@@ -135,48 +135,38 @@ router.post('/initiate', authenticate, async (req: any, res) => {
 // POST /api/premium/purchase - Purchase premium with tokens
 router.post('/purchase', authenticate, async (req: any, res) => {
   const userId = BigInt(req.user.id);
-  const { planId } = req.body;
-
-  const tokenCosts = {
-    monthly: 500,
-    yearly: 4000
-  };
-
-  const cost = tokenCosts[planId as keyof typeof tokenCosts] || tokenCosts.monthly;
-
+  const { planId, plan } = req.body;
+  const planKey = planId || plan || 'monthly';
+  const tokenCosts: Record<string, number> = { monthly: 500, yearly: 4000, gold: 500, silver: 200, platinum: 4000, trial: 50, weekly: 100 };
+  const cost = tokenCosts[planKey] || tokenCosts['monthly'] || 500;
   try {
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.users.findUnique({ where: { id: userId } });
       if (!user || Number(user.token_balance) < cost) {
         throw new Error('Insufficient tokens');
       }
-
       await tx.users.update({
         where: { id: userId },
         data: {
           token_balance: { decrement: cost },
-          tier: 'gold',
+          tier: 'gold' as any,
           unlimited_swipes: true,
-          tier_expires_at: new Date(Date.now() + (planId === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000)
+          tier_expires_at: new Date(Date.now() + ((planKey === 'yearly' || planKey === 'platinum') ? 365 : 30) * 24 * 60 * 60 * 1000)
         }
       });
-
-      // Record wallet transaction
       try {
         await tx.wallet_transactions.create({
           data: {
             user_id: userId,
             amount: -cost,
             type: 'spend',
-            description: `Premium ${planId === 'yearly' ? 'Yearly' : 'Monthly'} subscription`,
+            description: `Premium ${planKey === 'yearly' ? 'Yearly' : (planKey === 'platinum' ? 'Platinum' : 'Monthly')} subscription`,
             created_at: new Date(),
           },
         });
       } catch (_) {}
-
       return { success: true };
     });
-
     res.json(result);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
