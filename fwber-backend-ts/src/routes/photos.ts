@@ -205,6 +205,32 @@ router.post('/', authenticate, (req: any, _res, next) => {
 });
 
 // PUT /api/photos/:id — Update a photo
+// PUT /api/photos/reorder — alias for POST
+router.put('/reorder', authenticate, async (req: any, res: Response) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { photo_ids, order } = req.body as { photo_ids?: string[]; order?: number[] };
+    const ids = photo_ids || order || [];
+    if (!Array.isArray(ids)) {
+      res.status(400).json({ success: false, message: 'photo_ids or order must be an array' });
+      return;
+    }
+    for (let i = 0; i < ids.length; i++) {
+      await prisma.photos.updateMany({
+        where: { id: BigInt(ids[i]!), user_id: userId },
+        data: { sort_order: i, updated_at: new Date() },
+      });
+    }
+    const photos = await prisma.photos.findMany({
+      where: { user_id: userId },
+      orderBy: { sort_order: 'asc' },
+    });
+    res.json({ success: true, data: photos.map(serialize) });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Reorder failed' });
+  }
+});
+
 router.put('/:id', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
@@ -299,16 +325,17 @@ router.delete('/:id', authenticate, async (req: any, res: Response) => {
 router.post('/reorder', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
-    const { photo_ids } = req.body as { photo_ids: string[] };
+    const { photo_ids, order } = req.body as { photo_ids?: string[], order?: number[] };
+    const ids = photo_ids || order || [];
 
-    if (!Array.isArray(photo_ids)) {
+    if (!Array.isArray(ids)) {
       res.status(400).json({ success: false, message: 'photo_ids must be an array' });
       return;
     }
 
-    for (let i = 0; i < photo_ids.length; i++) {
+    for (let i = 0; i < ids.length; i++) {
       await prisma.photos.updateMany({
-        where: { id: BigInt(photo_ids[i]!), user_id: userId },
+        where: { id: BigInt(ids[i]!), user_id: userId },
         data: { sort_order: i, updated_at: new Date() },
       });
     }
@@ -421,5 +448,8 @@ router.get('/:id/original', authenticate, async (req: any, res: Response) => {
 router.get('/reveals', authenticate, async (_req: any, res: Response) => {
   res.json({ success: true, data: [], count: 0 });
 });
+
+
+
 
 export default router;
