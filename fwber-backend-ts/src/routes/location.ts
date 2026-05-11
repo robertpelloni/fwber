@@ -199,6 +199,24 @@ router.post('/', authenticate, async (req: any, res) => {
   }
 });
 
+// GET /api/location/privacy - Get location privacy settings
+router.get('/privacy', authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const location = await prisma.user_locations.findFirst({ where: { user_id: userId } });
+    res.json({
+      location_shared: !!location && location.is_active !== false,
+      privacy_level: location?.privacy_level || 'friends',
+      show_distance: true,
+      show_city: true,
+      precision_mode: 'city',  // 'exact', 'neighborhood', 'city'
+      options: ['public', 'friends', 'private'],
+    });
+  } catch (error) {
+    res.json({ location_shared: false, privacy_level: 'friends', show_distance: true, show_city: true, precision_mode: 'city', options: ['public', 'friends', 'private'] });
+  }
+});
+
 // PUT /api/location/privacy - Update location privacy
 router.put('/privacy', authenticate, async (req: any, res) => {
   try {
