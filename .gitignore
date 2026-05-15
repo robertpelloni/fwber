@@ -1,21 +1,11 @@
-# Dependency directories
-node_modules/
-fwber-frontend/node_modules/
-fwber-backend-ts/node_modules/
-mobile/node_modules/
-
-# Next.js build output
-fwber-frontend/.next/
-fwber-frontend/out/
-
-# TypeScript build output
-fwber-backend-ts/dist/
-dist/
-
-# Test coverage
-coverage/
-fwber-backend-ts/coverage/
-
-# Misc
-.DS_Store
-*.log
+*node_modules*
+*.next*
+*dist*
+*coverage*
+*ARCHIVE*
+*.vercel*
+*.pi*
+*.sqlite*
+*.sqlite3*
+.env*
+!.env.example
