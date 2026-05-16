@@ -2163,3 +2163,13 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Extended merchant moderation API support so queue filtering/search is reflected in frontend moderation hooks and API clients.
 - Surfaced merchant priority and verification-note context in the moderation dashboard instead of forcing moderators through a flat queue.
+
+## [2.0.7] - $(date +%Y-%m-%d) — ActivityPub Hardening & Map Hydration
+
+### Added
+- **ActivityPub Security**: Replaced the HTTP Signature validation stubs in the `FederationService` with actual cryptographic validation. The backend now fetches the remote public key, reconstructs the `(request-target)`, `host`, and `date` headers, and uses `crypto.createVerify` to authenticate incoming payloads.
+- **Federation Tests**: Added `tests/FederationHttpSignature.test.ts` to mock and verify valid and tampered HTTP signatures targeting the inbox.
+- **Map Socket Hook**: Wired the frontend `EventMap.tsx` component to the `socket.io-client` hook. The map now subscribes to the event-specific socket channel and drops dynamic markers representing live users broadcasting their coordinates.
+
+### Changed
+- **Version Bump**: Updated to `2.0.7` across all tracking files and marked the final "Next Gen Federated Social Graph" milestone elements as complete in `TODO.md`.

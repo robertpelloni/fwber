@@ -72,3 +72,15 @@
 
 **Last Updated:** 2026-03-06
 **Status:** Phase 4 COMPLETE, Phase 6 COMPLETE.
+
+## Phase 9: GraphQL Migration & Data Optimization (Planned)
+*   **Target:** Migrate heavily relational REST endpoints to GraphQL to prevent over-fetching on the frontend.
+*   **Key Deliverables:**
+    *   Implement Apollo Server on `fwber-backend-ts`.
+    *   Create GraphQL schemas and resolvers mapped to Prisma.
+    *   Migrate `UserProfile`, `Dashboard`, and `Matches` frontend components to use Apollo Client.
+*   **Status:** In Design Phase.
+
+## Phase 10: Web3 & Decentralized Identity (Future)
+*   **Target:** Integrate verifiable credentials (W3C DIDs) and smart contracts for merchant promotions.
+*   **Status:** Ideation.

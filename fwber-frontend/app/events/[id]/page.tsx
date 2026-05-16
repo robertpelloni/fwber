@@ -8,6 +8,13 @@ import InviteUserModal from '@/components/events/InviteUserModal';
 import EventPaymentModal from '@/components/events/EventPaymentModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Chatroom from '@/components/chatrooms/Chatroom';
+import dynamic from 'next/dynamic';
+
+const EventMap = dynamic(() => import('@/components/EventMap').then(mod => mod.EventMap), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-lg flex items-center justify-center">Loading Map...</div>
+});
+
 
 export default function EventDetailPage() {
   const { id } = useParams();
@@ -109,6 +116,15 @@ export default function EventDetailPage() {
                     Discussion
                   </TabsTrigger>
                 )}
+                {event.latitude && event.longitude && (
+                  <TabsTrigger
+                    value="map"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 px-0 py-3 flex items-center gap-2"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Live Map
+                  </TabsTrigger>
+                )}
               </TabsList>
               
               <TabsContent value="about" className="pt-6">
@@ -120,6 +136,19 @@ export default function EventDetailPage() {
               {event.chatroom_id && (
                 <TabsContent value="discussion" className="pt-6">
                   <Chatroom chatroomId={event.chatroom_id} />
+                </TabsContent>
+              )}
+              {event.latitude && event.longitude && (
+                <TabsContent value="map" className="pt-6">
+                   <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                     <h3 className="font-semibold flex items-center gap-2"><MapPin className="w-4 h-4"/> Live Event Map</h3>
+                     <p className="text-sm mt-1">See where other attendees are right now! Your location is shared anonymously with other attendees while viewing this map.</p>
+                   </div>
+                   <EventMap
+                     eventId={event.id}
+                     centerLat={Number(event.latitude)}
+                     centerLng={Number(event.longitude)}
+                   />
                 </TabsContent>
               )}
             </Tabs>
