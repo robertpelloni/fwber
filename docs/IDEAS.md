@@ -12,7 +12,3 @@
 *   **Decentralized Identity (DID):** Moving beyond basic email/password auth to support verifiable credentials (W3C DIDs) would align perfectly with the "Radical Privacy" vision, allowing users to own their identity graphs.
 *   **Smart Contracts for Merchants:** If "fwber" adopts a web3 stance, merchant promotions and referral rewards could be codified as smart contracts on a low-fee chain (like Polygon or Solana), ensuring transparent payout mechanics.
 *   **Hyper-Local Mesh Networking:** For very dense environments (like concerts or festivals), integrating Bluetooth Low Energy (BLE) mesh networking via native mobile plugins could allow proximity matching even when cellular service drops.
-
-## Structural Enhancements
-- Refactor frontend proxy routing: Instead of creating a Next.js `/api/.../route.ts` for every backend gap, implement a universal `[[...slug]]` proxy middleware to catch and securely forward all traffic to the Express service, massively reducing boilerplate.
-- Abstract the `ContentUnlockGate.tsx` logic into a higher-order component to ensure premium gating on future views like `burner-links` analytics.
