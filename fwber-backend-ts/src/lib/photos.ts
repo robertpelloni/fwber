@@ -18,6 +18,11 @@ const API_BASE = process.env.API_BASE_URL || '';
 export function filePathToUrl(filePath: string | null | undefined): string {
   if (!filePath) return '';
 
+  // Already a full URL (http:// or https://) — return as-is
+  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+    return filePath;
+  }
+
   let relativePath: string;
 
   // Already a relative URL path (e.g. "/uploads/...")

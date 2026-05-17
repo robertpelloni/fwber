@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["PLACEHOLDER_TEAM_ID.me.fwber.app"],
+        "components": [
+          { "/": "/dashboard/*" },
+          { "/": "/messages/*" },
+          { "/": "/matches/*" },
+          { "/": "/profile/*" },
+          { "/": "/onboarding/*" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["PLACEHOLDER_TEAM_ID.me.fwber.app"]
+  }
+}

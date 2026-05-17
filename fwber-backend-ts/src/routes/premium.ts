@@ -17,7 +17,7 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
     const likes = await prisma.match_actions.findMany({
       where: {
         target_user_id: userId,
-        action: 'like'
+        action: { in: ['like', 'super_like'] }
       },
       include: {
         users_match_actions_user_idTousers: {
@@ -28,7 +28,7 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
             user_profiles: {
               select: {
                 bio: true,
-                avatar_url: true
+          avatar_url: true, display_name: true, date_of_birth: true, gender: true
               }
             }
           }
@@ -37,14 +37,19 @@ router.get('/who-likes-you', authenticate, async (req: any, res) => {
       take: 50
     });
 
-    const users = likes.map(l => {
+    const users = likes.map((l: any) => {
       const u = l.users_match_actions_user_idTousers;
       const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
+      const age = p?.date_of_birth ? Math.floor((Date.now() - new Date(p.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null;
       return {
         id: Number(u.id),
-        name: u.name,
+        name: p?.display_name || u.name,
         avatar_url: p?.avatar_url || u.avatar_url,
-        bio: p?.bio
+        bio: p?.bio,
+        age,
+        action_type: l.action,
+        created_at: l.created_at?.toISOString(),
+        gender: p?.gender || null,
       };
     });
     res.json({ users, total: users.length });
@@ -81,7 +86,7 @@ router.get('/status', authenticate, async (req: any, res) => {
 // POST /api/premium/initiate - Initiate premium subscription via Stripe
 router.post('/initiate', authenticate, async (req: any, res) => {
   const userId = BigInt(req.user.id);
-  const { planId } = req.body; // monthly, yearly
+  const { planId } = req.body || {}; // monthly, yearly
 
   if (!stripe) {
     return res.status(501).json({ error: 'Stripe is not configured on the server' });
@@ -155,6 +160,19 @@ router.post('/purchase', authenticate, async (req: any, res) => {
           tier_expires_at: new Date(Date.now() + (planId === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000)
         }
       });
+
+      // Record wallet transaction
+      try {
+        await tx.wallet_transactions.create({
+          data: {
+            user_id: userId,
+            amount: -cost,
+            type: 'spend',
+            description: `Premium ${planId === 'yearly' ? 'Yearly' : 'Monthly'} subscription`,
+            created_at: new Date(),
+          },
+        });
+      } catch (_) {}
 
       return { success: true };
     });

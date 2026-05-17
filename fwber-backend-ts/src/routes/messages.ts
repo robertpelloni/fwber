@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
 router.use(authenticate);
@@ -84,7 +85,8 @@ router.get('/conversations', async (req: any, res) => {
     const matches = await prisma.matches.findMany({
       where: {
         OR: [{ user1_id: userId }, { user2_id: userId }],
-        status: 'accepted',
+        status: { in: ['accepted', 'pending'] },
+        is_active: true,
       },
       include: {
         users_matches_user1_idTousers: {
@@ -97,28 +99,109 @@ router.get('/conversations', async (req: any, res) => {
       take: 50,
     });
 
+    // Fetch last message for each match partner
+    const partnerIds = matches.map((m: any) => {
+      const isUser1 = m.user1_id.toString() === userId.toString();
+      return isUser1 ? m.user2_id : m.user1_id;
+    });
+
+    let lastMessages: Map<string, any> = new Map();
+    try {
+      for (const partnerId of partnerIds) {
+        const msg = await prisma.messages.findFirst({
+          where: {
+            OR: [
+              { sender_id: userId, receiver_id: partnerId },
+              { sender_id: partnerId, receiver_id: userId },
+            ],
+          },
+          orderBy: { id: 'desc' },
+          take: 1,
+        });
+        if (msg) {
+          lastMessages.set(partnerId.toString(), msg);
+        }
+      }
+    } catch (_) {}
+
     const conversations = matches.map((m: any) => {
-      const otherUser = m.user1_id.toString() === userId.toString()
+      const isUser1 = m.user1_id.toString() === userId.toString();
+      const otherUser = isUser1
         ? m.users_matches_user2_idTousers
         : m.users_matches_user1_idTousers;
       const profile = otherUser?.user_profiles?.[0];
+      const partnerId = isUser1 ? m.user2_id : m.user1_id;
+      const lastMsg = lastMessages.get(partnerId.toString());
+
       return {
         id: Number(otherUser?.id || 0),
+        match_id: Number(m.id),
         other_user: {
           id: Number(otherUser?.id || 0),
           name: otherUser?.name || 'Unknown',
           display_name: profile?.display_name || otherUser?.name || 'Unknown',
           avatar_url: profile?.avatar_url || null,
         },
-        last_message: null,
+        last_message: lastMsg ? {
+          content: lastMsg.content,
+          sender_id: Number(lastMsg.sender_id),
+          sent_at: lastMsg.sent_at || lastMsg.created_at || null,
+          is_read: lastMsg.is_read,
+        } : null,
+        match_status: m.status,
         created_at: m.created_at?.toISOString() || null,
       };
     });
 
+
+    // Count unread per conversation for accurate badges
+    try {
+      for (const conv of conversations as any[]) {
+        const pid = Number(conv.other_user.id);
+        if (!isNaN(pid) && pid > 0) {
+          const partnerId = BigInt(pid);
+          const count = await prisma.messages.count({
+            where: { sender_id: partnerId, receiver_id: userId, is_read: false },
+          });
+          conv.unread_count = count;
+        }
+      }
+    } catch (e: any) {
+      console.warn("[Messages] Unread count error:", e.message);
+    }
     res.json(conversations);
   } catch (error: any) {
     console.error('[Messages] Conversations error:', error.message);
     res.json([]);
+  }
+});
+
+// GET /api/messages/unread-count \x97 get total unread message count
+router.get("/unread-count", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const count = await prisma.messages.count({
+      where: { receiver_id: userId, is_read: false },
+    });
+    res.json({ unread_count: count, count });
+  } catch (error: any) {
+    console.error("[Messages] Unread count error:", error.message);
+    res.json({ unread_count: 0, count: 0 });
+  }
+});
+
+// POST /api/messages/mark-all-read/:id \x97 mark all from user :id as read
+router.post("/mark-all-read/:id", async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const partnerId = BigInt(req.params.id);
+    const result = await prisma.messages.updateMany({
+      where: { sender_id: partnerId, receiver_id: userId, is_read: false },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true, marked_count: result.count });
+  } catch (error: any) {
+    res.json({ success: true, marked_count: 0 });
   }
 });
 
@@ -178,6 +261,42 @@ router.post('/', async (req: any, res) => {
         sent_at: new Date(),
       },
     });
+
+    // Auto-accept the match when first message is sent
+    try {
+      const receiverBigId = BigInt(receiver_id);
+      await prisma.matches.updateMany({
+        where: {
+          OR: [
+            { user1_id: userId, user2_id: receiverBigId },
+            { user1_id: receiverBigId, user2_id: userId },
+          ],
+          status: 'pending',
+        },
+        data: {
+          status: 'accepted',
+          last_message_at: new Date(),
+        },
+      });
+    } catch (_) {}
+
+    // Also update last_message_at for the match
+    try {
+      const receiverBigId = BigInt(receiver_id);
+      await prisma.matches.updateMany({
+        where: {
+          OR: [
+            { user1_id: userId, user2_id: receiverBigId },
+            { user1_id: receiverBigId, user2_id: userId },
+          ],
+        },
+        data: { last_message_at: new Date() },
+      });
+    } catch (_) {}
+
+    // Check achievements (first message, etc.)
+    checkAndUnlockAchievements(userId).catch(() => {});
+
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {
     console.error('[Messages] Send error:', error.message);
@@ -188,6 +307,44 @@ router.post('/', async (req: any, res) => {
 // POST /api/messages/:id/react
 router.post('/:id/react', async (req: any, res) => {
   res.json({ success: true });
+});
+
+// POST /api/messages/mark-all-read/:id \x97 mark all messages from user :id as read
+router.post('/mark-all-read/:id', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const partnerId = BigInt(req.params.id);
+    const result = await prisma.messages.updateMany({
+      where: {
+        sender_id: partnerId,
+        receiver_id: userId,
+        is_read: false,
+      },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true, marked_count: result.count });
+  } catch (error: any) {
+    console.error('[Messages] Mark read error:', error.message);
+    res.json({ success: true, marked_count: 0 });
+  }
+});
+
+// POST /api/messages/read \x97 mark a specific message as read
+router.post('/read', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { message_id } = req.body;
+    if (!message_id) {
+      return res.status(400).json({ message: 'message_id required' });
+    }
+    await prisma.messages.updateMany({
+      where: { id: BigInt(message_id), receiver_id: userId },
+      data: { is_read: true, read_at: new Date() },
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    res.json({ success: true });
+  }
 });
 
 export default router;

@@ -71,7 +71,7 @@ router.get('/stats', async (req: any, res) => {
       totalMatches,
       pendingMatches,
       acceptedMatches,
-      profileViews,
+      profileViews, todayViews,
       conversations,
     ] = await Promise.all([
       prisma.users.findUnique({ where: { id: userId } }),
@@ -80,6 +80,12 @@ router.get('/stats', async (req: any, res) => {
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'pending' } }),
       prisma.matches.count({ where: { OR: [{ user1_id: userId }, { user2_id: userId }], status: 'accepted' } }),
       prisma.profile_views.count({ where: { viewed_user_id: userId } }).catch(() => 0),
+      prisma.profile_views.count({
+        where: {
+          viewed_user_id: userId,
+          created_at: { gte: (() => { const d = new Date(); d.setUTCHours(0, 0, 0, 0); return d; })() }
+        }
+      }).catch(() => 0),
       prisma.chatrooms.count().catch(() => 0),
     ]);
 
@@ -95,7 +101,7 @@ router.get('/stats', async (req: any, res) => {
       accepted_matches: acceptedMatches,
       conversations,
       profile_views: typeof profileViews === 'number' ? profileViews : 0,
-      today_views: 0,
+      today_views: typeof todayViews === 'number' ? todayViews : 0,
       match_score_avg: 50,
       response_rate: 0,
       days_active: daysActive,
@@ -143,6 +149,7 @@ router.get('/activity', async (req: any, res) => {
       activities.push({
         id: `match-${m.id}`,
         type: 'match',
+          description: 'You have a new match!',
         user: {
           id: Number(partner.id),
           name: profile?.display_name || partner.name || 'Anonymous',
@@ -167,6 +174,7 @@ router.get('/activity', async (req: any, res) => {
       activities.push({
         id: `view-${v.id}`,
         type: 'view',
+          description: `${profile?.display_name || viewer.name || 'Someone'} viewed your profile`,
         user: {
           id: Number(viewer.id),
           name: profile?.display_name || viewer.name || 'Anonymous',
@@ -175,6 +183,79 @@ router.get('/activity', async (req: any, res) => {
         timestamp: v.created_at?.toISOString(),
       });
     }
+
+    // Recent messages received
+    try {
+      const recentMsgs = await prisma.messages.findMany({
+        where: { receiver_id: userId },
+        include: {
+          users_messages_sender_idTousers: { include: { user_profiles: { take: 1 } } },
+        },
+        orderBy: { created_at: 'desc' },
+        take: 3,
+      });
+      for (const msg of recentMsgs) {
+        const sender = msg.users_messages_sender_idTousers;
+        if (!sender) continue;
+        const profile = Array.isArray(sender.user_profiles) ? sender.user_profiles[0] : sender.user_profiles;
+        activities.push({
+          id: `msg-${msg.id}`,
+          type: 'message',
+          description: msg.content?.substring(0, 60),
+          user: {
+            id: Number(sender.id),
+            name: profile?.display_name || sender.name || 'Someone',
+            avatar_url: profile?.avatar_url || null,
+          },
+          timestamp: msg.created_at?.toISOString(),
+        });
+      }
+    } catch (_) {}
+
+    // Recent check-ins (streak activity)
+    try {
+      const recentCheckins = await prisma.venue_checkins.findMany({
+        where: { user_id: userId },
+        orderBy: { created_at: 'desc' },
+        take: 3,
+      });
+      for (const c of recentCheckins) {
+        activities.push({
+          id: `checkin-${c.id}`,
+          type: 'checkin',
+          description: 'Checked in at a venue',
+          timestamp: c.created_at?.toISOString(),
+        });
+      }
+    } catch (_) {}
+
+    // Pending match requests
+    try {
+      const pendingAs = await prisma.matches.findMany({
+        where: { user2_id: userId, status: 'pending' },
+        include: {
+          users_matches_user1_idTousers: { include: { user_profiles: { take: 1 } } },
+        },
+        orderBy: { created_at: 'desc' },
+        take: 3,
+      });
+      for (const m of pendingAs) {
+        const requester = m.users_matches_user1_idTousers;
+        if (!requester) continue;
+        const profile = Array.isArray(requester.user_profiles) ? requester.user_profiles[0] : requester.user_profiles;
+        activities.push({
+          id: `pending-${m.id}`,
+          type: 'pending_match',
+          description: 'Wants to match with you',
+          user: {
+            id: Number(requester.id),
+            name: profile?.display_name || requester.name || 'Someone',
+            avatar_url: profile?.avatar_url || null,
+          },
+          timestamp: m.created_at?.toISOString(),
+        });
+      }
+    } catch (_) {}
 
     activities.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
     res.json(activities.slice(0, limit));

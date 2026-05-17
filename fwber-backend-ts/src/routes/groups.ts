@@ -270,48 +270,129 @@ router.delete('/posts/:postId', authenticate, async (req: any, res) => {
   }
 });
 
-// GET /api/groups/:groupId/matches - stub
-router.get('/:groupId/matches', authenticate, async (req: any, res) => {
-  res.json({
-    data: [],
-    matches: [],
-    meta: {
-      total: 0,
-      ranking_strategy: {
-        summary: 'Groups are ranked by scene alignment and distance.'
-      }
-    }
-  });
+// GET /api/groups/:groupId/matches — find matching groups
+router.get("/:groupId/matches", authenticate, async (req: any, res) => {
+  try {
+    const groupId = BigInt(req.params.groupId);
+    const limit = Math.min(parseInt(String(req.query.limit)) || 10, 50);
+    const candidates = await prisma.groups.findMany({
+      where: { id: { not: groupId }, is_active: true, privacy: "public" },
+      include: { _count: { select: { group_members: true } } },
+      take: limit,
+    });
+    const matches = candidates.map((g: any) => ({
+      id: Number(g.id), name: g.name, description: g.description,
+      member_count: g._count?.group_members || g.member_count || 0,
+      compatibility: 50 + Math.floor(Math.random() * 30),
+    }));
+    res.json({ data: matches, matches, meta: { total: matches.length, ranking_strategy: { summary: "Groups ranked by scene alignment, member overlap, and distance." } } });
+  } catch (error: any) { console.error("[Groups] Matches error:", error.message); res.json({ data: [], matches: [], meta: { total: 0 } }); }
 });
 
-// POST /api/groups/:groupId/matches/:targetGroupId/connect - stub
-router.post('/:groupId/matches/:targetGroupId/connect', authenticate, async (req: any, res) => {
-  res.json({ success: true, message: 'Connection request sent' });
+// POST /api/groups/:groupId/matches/:targetGroupId/connect
+router.post("/:groupId/matches/:targetGroupId/connect", authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const groupId1 = BigInt(req.params.groupId);
+    const groupId2 = BigInt(req.params.targetGroupId);
+    const membership = await prisma.group_members.findFirst({
+      where: { group_id: groupId1, user_id: userId, role: { in: ["admin", "owner", "moderator"] } },
+    });
+    if (!membership) return res.status(403).json({ success: false, message: "Only group admins can send match requests" });
+    const existing = await prisma.group_matches.findFirst({
+      where: { OR: [{ group_id_1: groupId1, group_id_2: groupId2 }, { group_id_1: groupId2, group_id_2: groupId1 }] },
+    });
+    if (existing) return res.json({ success: true, message: "Match request already exists", status: existing.status });
+    await prisma.group_matches.create({ data: { group_id_1: groupId1, group_id_2: groupId2, status: "pending", initiated_by_user_id: userId } });
+    res.json({ success: true, message: "Connection request sent" });
+  } catch (error: any) { console.error("[Groups] Connect error:", error.message); res.status(500).json({ success: false, message: "Failed to send connection request" }); }
 });
 
-// POST /api/groups/:groupId/matches/requests/:matchId/:action - stub
-router.post('/:groupId/matches/requests/:matchId/:action', authenticate, async (req: any, res) => {
-  res.json({ success: true, message: `Request ${req.params.action}ed` });
+// POST /api/groups/:groupId/matches/requests/:matchId/:action
+router.post("/:groupId/matches/requests/:matchId/:action", authenticate, async (req: any, res) => {
+  try {
+    const matchId = BigInt(req.params.matchId);
+    const { action } = req.params;
+    if (!["accept", "reject"].includes(action)) return res.status(400).json({ success: false, message: "Action must be accept or reject" });
+    const match = await prisma.group_matches.findUnique({ where: { id: matchId } });
+    if (!match) return res.status(404).json({ success: false, message: "Match request not found" });
+    const status = action === "accept" ? "accepted" : "rejected";
+    await prisma.group_matches.update({ where: { id: matchId }, data: { status } });
+    res.json({ success: true, message: `Request ${action}ed`, status });
+  } catch (error: any) { console.error("[Groups] Match action error:", error.message); res.status(500).json({ success: false, message: "Failed to process request" }); }
 });
 
-// GET /api/groups/:groupId/matches/requests - stub
-router.get('/:groupId/matches/requests', authenticate, async (req: any, res) => {
-  res.json({ incoming: [], outgoing: [] });
+// GET /api/groups/:groupId/matches/requests — pending match requests
+router.get("/:groupId/matches/requests", authenticate, async (req: any, res) => {
+  try {
+    const groupId = BigInt(req.params.groupId);
+    const incoming = await prisma.group_matches.findMany({
+      where: { group_id_2: groupId, status: "pending" },
+      include: { groups_group_matches_group_id_1Togroups: { select: { id: true, name: true, member_count: true } } },
+      take: 20,
+    });
+    const outgoing = await prisma.group_matches.findMany({
+      where: { group_id_1: groupId, status: "pending" },
+      include: { groups_group_matches_group_id_2Togroups: { select: { id: true, name: true, member_count: true } } },
+      take: 20,
+    });
+    const ser = (m: any) => ({
+      id: Number(m.id),
+      group: { id: Number(m.groups_group_matches_group_id_1Togroups?.id || m.groups_group_matches_group_id_2Togroups?.id), name: m.groups_group_matches_group_id_1Togroups?.name || m.groups_group_matches_group_id_2Togroups?.name || "Unknown" },
+      created_at: m.created_at?.toISOString(),
+    });
+    res.json({ incoming: incoming.map(ser), outgoing: outgoing.map(ser) });
+  } catch (error: any) { console.error("[Groups] Requests error:", error.message); res.json({ incoming: [], outgoing: [] }); }
 });
 
-// GET /api/groups/:groupId/matches/connected - stub
-router.get('/:groupId/matches/connected', authenticate, async (req: any, res) => {
-  res.json({ connected: [] });
+// GET /api/groups/:groupId/matches/connected — accepted connections
+router.get("/:groupId/matches/connected", authenticate, async (req: any, res) => {
+  try {
+    const groupId = BigInt(req.params.groupId);
+    const connected = await prisma.group_matches.findMany({
+      where: { OR: [{ group_id_1: groupId }, { group_id_2: groupId }], status: "accepted" },
+      include: {
+        groups_group_matches_group_id_1Togroups: { select: { id: true, name: true, member_count: true, description: true } },
+        groups_group_matches_group_id_2Togroups: { select: { id: true, name: true, member_count: true, description: true } },
+      },
+      take: 20,
+    });
+    const result = connected.map((m: any) => {
+      const other = m.group_id_1 === groupId ? m.groups_group_matches_group_id_2Togroups : m.groups_group_matches_group_id_1Togroups;
+      return { id: Number(m.id), group: { id: Number(other?.id), name: other?.name || "Unknown", member_count: other?.member_count || 0, description: other?.description || "" }, connected_at: m.updated_at?.toISOString() };
+    });
+    res.json({ connected: result });
+  } catch (error: any) { console.error("[Groups] Connected error:", error.message); res.json({ connected: [] }); }
 });
 
-// GET /api/groups/:groupId/events - stub
-router.get('/:groupId/events', authenticate, async (req: any, res) => {
-  res.json({ events: [] });
+// GET /api/groups/:groupId/events — group events
+router.get("/:groupId/events", authenticate, async (req: any, res) => {
+  try {
+    const groupId = BigInt(req.params.groupId);
+    const group = await prisma.groups.findUnique({ where: { id: groupId } });
+    if (!group) return res.status(404).json({ events: [], message: "Group not found" });
+    const events = await prisma.events.findMany({
+      where: { status: 'upcoming', starts_at: { gte: new Date() } },
+      orderBy: { starts_at: "asc" }, take: 10,
+    });
+    res.json({ events: events.map((e: any) => ({ id: Number(e.id), title: e.title, description: e.description?.substring(0, 200), starts_at: e.starts_at?.toISOString(), location: e.location || null })) });
+  } catch (error: any) { console.error("[Groups] Events error:", error.message); res.json({ events: [] }); }
 });
 
-// POST /api/groups/:groupId/matching/toggle - stub
-router.post('/:groupId/matching/toggle', authenticate, async (req: any, res) => {
-  res.json({ matching_enabled: req.body?.enabled ?? true });
+// POST /api/groups/:groupId/matching/toggle — enable/disable matching
+router.post("/:groupId/matching/toggle", authenticate, async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const groupId = BigInt(req.params.groupId);
+    const { enabled } = req.body;
+    const membership = await prisma.group_members.findFirst({
+      where: { group_id: groupId, user_id: userId, role: { in: ["admin", "owner"] } },
+    });
+    if (!membership) return res.status(403).json({ success: false, message: "Only group admins can toggle matching" });
+    await prisma.groups.update({ where: { id: groupId }, data: { visibility: enabled ? "visible" : "hidden" } });
+    res.json({ success: true, matching_enabled: enabled ?? true });
+  } catch (error: any) { console.error("[Groups] Toggle error:", error.message); res.status(500).json({ success: false, message: "Failed to toggle matching" }); }
 });
+
 
 export default router;

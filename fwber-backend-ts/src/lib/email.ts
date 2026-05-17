@@ -15,20 +15,27 @@ try {
 }
 
 // SMTP transporter (legacy fallback)
+// Supports both authenticated SMTP and local relay (no auth needed)
 let transporter: nodemailer.Transporter | null = null;
-if (process.env.MAIL_HOST && process.env.MAIL_USER && process.env.MAIL_PASS) {
-  transporter = nodemailer.createTransport({
+if (process.env.MAIL_HOST) {
+  const smtpConfig: any = {
     host: process.env.MAIL_HOST,
     port: parseInt(process.env.MAIL_PORT || '587'),
     secure: parseInt(process.env.MAIL_PORT || '587') === 465,
-    auth: {
+    // For local relay (port 25), disable TLS to avoid self-signed cert issues
+    ...(process.env.MAIL_TLS === 'false' ? { tls: { rejectUnauthorized: false } } : {}),
+  };
+  // Add auth only if credentials are provided (not needed for local relay)
+  if (process.env.MAIL_USER && process.env.MAIL_PASS) {
+    smtpConfig.auth = {
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
-    },
-  });
-  console.log('[Email] SMTP transporter configured for', process.env.MAIL_HOST);
+    };
+  }
+  transporter = nodemailer.createTransport(smtpConfig);
+  console.log('[Email] SMTP transporter configured for', process.env.MAIL_HOST, process.env.MAIL_USER ? '(authenticated)' : '(no auth / local relay)');
 } else {
-  console.log('[Email] No SMTP credentials found, relying on Resend or console fallback');
+  console.log('[Email] No SMTP configured, relying on Resend or console fallback');
 }
 
 const MAIL_FROM = process.env.MAIL_FROM || 'noreply@fwber.me';

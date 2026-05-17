@@ -32,9 +32,13 @@ function RegisterForm() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      const user = localStorage.getItem('fwber_user')
+      const parsed = user ? JSON.parse(user) : {}
+      const needsOnboarding = !parsed.onboarding_completed_at
+      const destination = needsOnboarding ? '/onboarding' : '/dashboard'
       // Use setTimeout to avoid blocking the render cycle
       const timer = setTimeout(() => {
-        router.push('/dashboard')
+        router.push(destination)
       }, 100)
       return () => clearTimeout(timer)
     }

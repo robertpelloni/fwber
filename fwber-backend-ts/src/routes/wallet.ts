@@ -10,36 +10,58 @@ const router = Router();
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 // GET /api/wallet - Get user wallet balance
-router.get('/', authenticate, async (req: any, res) => {
+// GET /api/wallet/balance - Alias for balance
+async function getWalletBalance(req: any, res: any) {
   const userId = BigInt(req.user.id);
   try {
     const user = await prisma.users.findUnique({
       where: { id: userId },
       select: { token_balance: true }
     });
+    let transactions: any[] = [];
+    try {
+      transactions = await prisma.wallet_transactions.findMany({
+        where: { user_id: userId },
+        orderBy: { created_at: 'desc' },
+        take: 5
+      });
+    } catch (_) {}
     res.json({
       balance: user?.token_balance || 0,
       tokens: user?.token_balance || 0,
       currency: 'FWB',
-      transactions: [],
+      transactions,
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch wallet' });
   }
-});
+}
+
+router.get('/', authenticate, getWalletBalance);
+router.get('/balance', authenticate, getWalletBalance);
 
 // GET /api/wallet/transactions - Transaction history
 router.get('/transactions', authenticate, async (req: any, res) => {
   const userId = BigInt(req.user.id);
   try {
-    const transactions = await prisma.merchant_payments.findMany({
-      where: { payer_id: userId },
+    const transactions = await prisma.wallet_transactions.findMany({
+      where: { user_id: userId },
       orderBy: { created_at: 'desc' },
       take: 20
     });
     res.json({ transactions, total: transactions.length });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch transactions' });
+    // Fallback: if wallet_transactions not available, check merchant_payments
+    try {
+      const transactions = await prisma.merchant_payments.findMany({
+        where: { payer_id: userId },
+        orderBy: { created_at: 'desc' },
+        take: 20
+      });
+      res.json({ transactions, total: transactions.length });
+    } catch (e) {
+      res.json({ transactions: [], total: 0 });
+    }
   }
 });
 

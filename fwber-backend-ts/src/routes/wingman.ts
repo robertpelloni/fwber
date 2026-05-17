@@ -73,13 +73,30 @@ router.use(authenticate);
 router.post('/roast', async (req: any, res) => {
   try {
     const mode = req.body?.mode === 'hype' ? 'hype' : 'roast';
-    const roast = await ai.generateRoast(BigInt(req.user.id), mode);
+    let roast = await ai.generateRoast(BigInt(req.user.id), mode);
     const userId = BigInt(req.user.id);
+
+    // Fallback if AI returned empty
+    if (!roast || roast.trim() === '') {
+      const fallbacks = [
+        'Your profile is like a parking ticket — technically valid but nobody wants to deal with it.',
+        'Your bio reads like a Terms of Service agreement — long, boring, and nobody reads it.',
+        'You have the energy of a LinkedIn connection request at 3 AM.',
+        'Your profile pic screams I let my mom pick my outfit today.',
+        'You are giving main character energy in a movie nobody asked for a sequel to.',
+        'Your dating profile has the same vibe as a gym selfie in a bathroom mirror.',
+        'I have seen CVS receipts with more personality than your bio.',
+      ];
+      roast = fallbacks[Math.floor(Math.random() * fallbacks.length)] || 'Your profile is a mystery wrapped in an enigma wrapped in a beige turtleneck.';
+    }
+
     const shareId = await storeResult(userId, mode, { text: roast });
     res.json({ roast, share_id: shareId });
   } catch (err: any) {
     console.error('[wingman/roast]', err.message);
-    res.json({ roast: 'Your profile is like a parking ticket — technically valid but nobody wants to deal with it.', share_id: `err-${Date.now()}` });
+    const fallbackRoasts = ["Your profile is like a parking ticket \u2014 technically valid but nobody wants to deal with it.", "Your bio reads like a Terms of Service agreement \u2014 long, boring, and nobody reads it.", "You've got the energy of a LinkedIn connection request at 3 AM.", "Your profile pic screams 'I let my mom pick my outfit.'", "You're giving main character energy in a movie nobody asked for."];
+    const fallback = fallbackRoasts[Math.floor(Math.random() * fallbackRoasts.length)];
+    res.json({ roast: fallback, share_id: `err-${Date.now()}` });
   }
 });
 

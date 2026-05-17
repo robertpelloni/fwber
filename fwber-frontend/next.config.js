@@ -81,6 +81,7 @@ const nextConfig = {
       { protocol: 'https', hostname: '**.cloudfront.net' },
       { protocol: 'https', hostname: 'oaidalleapiprodscus.blob.core.windows.net' },
       { protocol: 'https', hostname: '**.googleapis.com' },
+		{ protocol: 'https', hostname: 'api.dicebear.com' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8002', pathname: '/files/**' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8002', pathname: '/storage/**' },
       { protocol: 'http', hostname: 'localhost', port: '8002', pathname: '/files/**' },

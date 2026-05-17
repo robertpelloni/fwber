@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSocketLogic } from './use-socket-logic';
 import { api } from '@/lib/api/client';
-import type { UseWebSocketOptions } from '@/lib/types/realtime';
+import type { UseWebSocketOptions, OnlineUser, PresenceUpdate, NotificationPayload } from '@/lib/types/realtime';
 
 // Re-export types from centralized location
 export * from '@/lib/types/realtime';
@@ -24,9 +24,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       reconnectAttempts: 0
     },
     messages: chatMessages,
-    onlineUsers: [],
-    presenceUpdates: [],
-    notifications: [],
+    onlineUsers: [] as OnlineUser[],
+    presenceUpdates: [] as PresenceUpdate[],
+    notifications: [] as NotificationPayload[],
     chatMessages,
     typingIndicators,
     videoSignals: [],
@@ -36,7 +36,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     sendChatMessage,
     sendTypingIndicator,
     sendVideoSignal: async () => {},
-    updatePresence: async () => {},
+    updatePresence: async (_status?: any, _metadata?: any) => {},
     sendNotification: async () => {},
     loadConversationHistory: async () => {},
     injectMissedMessages: () => {},
@@ -76,7 +76,7 @@ export function useWebSocketChat(recipientId?: string) {
     handleTypingChange,
     isTyping: false,
     chatMessages,
-    onlineUsers: [],
+    onlineUsers: [] as OnlineUser[],
     currentNudges: [],
   };
 }
