@@ -2425,3 +2425,37 @@ enum users_tier {
   free
   gold
 }
+
+
+model UserIntegration {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  provider         String   @db.VarChar(50)
+  providerUserId   String   @map("provider_user_id") @db.VarChar(255)
+  accessToken      String   @map("access_token") @db.Text
+  refreshToken     String?  @map("refresh_token") @db.Text
+  tokenExpiresAt   DateTime @map("token_expires_at") @db.Timestamptz
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  syncedContacts   SyncedContact[]
+
+  @@unique([userId, provider])
+  @@map("user_integrations")
+}
+
+model SyncedContact {
+  id                  String   @id @default(uuid())
+  userIntegrationId   String   @map("user_integration_id")
+  firstName           String?  @map("first_name") @db.VarChar(255)
+  lastName            String?  @map("last_name") @db.VarChar(255)
+  emails              String[] @db.Text
+  phones              String[] @db.Text
+  rawProviderData     Json?    @map("raw_provider_data") @db.JsonB
+  syncedAt            DateTime @default(now()) @map("synced_at") @db.Timestamptz
+
+  userIntegration     UserIntegration @relation(fields: [userIntegrationId], references: [id], onDelete: Cascade)
+
+  @@map("synced_contacts")
+}
