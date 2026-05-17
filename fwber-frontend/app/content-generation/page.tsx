@@ -1,91 +1,290 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info, Sparkles } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import SmartContentEditor from '@/components/SmartContentEditor';
+import AIProfileBuilder from '@/components/AIProfileBuilder';
+import ConversationStarters from '@/components/ConversationStarters';
+import { useContentGenerationAnalytics } from '@/lib/hooks/use-content-generation';
+import { CosmicMatch } from '@/components/profile/CosmicMatch';
+import { NemesisFinder } from '@/components/profile/NemesisFinder';
+import { VibeCheck } from '@/components/profile/VibeCheck';
 
 export default function ContentGenerationPage() {
-    const [prompt, setPrompt] = useState('');
-    const [generating, setGenerating] = useState(false);
-    const [generatedBio, setGeneratedBio] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('profile');
+  const [generatedContent, setGeneratedContent] = useState<string>('');
 
-    const handleGenerate = async () => {
-        if (!prompt) return;
-        setGenerating(true);
-        try {
-            const res = await fetch('/api/content-generation/bio', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
-            });
-            if (!res.ok) throw new Error('Generation failed');
-            const data = await res.json();
-            setGeneratedBio(data.bio);
-        } catch (e: any) {
-            toast.error(e.message || 'Failed to generate content');
-        } finally {
-            setGenerating(false);
-        }
-    };
+  const { generationStats, optimizationStats, isLoading, error } = useContentGenerationAnalytics();
 
-    return (
-        <div className="container mx-auto p-4 md:p-8 max-w-4xl space-y-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Sparkles className="w-8 h-8 text-primary" />
-                AI Content Generation
-            </h1>
+  const tabs = [
+    { id: 'profile', name: 'AI Profile Builder', icon: '👤' },
+    { id: 'editor', name: 'Smart Content Editor', icon: '✍️' },
+    { id: 'conversation', name: 'Conversation Starters', icon: '💬' },
+    { id: 'viral', name: 'Viral Tools', icon: '✨' },
+    { id: 'analytics', name: 'Analytics Dashboard', icon: '📊' },
+  ];
 
-            <Card className="bg-white shadow-sm border border-gray-100">
-                <CardHeader>
-                    <CardTitle className="text-xl flex items-center gap-2">
-                        Profile Bio Generator
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Uses AI to generate a compelling dating profile bio based on your interests.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </CardTitle>
-                    <CardDescription>
-                        Struggling to write about yourself? Tell our AI Wingman a few things you like, and we'll craft the perfect bio.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <textarea
-                        className="w-full p-3 border rounded-lg h-32 focus:ring-2 focus:ring-primary/50"
-                        placeholder="E.g., I love hiking, dogs, and trying new coffee shops. Looking for someone adventurous..."
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                    />
-                    <Button
-                        onClick={handleGenerate}
-                        disabled={generating || !prompt}
-                        className="w-full sm:w-auto flex items-center gap-2"
-                    >
-                        {generating ? 'Crafting Bio...' : 'Generate Bio'}
-                        <Sparkles className="w-4 h-4" />
-                    </Button>
+  const handleProfileGenerated = (profile: any) => {
+    setGeneratedContent(profile.content);
+  };
 
-                    {generatedBio && (
-                        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <h3 className="font-semibold text-gray-700 mb-2">Suggested Bio:</h3>
-                            <p className="text-gray-800 whitespace-pre-wrap">{generatedBio}</p>
-                            <div className="mt-4 flex gap-2">
-                                <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(generatedBio)}>
-                                    Copy to Clipboard
-                                </Button>
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">AI Content Generation</h1>
+            <p className="text-gray-600">Leverage the power of AI to create engaging content</p>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="mb-8">
+            <nav className="flex space-x-8" aria-label="Tabs">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  data-testid={`${tab.id}-tab`}
+                  className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="text-lg">{tab.icon}</span>
+                  <span>{tab.name}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            {activeTab === 'profile' && (
+              <div className="p-6">
+                <AIProfileBuilder onProfileGenerated={handleProfileGenerated} />
+              </div>
+            )}
+
+            {activeTab === 'editor' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold mb-2">Smart Content Editor</h2>
+                  <p className="text-gray-600">
+                    Create and optimize content with AI-powered suggestions and real-time analysis.
+                  </p>
+                </div>
+
+                <SmartContentEditor
+                  initialContent={generatedContent}
+                  onContentChange={(content) => setGeneratedContent(content)}
+                  context={{
+                    location: {
+                      latitude: (user as any)?.latitude ?? (user as any)?.profile?.location?.latitude ?? 0,
+                      longitude: (user as any)?.longitude ?? (user as any)?.profile?.location?.longitude ?? 0,
+                    },
+                    interests: ((user as any)?.interests as string[] | undefined) ?? [],
+                  }}
+                  placeholder="Start writing your content here..."
+                  maxLength={1000}
+                  enableOptimization={true}
+                  enableQualityAnalysis={true}
+                  showSuggestions={true}
+                />
+              </div>
+            )}
+
+            {activeTab === 'conversation' && (
+              <div className="p-6">
+                <ConversationStarters />
+              </div>
+            )}
+
+            {activeTab === 'viral' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold mb-2">Viral Content Tools</h2>
+                  <p className="text-gray-600">
+                    Fun, shareable AI tools to engage with friends and potential matches.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <CosmicMatch />
+                  <NemesisFinder />
+                  <VibeCheck />
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
+              <div className="p-6">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-semibold mb-2">Content Generation Analytics</h2>
+                  <p className="text-gray-600">
+                    Track your content generation performance and optimization results.
+                  </p>
+                </div>
+
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading analytics...</p>
+                  </div>
+                ) : error ? (
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h3 className="font-semibold text-red-800 mb-2">Error Loading Analytics</h3>
+                    <p className="text-sm text-red-700">
+                      {error.message || 'An error occurred while loading analytics data.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Generation Stats */}
+                    {generationStats && (
+                      <div className="bg-blue-50 p-6 rounded-lg">
+                        <h3 className="text-lg font-semibold text-blue-800 mb-4">Generation Statistics</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-blue-600">
+                              {generationStats.total_generations}
                             </div>
+                            <div className="text-sm text-blue-700">Total Generations</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-green-600">
+                              {Math.round(generationStats.user_satisfaction * 100)}%
+                            </div>
+                            <div className="text-sm text-green-700">User Satisfaction</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-purple-600">
+                              {generationStats.successful_generations}
+                            </div>
+                            <div className="text-sm text-purple-700">Successful</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-orange-600">
+                              {generationStats.average_generation_time}s
+                            </div>
+                            <div className="text-sm text-orange-700">Avg. Time</div>
+                          </div>
                         </div>
+                      </div>
                     )}
-                </CardContent>
-            </Card>
+
+                    {/* Optimization Stats */}
+                    {optimizationStats && (
+                      <div className="bg-green-50 p-6 rounded-lg">
+                        <h3 className="text-lg font-semibold text-green-800 mb-4">Optimization Statistics</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-green-600">
+                              {optimizationStats.total_optimizations}
+                            </div>
+                            <div className="text-sm text-green-700">Total Optimizations</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-blue-600">
+                              {Math.round(optimizationStats.average_improvement_score * 100)}%
+                            </div>
+                            <div className="text-sm text-blue-700">Avg. Improvement</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-purple-600">
+                              {optimizationStats.successful_optimizations}
+                            </div>
+                            <div className="text-sm text-purple-700">Successful</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-3xl font-bold text-orange-600">
+                              {Object.keys(optimizationStats.optimization_types_usage).length}
+                            </div>
+                            <div className="text-sm text-orange-700">Types Used</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Popular Types */}
+                    {generationStats?.most_popular_types && (
+                      <div className="bg-purple-50 p-6 rounded-lg">
+                        <h3 className="text-lg font-semibold text-purple-800 mb-4">Popular Content Types</h3>
+                        <div className="space-y-2">
+                          {generationStats.most_popular_types.map((type: string, index: number) => (
+                            <div key={type} className="flex justify-between items-center">
+                              <span className="text-sm text-purple-700 capitalize">{type}</span>
+                              <span className="text-sm font-medium text-purple-600">#{index + 1}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Common Improvements */}
+                    {optimizationStats?.most_common_improvements && (
+                      <div className="bg-yellow-50 p-6 rounded-lg">
+                        <h3 className="text-lg font-semibold text-yellow-800 mb-4">Common Improvements</h3>
+                        <div className="space-y-2">
+                          {optimizationStats.most_common_improvements.map((improvement: string, index: number) => (
+                            <div key={improvement} className="flex justify-between items-center">
+                              <span className="text-sm text-yellow-700">{improvement}</span>
+                              <span className="text-sm font-medium text-yellow-600">#{index + 1}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">🚀 Quick Start</h3>
+              <p className="text-gray-600 mb-4">
+                Get started with AI content generation in just a few clicks.
+              </p>
+              <button
+                onClick={() => setActiveTab('profile')}
+                className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Create Profile
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">✍️ Smart Editor</h3>
+              <p className="text-gray-600 mb-4">
+                Use our AI-powered editor to create and optimize content.
+              </p>
+              <button
+                onClick={() => setActiveTab('editor')}
+                className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Start Writing
+              </button>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">📊 Analytics</h3>
+              <p className="text-gray-600 mb-4">
+                Track your content performance and optimization results.
+              </p>
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors"
+              >
+                View Analytics
+              </button>
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </ProtectedRoute>
+  );
 }

@@ -89,7 +89,33 @@ export function setupSocketIO(httpServer: any) {
       }
     });
 
+
+    // Handle Live Event Rooms
+    socket.on('join_event', (data: { eventId: number }) => {
+      if (!socket.user) return;
+      socket.join(`event:${data.eventId}`);
+      console.log(`[Socket.io] User ${socket.user.id} joined event ${data.eventId}`);
+    });
+
+    socket.on('leave_event', (data: { eventId: number }) => {
+      if (!socket.user) return;
+      socket.leave(`event:${data.eventId}`);
+      console.log(`[Socket.io] User ${socket.user.id} left event ${data.eventId}`);
+    });
+
+    socket.on('update_location', (data: { eventId: number; lat: number; lng: number }) => {
+      if (!socket.user) return;
+      // Broadcast location to everyone else in the event room
+      socket.to(`event:${data.eventId}`).emit('location_updated', {
+        userId: socket.user.id,
+        lat: data.lat,
+        lng: data.lng,
+        timestamp: new Date()
+      });
+    });
+
     // Handle Typing status
+
     socket.on('typing', (data: { receiverId: number }) => {
       if (!socket.user) return;
       io.to(`user:${data.receiverId}`).emit('user_typing', { senderId: socket.user.id });

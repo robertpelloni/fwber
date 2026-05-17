@@ -1,11 +1,9 @@
 /**
- * Shared in-memory verification token store.
- * Used by both the auth controller (registration) and the email route
- * so that tokens generated at registration can be verified later.
- *
- * For production, replace with a database-backed store.
+ * Redis-backed verification token store.
+ * Replaces the in-memory store for horizontal scalability.
  */
 import crypto from 'crypto';
+import redis from './redis.js';
 
 interface TokenData {
   userId: bigint;
@@ -13,23 +11,16 @@ interface TokenData {
   expires: number;
 }
 
-const tokens = new Map<string, TokenData>();
-
-// Clean expired tokens every 10 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [token, data] of tokens) {
-    if (data.expires < now) tokens.delete(token);
-  }
-}, 10 * 60 * 1000);
+const REDIS_PREFIX = 'verification_token:';
 
 /**
  * Generate a new verification token for a user.
  * Returns the token string.
  */
-export function createVerificationToken(userId: bigint, email: string, ttlMs = 24 * 60 * 60 * 1000): string {
+export async function createVerificationToken(userId: bigint, email: string, ttlMs = 24 * 60 * 60 * 1000): Promise<string> {
   const token = crypto.randomBytes(32).toString('hex');
-  tokens.set(token, { userId, email, expires: Date.now() + ttlMs });
+  const data: TokenData = { userId, email, expires: Date.now() + ttlMs };
+  await redis.setex(`${REDIS_PREFIX}${token}`, Math.floor(ttlMs / 1000), JSON.stringify(data));
   return token;
 }
 
@@ -37,25 +28,32 @@ export function createVerificationToken(userId: bigint, email: string, ttlMs = 2
  * Validate and consume a verification token.
  * Returns the token data if valid, or null if invalid/expired.
  */
-export function consumeVerificationToken(token: string): TokenData | null {
-  const data = tokens.get(token);
-  if (!data) return null;
+export async function consumeVerificationToken(token: string): Promise<TokenData | null> {
+  const key = `${REDIS_PREFIX}${token}`;
+  const dataStr = await redis.get(key);
+  if (!dataStr) return null;
+
+  const data: TokenData = JSON.parse(dataStr);
   if (data.expires < Date.now()) {
-    tokens.delete(token);
+    await redis.del(key);
     return null;
   }
-  tokens.delete(token); // One-time use
+
+  await redis.del(key); // One-time use
   return data;
 }
 
 /**
  * Check if a token exists without consuming it.
  */
-export function hasVerificationToken(token: string): boolean {
-  const data = tokens.get(token);
-  if (!data) return false;
+export async function hasVerificationToken(token: string): Promise<boolean> {
+  const key = `${REDIS_PREFIX}${token}`;
+  const dataStr = await redis.get(key);
+  if (!dataStr) return false;
+
+  const data: TokenData = JSON.parse(dataStr);
   if (data.expires < Date.now()) {
-    tokens.delete(token);
+    await redis.del(key);
     return false;
   }
   return true;

@@ -18,6 +18,8 @@ type Setter<T> = (val: T | ((prev: T) => T)) => void;
 const _chatMessageSetters = new Set<Setter<ChatMessage[]>>();
 const _typingSetters = new Set<Setter<TypingIndicator[]>>();
 const _connectedSetters = new Set<Setter<boolean>>();
+const _eventAttendeesSetters = new Set<Setter<Record<string, {userId: number, lat: number, lng: number, timestamp: Date}>>>();
+let _eventAttendeesLocations: Record<string, {userId: number, lat: number, lng: number, timestamp: Date}> = {};
 
 function attachListeners(socket: Socket, userId: string | undefined) {
   if (_listenersAttached) return;
@@ -50,6 +52,20 @@ function attachListeners(socket: Socket, userId: string | undefined) {
     _chatMessages.push(newMessage);
     const snapshot = [..._chatMessages];
     _chatMessageSetters.forEach(s => s(snapshot));
+  });
+
+  socket.on('location_updated', (data: { userId: number, lat: number, lng: number, timestamp: Date }) => {
+    _eventAttendeesLocations = {
+      ..._eventAttendeesLocations,
+      [data.userId.toString()]: {
+        userId: data.userId,
+        lat: data.lat,
+        lng: data.lng,
+        timestamp: data.timestamp
+      }
+    };
+    const snapshot = { ..._eventAttendeesLocations };
+    _eventAttendeesSetters.forEach(s => s(snapshot));
   });
 
   socket.on('user_typing', (data: any) => {
@@ -86,6 +102,7 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
   const [connected, setConnected] = useState(() => _socket?.connected ?? false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => [..._chatMessages]);
   const [typingIndicators, setTypingIndicators] = useState<TypingIndicator[]>(() => [..._typingIndicators]);
+  const [eventAttendeesLocations, setEventAttendeesLocations] = useState<Record<string, {userId: number, lat: number, lng: number, timestamp: Date}>>(() => ({..._eventAttendeesLocations}));
   const mountedRef = useRef(true);
 
   // Register setters so singleton can update all instances
@@ -94,11 +111,13 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
     _connectedSetters.add(setConnected);
     _chatMessageSetters.add(setChatMessages);
     _typingSetters.add(setTypingIndicators);
+    _eventAttendeesSetters.add(setEventAttendeesLocations);
     return () => {
       mountedRef.current = false;
       _connectedSetters.delete(setConnected);
       _chatMessageSetters.delete(setChatMessages);
       _typingSetters.delete(setTypingIndicators);
+      _eventAttendeesSetters.delete(setEventAttendeesLocations);
     };
   }, []);
 
@@ -158,6 +177,24 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, []);
 
+  const joinEventRoom = useCallback((eventId: number) => {
+    if (_socket) {
+      _socket.emit('join_event', { eventId });
+    }
+  }, []);
+
+  const leaveEventRoom = useCallback((eventId: number) => {
+    if (_socket) {
+      _socket.emit('leave_event', { eventId });
+    }
+  }, []);
+
+  const broadcastLocation = useCallback((eventId: number, lat: number, lng: number) => {
+    if (_socket) {
+      _socket.emit('update_location', { eventId, lat, lng });
+    }
+  }, []);
+
   useEffect(() => {
     if (options.autoConnect && isAuthenticated) {
       _connectionCount++;
@@ -176,6 +213,10 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
     typingIndicators,
     sendChatMessage,
     sendTypingIndicator,
+    joinEventRoom,
+    leaveEventRoom,
+    broadcastLocation,
+    eventAttendeesLocations,
     connect,
     disconnect,
   };

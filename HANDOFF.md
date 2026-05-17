@@ -1,122 +1,21 @@
-# HANDOFF - End of Session
-
-> **Timestamp:** 2026-04-08
-> **Version Reached:** 1.8.54
-> **Version Started:** 1.8.48
-> **Current Model:** Claude (Antigravity)
-> **Branch:** `main`
+# HANDOFF.md
 
 ## Executive Summary
+I have successfully completed the next set of Action Items and brought the project to version `2.0.8`. This session focused heavily on the critical security aspects of the new Federation Service and bringing the frontend live event architecture to life using websockets.
 
-This session performed comprehensive security hardening, GDPR compliance, CSP fixes, password reset flow, account deletion security, profile view tracking restoration, notification listener expansion, and WebSocket production fixes. The project moved from v1.8.48 → v1.8.59 across 12 deployments, all successfully deployed to both Hetzner (backend) and Vercel (frontend).
+## What was completed
+1. **Federated Social Graph Hardening**:
+   - Replaced the stubbed `verifyHttpSignature` method in `FederationService.ts` with a fully functional cryptographic validation pipeline using Node's `crypto` module.
+   - Wrote a new Jest test suite `tests/FederationHttpSignature.test.ts` to explicitly assert the behavior of valid and tampered incoming signatures.
+2. **Live Event Architecture**:
+   - Updated the `EventMap.tsx` to subscribe to the `location_updated` socket channel. It now receives live coordinate broadcasts from other users in the same event room and updates their markers dynamically.
+3. **Documentation**:
+   - Updated `VERSION`, `TODO.md`, `CHANGELOG.md`, `ROADMAP.md`, and `PROJECT_STATUS.md` to `2.0.10` and marked these tasks as complete.
 
-**Total route count: 445** (including forgot-password, reset-password, profile view tracking, and rate-limit status).
-**Total tests: 432 passing, 0 failures** (was 431 with 1 failure).
+## Outstanding Issues / Findings
+- **Prisma Schema**: The new schema additions (like `federation_follows` and the new columns on `users`) STILL require a live migration (`npx prisma migrate dev`) against the Hetzner staging database to become real. The mock testing suite bypasses this.
+- **ActivityPub Real-World Testing**: While unit tests cover the HTTP Signature algorithm, a real-world test against a Mastodon instance is required to ensure our headers and JSON-LD payloads align precisely with external implementations.
 
-### What Was Done
-
-#### v1.8.48 — Native confirm() Removal
-- Removed all 14 native `confirm()` calls from 12 production pages
-- Added `useConfirmDialog` hook using shadcn Dialog for the messages page block/report flow
-
-#### v1.8.49-50 — Password Reset Flow
-- `POST /auth/forgot-password` + `POST /auth/reset-password` API routes
-- Custom `ResetPasswordNotification` with branded emails linking to frontend
-- `/forgot-password` and `/reset-password` frontend pages
-
-#### v1.8.51 — Account Security & GDPR
-- Password verification for account deletion, token revocation, data anonymization
-- Data export UI + privacy rights section in account settings
-- Removed last `console.log()` calls from production
-
-#### v1.8.52-54 — CSP Hardening
-- Fixed Google Fonts, blob workers, and Pusher WebSocket CSP violations
-- Tightened image remote patterns from wildcard to explicit domains
-- DNS prefetch fixed from localhost to api.fwber.me
-
-#### v1.8.56-57 — Profile View Tracking
-- Restored 3 unrouted `ProfileViewController` endpoints (record, list, stats)
-- Frontend fires `POST /profile/{userId}/view` on profile load
-- Schema migration for `viewer_ip` and `user_agent` columns
-
-#### v1.8.58 — Notification Expansion
-- NotificationListener expanded from 1 to 14 notification types
-- Each type has contextual title, message, and CTA action button
-- Deduplication prevents repeated toasts
-
-#### v1.8.59 — Settings Dark Mode
-- Dark mode classes added to main `/settings` page
-
-### Verified Working
-- All 445 API routes confirmed matching frontend API calls (zero gaps)
-- All backend controllers have registered routes (only ActivityPub excluded per ROADMAP)
-- All 17 notification types have backend classes, 14 handled in frontend listener
-- CSP confirmed deployed and correct (browser cache may show stale errors)
-- All 4 CI pipelines consistently green across all deployments
-- **API client consolidation**: 6 modules migrated from raw axios/fetch to apiClient proxy for retry, auth, and error handling consistency
-- **1700+ OpenAPI/Swagger annotations** across backend controllers
-
-## What Was Done
-
-### v1.8.29 — Missing Route Restoration
-- Restored **16 moderation API routes** (`api/moderation/*`) backed by existing `ModerationController`.
-- Added `GET api/config/features`, `GET api/wingman/status`, `GET api/referrals/payouts`, `POST api/location/travel-mode`, achievement progress/unlock endpoints.
-
-### v1.8.30 — Content Generation & Method Fix
-- Registered 6 `content-generation/*` routes: optimize, stats, optimization-stats, feedback, history, content/{id} DELETE.
-- Fixed frontend `wingman.ts` — `vibe-check`, `fortune`, `cosmic-match` were using POST but backend routes are GET.
-- Moved `config/features` to public route (no auth required).
-
-### v1.8.31 — Feature Flags, CORS Fix, Route Gap Closure
-- Created `config/feature_flags.php` with all 15 flags defaulting to `true`, overridable via `FEATURE_*` env vars.
-- **Fixed CORS `credentials+wildcard` mismatch**: Changed from `allowed_origins: ['*']` to explicit origins list so `supports_credentials: true` works in browsers.
-- Added `PATCH` to CORS allowed methods.
-- Added `GET api/matches/history` alias, `GET api/photos/settings` endpoint.
-- Cleaned stale "DreamHost" references.
-
-### v1.8.32 — Frontend Route Gap Closure
-- Added `GET api/wingman/date-ideas/general` (curated Detroit ideas, no match ID required).
-- Added `GET api/photos/reveals` (paginated photo reveal requests).
-- Added `GET api/matches/insights/unlocked` (unlocked match insights via ContentUnlock).
-- Fixed wingman roast page to use `POST` instead of `GET`.
-
-### v1.8.33 — Feature Flag Activation
-- Activated `useBackendFeatureFlags` hook (changed from `enabled: false` to `enabled: true`).
-- Added `media_analysis` to BackendFeatureFlags interface.
-- Verified all 436 backend routes against every frontend API call — zero remaining gaps.
-
-## Deployment Status
-- **Hetzner Backend**: v1.8.57 confirmed healthy ✅
-- **Vercel Frontend**: v1.8.57 deployed and serving ✅
-- **Frontend→Backend proxy**: `www.fwber.me/api/*` → `api.fwber.me/api/*` working ✅
-- **CORS**: `Access-Control-Allow-Origin: https://fwber.me` with `credentials: true` ✅
-- **Feature flags**: All 16 features enabled on production ✅
-- **GitHub Actions**: All CI checks passing (Backend Tests, Repository Hygiene, Hetzner Deploy, Vercel Deploy) ✅
-- **SEO**: robots.txt + dynamic sitemap.xml serving ✅
-- **Error handling**: Error boundaries at page and global level ✅
-- **Broadcasting**: Default driver changed to `reverb` ✅
-- **WebSocket origins**: Restricted to fwber.me, www.fwber.me, localhost ✅
-- **APM**: Enabled by default with 500ms slow request threshold ✅
-- **Email verification**: Full flow (register → email → verify → settings) ✅
-- **OG images**: Dynamic for share pages and roast page ✅
-- **Auth normalization**: snake_case → camelCase at all auth dispatch points ✅
-- **Security**: security.txt and humans.txt for responsible disclosure ✅
-- **Profile view tracking**: 3 endpoints + frontend call + migration ✅
-- **CSP**: Full Content Security Policy with Google Fonts, worker-src, Pusher WebSocket ✅
-- **GDPR**: Data export UI, account deletion with password verification, privacy rights ✅
-
-## Verified Working Endpoints
-- `GET /api/health` → version 1.8.44, all checks OK
-- `GET /api/config/features` → all 15 features enabled (public, no auth)
-- `GET /api/health/metrics` → Redis 1.45M, 4 clients, DB 2 threads
-- `GET /api/viral-content/{id}` → viral content with view counting and Gold reward
-- `POST /api/email/verification-notification` → resend verification email
-- CORS preflight → returns proper `Allow-Origin`, `Allow-Credentials`, `Allow-Methods`
-- OG images → `/share/{id}/opengraph-image` and `/roast/opengraph-image` generate dynamic social cards
-
-## Best Next Steps
-1. **Marketing Push**: The referral system, viral roast page, and dynamic OG images are all production-ready — ready for acquisition campaigns.
-2. **Landing Page Optimization**: The public `/roast` page is the primary acquisition funnel — consider A/B testing.
-3. **Mobile Store Submission**: The Expo config is ready — next step is EAS build and store submission.
-4. **Performance APM**: APM is now enabled by default — review slow request logs and optimize hot paths.
-5. **Email Verification Enforcement**: Consider gating certain features (e.g., messaging) behind email verification for spam prevention.
+## Next Steps for Next Agent
+1. **Live Deployment & Migration**: Run the Prisma migrations on the Hetzner live database to synchronize the new Federation columns (`public_key`, `private_key`, `federation_follows`).
+2. **Fediverse Interop Testing**: Spin up a local Mastodon/Pleroma dev instance and attempt to search for a local `fwber` user handle to test the `webfinger` and `actor` endpoints end-to-end.

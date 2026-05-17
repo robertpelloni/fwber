@@ -1,68 +1,35 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.0.0-ts
-> **Last Updated:** 2026-04-13
+> **Version:** 2.0.10
+> **Last Updated:** $(date +%Y-%m-%d)
 
 ---
 
-## 🔴 Critical: TypeScript Ecosystem Stability
-- [x] **Backend Porting**: Port all 70+ Laravel models, controllers, and services to Express/Prisma.
-- [x] **Frontend Integration**: Update `apiClient` and `AuthProvider` to sync with the new Node.js backend.
-- [x] **Real-time Migration**: Replace Laravel Echo/Pusher with `socket.io-client` and a dedicated `useSocketLogic` hook.
-- [x] **Deployment Automation**: Create Hetzner and Vercel deployment configurations for the TypeScript stack.
-- [ ] **Service Layer Hardening**: Expand unit tests for `MatchMakerService` and `GeoScreenerService` in the new Node environment.
-- [ ] **Production Monitoring**: Set up Winston/Morgan logging and integrate with Sentry for the new Express backend.
-- [ ] **Data Migration Validation**: Verify that the production MySQL/PostgreSQL data remains consistent after the Prisma cutover.
+## 🔴 Critical: Data Migration & Deployment
+- [ ] **Database Migration**: Run Prisma migrations on the Hetzner staging/production database to generate the new ActivityPub columns and tables.
+- [ ] **Deployment Verification**: Deploy the backend and frontend, ensuring no regressions in the core flow.
+- [ ] **Fediverse Interop Testing**: Spin up a local Mastodon/Pleroma dev instance and attempt to search for a local `fwber` user handle to test the `webfinger` and `actor` endpoints end-to-end.
 
-## 🟡 High: User Growth & Engagement
-- [ ] **Marketing Push**: Leverage the restored Referral & Payout system to drive early adopter signups.
-- [x] **Mobile Store Prep**: Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
-- [x] **SEO & Meta Optimization**: Dynamic OG images for share pages, roast page SEO metadata.
-- [ ] **Landing Page Conversion**: A/B test the public `/roast` page as the primary acquisition funnel.
+## 🟡 High: Mobile & Notifications Polish
+- [x] **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
+- [x] **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
 
-## ✅ Recently Completed
-- [x] **Recommendation Engine Performance Pass**: Optimized `RecommendationService` to eliminate nested N+1 queries when fetching collaborative filtering telemetry and content data.
-- [x] **Mobile Store Prep**: Added missing `expo-notifications` dependency and native plugins to `app.json` to prepare the mobile shell for EAS builds and store distribution.
-- [x] **Advanced Proximity Performance Pass**: Pre-fetched artifact counts in `ProximityArtifactController` to remove N+1 queries during nearby candidate processing.
-- [x] **Extended Performance Monitoring Pass**: Optimized `MatchController` and `ProfileViewController` to eliminate N+1 queries, prefetching necessary related user data via `GROUP BY` and `whereIn`.
-- [x] **Performance Monitoring & N+1 Query Optimization**: Refactored the dashboard `getActivity` method to eliminate N+1 database queries when fetching the recent activity feed.
-- [x] **AI Prompt Tuning & Localization**: Hyper-localized the AI Wingman prompts (roasts, vibes, date ideas) to the Detroit and privacy-first product identity.
-- [x] **Project Consolidation & Future Milestones**: Completed broad product polish across all hubs. Verified all leaf features (Gifts, Matches, Connections, Commerce) are reachable and functional.
-- [x] **Merchant Inventory & Proximity Polish**: Added merchant inventory management, surfaced the proximity feed in Spaces, and verified Reverb heartbeats.
-- [x] **Critical Production & CI Repair**: Fixed dashboard 500 error ($daysActive) and expanded nuclear recovery to include missing proximity and artifact tables.
-- [x] **Nuclear Schema Recovery & System Heartbeat**: Forcefully restored missing 'ghost' tables on production, activated the Laravel Scheduler on Hetzner, and added a Reverb health heartbeat.
-- [x] **Token Bridge & Real-time Signal**: Surfaced the Swap interface in the Economy hub and added a live Reverb network signal to the dashboard stats.
-- [x] **Mobile Notification Bridge & Marketplace Surfacing**: Restored the native push bridge for the mobile shell and surfaced the physical item marketplace in the Commerce hub.
-- [x] **Gamification & Physical-Match Surfacing**: Surfaced NFC Flash Match, AI Date Ideas, and Daily Streak celebration; expanded smoke checks to cover all hubs.
-- [x] **Sidebar Domain Organization & Exclusion Audit**: Reorganized sidebar/mobile nav by domain, updated dashboard quick actions to use hubs, and removed excluded Icebreaker/Journal links.
-- [x] **Hub Completion & Leaf Recovery**: Fixed build-breaking imports and surfaced Ice Breaker Cards, Video Calls, and Hardware Token in their respective hubs.
-- [x] **Surface Polish & Runtime Hardening**: Hardened `VectorService` against missing RediSearch, surfaced `/rate-my-pussy`, `/groups/matching`, and `/gifts/history` in their respective hubs, and removed excluded links from Settings.
-- [x] **Production Schema Repair**: Added a corrective migration to eliminate 500 errors caused by 'ghost' migrations; ensuring the production database actually holds the tables and columns required by the restored codebase.
-- [x] **Rewind Sidebar Domain Organization**: Reorganized the sidebar and mobile restored-surfaces navigation into domain groups so the app shell now mirrors the dashboard’s product map instead of presenting a flat feature list.
-- [x] **Rewind Dashboard Domain Organization**: Reorganized the dashboard’s restored-surfaces area into product-domain sections so the restored branch feels more intentionally structured and less like a flat list of recovered routes.
-- [x] **Rewind Matching Hub Recovery**: Added a new `/matching` hub and surfaced recommendations, matches, match dashboard, who-likes-you, profile-view signals, and nearby dating context from one coherent restored destination.
-- [x] **Rewind Support Hub Recovery**: Added a new `/support` hub and surfaced help, support contact, privacy policy, terms, safety, and blocked-user controls from one coherent restored destination.
-- [x] **Rewind Plans Hub Recovery**: Added a new `/plans` hub and surfaced events, event creation, date planning, nearby discovery, venues, and deals from one coherent restored destination.
-- [x] **Rewind Commerce Hub Recovery**: Added a new `/commerce` hub and surfaced merchant onboarding, dashboard operations, merchant profile, promotions, analytics, vibe broadcasting, and adjacent business-control entry points from one coherent restored destination.
-- [x] **Rewind Economy Hub Recovery**: Added a new `/economy` hub and surfaced premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one coherent restored destination.
-- [x] **Rewind Identity Hub Recovery**: Added a new `/identity` hub and surfaced profile, photos, identity settings, verification, physical-profile controls, and security/recovery access from one coherent restored destination.
-- [x] **Rewind Operations Hub Recovery**: Added a new `/operations` hub and surfaced safety, settings, security, merchant flows, and moderation/travel operational tooling from one coherent restored destination.
-- [x] **Rewind Connections Hub Recovery**: Added a new `/connections` hub and surfaced messages, friends, activity, notifications, matches, and groups from one coherent restored destination.
-- [x] **Rewind Studio Hub Recovery**: Added a new `/studio` hub and surfaced roast, roast-date, content generation, wingman, bounties, and analytics from one coherent restored destination.
-- [x] **Rewind Scenes Hub Recovery**: Added a new `/scenes` hub and surfaced recommendations, groups, topics, matches, match dashboard, and leaderboard-style discovery from one coherent restored destination.
-- [x] **Rewind Reputation Hub Recovery**: Added a new `/reputation` hub and surfaced achievements, leaderboard, profile views, verification, and adjacent trust signals from one coherent restored destination.
-- [x] **Rewind Places Hub + Avatar Provider Test Fallback**: Added a new `/places` hub for local-discovery surfaces and pinned implicit avatar test provider fallback to DALL-E for the richer rewind test contract.
-- [x] **Rewind Avatar Prompt Interest Label Fix**: Title-cased normalized interest labels in avatar prompt generation so the restore branch better matches the richer avatar-generation test contract.
-- [x] **Rewind Live-Spaces Hub Recovery**: Added a new top-level `/spaces` hub and surfaced chatrooms, audio rooms, bulletin boards, local pulse, conference pulse, burner bridge, and proximity chatrooms from one coherent restored destination.
-- [x] **Rewind Avatar Prompt Relation Refresh Fix**: Patched restore-branch avatar prompt generation to query the latest profile row directly, targeting the remaining explicit avatar-generation backend CI failure.
-- [x] **Rewind Unlock Hub + Paywall Surface Navigation Recovery**: Added a new top-level `/unlocks` page and surfaced premium unlocks, who-likes-you, share unlocks, and photo reveals through the dashboard + restored-features navigation.
-- [x] **Rewind Surface Recovery for Boosts, Gifts, Referrals, and Video**: Added dedicated top-level pages for these restored systems and surfaced them in the dashboard + restored-features navigation so the richer branch exposes more of the approved token-era product again.
-- [x] **Rewind CI Repair for Avatar Requests + Recommendation Caching**: Patched restore-branch avatar generation to preserve outbound HTTP fake assertions in tests and restored tagged caching in `RecommendationController`, directly targeting the next backend CI blockers.
-- [x] **Rewind Navigation Recovery + Missing Activity Surfaces**: Reworked the restore-branch shell to spotlight approved restored areas, added real `/activity` and `/notifications` pages, added shared notification route helpers, and rebuilt the dashboard around visible restored surfaces; validated with a successful frontend production build.
-- [x] **Restore Branch CI Compatibility Sweep**: Repaired avatar-generation config/prompt compatibility, tagged-cache mock behavior, frontend Sentry App Router instrumentation, broken WASM import assumptions, and stale Sentry webpack options in the rewind branch; validated with `php artisan test` (**425 passed / 8 skipped**) and successful frontend build.
-- [x] **NodeInfo 500 Recovery + Frontend CI Runtime Fix**: Hardened discovery routes against missing federation columns and aligned the frontend GitHub workflow to Node.js 24.
-- [x] **Hetzner Log ACL Deploy Fix**: Removed the broken log permission override, switched to ACL-based shared log access, and repaired the live Hetzner server log directory ACLs.
-- [x] **Hetzner Backend Stability Repair**: Replaced the broken root route, restored the missing `WebFingerController`, hardened dashboard endpoints against missing `user_matches`, fixed the PHP 8.4 dashboard `limit` type bug, and added a corrective migration for drifted match tables.
+## ✅ Completed (v2.0 Phase 8)
+- [x] **Event Map Frontend**: Built `EventMap.tsx` using `react-leaflet` to visualize attendee coordinates in real time on the `/events/[id]` page.
+- [x] **Live Socket Broadcasting**: Added `join_event`, `leave_event`, and `update_location` to `fwber-backend-ts/src/socket.ts` to power the live map functionality.
+- [x] **Map Geolocation Watch**: Bound the browser's `navigator.geolocation.watchPosition` to the Socket.io `update_location` emitter to ensure the user's position constantly broadcasts while the event page is open.
+- [x] **TypeScript Stabilization**: Repaired Prisma schema validation errors and exported backend enum usage to allow the project to build cleanly after merging `main`.
 
----
-*This file is continuously updated by autonomous AI agents. Do not leave items unchecked if they are completed.*
+## ✅ Completed (v2.0 Phase 7)
+- [x] **ActivityPub Models**: Define Prisma models for `actors`, `follows`, `inbox`, and `outbox`.
+- [x] **Federation Keys**: Generate RSA keypairs for users upon registration and implement HTTP Signatures for secure ActivityPub payload transmission.
+- [x] **WebFinger Service**: Implement `.well-known/webfinger` endpoint to allow external Fediverse discovery.
+- [x] **Inbox Handling**: Build an endpoint to accept `Follow`, `Accept`, `Like`, and `Create` activities from external instances.
+- [x] **Outbox Sync**: Hook into internal app actions (e.g., posting a bulletin or changing a bio) to distribute `Update` and `Create` payloads to followers.
+- [x] **Federation E2E tests**: Write supertest specs confirming WebFinger and Actor resolution.
+- [x] **Merchant Subscriptions**: Hook up Stripe webhooks to automatically activate Merchant Premium tiers based on verified payments.
+- [x] **Crypto Loyalty Hooks**: Connect the internal token system (FWB) to an external chain (e.g., Solana via an RPC) for minting loyalty NFTs.
+- [x] **Marketplace Integration**: Expose Merchant premium tiers on the frontend `/merchant/dashboard`.
+- [x] **NFT display**: Show Loyalty Badges (mocked NFTs) on user profiles if they've earned them from a merchant.
+- [x] **Minting UI**: Add a "Mint to Wallet" button in the Merchant UI to manually trigger the Solana service for specific patrons.
+- [x] **Group Spatial Indexing**: Extend `GeoScreenerService` to support querying users restricted to a specific `event_id`.
