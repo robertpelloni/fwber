@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import emailRoutes from './routes/email.js';
+import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync';
 import contactsIntegrationRoutes from './routes/contacts-integration';
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
@@ -120,6 +121,7 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/integrations/contacts/data', contactsIntegrationSyncRoutes);
 app.use('/api/integrations/contacts', contactsIntegrationRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/analytics', analyticsRoutes);
