@@ -84,3 +84,12 @@
 ## Phase 10: Web3 & Decentralized Identity (Future)
 *   **Target:** Integrate verifiable credentials (W3C DIDs) and smart contracts for merchant promotions.
 *   **Status:** Ideation.
+
+## Recently Completed by AI Agent (Phase 2)
+- [x] Closed gap: Implemented UI for `referrals.ts` route.
+- [x] Closed gap: Implemented UI for `bounties.ts` route.
+- [x] Closed gap: Implemented UI for `reports.ts` route (Moderation reporting UX).
+- [x] Closed gap: Implemented UI for `burner-links.ts` route (Disposable profile links).
+- [x] Schema: Added `UserIntegration` and `SyncedContact` tables to Prisma.
+- [x] Backend: Implemented OAuth routing for Google, Microsoft, and Facebook contact sync.
+- [x] Frontend: Designed Integrations UI to trigger OAuth handshakes.
