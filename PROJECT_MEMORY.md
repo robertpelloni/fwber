@@ -28,4 +28,11 @@ The project `fwber` is a sophisticated full-stack monorepo consisting of:
 *   **Bounties:** Designed and implemented the missing UI for the `bounties` system (`fwber-frontend/app/bounties/page.tsx`), providing users with a marketplace view to earn tokens by completing community requests.
 *   **Reports:** Designed and implemented the missing UI for the `reports` system (`fwber-frontend/app/reports/page.tsx`), providing a user safety dashboard to track filed moderation requests.
 *   **Burner Links:** Designed and implemented the missing UI for the `burner-links` system (`fwber-frontend/app/burner-links/page.tsx`), providing a dashboard to create, manage, and revoke disposable profile URLs, wired to a Next.js proxy route.
-*   **Contact Synchronization:** Designed and implemented standard OAuth 2.0 integration backing Facebook, Google, and Outlook address books (`UserIntegration` and `SyncedContact` Prisma schemas). Added a backend worker (`ContactSyncService.ts`) to fetch contacts, and completed UI views to trigger the OAuth links and display the user's fetched network.
+*   **Leaderboard:** Verified the existence of `fwber-frontend/app/leaderboard/page.tsx` and bridged the gap by implementing its missing Next.js proxy route (`fwber-frontend/app/api/leaderboard/route.ts`).
+
+## Active Feature Specifications: Contact Synchronization
+*   **Goal:** Implement a contact synchronization system allowing users to integrate Facebook, Google, and Microsoft/Outlook address books.
+*   **Architecture Requirements:** Standard OAuth 2.0 implementation requiring `access_token` and `refresh_token` management.
+*   **Schema Requirements:** Added the `UserIntegration` and `SyncedContact` tables to the Prisma schema (`fwber-backend-ts/prisma/schema.prisma`).
+*   **Backend Implementation:** Implemented the `fwber-backend-ts/src/routes/contacts-integration.ts` routing infrastructure, mapping to the 4-step OAuth handshake for Google, Microsoft, and Facebook, and wired it into `index.ts`. Implemented the background worker `ContactSyncService.ts` to iterate over active integrations and fetch contacts. Added REST endpoints in `contacts-integration-sync.ts` for fetching and manually triggering syncs.
+*   **Frontend UI:** Built the frontend view (`fwber-frontend/app/integrations/page.tsx`) mapping connection triggers to the correct backend OAuth endpoints. Built the Contacts view (`fwber-frontend/app/integrations/contacts/page.tsx`) to display the synced social network with manual refresh triggers.

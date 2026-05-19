@@ -4,11 +4,7 @@ export async function GET(request: Request) {
     try {
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
 
-        // Parse search params for 'type' (e.g., global, local, weekly)
-        const { searchParams } = new URL(request.url);
-        const type = searchParams.get('type') || 'global';
-
-        const res = await fetch(`${backendUrl}/leaderboard?type=${type}`, {
+        const res = await fetch(`${backendUrl}/topics`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,7 +19,7 @@ export async function GET(request: Request) {
         const data = await res.json();
         return NextResponse.json(data);
     } catch (e: any) {
-        console.error('Leaderboard proxy error:', e);
-        return NextResponse.json({ error: e.message || 'Failed to fetch leaderboard' }, { status: 500 });
+        console.error('Topics proxy error:', e);
+        return NextResponse.json({ error: e.message || 'Failed to fetch topics' }, { status: 500 });
     }
 }
