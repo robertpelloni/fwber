@@ -1,7 +1,8 @@
 with open('docs/TODO.md', 'r') as f:
     content = f.read()
 
-content = content.replace("- [ ] Create frontend view to display synced contacts and mutual friends.", "- [x] Create frontend view to display synced contacts and mutual friends.")
+# Make sure we check it off
+content = content.replace("- [ ] Implement UI for `leaderboard.ts` route.", "- [x] Implement UI for `leaderboard.ts` route.")
 
 with open('docs/TODO.md', 'w') as f:
     f.write(content)
