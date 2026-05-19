@@ -46,7 +46,7 @@ router.get('/actors/:id', async (req, res) => {
 });
 
 // POST /api/federation/inbox/:id - Receive inbox messages
-router.post('/inbox/:id', async (req, res) => {
+router.post('/users/:id/inbox', async (req, res) => {
   // Validate HTTP signature
   const isValid = await federationService.verifyHttpSignature(req);
   if (!isValid) {
