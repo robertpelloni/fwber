@@ -2428,8 +2428,8 @@ enum users_tier {
 
 
 model UserIntegration {
-  id               String   @id @default(uuid())
-  userId           String   @map("user_id")
+  id        String   @id @default(uuid())
+  userId    BigInt   @map("user_id")
   provider         String   @db.VarChar(50)
   providerUserId   String   @map("provider_user_id") @db.VarChar(255)
   accessToken      String   @map("access_token") @db.Text

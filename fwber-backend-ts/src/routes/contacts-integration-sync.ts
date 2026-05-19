@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Simulated middleware for auth
-const requireAuth = (req: Request, res: Response, next: any) => {
+const authenticateToken = (req: Request, res: Response, next: any) => {
     // Basic mock auth context
     if (!req.user) {
         req.user = { id: 'mock-user-uuid' };
@@ -18,7 +18,7 @@ const requireAuth = (req: Request, res: Response, next: any) => {
  * Endpoint to fetch already synced contacts for the user
  * GET /api/integrations/contacts
  */
-router.get('/', requireAuth, async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: Request, res: Response) => {
     try {
         const integrations = await prisma.userIntegration.findMany({
             where: { userId: req.user.id },
@@ -41,7 +41,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
  * Endpoint to manually trigger a sync for the user
  * POST /api/integrations/contacts/sync
  */
-router.post('/sync', requireAuth, async (req: Request, res: Response) => {
+router.post('/sync', authenticateToken, async (req: Request, res: Response) => {
     try {
         const integrations = await prisma.userIntegration.findMany({
             where: { userId: req.user.id }

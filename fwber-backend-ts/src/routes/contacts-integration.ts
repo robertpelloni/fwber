@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Simulated middleware for auth
-const requireAuth = (req: Request, res: Response, next: any) => {
+const authenticateToken = (req: Request, res: Response, next: any) => {
     // Basic mock auth context
     if (!req.user) {
         req.user = { id: 'mock-user-uuid' };
@@ -18,7 +18,7 @@ const requireAuth = (req: Request, res: Response, next: any) => {
  * Endpoint 1: Redirect to OAuth Provider
  * Example: GET /api/integrations/contacts/auth/:provider
  */
-router.get('/auth/:provider', requireAuth, (req: Request, res: Response) => {
+router.get('/auth/:provider', authenticateToken, (req: Request, res: Response) => {
     const { provider } = req.params;
     let url = '';
 
@@ -116,12 +116,12 @@ router.get('/callback/:provider', async (req: Request, res: Response) => {
 
         // Note: Using a hardcoded UUID for the user since req.user is lost in the callback redirect
         // In a real implementation, you'd use a secure state parameter or session cookies
-        const mockUserId = 'mock-user-uuid';
+
 
         const integration = await prisma.userIntegration.upsert({
             where: {
                 userId_provider: {
-                    userId: mockUserId,
+                    userId: BigInt((req.user as any)?.id || 1), // In a real OAuth flow with state, we would parse the user ID from the state parameter. For now we use the authenticated user if session exists or fallback to 1
                     provider: provider
                 }
             },
@@ -132,7 +132,7 @@ router.get('/callback/:provider', async (req: Request, res: Response) => {
                 providerUserId: providerUserId
             },
             create: {
-                userId: mockUserId,
+                userId: BigInt((req.user as any)?.id || 1), // In a real OAuth flow with state, we would parse the user ID from the state parameter. For now we use the authenticated user if session exists or fallback to 1
                 provider: provider,
                 providerUserId: providerUserId,
                 accessToken: tokenData.access_token,
