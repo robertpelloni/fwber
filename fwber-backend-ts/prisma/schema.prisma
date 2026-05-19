@@ -2120,6 +2120,8 @@ model users {
   @@index([last_active_at], map: "users_last_active_at_index")
   @@index([last_seen_at], map: "users_last_seen_at_index")
   @@index([referrer_id], map: "users_referrer_id_index")
+  public_key                                                           String?                                @db.Text
+  private_key                                                          String?                                @db.Text
 }
 
 model venue_checkins {
@@ -2448,4 +2450,33 @@ enum venues_subscription_tier {
 enum users_tier {
   free
   gold
+}
+
+model federation_follows {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  actor_uri       String    @db.VarChar(255)
+  target_uri      String    @db.VarChar(255)
+  status          String    @default("pending") @db.VarChar(255)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model federation_inbox {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  activity_id     String    @unique @db.VarChar(255)
+  actor_uri       String    @db.VarChar(255)
+  type            String    @db.VarChar(255)
+  payload         Json
+  processed_at    DateTime? @db.Timestamp(0)
+  created_at      DateTime? @db.Timestamp(0)
+}
+
+model federation_outbox {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  activity_id     String    @unique @db.VarChar(255)
+  actor_uri       String    @db.VarChar(255)
+  type            String    @db.VarChar(255)
+  payload         Json
+  delivered_at    DateTime? @db.Timestamp(0)
+  created_at      DateTime? @db.Timestamp(0)
 }

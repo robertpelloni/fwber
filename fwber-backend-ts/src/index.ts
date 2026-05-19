@@ -196,7 +196,43 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/share-unlocks', shareUnlocksRoutes);
 app.use('/api/payments', paymentsRoutes);
 
-// Catch-all for unmatched /api/* routes — return safe defaults instead of 404 HTML
+
+// WebFinger Route for ActivityPub Federation
+app.get('/.well-known/webfinger', async (req, res) => {
+  const resource = req.query.resource as string;
+  if (!resource || !resource.startsWith('acct:')) {
+    return res.status(400).json({ error: 'Invalid resource parameter' });
+  }
+
+  const [username, domain] = resource.replace('acct:', '').split('@');
+
+  try {
+    const user = await prisma.users.findFirst({
+      where: { name: username as string },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      subject: `acct:${user.name}@fwber.me`,
+      links: [
+        {
+          rel: 'self',
+          type: 'application/activity+json',
+          href: `https://api.fwber.me/api/federation/actors/${user.id}`
+        }
+      ]
+    });
+  } catch (error) {
+    console.error('[WebFinger] Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Catch-all for unmatched /api/* routes
+
 app.use('/api', (_req, res) => {
   // Return an empty array for GET, success object for everything else
   if (_req.method === 'GET') {
@@ -221,8 +257,9 @@ app.get('/', (req, res) => {
   res.json({ message: 'FWBER TypeScript Backend API v2.0' });
 });
 
-httpServer.listen(port, () => {
+const server = httpServer.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
+(app as any).close = () => server.close();
 export default app;
