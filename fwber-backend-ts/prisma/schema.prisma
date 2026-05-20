@@ -2120,8 +2120,6 @@ model users {
   @@index([last_active_at], map: "users_last_active_at_index")
   @@index([last_seen_at], map: "users_last_seen_at_index")
   @@index([referrer_id], map: "users_referrer_id_index")
-  public_key                                                           String?                                @db.Text
-  private_key                                                          String?                                @db.Text
 }
 
 model venue_checkins {

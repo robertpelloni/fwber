@@ -3,7 +3,7 @@ import app from '../src/index.js';
 import prisma from '../src/lib/prisma.js';
 import bcrypt from 'bcryptjs';
 
-describe.skip('Auth Endpoints', () => {
+describe('Auth Endpoints', () => {
   const testUser = {
     name: 'Test User',
     email: 'test@example.com',

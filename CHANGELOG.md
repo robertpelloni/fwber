@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.11] - 2026-05-19
+## [2.0.11] - 2026-05-20
 
 ### Added
 - **ActivityPub Models**: Added `federation_follows`, `federation_inbox`, and `federation_outbox` Prisma models. Added `public_key` and `private_key` to `users`.

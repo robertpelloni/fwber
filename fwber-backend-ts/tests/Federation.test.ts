@@ -32,7 +32,7 @@ jest.unstable_mockModule('../src/lib/prisma.js', () => ({
 
 const { default: app } = await import('../src/index.js');
 
-describe.skip('Federation Endpoints', () => {
+describe('Federation Endpoints', () => {
   const testUser = {
     id: 9999n,
     name: 'FediverseTestUser',

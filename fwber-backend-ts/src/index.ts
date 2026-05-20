@@ -231,7 +231,7 @@ app.get('/.well-known/webfinger', async (req, res) => {
   }
 });
 
-// Catch-all for unmatched /api/* routes
+// Catch-all for unmatched /api/* routes — return safe defaults instead of 404 HTML
 
 app.use('/api', (_req, res) => {
   // Return an empty array for GET, success object for everything else
