@@ -37,7 +37,7 @@ Restored:
 - merchant trust scoring and moderation workflows
 
 Explicitly still excluded from restoration:
-- ActivityPub / Federation
+- Advanced AR overlay mapping
 - Governance / DAO / Council / On-chain systems
 - Journals / Scrapbooks / Icebreakers / extra profile-social layer
 

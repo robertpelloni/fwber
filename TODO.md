@@ -1,12 +1,12 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.0.10
+> **Version:** 2.0.11
 > **Last Updated:** $(date +%Y-%m-%d)
 
 ---
 
 ## 🔴 Critical: Data Migration & Deployment
-- [ ] **Database Migration**: Run Prisma migrations on the Hetzner staging/production database to generate the new ActivityPub columns and tables.
+- [x] **Database Migration**: Run Prisma migrations on the Hetzner staging/production database to generate the new ActivityPub columns and tables.
 - [ ] **Deployment Verification**: Deploy the backend and frontend, ensuring no regressions in the core flow.
 - [ ] **Fediverse Interop Testing**: Spin up a local Mastodon/Pleroma dev instance and attempt to search for a local `fwber` user handle to test the `webfinger` and `actor` endpoints end-to-end.
 
