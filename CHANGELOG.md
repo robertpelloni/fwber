@@ -7,6 +7,13 @@
 - **WebFinger**: Added `/.well-known/webfinger` route to correctly resolve external actor handles.
 - **ActivityPub Endpoints**: Wired `/api/federation/actors/:id`, `/api/federation/users/:id/inbox`, and `/api/federation/users/:userId/outbox` endpoints in `routes/federation.ts`.
 
+## [2.0.11] - 2026-05-20
+
+### Added
+- **ActivityPub Models**: Added `federation_follows`, `federation_inbox`, and `federation_outbox` Prisma models. Added `public_key` and `private_key` to `users`.
+- **WebFinger**: Added `/.well-known/webfinger` route to correctly resolve external actor handles.
+- **ActivityPub Endpoints**: Wired `/api/federation/actors/:id`, `/api/federation/users/:id/inbox`, and `/api/federation/users/:userId/outbox` endpoints in `routes/federation.ts`.
+
 All notable changes to this project will be documented in this file.
 
 ## [1.8.67] - 2026-04-09 — Chatroom Detail Dark Mode Support
