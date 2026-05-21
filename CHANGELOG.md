@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.12] - 2026-05-21
+
+### Added
+- **Referral Polish**: Hooked up the `/api/referrals/summary` endpoint to properly return `vouch_link`, `referral_link`, and calculate `levels` based on `token_balance` and real cash values to support the frontend's referral modal.
+
 ## [2.0.11] - 2026-05-20
 
 ### Added
