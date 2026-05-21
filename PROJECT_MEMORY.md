@@ -1,24 +1,35 @@
-# PROJECT_MEMORY
+# Project Memory: fwber Architecture & Decisions
 
-## Architecture Context
-The project `fwber` is a sophisticated full-stack monorepo consisting of:
-*   **Frontend:** A modern Next.js React application (`fwber-frontend`), utilizing features like WebAssembly (`lib/wasm`) for high-performance tasks, real-time WebSocket hooks (`use-websocket.ts`), Radix UI for tooltips and standard components, and a comprehensive routing structure utilizing the App Router.
-*   **Backend:** An Express/TypeScript backend (`fwber-backend-ts`), heavily reliant on Prisma for ORM and database management. It supports a vast array of features including ActivityPub Federation, crypto payments/wallets, achievements, AI moderation, and real-time proximity chat via WebSockets (`socket.ts`).
-*   **Infrastructure:** A robust deployment stack designed for Kubernetes (`docker/k8s/`), employing Redis for high-performance state management (e.g., verification stores, caching), and integrating with Datadog for APM monitoring, and Sentry for error tracking.
+## High-Level Vision & Architecture
+* **fwber** is a "privacy-first, proximity-based social operating system" aiming to replace swipe-based dating apps with real-world interactions.
+* **Core Philosophy**: Zero-knowledge identity, AI-generated avatars before mutual matches, "Local Pulse" feeds, and strong location privacy.
+* **Technology Stack**:
+  * **Backend**: Node.js (ESM), Express.js, TypeScript. Recently migrated from Laravel PHP in Phase 5/6 (v2.0.0-ts).
+  * **Database**: PostgreSQL or MySQL, using Prisma ORM.
+  * **Real-time Engine**: Socket.io handles live presence (e.g., event maps). Replaced a Laravel Reverb/Pusher setup.
+  * **Frontend**: Next.js 15 (React 19) utilizing Server Components, TailwindCSS, and PWA capabilities.
+  * **Microservices**: A Rust geo-screener service handles high-density H3 spatial indexing (`fwber-geo`).
+  * **Federation**: Moving towards ActivityPub interop, enabling users to interact over the Fediverse (via `/.well-known/webfinger` and Actor/Inbox routes).
 
-## Core Directives & Project Vision
-*   **Radical Privacy & Authentic Identity:** The project's north star, outlined in `docs/VISION.md`, emphasizes a shift from a standard dating app to a "Local Social Economy".
-*   **Universal AI Protocol:** All AI interactions and code generation must adhere strictly to `docs/universal/UNIVERSAL_LLM_INSTRUCTIONS.md`, ensuring all implemented features are 100% represented in the UI, fully documented with tooltips, and securely merged without regressions.
+## Major Subsystems & Features
+1. **Core Loop**: Registration, ZK-identity, Onboarding, Discovery (Local Pulse), Matches.
+2. **Federation (In Progress)**:
+   * Prisma schema updated with `federation_follows`, `federation_inbox`, and `federation_outbox` models.
+   * `users` table requires `public_key` and `private_key` fields for cryptographic payload signing/verification.
+   * Endpoints managed under `fwber-backend-ts/src/routes/federation.ts`.
+3. **Monetization & Economy**: Merchant marketplace, Stripe subscriptions, FWB loyalty token system, and Solana wallet hooks.
+4. **Real-time Maps**: Frontend (`EventMap.tsx` using `react-leaflet`) hooks into Socket.io `location_updated` to visualize live coordinates.
 
-## Recent Significant Patches
-*   **ActivityPub Federation:** Critical SSRF vulnerabilities were identified and patched within `FederationService.ts`.
-*   **State Management Migration:** Verification states were successfully migrated from local memory to a scalable Redis store (`verification-store.ts`), resolving critical Event Loop blocking issues that plagued backend performance under load.
-*   **Git Environment Stabilization:** The workspace was crippled by tracked build artifacts. A severe and aggressive `.gitignore` policy was enforced, followed by a hard reset and cache purge, restoring the ability of AI agents to diff and analyze code efficiently.
+## Operational & Deployment Patterns
+* **Target Topology**: Vercel for Frontend, Hetzner VPS for Backend/DB/Websockets. DreamHost was explicitly retired.
+* **Versioning**: A strict versioning protocol requires bumping `VERSION` (plain text) and updating `CHANGELOG.md` upon every significant change.
+* **Database Management**: Prisma migrations (`npx prisma migrate dev`) are standard.
+* **Testing**:
+  * Backend testing relies on Jest configured for ESM (`node --experimental-vm-modules node_modules/jest/bin/jest.js`).
+  * Local DB tests (e.g., `auth.test.ts`) require a functional mock or a live `DATABASE_URL` (like `mysql://root@localhost/fwber`) to pass successfully. ESM mocking with Prisma requires complex lifecycle handling or bypassing.
+* **Clean Code**: Adherence to removing intermediate operational scripts (`patch_*.js`) before committing. Secrets must live in `.env` and be mocked in `.env.example`.
 
-## Development Patterns
-*   **Feature Flags:** extensively used in the frontend (`fwber-frontend/lib/hooks/use-feature-flags.ts`) and backend to toggle advanced capabilities like `video_chat`, `ai_wingman`, and `federation`.
-*   **AI Integration:** The backend heavily utilizes a Driver pattern for services, notably the `MediaAnalysisServiceProvider` which seamlessly switches between OpenAI, AWS, and mock drivers for content moderation and the "AiWingman" features.
-*   **Caching & Performance:** High-traffic read paths (Profiles, Analytics, Feeds) aggressively utilize Redis caching to prevent database bottlenecking.
-
-## Current Technical Blockers
-*   **Sandbox Isolation:** The current execution environment prohibits interactive remote git operations (`push`, `pull`). All merges must be non-interactive, and final deployment/pushes rely on the host user.
+## Agent Directives
+* Proceed autonomously through cycles without stopping, referencing `docs/UNIVERSAL_LLM_INSTRUCTIONS.md` and maintaining robust `TODO.md` tracking.
+* Log progress extremely meticulously in `HANDOFF.md` to relay context across sessions.
+* Refactor only to remove redundancy; do not mutate functional features without cause. Add code comments exclusively for "why," non-obvious algorithms, and trade-offs.

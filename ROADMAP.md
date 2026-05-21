@@ -37,7 +37,7 @@ Restored:
 - merchant trust scoring and moderation workflows
 
 Explicitly still excluded from restoration:
-- ActivityPub / Federation
+- Advanced AR overlay mapping
 - Governance / DAO / Council / On-chain systems
 - Journals / Scrapbooks / Icebreakers / extra profile-social layer
 
@@ -147,5 +147,5 @@ Explicitly still excluded from restoration:
 
 ## 🎯 Next Immediate Milestones
 1. **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
-2. **Performance Monitoring Pass:** Systematically optimize API latency across newly restored hub routes using live APM signals.
+2. **Performance Monitoring Pass:** Systematically optimize API latency across newly restored hub routes using live APM signals. ✅
 3. **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.

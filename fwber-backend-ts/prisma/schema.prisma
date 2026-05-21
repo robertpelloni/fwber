@@ -2449,3 +2449,32 @@ enum users_tier {
   free
   gold
 }
+
+model federation_follows {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  actor_uri       String    @db.VarChar(255)
+  target_uri      String    @db.VarChar(255)
+  status          String    @default("pending") @db.VarChar(255)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model federation_inbox {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  activity_id     String    @unique @db.VarChar(255)
+  actor_uri       String    @db.VarChar(255)
+  type            String    @db.VarChar(255)
+  payload         Json
+  processed_at    DateTime? @db.Timestamp(0)
+  created_at      DateTime? @db.Timestamp(0)
+}
+
+model federation_outbox {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  activity_id     String    @unique @db.VarChar(255)
+  actor_uri       String    @db.VarChar(255)
+  type            String    @db.VarChar(255)
+  payload         Json
+  delivered_at    DateTime? @db.Timestamp(0)
+  created_at      DateTime? @db.Timestamp(0)
+}

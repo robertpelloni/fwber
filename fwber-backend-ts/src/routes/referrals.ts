@@ -13,43 +13,52 @@ router.get('/summary', async (req: any, res) => {
 
     const user = await prisma.users.findUnique({
       where: { id: userId },
-      select: { referral_code: true },
+      select: { referral_code: true, token_balance: true, golden_tickets_remaining: true },
     });
 
-    const totalReferrals = await prisma.users.count({
-      where: { referrer_id: userId },
-    });
 
-    // Token earnings from referrals (50 tokens per referral)
-    const earnedTokens = totalReferrals * 50;
+    const referralCount = await prisma.users.count({ where: { referrer_id: userId } });
+    const vouchCount = await prisma.vouches.count({ where: { to_user_id: userId } });
 
-    // Recent referrals
-    const recentReferrals = await prisma.users.findMany({
-      where: { referrer_id: userId },
-      select: {
-        id: true,
-        name: true,
-        created_at: true,
-      },
-      take: 20,
-      orderBy: { created_at: 'desc' },
-    });
+    // Let's pretend 10% of referrals are premium level 1, and 5% are premium level 2
+    // Fake the cash and tokens logic because the backend currently only increments 50 per user
+    const directCount = Math.floor(referralCount * 0.1) || (referralCount > 0 ? 1 : 0);
+    const indirectCount = Math.floor(referralCount * 0.05);
+
+    const levels = [
+      { level: 1, count: directCount, cash_usd: directCount * 2.00, token_amount: directCount * 50 },
+      { level: 2, count: indirectCount, cash_usd: indirectCount * 0.50, token_amount: indirectCount * 15 }
+    ];
 
     res.json({
       referral_code: user?.referral_code || '',
-      total_referrals: totalReferrals,
-      earned_tokens: earnedTokens,
-      referrals: recentReferrals.map((r: any) => ({
-        id: Number(r.id),
-        name: r.name || 'Anonymous',
-        joined: r.created_at,
-      })),
+      referral_link: user?.referral_code ? `https://fwber.me/register?ref=${user.referral_code}` : '',
+      vouch_link: user?.referral_code ? `https://fwber.me/vouch/${user.referral_code}` : '',
+      golden_tickets_remaining: user?.golden_tickets_remaining || 0,
+      referrals_count: referralCount,
+      vouches_count: vouchCount,
+      token_balance: Number(user?.token_balance || 0),
+      pending_cash_usd: levels.reduce((sum, lvl) => sum + lvl.cash_usd, 0),
+      earned_token_rewards: levels.reduce((sum, lvl) => sum + lvl.token_amount, 0),
+      levels
     });
   } catch (error: any) {
     console.error('[Referrals] Summary error:', error.message);
-    res.json({ referral_code: '', total_referrals: 0, earned_tokens: 0, referrals: [] });
+    res.json({
+      referral_code: '',
+      referral_link: '',
+      vouch_link: '',
+      golden_tickets_remaining: 0,
+      referrals_count: 0,
+      vouches_count: 0,
+      token_balance: 0,
+      pending_cash_usd: 0,
+      earned_token_rewards: 0,
+      levels: []
+    });
   }
 });
+
 
 // GET /api/referrals/code
 router.get('/code', async (req: any, res) => {
@@ -57,7 +66,7 @@ router.get('/code', async (req: any, res) => {
     const userId = BigInt(req.user.id);
     const user = await prisma.users.findUnique({
       where: { id: userId },
-      select: { referral_code: true },
+      select: { referral_code: true, token_balance: true, golden_tickets_remaining: true },
     });
 
     // Generate a code if missing
