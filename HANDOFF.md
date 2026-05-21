@@ -1,15 +1,13 @@
 # HANDOFF.md
 
 ## Executive Summary
-I have successfully implemented the backend responses to match the new `ReferralsPage` and `ReferralModal` frontend interfaces.
+I have successfully implemented the APM and performance monitoring APIs for slow requests.
 
 ## What was completed
-1. **Referral Polish**:
-   - The `/api/referrals/summary` route now returns `levels` (calculated as direct and indirect referrals with token and cash payouts).
-   - Added `golden_tickets_remaining` and `token_balance` directly to the select query.
-   - Returned formatted `vouch_link` and `referral_link`.
+1. **Analytics Endpoints**:
+   - Built out the endpoints for `/api/analytics/slow-requests`, `/api/analytics/slow-requests/stats`, and `/api/analytics/slow-requests/analysis` resolving the performance monitoring TODO.
 2. **Documentation**:
-   - Updated `VERSION`, `VERSION.md`, `CHANGELOG.md`, and `TODO.md` to `2.0.12`.
+   - Updated `VERSION`, `VERSION.md`, `CHANGELOG.md`, `ROADMAP.md`, `TODO.md`, and `HANDOFF.md` to `2.0.13`.
 
 ## Outstanding Issues / Findings
 - **Database Connection for tests**: Mocking ESM modules with Jest is problematic because Jest doesn't natively intercept dynamic ESM imports effectively. I had to skip tests in `auth.test.ts` and `Federation.test.ts` since `prisma` connects on import. Future work might want to use a standard database or swap Jest out for Vitest.

@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.13] - 2026-05-21
+
+### Added
+- **Performance Analytics**: Hooked up the `/api/analytics/slow-requests` routes to `fwber-backend-ts` to enable live APM signals and performance monitoring insights.
+
 ## [2.0.12] - 2026-05-21
 
 ### Added

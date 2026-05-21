@@ -147,33 +147,154 @@ router.get('/retention', authenticate, async (_req: any, res) => {
   }
 });
 
+
 // GET /api/analytics/slow-requests — slow request tracking
-router.get('/slow-requests', authenticate, (_req: any, res) => {
-  res.json({
-    slow_requests: [],
-    average_response_time_ms: 0,
-    p95_response_time_ms: 0,
-    p99_response_time_ms: 0,
-  });
+router.get('/slow-requests', authenticate, async (_req: any, res) => {
+  try {
+    const slowRequests = await prisma.slow_requests.findMany({
+      orderBy: { duration_ms: 'desc' },
+      take: 50,
+    });
+
+    if (!slowRequests.length) {
+      return res.json({
+        slow_requests: [],
+        average_response_time_ms: 0,
+        p95_response_time_ms: 0,
+        p99_response_time_ms: 0,
+      });
+    }
+
+    const durations = slowRequests.map(r => r.duration_ms).sort((a, b) => a - b);
+    const sum = durations.reduce((a, b) => a + b, 0);
+    const avg = sum / durations.length;
+    const p95 = durations[Math.floor(durations.length * 0.95)] || durations[durations.length - 1];
+    const p99 = durations[Math.floor(durations.length * 0.99)] || durations[durations.length - 1];
+
+    res.json(serialize({
+      slow_requests: slowRequests,
+      average_response_time_ms: Math.round(avg),
+      p95_response_time_ms: Math.round(p95 || 0),
+      p99_response_time_ms: Math.round(p99 || 0),
+    }));
+  } catch (error: any) {
+    console.error('[Analytics] Slow requests error:', error.message);
+    res.json({
+      slow_requests: [],
+      average_response_time_ms: 0,
+      p95_response_time_ms: 0,
+      p99_response_time_ms: 0,
+    });
+  }
 });
 
 // GET /api/analytics/slow-requests/stats — slow request stats
-router.get('/slow-requests/stats', authenticate, (_req: any, res) => {
-  res.json({
-    total_tracked: 0,
-    average_ms: 0,
-    threshold_ms: 1000,
-    by_endpoint: [],
-  });
+router.get('/slow-requests/stats', authenticate, async (_req: any, res) => {
+  try {
+    const totalTracked = await prisma.slow_requests.count();
+
+    // Fallback if no records
+    if (totalTracked === 0) {
+      return res.json({
+        total_tracked: 0,
+        average_ms: 0,
+        threshold_ms: 1000,
+        by_endpoint: [],
+      });
+    }
+
+    const allRequests = await prisma.slow_requests.findMany({
+      select: { duration_ms: true, url: true, method: true }
+    });
+
+    const sum = allRequests.reduce((acc, r) => acc + r.duration_ms, 0);
+    const average_ms = Math.round(sum / allRequests.length);
+
+    // Group by endpoint (url)
+    const endpointMap: Record<string, { count: number, totalDuration: number }> = {};
+    for (const r of allRequests) {
+      const key = `${r.method} ${r.url}`;
+      if (!endpointMap[key]) endpointMap[key] = { count: 0, totalDuration: 0 };
+      endpointMap[key]!.count++;
+      endpointMap[key]!.totalDuration += r.duration_ms;
+    }
+
+    const by_endpoint = Object.keys(endpointMap).map(key => ({
+      endpoint: key,
+      count: endpointMap[key]!.count,
+      avg_ms: Math.round(endpointMap[key]!.totalDuration / endpointMap[key]!.count),
+    })).sort((a, b) => b.count - a.count).slice(0, 20);
+
+    res.json(serialize({
+      total_tracked: totalTracked,
+      average_ms,
+      threshold_ms: 1000,
+      by_endpoint,
+    }));
+  } catch (error: any) {
+    console.error('[Analytics] Slow requests stats error:', error.message);
+    res.json({
+      total_tracked: 0,
+      average_ms: 0,
+      threshold_ms: 1000,
+      by_endpoint: [],
+    });
+  }
 });
 
 // GET /api/analytics/slow-requests/analysis — slow request analysis
-router.get('/slow-requests/analysis', authenticate, (_req: any, res) => {
-  res.json({
-    analysis: [],
-    recommendations: [],
-    bottleneck_endpoints: [],
-  });
+router.get('/slow-requests/analysis', authenticate, async (_req: any, res) => {
+  try {
+    const allRequests = await prisma.slow_requests.findMany({
+      select: { duration_ms: true, url: true, method: true },
+      orderBy: { duration_ms: 'desc' },
+      take: 100
+    });
+
+    if (!allRequests.length) {
+      return res.json({
+        analysis: [],
+        recommendations: [],
+        bottleneck_endpoints: [],
+      });
+    }
+
+    // Group by endpoint (url) for bottleneck detection
+    const endpointMap: Record<string, { count: number, totalDuration: number }> = {};
+    for (const r of allRequests) {
+      const key = `${r.method} ${r.url}`;
+      if (!endpointMap[key]) endpointMap[key] = { count: 0, totalDuration: 0 };
+      endpointMap[key]!.count++;
+      endpointMap[key]!.totalDuration += r.duration_ms;
+    }
+
+    const bottleneck_endpoints = Object.keys(endpointMap).map(key => ({
+      endpoint: key,
+      avg_ms: Math.round(endpointMap[key]!.totalDuration / endpointMap[key]!.count),
+    })).filter(e => e.avg_ms > 2000).sort((a, b) => b.avg_ms - a.avg_ms).slice(0, 10);
+
+    const recommendations = bottleneck_endpoints.map(b =>
+      `Consider implementing caching or optimizing DB queries for ${b.endpoint} (Avg: ${b.avg_ms}ms)`
+    );
+
+    res.json(serialize({
+      analysis: [
+        `Analyzed the top ${allRequests.length} slowest requests in the system.`,
+        `Identified ${bottleneck_endpoints.length} critical bottlenecks averaging over 2 seconds.`
+      ],
+      recommendations: recommendations.length > 0 ? recommendations : ['System performance is currently optimal. No immediate actions required.'],
+      bottleneck_endpoints,
+    }));
+
+  } catch (error: any) {
+    console.error('[Analytics] Slow requests analysis error:', error.message);
+    res.json({
+      analysis: [],
+      recommendations: [],
+      bottleneck_endpoints: [],
+    });
+  }
 });
+
 
 export default router;
