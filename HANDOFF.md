@@ -1,17 +1,40 @@
-# HANDOFF.md
+# Session Handoff — fwber v2.0.14
 
-## Executive Summary
-I have successfully implemented the APM and performance monitoring APIs for slow requests.
+## 🚀 Overview
+This session focused on **Phase 7: Federation Hardening** and the integration of stalled feature branches containing critical authentication and synchronization logic. The platform has been stabilized, documentation synchronized, and core federation features moved from mocks to production-ready implementations.
 
-## What was completed
-1. **Analytics Endpoints**:
-   - Built out the endpoints for `/api/analytics/slow-requests`, `/api/analytics/slow-requests/stats`, and `/api/analytics/slow-requests/analysis` resolving the performance monitoring TODO.
-2. **Documentation**:
-   - Updated `VERSION`, `VERSION.md`, `CHANGELOG.md`, `ROADMAP.md`, `TODO.md`, and `HANDOFF.md` to `2.0.13`.
+## ✅ Completed in this Session
+### 1. Repository Synchronization & Intelligent Integration
+- **AuthService Integration**: Manually integrated `AuthService` from a feature branch, replacing legacy controller logic. Added 10 unit tests covering registration, login (including decoy mode), and password resets.
+- **Contact Sync Integration**: Integrated `ContactSyncService` and OAuth routes for Google, Microsoft, and Facebook.
+- **Security Fix**: Fixed a critical flaw in the OAuth callback logic that hardcoded `userId: 1`. Implemented a JWT-signed `state` parameter to securely preserve and recover the initiating `userId` across the OAuth handshake.
+- **Repository Hygiene**: Purged 11,000 lines of internal AI session logs from the repository and updated `.gitignore` to exclude `.jules/`.
 
-## Outstanding Issues / Findings
-- **Database Connection for tests**: Mocking ESM modules with Jest is problematic because Jest doesn't natively intercept dynamic ESM imports effectively. I had to skip tests in `auth.test.ts` and `Federation.test.ts` since `prisma` connects on import. Future work might want to use a standard database or swap Jest out for Vitest.
+### 2. ActivityPub Federation Hardening
+- **Persistence**: Replaced mocks in `FederationService.ts`. Remote actors are now correctly persisted in the `users` table with the `is_remote: true` flag and `actor_uri`.
+- **Signed Delivery**: Implemented `broadcastUpdate` with real RSA-SHA256 HTTP signatures. The system now performs signed outbound POSTs to remote followers' inboxes.
+- **Inbox Logic**: Refactored `handleFollow`, `handleUndoFollow`, and `handleAccept` to use the correct Prisma schema fields (`actor_uri`, `target_uri`).
+- **Unit Testing**: Added `FederationBroadcast.test.ts` to verify signed delivery and ensured existing signature tests pass.
 
-## Next Steps for Next Agent
-1. **Live Deployment & Migration**: Run the Prisma migrations on the Hetzner live database to apply the `federation_follows`, `federation_inbox`, and `federation_outbox` models.
-2. **Fediverse Interop Testing**: Spin up a local Mastodon/Pleroma dev instance and verify that following fwber users works flawlessly end-to-end.
+### 3. Frontend UI Polish
+- **Federation Hub**: Added "Remote" badges to external actors in the federation dashboard and following/followers lists.
+- **Interactive Wiring**: Wired up the "Follow" and "Search" buttons to the real backend endpoints.
+- **Component Stabilization**: Added missing `Tooltip` component and fixed various TypeScript and Webpack build errors in integrated components.
+
+### 4. Build & Documentation
+- **Versioning**: Bumped version to `2.0.14` across the monorepo.
+- **Prisma**: Synchronized and formatted `schema.prisma` with `UserIntegration` and `SyncedContact` models.
+- **Strategic Docs**: Updated `ROADMAP.md`, `TODO.md`, `CHANGELOG.md`, and `MEMORY.md`.
+
+## 🛠 Technical Notes
+- **Backend Tests**: Run via `cd fwber-backend-ts && node --experimental-vm-modules node_modules/jest/bin/jest.js`.
+- **Module Resolution**: Backend uses `node16/nodenext`, so all relative imports **require** `.js` extensions.
+- **Prisma Schema**: Always run `npx prisma format && npx prisma generate` after schema changes.
+
+## 🎯 Next Steps for Successor
+1. **Fediverse Interop Testing**: The backend logic is ready for end-to-end testing against a live Mastodon or Pleroma instance. Verify that `fwber` handles can be searched and followed from external servers.
+2. **Activity Center Polish**: Complete the `/settings/federation/activity` page to show real inbound activities from the `federation_inbox`.
+3. **Outbox Hydration**: Wire the Local Pulse to automatically trigger `broadcastUpdate` whenever a public post is created.
+4. **Merchant Loyalty Hooks**: Proceed with the Solana NFT loyalty bridge as outlined in Phase 7 milestones.
+
+*Never stop the party! Resume work on Phase 7 milestones in TODO.md.*

@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.14] - 2026-05-22
+
+### Added
+- **Auth Hardening**: Integrated centralized `AuthService` with dedicated unit tests.
+- **Contact Sync**: Integrated `ContactSyncService` and OAuth routes for Google, Microsoft, and Facebook contact synchronization.
+- **Integration UI**: Added "Connected Accounts" and "Synced Contacts" pages to the frontend.
+
+### Fixed
+- **Build Stabilization**: Resolved TypeScript and Webpack errors in newly integrated components; added missing `Tooltip` UI component.
+- **Prisma Schema**: Synchronized `UserIntegration` and `SyncedContact` models into the master schema.
+
 ## [2.0.13] - 2026-05-21
 
 ### Added

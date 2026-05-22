@@ -95,6 +95,4 @@ frontend_build.tar.gz
 temp_build/
 metamcp.db
 metamcp.db*
-
-# Jules AI session logs (auto-generated, not needed in repo)
-.jules/sessions/
+.jules/

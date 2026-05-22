@@ -336,12 +336,15 @@ export default function FederationSettingsPage() {
                                                             {actor.icon && <Image src={actor.icon.url} alt="" fill sizes="40px" className="object-cover" />}
                                                         </div>
                                                         <div>
-                                                            <Link
-                                                                href={buildFederationActorExplorerHref(actor.id)}
-                                                                className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
-                                                            >
-                                                                {formatFederationHandle(actor.preferredUsername, actor.server, actor.id)}
-                                                            </Link>
+                                                            <div className="flex items-center gap-2">
+                                                                <Link
+                                                                    href={buildFederationActorExplorerHref(actor.id)}
+                                                                    className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                                                                >
+                                                                    {formatFederationHandle(actor.preferredUsername, actor.server, actor.id)}
+                                                                </Link>
+                                                                <Badge variant="outline" className="text-[9px] h-4 px-1 uppercase tracking-tighter text-blue-500 border-blue-200 bg-blue-50">Remote</Badge>
+                                                            </div>
                                                             <p className="text-xs text-zinc-500">{actor.name || 'External Actor'}</p>
                                                         </div>
                                                     </div>
@@ -392,12 +395,15 @@ export default function FederationSettingsPage() {
                                                 {f.username?.[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <Link
-                                                    href={buildFederationActorExplorerHref(f.actor_uri)}
-                                                    className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
-                                                >
-                                                    {formatFederationHandle(f.username, f.domain, f.actor_uri)}
-                                                </Link>
+                                                <div className="flex items-center gap-2">
+                                                    <Link
+                                                        href={buildFederationActorExplorerHref(f.actor_uri)}
+                                                        className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                                                    >
+                                                        {formatFederationHandle(f.username, f.domain, f.actor_uri)}
+                                                    </Link>
+                                                    <Badge variant="outline" className="text-[9px] h-4 px-1 uppercase tracking-tighter text-blue-500 border-blue-200 bg-blue-50">Remote</Badge>
+                                                </div>
                                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Status: {f.status}</p>
                                             </div>
                                         </div>
@@ -420,12 +426,15 @@ export default function FederationSettingsPage() {
                                                 {f.username?.[0].toUpperCase()}
                                             </div>
                                             <div>
-                                                <Link
-                                                    href={buildFederationActorExplorerHref(f.actor_uri)}
-                                                    className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
-                                                >
-                                                    {formatFederationHandle(f.username, f.domain, f.actor_uri)}
-                                                </Link>
+                                                <div className="flex items-center gap-2">
+                                                    <Link
+                                                        href={buildFederationActorExplorerHref(f.actor_uri)}
+                                                        className="font-bold text-sm hover:text-blue-600 dark:hover:text-blue-400"
+                                                    >
+                                                        {formatFederationHandle(f.username, f.domain, f.actor_uri)}
+                                                    </Link>
+                                                    <Badge variant="outline" className="text-[9px] h-4 px-1 uppercase tracking-tighter text-blue-500 border-blue-200 bg-blue-50">Remote</Badge>
+                                                </div>
                                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Remote Follower</p>
                                             </div>
                                         </div>
