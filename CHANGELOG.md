@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.16] - 2026-05-23
+
+### Added
+- **Unified Activity Center**: Implemented a central ActivityPub activity aggregator endpoint in the backend and rewired the frontend Activity Center to use it.
+- **Enhanced Inbox Processing**: Added support for `Like` and `Announce` (Boost) activities in the `FederationService`, including automated detection of interactions with local outbox content.
+- **Activity Types**: Frontend now supports and badges `Like` and `Boost` activities alongside `Follow` and `Create`.
+
 ## [2.0.15] - 2026-05-22
 
 ### Added

@@ -77,11 +77,57 @@ export class FederationService {
         await this.handleAccept(activity, targetUserId);
         break;
       case 'Create':
+        await this.handleCreate(activity, targetUserId);
+        break;
       case 'Like':
-        console.log(`[Federation] Processed ${activity.type} interaction.`);
+        await this.handleLike(activity, targetUserId);
+        break;
+      case 'Announce':
+        await this.handleAnnounce(activity, targetUserId);
         break;
       default:
         console.log(`[Federation] Unhandled activity type: ${activity.type}`);
+    }
+  }
+
+  private async handleCreate(activity: any, targetUserId: bigint) {
+    console.log(`[Federation] Received Create activity for user ${targetUserId}`);
+    // Future: Check if it's a reply to a local post or a mention
+  }
+
+  private async handleLike(activity: any, targetUserId: bigint) {
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const objectUri = typeof activity.object === 'string' ? activity.object : activity.object.id;
+
+    console.log(`[Federation] ${actorUri} liked ${objectUri} for user ${targetUserId}`);
+
+    // If the object is a local outbox item, we can track it
+    if (objectUri.includes('api.fwber.me')) {
+        const outboxItem = await prisma.federation_outbox.findUnique({
+            where: { activity_id: objectUri }
+        });
+
+        if (outboxItem) {
+            console.log(`[Federation] Local object ${outboxItem.id} was liked by remote actor.`);
+            // In the future: Increment a like counter or create a notification
+        }
+    }
+  }
+
+  private async handleAnnounce(activity: any, targetUserId: bigint) {
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const objectUri = typeof activity.object === 'string' ? activity.object : activity.object.id;
+
+    console.log(`[Federation] ${actorUri} announced (boosted) ${objectUri} for user ${targetUserId}`);
+
+    if (objectUri.includes('api.fwber.me')) {
+        const outboxItem = await prisma.federation_outbox.findUnique({
+            where: { activity_id: objectUri }
+        });
+
+        if (outboxItem) {
+            console.log(`[Federation] Local object ${outboxItem.id} was boosted by remote actor.`);
+        }
     }
   }
 

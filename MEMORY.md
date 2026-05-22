@@ -152,3 +152,8 @@
 ## 2026-04-05 — v1.6.6 Daily-log shared write should use ACLs, not Monolog chmod from deploy user
 - The first live deploy after the backend stability patch failed because Monolog's `permission` option tried to chmod a daily log file owned by `www-data` from a deploy-user artisan process.
 - The correct repair shape is shared ACLs on `storage/logs` plus removing the Monolog permission override, not repeated per-file chmod attempts in deploy code.
+
+## 2026-05-23 — v2.0.16 Unified activity aggregation simplifies frontend state management
+- Replacing multiple separate API calls (followers, following, posts, outbox) with a single `/api/federation/activity` aggregator endpoint significantly reduced Activity Center complexity.
+- This pattern (Unified Activity) allows for easier sorting and badging of diverse ActivityPub interaction types (Follow, Like, Boost, Create) in a merged timeline.
+- The `FederationService` enhancement to handle `Like` and `Announce` (Boost) activities provides the backend foundation for these new timeline items.

@@ -74,6 +74,21 @@ export interface FederationOutboxPage {
   orderedItems: FederationOutboxActivity[]
 }
 
+export interface UnifiedActivityItem {
+  id: number
+  type: string
+  actor_uri: string
+  actor_username: string
+  actor_domain: string
+  content: string
+  timestamp: string
+  payload: any
+}
+
+export interface UnifiedActivityResponse {
+  activity: UnifiedActivityItem[]
+}
+
 interface FederationActorDetailResponse {
   actor: FederationActor
 }

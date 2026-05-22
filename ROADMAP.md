@@ -1,7 +1,7 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.0.0-ts "TypeScript Unified Stack"
-> **Last Updated:** 2026-04-13
+> **Current Version:** 2.0.16 "ActivityPub Hardened"
+> **Last Updated:** 2026-05-23
 
 ---
 
@@ -143,9 +143,16 @@ Explicitly still excluded from restoration:
 - **AI Prompt Tuning & Localization:** Refined AI Wingman prompts across the board to deeply ground LLM instructions in Detroit's local geography and the platform's "privacy-first" identity.
 - **Project Consolidation & Future Milestones:** Completed broad product polish across all hubs and defined next-phase milestones for growth.
 
+- **ActivityPub Hardening (ACTIVE - v2.0.16):**
+  - **Unified Activity Center**: Implemented a central ActivityPub activity aggregator endpoint in the backend and rewired the frontend Activity Center to use it.
+  - **Enhanced Inbox Processing**: Added support for `Like` and `Announce` (Boost) activities in the `FederationService`, including automated detection of interactions with local outbox content.
+  - **Handshake Completion**: Implemented signed 'Accept' activities back to remote servers to complete the follow handshake. (v2.0.15)
+  - **Outbox Automation**: Wired proximity artifact creation to ActivityPub broadcasting. (v2.0.15)
+
 ---
 
 ## 🎯 Next Immediate Milestones
 1. **Engagement Push:** Leverage the restored Referral & Payout system to drive early adopter signups.
 2. **Performance Monitoring Pass:** Systematically optimize API latency across newly restored hub routes using live APM signals. ✅
 3. **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
+4. **Fediverse Interop Testing:** Verify end-to-end handle discovery and activity delivery with external servers (Mastodon/Pleroma).

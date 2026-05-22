@@ -63,7 +63,7 @@ router.post('/users/:id/inbox', async (req, res) => {
       }
     });
 
-    // Process activity asynchronously (e.g. handle Follows)
+    // Process activity asynchronously
     federationService.processInboxActivity(payload, BigInt(req.params.id)).catch(console.error);
 
     res.status(202).json({ success: true, message: 'Activity accepted' });
@@ -103,6 +103,37 @@ router.get('/', (_req, res) => res.json({
   status: 'active',
   message: 'Federation is active',
 }));
+
+// GET /api/federation/activity - Unified Activity Center endpoint
+router.get('/activity', async (req: any, res) => {
+    try {
+        const inboxItems = await prisma.federation_inbox.findMany({
+            orderBy: { created_at: 'desc' },
+            take: 50
+        });
+
+        const activity = inboxItems.map((item: any) => {
+            const payload = item.payload;
+            const actorUri = item.actor_uri;
+
+            return {
+                id: Number(item.id),
+                type: item.type,
+                actor_uri: actorUri,
+                actor_username: actorUri.split('/').pop(),
+                actor_domain: actorUri.includes('http') ? new URL(actorUri).host : 'unknown',
+                content: payload.object?.content || payload.object?.type || '',
+                timestamp: item.created_at.toISOString(),
+                payload: payload
+            };
+        });
+
+        res.json({ activity });
+    } catch (err: any) {
+        console.error('[Federation] Error fetching activity:', err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 // GET /api/federation/posts — get federation posts from inbox
 router.get('/posts', async (_req, res) => {
