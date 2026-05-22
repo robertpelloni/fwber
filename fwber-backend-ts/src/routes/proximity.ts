@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { FederationService } from '../services/FederationService.js';
 
 const router = Router();
+const federationService = new FederationService();
 
 function safeProfile(u: any) {
   if (!u) return { name: 'Anonymous', avatar: null };
@@ -50,6 +52,18 @@ router.post('/artifacts', authenticate, async (req: any, res) => {
     if (!type || !content) return res.status(400).json({ error: 'type and content required' });
     const expiresAt = new Date(); expiresAt.setHours(expiresAt.getHours() + 4);
     const a = await prisma.proximity_artifacts.create({ data: { user_id: userId, type, content, location_lat: lat || 42.33, location_lng: lng || -83.05, visibility_radius_m: radius_m || 1000, moderation_status: 'clean', expires_at: expiresAt } });
+
+    // Federation: Broadcast if enabled
+    const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    if (profile?.is_federated) {
+        federationService.broadcastUpdate(userId, {
+            id: `https://api.fwber.me/api/proximity/artifacts/${a.id}`,
+            type: 'Note',
+            content: content,
+            published: a.created_at?.toISOString()
+        }).catch(err => console.error('[proximity] Federation broadcast failed:', err.message));
+    }
+
     res.json({ artifact: { id: Number(a.id), type: a.type, content: a.content }, success: true });
   } catch (err: any) { console.error('[proximity] create error:', err.message); res.json({ artifact: null, success: false }); }
 });

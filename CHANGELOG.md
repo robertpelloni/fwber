@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.15] - 2026-05-22
+
+### Added
+- **Federation Automation**: New proximity artifacts are now automatically broadcast to the Fediverse if federation is enabled for the user.
+- **Handshake Completion**: Implemented outbound signed `Accept` activities to complete the follow handshake with remote servers.
+- **Inbox Processing**: Connected the `/inbox` endpoint to the `FederationService` processing logic.
+
 ## [2.0.14] - 2026-05-22
 
 ### Added

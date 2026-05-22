@@ -4,7 +4,12 @@
 This session focused on **Phase 7: Federation Hardening** and the integration of stalled feature branches containing critical authentication and synchronization logic. The platform has been stabilized, documentation synchronized, and core federation features moved from mocks to production-ready implementations.
 
 ## ✅ Completed in this Session
-### 1. Repository Synchronization & Intelligent Integration
+### 1. ActivityPub Automation (v2.0.15)
+- **Outbox Automation**: Wired proximity artifact creation to ActivityPub broadcasting. New public posts are now automatically dispatched to remote followers as standard ActivityStreams `Note` objects.
+- **Handshake Completion**: Implemented outbound signed `Accept` activities. The follow handshake is now fully compliant, informing remote servers when their follow requests are accepted by `fwber`.
+- **Logic Refinement**: Connected the `/inbox` route to the `FederationService` processing logic to enable asynchronous handling of inbound activities.
+
+### 2. Repository Synchronization & Intelligent Integration (v2.0.14)
 - **AuthService Integration**: Manually integrated `AuthService` from a feature branch, replacing legacy controller logic. Added 10 unit tests covering registration, login (including decoy mode), and password resets.
 - **Contact Sync Integration**: Integrated `ContactSyncService` and OAuth routes for Google, Microsoft, and Facebook.
 - **Security Fix**: Fixed a critical flaw in the OAuth callback logic that hardcoded `userId: 1`. Implemented a JWT-signed `state` parameter to securely preserve and recover the initiating `userId` across the OAuth handshake.

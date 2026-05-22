@@ -1,13 +1,17 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.0.13
-> **Last Updated:** $(date +%Y-%m-%d)
+> **Version:** 2.0.15
+> **Last Updated:** 2026-05-22
 
 ---
 
-## 🔴 Critical: Data Migration & Deployment
-- [x] **Database Migration**: Run Prisma migrations on the Hetzner staging/production database to generate the new ActivityPub columns and tables.
-- [ ] **Deployment Verification**: Deploy the backend and frontend, ensuring no regressions in the core flow.
+## 🔴 Critical: Federation Hardening & UI
+- [x] **Remote Actor Persistence**: Implement logic to store external federated users in the local DB. (v2.0.14)
+- [x] **Signed Outbound Delivery**: Implement `broadcastUpdate` with real HTTP signatures in `FederationService.ts`. (v2.0.14)
+- [x] **UI Polish**: Add "Remote" badges and interactive follow states to the /federation hub. (v2.0.14)
+- [x] **Handshake Completion**: Implemented signed 'Accept' activities back to remote servers. (v2.0.15)
+- [x] **Outbox Automation**: Wired proximity artifact creation to ActivityPub broadcasting. (v2.0.15)
+- [ ] **Activity Center Logic**: Implement real data fetching for the Activity Center from `federation_inbox`.
 - [ ] **Fediverse Interop Testing**: Spin up a local Mastodon/Pleroma dev instance and attempt to search for a local `fwber` user handle to test the `webfinger` and `actor` endpoints end-to-end.
 
 ## 🟡 High: Mobile & Notifications Polish

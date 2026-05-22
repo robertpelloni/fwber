@@ -63,6 +63,9 @@ router.post('/users/:id/inbox', async (req, res) => {
       }
     });
 
+    // Process activity asynchronously (e.g. handle Follows)
+    federationService.processInboxActivity(payload, BigInt(req.params.id)).catch(console.error);
+
     res.status(202).json({ success: true, message: 'Activity accepted' });
   } catch (error) {
     console.error('[Federation] Error processing inbox:', error);
@@ -101,6 +104,40 @@ router.get('/', (_req, res) => res.json({
   message: 'Federation is active',
 }));
 
+// GET /api/federation/posts — get federation posts from inbox
+router.get('/posts', async (_req, res) => {
+    try {
+        const inboxItems = await prisma.federation_inbox.findMany({
+            where: { type: 'Create' },
+            orderBy: { created_at: 'desc' },
+            take: 50
+        });
+
+        const posts = inboxItems.map((item: any) => {
+            const payload = item.payload;
+            const object = payload.object || {};
+
+            return {
+                id: Number(item.id),
+                actor_uri: item.actor_uri,
+                actor_username: item.actor_uri.split('/').pop(),
+                actor_domain: new URL(item.actor_uri).host,
+                content: object.content || '',
+                published_at: object.published || item.created_at.toISOString(),
+                metadata: {
+                    name: object.name || 'Remote Post',
+                    summary: object.summary || ''
+                }
+            };
+        });
+
+        res.json({ posts, total: posts.length });
+    } catch (err: any) {
+        console.error('[Federation] Error fetching posts:', err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 // GET /api/federation/following - Get external actors user is following
 router.get('/following', async (req: any, res) => {
     try {
@@ -109,7 +146,7 @@ router.get('/following', async (req: any, res) => {
         });
 
         const mapped = following.map((f: any) => ({
-            id: f.id.toString(),
+            id: Number(f.id),
             actor_uri: f.target_uri,
             username: f.target_uri.split('/').pop(),
             domain: new URL(f.target_uri).host,
@@ -130,7 +167,7 @@ router.get('/followers', async (req: any, res) => {
         });
 
         const mapped = followers.map((f: any) => ({
-            id: f.id.toString(),
+            id: Number(f.id),
             actor_uri: f.actor_uri,
             username: f.actor_uri.split('/').pop(),
             domain: new URL(f.actor_uri).host

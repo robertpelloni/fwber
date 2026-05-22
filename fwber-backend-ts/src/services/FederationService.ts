@@ -92,13 +92,17 @@ export class FederationService {
     console.log(`[Federation] ${actorUri} wants to follow local user ${targetUserId}`);
 
     try {
+        const user = await prisma.users.findUnique({
+            where: { id: targetUserId },
+            select: { private_key: true }
+        });
+
         // Find or create remote user record
         let remoteUser = await prisma.users.findUnique({
             where: { actor_uri: actorUri }
         });
 
         if (!remoteUser) {
-            // Attempt to fetch actor info for basic details
             try {
                 const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
                 remoteUser = await prisma.users.create({
@@ -112,7 +116,6 @@ export class FederationService {
                     }
                 });
             } catch (err) {
-                console.warn(`[Federation] Could not fetch remote actor details for ${actorUri}, creating minimal record`);
                 remoteUser = await prisma.users.create({
                     data: {
                         name: 'remote_user',
@@ -134,7 +137,27 @@ export class FederationService {
       });
       console.log(`[Federation] Auto-accepted follow request from ${actorUri}`);
 
-      // TODO: Send an Accept activity back to the remote user
+      // Send Accept activity back
+      if (user?.private_key) {
+          const acceptActivity = {
+              '@context': 'https://www.w3.org/ns/activitystreams',
+              id: `https://api.fwber.me/api/federation/activities/accept-${Date.now()}`,
+              type: 'Accept',
+              actor: targetUri,
+              object: activity
+          };
+
+          try {
+              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const inbox = actorRes.data.inbox;
+              if (inbox) {
+                  await this.sendSignedRequest(inbox, acceptActivity, user.private_key, targetUri);
+                  console.log(`[Federation] Sent Accept activity to ${inbox}`);
+              }
+          } catch (err: any) {
+              console.error(`[Federation] Failed to send Accept to ${actorUri}:`, err.message);
+          }
+      }
     } catch (e) {
       console.error('[Federation] Error recording follow:', e);
     }
@@ -210,8 +233,6 @@ export class FederationService {
 
     for (const follower of followers) {
         try {
-            // In a real implementation, we would resolve the follower's inbox URI
-            // For now, we assume the actor_uri is the actor's profile and we'd fetch it to find the inbox
             const actorRes = await axios.get(follower.actor_uri, { headers: { Accept: 'application/activity+json' }});
             const inbox = actorRes.data.inbox;
 
