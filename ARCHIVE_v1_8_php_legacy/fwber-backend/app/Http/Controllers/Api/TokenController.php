@@ -1,0 +1,452 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Token\ConfirmTopUpRequest;
+use App\Http\Requests\Token\DepositTokenRequest;
+use App\Http\Requests\Token\InitiateTopUpRequest;
+use App\Http\Requests\Token\TransferTokenRequest;
+use App\Http\Requests\Token\UpdateWalletAddressRequest;
+use App\Http\Requests\Token\WithdrawTokenRequest;
+use App\Models\TokenTransaction;
+use App\Models\User;
+use App\Services\PushNotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Process;
+
+class TokenController extends Controller
+{
+    protected $pushService;
+
+    protected $paymentGateway;
+
+    public function __construct(PushNotificationService $pushService, \App\Services\Payment\PaymentGatewayInterface $paymentGateway)
+    {
+        $this->pushService = $pushService;
+        $this->paymentGateway = $paymentGateway;
+    }
+
+    public function withdraw(WithdrawTokenRequest $request)
+    {
+        $user = $request->user();
+        $amount = $request->amount;
+
+        // Atomic Check & Update
+        $updated = User::where('id', $user->id)
+            ->where('token_balance', '>=', $amount)
+            ->decrement('token_balance', $amount);
+
+        if (! $updated) {
+            return response()->json(['error' => 'Insufficient balance'], 400);
+        }
+
+        $user->refresh();
+
+        // Run Node Script safely using array arguments to prevent injection
+        $scriptPath = base_path('scripts/solana/transfer_token.cjs');
+
+        $process = Process::path(base_path())
+            ->env([
+                'SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key'),
+                'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
+                'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
+            ])
+            ->run(['node', $scriptPath, $request->destination_address, (string) $amount]);
+
+        if ($process->failed()) {
+            // Rollback
+            $user->increment('token_balance', $amount);
+            \Log::error('Solana Withdrawal Failed: '.$process->errorOutput());
+
+            return response()->json(['error' => 'Transfer failed. Please try again.'], 500);
+        }
+
+        $output = $process->output();
+        preg_match('/TX_SIGNATURE: (\S+)/', $output, $matches);
+        $signature = $matches[1] ?? 'pending';
+
+        // Log Transaction
+        $user->tokenTransactions()->create([
+            'amount' => -$amount,
+            'type' => 'withdrawal',
+            'description' => 'Withdrawal to Solana',
+            'metadata' => [
+                'signature' => $signature,
+                'destination' => $request->destination_address,
+                'chain' => 'solana',
+            ],
+        ]);
+
+        return response()->json([
+            'message' => 'Withdrawal successful',
+            'signature' => $signature,
+            'new_balance' => $user->token_balance,
+        ]);
+    }
+
+    public function deposit(DepositTokenRequest $request)
+    {
+        // Check for duplicate signature
+        $exists = TokenTransaction::whereJsonContains('metadata->signature', $request->signature)->exists();
+        // Fallback for SQLite which sometimes struggles with JSON path in whereJsonContains depending on version
+        if (! $exists) {
+            $exists = TokenTransaction::where('metadata', 'like', '%"'.$request->signature.'"%')->exists();
+        }
+
+        if ($exists) {
+            return response()->json(['error' => 'Transaction already processed'], 400);
+        }
+
+        $user = $request->user();
+
+        // Verify via Node script
+        $scriptPath = base_path('scripts/solana/verify_transaction.cjs');
+
+        $process = Process::path(base_path())
+            ->env([
+                'SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key'),
+                'SOLANA_MINT_ADDRESS' => config('services.solana.mint_address'),
+                'SOLANA_RPC_URL' => config('services.solana.rpc_url'),
+            ])
+            ->run(['node', $scriptPath, $request->signature, (string) $request->amount]);
+
+        if ($process->failed()) {
+            \Log::error('Deposit Verification Failed: '.$process->errorOutput());
+
+            return response()->json(['error' => 'Verification failed or transaction not found'], 400);
+        }
+
+        // Credit User
+        $user->increment('token_balance', $request->amount);
+
+        $user->tokenTransactions()->create([
+            'amount' => $request->amount,
+            'type' => 'deposit',
+            'description' => 'Deposit from Solana',
+            'metadata' => [
+                'signature' => $request->signature,
+                'chain' => 'solana',
+            ],
+        ]);
+
+        return response()->json(['message' => 'Deposit successful', 'new_balance' => $user->fresh()->token_balance]);
+    }
+
+    public function transfer(TransferTokenRequest $request)
+    {
+        $sender = $request->user();
+
+        if ($request->has('recipient_id')) {
+            $recipient = User::findOrFail($request->recipient_id);
+        } else {
+            $recipient = User::where('email', $request->recipient_email)->firstOrFail();
+        }
+
+        $amount = $request->amount;
+        $message = $request->message;
+        $onChain = $request->boolean('on_chain', false);
+        $signature = $request->signature;
+
+        if ($sender->id === $recipient->id) {
+            return response()->json(['error' => 'Cannot send tokens to yourself'], 400);
+        }
+
+        if (! $onChain && $sender->token_balance < $amount) {
+            return response()->json(['error' => 'Insufficient balance'], 400);
+        }
+
+        try {
+            \DB::transaction(function () use ($sender, $recipient, $amount, $message, $onChain, $signature) {
+                if ($onChain) {
+                    // Just log the transaction as it was settled on-chain
+                    $sender->tokenTransactions()->create([
+                        'amount' => -$amount,
+                        'type' => 'on_chain_transfer',
+                        'description' => "On-chain transfer to {$recipient->name}",
+                        'metadata' => ['recipient_id' => $recipient->id, 'message' => $message, 'signature' => $signature],
+                    ]);
+
+                    $recipient->tokenTransactions()->create([
+                        'amount' => $amount,
+                        'type' => 'on_chain_received',
+                        'description' => "On-chain received from {$sender->name}",
+                        'metadata' => ['sender_id' => $sender->id, 'message' => $message, 'signature' => $signature],
+                    ]);
+                } else {
+                    $deducted = User::where('id', $sender->id)
+                        ->where('token_balance', '>=', $amount)
+                        ->decrement('token_balance', $amount);
+
+                    if (! $deducted) {
+                        throw new \Exception('Insufficient balance');
+                    }
+
+                    $recipient->increment('token_balance', $amount);
+
+                    $sender->tokenTransactions()->create([
+                        'amount' => -$amount,
+                        'type' => 'tip_sent',
+                        'description' => "Sent to {$recipient->name}",
+                        'metadata' => ['recipient_id' => $recipient->id, 'message' => $message],
+                    ]);
+
+                    $recipient->tokenTransactions()->create([
+                        'amount' => $amount,
+                        'type' => 'tip_received',
+                        'description' => "Received from {$sender->name}",
+                        'metadata' => ['sender_id' => $sender->id, 'message' => $message],
+                    ]);
+                }
+            });
+
+            // Send Push Notification
+            $body = $message
+                ? "{$sender->name} sent {$amount} FWB: \"{$message}\""
+                : "{$sender->name} sent you {$amount} FWB.";
+
+            if ($onChain) {
+                $body = '🌐 On-Chain: '.$body;
+            }
+
+            $this->pushService->send(
+                $recipient,
+                [
+                    'title' => '💰 Payment Received!',
+                    'body' => $body,
+                    'url' => '/wallet',
+                ],
+                'transaction'
+            );
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+
+        return response()->json(['message' => 'Transfer successful', 'new_balance' => $sender->fresh()->token_balance]);
+    }
+
+    public function balance(Request $request)
+    {
+        $user = $request->user();
+
+        $treasury = \Cache::rememberForever('treasury_address', function () {
+            $script = base_path('scripts/solana/get_server_pubkey.cjs');
+            if (! file_exists($script)) {
+                return null;
+            }
+
+            $process = Process::path(base_path())
+                ->env(['SOLANA_SERVER_SECRET_KEY' => config('services.solana.server_secret_key')])
+                ->run(['node', $script]);
+
+            return trim($process->output());
+        });
+
+        return response()->json([
+            'balance' => $user->token_balance,
+            'referral_code' => $user->referral_code,
+            'wallet_address' => $user->wallet_address,
+            'transactions' => $user->tokenTransactions()->latest()->take(20)->get(),
+            'referral_count' => $user->referrals()->count(),
+            'golden_tickets_remaining' => $user->golden_tickets_remaining,
+            'treasury_address' => $treasury,
+            'mint_address' => config('services.solana.mint_address'),
+        ]);
+    }
+
+    public function updateAddress(UpdateWalletAddressRequest $request)
+    {
+        $user = $request->user();
+        $user->wallet_address = $request->wallet_address;
+        $user->save();
+
+        return response()->json(['message' => 'Wallet address updated']);
+    }
+
+    public function leaderboard()
+    {
+        // ... (existing leaderboard code) ...
+        // Cache for 15 minutes to reduce database load on expensive aggregations
+        return \Cache::remember('leaderboard_stats', 900, function () {
+            $topHolders = User::orderByDesc('token_balance')
+                ->take(10)
+                ->get(['id', 'name', 'token_balance', 'created_at'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3).'***', // Privacy
+                        'balance' => $user->token_balance,
+                        'joined' => $user->created_at->diffForHumans(),
+                    ];
+                });
+
+            $topReferrers = User::withCount('referrals')
+                ->orderByDesc('referrals_count')
+                ->take(10)
+                ->get(['id', 'name', 'referrals_count'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3).'***',
+                        'referrals' => $user->referrals_count,
+                    ];
+                });
+
+            $topWingmen = \App\Models\MatchAssist::select('matchmaker_id', \DB::raw('count(*) as assists_count'))
+                ->where('status', 'matched')
+                ->groupBy('matchmaker_id')
+                ->orderByDesc('assists_count')
+                ->take(10)
+                ->with('matchmaker:id,name')
+                ->get()
+                ->map(function ($assist) {
+                    return [
+                        'name' => substr($assist->matchmaker->name, 0, 3).'***',
+                        'assists' => $assist->assists_count,
+                    ];
+                });
+
+            $topVouched = User::withCount([
+                'vouches',
+                'vouches as safe_count' => function ($query) {
+                    $query->where('type', 'safe');
+                },
+                'vouches as fun_count' => function ($query) {
+                    $query->where('type', 'fun');
+                },
+                'vouches as hot_count' => function ($query) {
+                    $query->where('type', 'hot');
+                },
+            ])
+                ->orderByDesc('vouches_count')
+                ->take(10)
+                ->get(['id', 'name'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3).'***',
+                        'vouches' => $user->vouches_count,
+                        'breakdown' => [
+                            'safe' => $user->safe_count,
+                            'fun' => $user->fun_count,
+                            'hot' => $user->hot_count,
+                        ],
+                    ];
+                });
+
+            $topStreaks = User::where('current_streak', '>', 0)
+                ->orderByDesc('current_streak')
+                ->take(10)
+                ->get(['id', 'name', 'current_streak'])
+                ->map(function ($user) {
+                    return [
+                        'name' => substr($user->name, 0, 3).'***',
+                        'streak' => $user->current_streak,
+                    ];
+                });
+
+            return response()->json([
+                'top_holders' => $topHolders,
+                'top_referrers' => $topReferrers,
+                'top_wingmen' => $topWingmen,
+                'top_vouched' => $topVouched,
+                'top_streaks' => $topStreaks,
+            ]);
+        });
+    }
+
+    public function initiateTopUp(InitiateTopUpRequest $request)
+    {
+        $user = $request->user();
+        $amountUsd = $request->amount_usd;
+        $currency = 'USD';
+
+        // Exchange Rate: $1 USD = 10 FWB
+        $fwbAmount = $amountUsd * 10;
+
+        $result = $this->paymentGateway->createPaymentIntent($amountUsd, $currency, [
+            'user_id' => $user->id,
+            'description' => "Purchase {$fwbAmount} FWB",
+            'type' => 'token_topup',
+            'fwb_amount' => $fwbAmount,
+        ]);
+
+        if ($result->success) {
+            return response()->json([
+                'client_secret' => $result->data['client_secret'],
+                'amount_usd' => $amountUsd,
+                'fwb_amount' => $fwbAmount,
+            ]);
+        }
+
+        return response()->json(['error' => $result->message], 500);
+    }
+
+    public function confirmTopUp(ConfirmTopUpRequest $request)
+    {
+        $user = $request->user();
+
+        try {
+            $result = $this->paymentGateway->verifyPayment($request->payment_intent_id);
+
+            if ($result->success) {
+                // Check if already processed to be idempotent
+                $existingTx = TokenTransaction::whereJsonContains('metadata->payment_intent_id', $request->payment_intent_id)->exists();
+                if ($existingTx) {
+                    return response()->json(['message' => 'Transaction already processed']);
+                }
+
+                // metadata from Stripe intent
+                $metadata = $result->data['metadata'] ?? [];
+                $fwbAmount = isset($metadata['fwb_amount']) ? (int) $metadata['fwb_amount'] : 0;
+
+                // Fallback if metadata missing (shouldn't happen if initiated correctly)
+                if ($fwbAmount <= 0) {
+                    // Default calculation based on amount charged
+                    $chargedAmount = $result->data['amount'] ?? 0; // usually in cents if from stripe object, but our result object normalizes it?
+                    // Let's rely on what we get. Our StripePaymentGateway returns amount in float from intent?
+                    // Actually let's assume standard $1 = 10 FWB
+                    $fwbAmount = ($result->data['amount'] ?? 0) * 10;
+                }
+
+                \DB::transaction(function () use ($user, $result, $fwbAmount, $request) {
+                    // Log Payment
+                    \App\Models\Payment::create([
+                        'user_id' => $user->id,
+                        'amount' => $result->data['amount'],
+                        'currency' => $result->data['currency'],
+                        'payment_gateway' => config('services.payment.driver', 'mock'),
+                        'transaction_id' => $result->transactionId,
+                        'status' => 'succeeded',
+                        'description' => 'FWB Token Purchase',
+                        'metadata' => $result->data,
+                    ]);
+
+                    // Credit User
+                    $user->increment('token_balance', $fwbAmount);
+
+                    // Log Token Transaction
+                    $user->tokenTransactions()->create([
+                        'amount' => $fwbAmount,
+                        'type' => 'deposit',
+                        'description' => 'Purchased FWB Tokens',
+                        'metadata' => [
+                            'payment_intent_id' => $request->payment_intent_id,
+                            'gateway' => 'stripe',
+                            'cost_usd' => $result->data['amount'],
+                        ],
+                    ]);
+                });
+
+                return response()->json([
+                    'message' => 'Top-up successful',
+                    'new_balance' => $user->fresh()->token_balance,
+                    'fwb_added' => $fwbAmount,
+                ]);
+            }
+
+            return response()->json(['error' => 'Payment verification failed: '.$result->message], 400);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error verifying payment: '.$e->getMessage()], 500);
+        }
+    }
+}

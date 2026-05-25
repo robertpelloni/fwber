@@ -1,0 +1,89 @@
+name: Repository Hygiene
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'VERSION'
+      - 'VERSION.md'
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'GEMINI.md'
+      - 'GPT.md'
+      - 'copilot-instructions.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  consistency-checks:
+    name: Source of Truth Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version consistency check
+        shell: bash
+        run: |
+          VERSION=$(tr -d '[:space:]' < VERSION)
+          echo "VERSION file says: $VERSION"
+
+          for file in AGENTS.md CLAUDE.md GEMINI.md GPT.md copilot-instructions.md; do
+            if [ -f "$file" ] && grep -Fq "**Current Version:**" "$file"; then
+              FILE_VERSION=$(grep -F "**Current Version:**" "$file" | head -1 | sed 's/.*\*\*Current Version:\*\* *//' | tr -d '[:space:]')
+              if [ "$FILE_VERSION" != "$VERSION" ]; then
+                echo "❌ Version mismatch in $file: found '$FILE_VERSION', expected '$VERSION'"
+                exit 1
+              fi
+              echo "✅ $file version matches"
+            fi
+          done
+
+      - name: License check
+        shell: bash
+        run: |
+          if [ ! -f LICENSE ]; then
+            echo "❌ LICENSE file is missing"
+            exit 1
+          fi
+          if ! grep -q "MIT License" LICENSE; then
+            echo "❌ LICENSE is not MIT"
+            exit 1
+          fi
+          if [ -f COPYING ]; then
+            echo "❌ COPYING file should not exist (legacy AGPL artifact)"
+            exit 1
+          fi
+          echo "✅ License is MIT, no AGPL artifacts"
+
+      - name: Secret scanning check
+        shell: bash
+        run: |
+          if ! grep -q ".encryption_key" .gitignore; then
+            echo "❌ .encryption_key is not in .gitignore"
+            exit 1
+          fi
+          TRACKED_ENV=$(git ls-files '*.env' '.env.*' | grep -v '.example' | grep -v '.testing' || true)
+          if [ -n "$TRACKED_ENV" ]; then
+            echo "❌ Environment files are tracked in git: $TRACKED_ENV"
+            exit 1
+          fi
+          echo "✅ No secrets or env files tracked"
+
+      - name: Documentation hygiene check
+        shell: bash
+        run: |
+          HANDOFFS=$(find . -maxdepth 1 -name "SESSION_HANDOFF_*.md" | wc -l)
+          if [ "$HANDOFFS" -gt 0 ]; then
+            echo "❌ Found $HANDOFFS SESSION_HANDOFF files in root (should be archived)"
+            exit 1
+          fi
+          UPDATES=$(find . -maxdepth 1 -name "RECENT_UPDATES_*.md" | wc -l)
+          if [ "$UPDATES" -gt 0 ]; then
+            echo "❌ Found $UPDATES RECENT_UPDATES files in root (should be archived)"
+            exit 1
+          fi
+          echo "✅ No stale handoff/update files in root"

@@ -1,0 +1,157 @@
+{
+  "files": {
+    "app/matches/page.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 4,
+          "end": 4
+        },
+        {
+          "start": 10,
+          "end": 10
+        },
+        {
+          "start": 20,
+          "end": 20
+        },
+        {
+          "start": 35,
+          "end": 35
+        },
+        {
+          "start": 137,
+          "end": 137
+        },
+        {
+          "start": 140,
+          "end": 140
+        },
+        {
+          "start": 164,
+          "end": 165
+        },
+        {
+          "start": 232,
+          "end": 232
+        },
+        {
+          "start": 264,
+          "end": 264
+        },
+        {
+          "start": 300,
+          "end": 300
+        },
+        {
+          "start": 310,
+          "end": 310
+        },
+        {
+          "start": 312,
+          "end": 312
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-29T18:07:45.373Z"
+    },
+    "components/RealTimeChat.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 267,
+          "end": 267
+        },
+        {
+          "start": 287,
+          "end": 287
+        },
+        {
+          "start": 586,
+          "end": 586
+        },
+        {
+          "start": 717,
+          "end": 717
+        },
+        {
+          "start": 928,
+          "end": 929
+        },
+        {
+          "start": 946,
+          "end": 946
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-04-29T22:42:51.408Z"
+    },
+    "app/messages/page.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 29,
+          "end": 29
+        },
+        {
+          "start": 65,
+          "end": 67
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-29T19:38:12.866Z"
+    },
+    "components/ErrorBoundary.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 1,
+          "end": 46
+        }
+      ],
+      "importsChanged": true,
+      "lastEdit": "2026-04-29T19:31:43.679Z"
+    },
+    "lib/api/messages.ts": {
+      "modifiedRanges": [
+        {
+          "start": 70,
+          "end": 71
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-04-29T19:58:51.212Z"
+    },
+    "components/ai/WingmanSuggestions.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 62,
+          "end": 62
+        },
+        {
+          "start": 71,
+          "end": 71
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-04-29T20:43:01.142Z"
+    },
+    "components/profile/ProfilePageClient.tsx": {
+      "modifiedRanges": [
+        {
+          "start": 123,
+          "end": 124
+        },
+        {
+          "start": 161,
+          "end": 164
+        },
+        {
+          "start": 513,
+          "end": 516
+        }
+      ],
+      "importsChanged": false,
+      "lastEdit": "2026-04-29T21:08:21.223Z"
+    }
+  },
+  "turnCycles": 0,
+  "maxCycles": 3,
+  "lastUpdated": "2026-04-29T22:42:51.409Z"
+}

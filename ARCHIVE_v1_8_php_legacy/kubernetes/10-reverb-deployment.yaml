@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-reverb
+  namespace: fwber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fwber-reverb
+  template:
+    metadata:
+      labels:
+        app: fwber-reverb
+    spec:
+      containers:
+      - name: reverb
+        image: fwber-backend:latest
+        imagePullPolicy: IfNotPresent
+        command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: REDIS_HOST
+          value: "fwber-redis-master"
+        - name: BROADCAST_DRIVER
+          value: "reverb"
+        - name: REVERB_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: REVERB_APP_ID
+        - name: REVERB_APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: REVERB_APP_KEY
+        - name: REVERB_APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: REVERB_APP_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-reverb
+  namespace: fwber
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: fwber-reverb

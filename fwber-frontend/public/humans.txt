@@ -1,0 +1,11 @@
+/* TEAM */
+Name: fwber.me Team
+Site: https://www.fwber.me
+Location: Detroit, MI
+
+/* SITE */
+Last update: 2026/04/08
+Language: English
+Standards: HTML5, CSS3, JavaScript
+Components: Next.js 15, Laravel 12, Solana, Redis, Reverb
+Software: Vercel, Hetzner

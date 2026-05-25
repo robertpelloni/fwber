@@ -1,0 +1,109 @@
+import { apiClient } from './client';
+import { PaginatedResponse } from './types';
+
+export interface EventSceneSignals {
+  headline: string | null;
+  matched_topics: Array<{
+    id: number;
+    slug: string;
+    label: string;
+    emoji?: string | null;
+  }>;
+  matched_tags: string[];
+  score_boost: number;
+}
+
+export interface EventRankingStrategy {
+  trusted_connections: boolean;
+  scene_alignment: boolean;
+  freshness: boolean;
+  distance: boolean;
+  summary: string;
+}
+
+export interface Event {
+  id: number;
+  title: string;
+  description: string;
+  type?: 'standard' | 'speed_dating' | 'party' | 'meetup' | 'workshop';
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  starts_at: string;
+  ends_at: string;
+  max_attendees: number | null;
+  price: number | null;
+  token_cost?: number | null;
+  created_by_user_id: number;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  attendees_count: number;
+  creator?: any;
+  attendees?: any[];
+  chatroom_id?: number;
+  distance_meters?: number;
+  ranking_score?: number;
+  scene_signals?: EventSceneSignals | null;
+}
+
+export type EventsResponse = PaginatedResponse<Event> & {
+  meta: PaginatedResponse<Event>['meta'] & {
+    ranking_strategy?: EventRankingStrategy;
+  };
+};
+
+export interface CreateEventRequest {
+  title: string;
+  description: string;
+  type?: 'standard' | 'speed_dating' | 'party' | 'meetup' | 'workshop';
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  starts_at: string;
+  ends_at: string;
+  max_attendees?: number;
+  price?: number;
+  token_cost?: number;
+  shared_group_ids?: number[];
+}
+
+export async function getNearbyEvents(latitude?: number, longitude?: number, radius: number = 50, type?: string): Promise<EventsResponse> {
+  const params: any = { radius, ranking_strategy: 'trust-aware' };
+  if (latitude && longitude) {
+    params.latitude = latitude;
+    params.longitude = longitude;
+  }
+  if (type) {
+    params.type = type;
+  }
+  const response = await apiClient.get<EventsResponse>('/events', { params });
+  return response.data;
+}
+
+export async function getMyEvents(): Promise<PaginatedResponse<Event>> {
+  const response = await apiClient.get<PaginatedResponse<Event>>('/events/my-events');
+  return response.data;
+}
+
+export async function getEvent(id: string | number): Promise<Event> {
+  const response = await apiClient.get<Event>(`/events/${id}`);
+  return response.data;
+}
+
+export async function createEvent(data: CreateEventRequest): Promise<Event> {
+  const response = await apiClient.post<Event>('/events', data);
+  return response.data;
+}
+
+export async function rsvpEvent(
+  id: number, 
+  status: string, 
+  paymentMethod?: 'stripe' | 'token',
+  paymentMethodId?: string
+): Promise<{ message: string }> {
+  const response = await apiClient.post<{ message: string }>(`/events/${id}/rsvp`, { 
+    status,
+    payment_method: paymentMethod,
+    payment_method_id: paymentMethodId
+  });
+  return response.data;
+}

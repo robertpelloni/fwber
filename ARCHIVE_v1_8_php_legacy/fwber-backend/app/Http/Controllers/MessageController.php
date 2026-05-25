@@ -1,0 +1,774 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Domain\Core\EventSourcing\EventStore;
+use App\Events\Messaging\MessageSent;
+use App\Http\Requests\Message\StoreMessageRequest;
+use App\Jobs\TranscribeAudioMessage;
+use App\Models\Block;
+use App\Models\Message;
+use App\Models\RelationshipTier;
+use App\Models\User;
+use App\Models\UserMatch;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class MessageController extends Controller
+{
+    public function __construct(
+        private readonly EventStore $eventStore
+    ) {}
+
+    /**
+     * @OA\Post(
+     *     path="/messages",
+     *     tags={"Messages"},
+     *     summary="Send a message",
+     *     description="Send a text message or media (image/video/audio/file) to a matched user. Either content or media is required. Enforces relationship tier limits and blocks.",
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *                 required={"receiver_id"},
+     *
+     *                 @OA\Property(property="receiver_id", type="integer", description="ID of message recipient", example=42),
+     *                 @OA\Property(property="content", type="string", maxLength=5000, description="Text message content", example="Hey, how are you?"),
+     *                 @OA\Property(property="message_type", type="string", enum={"text", "image", "video", "audio", "file"}, example="text"),
+     *                 @OA\Property(property="media", type="string", format="binary", description="Media file (image/video/audio/file)"),
+     *                 @OA\Property(property="media_duration", type="integer", description="Duration in seconds for audio/video", example=30)
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Message sent successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="id", type="integer", example=123),
+     *             @OA\Property(property="sender_id", type="integer", example=1),
+     *             @OA\Property(property="receiver_id", type="integer", example=42),
+     *             @OA\Property(property="content", type="string", example="Hey, how are you?"),
+     *             @OA\Property(property="message_type", type="string", example="text"),
+     *             @OA\Property(property="media_url", type="string", nullable=true),
+     *             @OA\Property(property="created_at", type="string", format="date-time")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=403,
+     *         description="Messaging blocked or not allowed",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Messaging blocked between users")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="No active match found",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="No active match found")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/ValidationError")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/UnauthorizedError")
+     *     )
+     * )
+     *
+     * Send a message to a matched user
+     */
+    public function store(StoreMessageRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $senderId = Auth::id();
+        $receiverId = $validated['receiver_id'];
+
+        // --- FEDERATED DM ROUTING ---
+        if (filter_var($receiverId, FILTER_VALIDATE_URL)) {
+            return $this->storeFederated($request, $receiverId);
+        }
+        // ----------------------------
+
+        // Block enforcement (either direction blocks messaging)
+        if (Block::isBlockedBetween($senderId, (int) $receiverId)) {
+            return response()->json(['error' => 'Messaging blocked between users'], 403);
+        }
+
+        // Find the match between these users (eager load relationshipTier to avoid N+1)
+        $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
+            $query->where('user1_id', $senderId)->where('user2_id', (int) $receiverId)
+                ->orWhere('user1_id', (int) $receiverId)->where('user2_id', $senderId);
+        })->where('is_active', true)->with('relationshipTier')->first();
+
+        if (! $match) {
+            return response()->json(['error' => 'No active match found'], 404);
+        }
+
+        // At least one of content or media is required
+        if (! $request->hasFile('media') && (! isset($validated['content']) || trim((string) $validated['content']) === '')) {
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors' => [
+                    'content' => ['Either content or media is required'],
+                ],
+            ], 422);
+        }
+
+        // Determine and validate media constraints
+        $mediaUrl = null;
+        $mediaType = null;
+        $thumbnailUrl = null;
+        $resolvedType = $validated['message_type'] ?? 'text';
+        $duration = $validated['media_duration'] ?? null;
+
+        if ($request->hasFile('media')) {
+            $file = $request->file('media');
+            $mediaType = $file->getMimeType();
+
+            // Infer message type from MIME when not explicitly set
+            if (! isset($validated['message_type'])) {
+                if (str_starts_with($mediaType, 'image/')) {
+                    $resolvedType = 'image';
+                } elseif (str_starts_with($mediaType, 'audio/')) {
+                    $resolvedType = 'audio';
+                } elseif (str_starts_with($mediaType, 'video/')) {
+                    $resolvedType = 'video';
+                } else {
+                    $resolvedType = 'file';
+                }
+            }
+
+            // If client specified a type, ensure it matches the detected type (for media)
+            if (isset($validated['message_type'])) {
+                $detectedForCompare = str_starts_with($mediaType, 'image/') ? 'image'
+                    : (str_starts_with($mediaType, 'audio/') ? 'audio'
+                        : (str_starts_with($mediaType, 'video/') ? 'video' : 'file'));
+
+                if ($validated['message_type'] !== $detectedForCompare) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'message_type' => ['message_type does not match uploaded media'],
+                        ],
+                    ], 422);
+                }
+            }
+
+            // Type-specific constraints
+            $sizeKB = (int) ceil(($file->getSize() ?? 0) / 1024);
+            $limits = [
+                'image' => 5120,   // 5 MB
+                'audio' => 3072,   // 3 MB
+                'video' => 15360,  // 15 MB
+                'file' => 2048,   // 2 MB
+            ];
+
+            // Validate size by resolved type
+            $cap = $limits[$resolvedType] ?? $limits['file'];
+            if ($sizeKB > $cap) {
+                return response()->json([
+                    'message' => 'The given data was invalid.',
+                    'errors' => [
+                        'media' => ["{$resolvedType} exceeds maximum size of {$cap} KB"],
+                    ],
+                ], 422);
+            }
+
+            // Validate allowed MIME for images specifically to block disguised executables
+            if ($resolvedType === 'image') {
+                $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (! in_array($mediaType, $allowed, true)) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'media' => ['Unsupported image type'],
+                        ],
+                    ], 422);
+                }
+            }
+
+            // Clamp duration for audio/video
+            if ($resolvedType === 'audio') {
+                $duration = (int) ($duration ?? 1);
+                if ($duration < 1 || $duration > 120) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'media_duration' => ['Audio duration must be between 1 and 120 seconds'],
+                        ],
+                    ], 422);
+                }
+            } elseif ($resolvedType === 'video') {
+                $duration = (int) ($duration ?? 1);
+                if ($duration < 1 || $duration > 60) {
+                    return response()->json([
+                        'message' => 'The given data was invalid.',
+                        'errors' => [
+                            'media_duration' => ['Video duration must be between 1 and 60 seconds'],
+                        ],
+                    ], 422);
+                }
+            } else {
+                $duration = null; // Not applicable
+            }
+
+            // Store in public disk under messages/{$senderId}
+            $stored = \App\Services\MediaUploadService::store($file, $senderId, $resolvedType);
+            $mediaUrl = $stored['media_url'];
+            $mediaType = $stored['media_type'];
+            $thumbnailUrl = $stored['thumbnail_url'];
+        }
+
+        // Wrap message + match update + tier creation in transaction for atomicity
+        [$message, $tier] = \DB::transaction(function () use ($senderId, $receiverId, $validated, $resolvedType, $mediaUrl, $mediaType, $duration, $thumbnailUrl, $match, $request) {
+            // Create the message
+            $message = Message::create([
+                'sender_id' => $senderId,
+                'receiver_id' => $receiverId,
+                'content' => $validated['content'] ?? '',
+                'message_type' => $resolvedType,
+                'media_url' => $mediaUrl,
+                'media_type' => $mediaType,
+                'media_duration' => $duration,
+                'thumbnail_url' => $thumbnailUrl,
+                'is_encrypted' => $validated['is_encrypted'] ?? false,
+                'sent_at' => now(),
+            ]);
+
+            // --- EVENT SOURCING INTEGRATION ---
+            $aggregateId = (string) $match->id;
+            $currentVersion = $this->eventStore->getCurrentVersion($aggregateId, 'Chatroom');
+            $event = new MessageSent(
+                $aggregateId, // Aggregate is the chat context
+                (int) $senderId,
+                (int) $receiverId,
+                (string) ($validated['content'] ?? ''),
+                (string) $resolvedType,
+                json_encode(['message_id' => $message->id])
+            );
+            try {
+                $this->eventStore->append(
+                    $event,
+                    'Chatroom',
+                    $currentVersion + 1,
+                    ['ip' => $request->ip(), 'user_agent' => $request->userAgent()]
+                );
+            } catch (\Throwable $eventStoreException) {
+                \Illuminate\Support\Facades\Log::warning('Message event append failed; continuing with message persistence', [
+                    'match_id' => $match->id,
+                    'sender_id' => $senderId,
+                    'receiver_id' => $receiverId,
+                    'error' => $eventStoreException->getMessage(),
+                ]);
+            }
+            // ----------------------------------
+
+            // Update match last_message_at
+            $match->last_message_at = now();
+            $match->save();
+
+            // Increment tier message count
+            $tier = $match->relationshipTier;
+
+            if (! $tier) {
+                $tier = RelationshipTier::create([
+                    'match_id' => $match->id,
+                    'current_tier' => 'matched',
+                    'first_matched_at' => $match->created_at,
+                ]);
+            }
+
+            return [$message, $tier];
+        });
+
+        $previousTier = $tier->current_tier;
+        $tier->incrementMessages();
+        $tierUpgraded = $tier->current_tier !== $previousTier;
+
+        if ($tierUpgraded) {
+            $user = Auth::user();
+            $otherUser = $match->getOtherUser($user->id);
+            $user->notify(new \App\Notifications\RelationshipTierUpgradedNotification($tier, $otherUser));
+            $otherUser->notify(new \App\Notifications\RelationshipTierUpgradedNotification($tier, $user));
+        }
+
+        // Dispatch audio transcription job if applicable
+        if ($message->message_type === 'audio') {
+            TranscribeAudioMessage::dispatch($message);
+        }
+
+        // Proactive Wingman Nudge: Analyze the conversation flow every 5 messages
+        if ($tier->messages_exchanged > 0 && $tier->messages_exchanged % 5 === 0) {
+            \App\Jobs\AnalyzeConversationNudge::dispatch($receiverId, $senderId);
+        }
+
+        return response()->json([
+            'message' => $message,
+            'tier_update' => [
+                'current_tier' => $tier->current_tier,
+                'previous_tier' => $previousTier,
+                'tier_upgraded' => $tierUpgraded,
+                'messages_exchanged' => $tier->messages_exchanged,
+            ],
+        ], 201);
+    }
+
+    /**
+     * Get conversation with a matched user
+     *
+     * @OA\Get(
+     *   path="/messages/{userId}",
+     *   tags={"Messages"},
+     *   summary="Get conversation with a matched user",
+     *   description="Returns paginated messages and other user's presence info.",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(
+     *     response=200,
+     *     description="Conversation",
+     *
+     *     @OA\JsonContent(type="object",
+     *
+     *       @OA\Property(property="messages", type="array", @OA\Items(ref="#/components/schemas/DirectMessage")),
+     *       @OA\Property(property="pagination", type="object"),
+     *       @OA\Property(property="other_user", ref="#/components/schemas/User")
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, ref="#/components/responses/Unauthorized")
+     * )
+     */
+    public function index(Request $request, int $userId): JsonResponse
+    {
+        $currentUserId = Auth::id();
+
+        // Block enforcement for fetching conversation
+        if (Block::isBlockedBetween($currentUserId, $userId)) {
+            return response()->json(['error' => 'Conversation access blocked'], 403);
+        }
+
+        // Verify match exists
+        $match = UserMatch::where(function ($query) use ($currentUserId, $userId) {
+            $query->where('user1_id', $currentUserId)->where('user2_id', $userId)
+                ->orWhere('user1_id', $userId)->where('user2_id', $currentUserId);
+        })->where('is_active', true)->first();
+
+        if (! $match) {
+            return response()->json(['error' => 'No active match found'], 404);
+        }
+
+        $messages = Message::between($currentUserId, $userId)
+            ->orderBy('sent_at', 'asc')
+            ->paginate(50);
+
+        // Include other user's presence info
+        $otherUser = User::find($userId);
+
+        return response()->json([
+            'messages' => $messages->items(),
+            'pagination' => [
+                'total' => $messages->total(),
+                'per_page' => $messages->perPage(),
+                'current_page' => $messages->currentPage(),
+                'last_page' => $messages->lastPage(),
+            ],
+            'other_user' => [
+                'id' => $otherUser->id,
+                'name' => $otherUser->name,
+                'last_seen_at' => optional($otherUser->last_seen_at)->toIso8601String(),
+            ],
+        ]);
+    }
+
+    /**
+     * Mark message as read
+     *
+     * @OA\Post(
+     *   path="/messages/{messageId}/read",
+     *   tags={"Messages"},
+     *   summary="Mark a message as read",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="messageId", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(response=200, description="Marked read"),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    /**
+     * Send a DM to a remote federated actor.
+     */
+    protected function storeFederated(StoreMessageRequest $request, string $actorUri): JsonResponse
+    {
+        $user = Auth::user();
+        $validated = $request->validated();
+        $content = $validated['content'] ?? '';
+
+        // 1. Resolve remote actor inbox
+        $activityPubService = app(\App\Services\ActivityPubService::class);
+        
+        // 2. Prepare the private Note activity
+        $activityId = url("/api/federation/activities/" . \Illuminate\Support\Str::uuid());
+        $activity = [
+            '@context' => 'https://www.w3.org/ns/activitystreams',
+            'id' => $activityId,
+            'type' => 'Create',
+            'actor' => url("/api/federation/users/{$user->id}"),
+            'to' => [$actorUri],
+            'object' => [
+                'id' => $activityId . "#object",
+                'type' => 'Note',
+                'attributedTo' => url("/api/federation/users/{$user->id}"),
+                'content' => $content,
+                'to' => [$actorUri],
+                'published' => now()->toIso8601String(),
+            ]
+        ];
+
+        try {
+            $activityPubService->dispatchToRemoteInbox($user, $actorUri, $activity);
+            
+            // 3. Store locally for chat history
+            $message = \App\Models\Message::create([
+                'sender_id' => $user->id,
+                'receiver_id' => 0,
+                'content' => $content,
+                'message_type' => 'federated_dm',
+                'is_encrypted' => $validated['is_encrypted'] ?? false,
+                'sent_at' => now(),
+                'metadata' => json_encode([
+                    'actor_uri' => $actorUri,
+                    'is_outbound' => true
+                ])
+            ]);
+
+            return response()->json([
+                'message' => 'Federated DM sent successfully',
+                'id' => $message->id,
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error("Federated DM delivery failed: " . $e->getMessage());
+            return response()->json(['error' => 'Failed to deliver federated message'], 500);
+        }
+    }
+
+    public function markAsRead(int $messageId): JsonResponse
+    {
+        $message = Message::findOrFail($messageId);
+        $currentUserId = Auth::id();
+
+        // Only the receiver can mark a message as read
+        if ($message->receiver_id != $currentUserId) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Idempotent: do not overwrite existing timestamp
+        if (! $message->is_read) {
+            $message->is_read = true;
+            $message->read_at = now();
+            $message->save();
+        }
+
+        return response()->json([
+            'message' => [
+                'id' => $message->id,
+                'sender_id' => $message->sender_id,
+                'receiver_id' => $message->receiver_id,
+                'is_read' => $message->is_read,
+                'read_at' => $message->read_at?->toISOString(),
+            ],
+        ]);
+    }
+
+    /**
+     * Mark all messages from a sender as read
+     *
+     * @OA\Post(
+     *   path="/messages/mark-all-read/{senderId}",
+     *   tags={"Messages"},
+     *   summary="Mark all messages from a sender as read",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="senderId", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(response=200, description="Marked all read"),
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function markAllAsRead(int $senderId): JsonResponse
+    {
+        $currentUserId = Auth::id();
+
+        Message::where('sender_id', $senderId)
+            ->where('receiver_id', $currentUserId)
+            ->where('is_read', false)
+            ->update(['is_read' => true, 'read_at' => now()]);
+
+        return response()->json(['message' => 'All messages marked as read']);
+    }
+
+    /**
+     * Get unread message count
+     *
+     * @OA\Get(
+     *   path="/messages/unread-count",
+     *   tags={"Messages"},
+     *   summary="Get count of unread messages",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Response(
+     *     response=200,
+     *     description="Unread count",
+     *
+     *     @OA\JsonContent(type="object",
+     *
+     *       @OA\Property(property="unread_count", type="integer", example=3)
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function unreadCount(): JsonResponse
+    {
+        $userId = Auth::id();
+
+        $count = Message::where('receiver_id', $userId)
+            ->unread()
+            ->count();
+
+        return response()->json(['unread_count' => $count]);
+    }
+
+    /**
+     * Sync an offline message sent while disconnected.
+     */
+    public function sync(Request $request): JsonResponse
+    {
+        $senderId = Auth::id();
+        $validated = $request->validate([
+            'uuid' => 'required|uuid',
+            'recipient_id' => 'required|exists:users,id',
+            'content' => 'required|string',
+            'message_type' => 'required|string',
+            'is_encrypted' => 'required|boolean',
+            'created_at' => 'required|date',
+        ]);
+
+        $receiverId = $validated['recipient_id'];
+
+        // Idempotency: Check if this message UUID already exists
+        $existing = Message::where('uuid', $validated['uuid'])->first();
+        if ($existing) {
+            return response()->json(['message' => 'Message already synced', 'id' => $existing->id]);
+        }
+
+        // Verify relationship
+        $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
+            $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
+                ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+        })->where('is_active', true)->first();
+
+        if (! $match) {
+            return response()->json(['message' => 'Cannot sync message without mutual match'], 403);
+        }
+
+        $message = Message::create([
+            'uuid' => $validated['uuid'],
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'content' => $validated['content'],
+            'message_type' => $validated['message_type'],
+            'is_encrypted' => $validated['is_encrypted'],
+            'sent_at' => $validated['created_at'],
+        ]);
+
+        // --- EVENT SOURCING INTEGRATION ---
+        $currentVersion = $this->eventStore->getCurrentVersion((string) $match->id, 'Chatroom');
+        $event = new MessageSent(
+            (string) $match->id,
+            (int) $senderId,
+            (int) $receiverId,
+            (string) $validated['content'],
+            (string) $validated['message_type'],
+            json_encode(['message_id' => $message->id, 'is_sync' => true])
+        );
+        $this->eventStore->append($event, 'Chatroom', $currentVersion + 1, ['ip' => $request->ip()]);
+        // ----------------------------------
+
+        $match->update(['last_message_at' => now()]);
+
+        return response()->json([
+            'message' => 'Offline message synced successfully',
+            'id' => $message->id,
+        ], 201);
+    }
+
+    /**
+     * CRDT-based Offline Batch Sync
+     *
+     * @OA\Post(
+     *   path="/messages/sync-batch",
+     *   tags={"Messaging"},
+     *   summary="CRDT Offline Batch Sync",
+     *   description="Accepts a batch of offline messages and reconciles them securely. Returns missed server-side messages.",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="last_sync_at", type="string", format="date-time", nullable=true),
+     *       @OA\Property(property="messages", type="array", @OA\Items(
+     *           @OA\Property(property="uuid", type="string", format="uuid"),
+     *           @OA\Property(property="recipient_id", type="integer"),
+     *           @OA\Property(property="content", type="string"),
+     *           @OA\Property(property="type", type="string"),
+     *           @OA\Property(property="is_encrypted", type="boolean"),
+     *           @OA\Property(property="created_at", type="string", format="date-time")
+     *       ))
+     *     )
+     *   ),
+     *   @OA\Response(response=200, description="Batch synced successfully")
+     * )
+     */
+    public function syncBatch(Request $request): JsonResponse
+    {
+        $senderId = Auth::id();
+        $validated = $request->validate([
+            'last_sync_at' => 'nullable|date',
+            'messages' => 'array',
+            'messages.*.uuid' => 'required|uuid',
+            'messages.*.recipient_id' => 'required|exists:users,id',
+            'messages.*.content' => 'required|string',
+            'messages.*.type' => 'required|string',
+            'messages.*.is_encrypted' => 'required|boolean',
+            'messages.*.created_at' => 'required|date',
+        ]);
+
+        $syncedIds = [];
+        $failedUuids = [];
+        $messages = $validated['messages'] ?? [];
+        $lastSyncAt = $validated['last_sync_at'] ?? null;
+
+        // Group messages by recipient to optimize match lookups
+        $groupedByRecipient = collect($messages)->groupBy('recipient_id');
+        
+        foreach ($groupedByRecipient as $receiverId => $userMessages) {
+            // Verify relationship once per recipient
+            $match = UserMatch::where(function ($query) use ($senderId, $receiverId) {
+                $query->where('user1_id', $senderId)->where('user2_id', $receiverId)
+                    ->orWhere('user1_id', $receiverId)->where('user2_id', $senderId);
+            })->where('is_active', true)->first();
+
+            if (! $match) {
+                foreach ($userMessages as $msg) {
+                    $failedUuids[] = ['uuid' => $msg['uuid'], 'reason' => 'No active match'];
+                }
+                continue;
+            }
+
+            // Get current aggregate version for the event store
+            $currentVersion = $this->eventStore->getCurrentVersion((string) $match->id, 'Chatroom');
+
+            foreach ($userMessages as $msg) {
+                // Idempotency: Check if this message UUID already exists
+                $existing = Message::where('uuid', $msg['uuid'])->first();
+                if ($existing) {
+                    $syncedIds[] = $msg['uuid'];
+                    continue;
+                }
+
+                // Insert historical message
+                $messageModel = Message::create([
+                    'uuid' => $msg['uuid'],
+                    'sender_id' => $senderId,
+                    'receiver_id' => $receiverId,
+                    'content' => $msg['content'],
+                    'message_type' => $msg['type'],
+                    'is_encrypted' => $msg['is_encrypted'],
+                    'sent_at' => $msg['created_at'],
+                ]);
+
+                // Append historical event
+                $currentVersion++;
+                $event = new MessageSent(
+                    (string) $match->id,
+                    (int) $senderId,
+                    (int) $receiverId,
+                    (string) $msg['content'],
+                    (string) $msg['type'],
+                    json_encode(['message_id' => $messageModel->id, 'is_batch_sync' => true, 'client_uuid' => $msg['uuid']])
+                );
+                
+                try {
+                    $this->eventStore->append($event, 'Chatroom', $currentVersion, ['ip' => $request->ip()]);
+                    $syncedIds[] = $msg['uuid'];
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to append offline message event", ['uuid' => $msg['uuid'], 'error' => $e->getMessage()]);
+                    $failedUuids[] = ['uuid' => $msg['uuid'], 'reason' => 'Event sourcing conflict'];
+                }
+            }
+
+            // Update match last activity
+            $match->update(['last_message_at' => now()]);
+        }
+
+        // Fetch missed messages from the server since last sync
+        $missedMessages = [];
+        if ($lastSyncAt) {
+            $missedMessages = Message::where('receiver_id', $senderId)
+                ->where('sent_at', '>', $lastSyncAt)
+                ->orderBy('sent_at', 'asc')
+                ->get()
+                ->map(function($m) {
+                    return [
+                        'id' => $m->id,
+                        'uuid' => $m->uuid,
+                        'sender_id' => $m->sender_id,
+                        'content' => $m->content,
+                        'type' => $m->message_type,
+                        'is_encrypted' => $m->is_encrypted,
+                        'sent_at' => $m->sent_at,
+                    ];
+                });
+        }
+
+        return response()->json([
+            'success' => true,
+            'synced_uuids' => $syncedIds,
+            'failed_uuids' => $failedUuids,
+            'missed_messages' => $missedMessages,
+            'server_time' => now()->toIso8601String(),
+        ]);
+    }
+}

@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "fwber",
+    "slug": "fwber",
+    "scheme": "fwber",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hyperfield.fwber",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "fwber needs access to your location to find nearby matches and venues.",
+        "NFCReaderUsageDescription": "fwber needs access to NFC to verify physical profile exchanges and process tap-to-pay transactions."
+      },
+      "entitlements": {
+        "com.apple.developer.nfc.readersession.formats": ["NDEF"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.hyperfield.fwber",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "NFC"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow fwber to use your location."
+        }
+      ],
+      "expo-notifications"
+    ]
+  }
+}

@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\ZKProximityService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class ZKProximityController extends Controller
+{
+    protected $zkService;
+
+    public function __construct(ZKProximityService $zkService)
+    {
+        $this->zkService = $zkService;
+    }
+
+    /**
+     * Get the parameters for ZK proof generation (Mock hardware enclave keys).
+     */
+    public function params()
+    {
+        return response()->json([
+            'secret' => env('ZK_SECRET', 'fwber-zk-hardware-enclave-secret'),
+            'precision' => 6,
+        ]);
+    }
+
+    /**
+     * Verify a zero-knowledge proximity proof from the client.
+     */
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'target_entity_type' => 'required|string|in:venue,user,event,chatroom',
+            'target_entity_id' => 'required|integer',
+            'proof_payload' => 'required|array',
+            'proof_payload.geohash' => 'required|string',
+            'proof_payload.signature' => 'required|string',
+            'public_signals' => 'required|array',
+            'public_signals.timestamp' => 'required|integer',
+            'public_signals.target_entity_id' => 'required|integer',
+            'proof_hash' => 'required|string',
+        ]);
+
+        $userId = Auth::id();
+
+        // Pass circuit evaluation to the Service
+        $isValid = $this->zkService->verifyProof(
+            $request->proof_payload,
+            $request->public_signals,
+            $request->target_entity_type
+        );
+
+        if (! $isValid) {
+            return response()->json([
+                'message' => 'Zero-Knowledge Proximity Proof failed verification.',
+                'verified' => false,
+            ], 422);
+        }
+
+        // Record the mathematical presence
+        $proofRecord = $this->zkService->recordVerifiedPresence(
+            $userId,
+            $request->target_entity_type,
+            $request->target_entity_id,
+            $request->proof_hash
+        );
+
+        return response()->json([
+            'message' => 'Proximity Cryptographically Verified',
+            'verified' => true,
+            'record_id' => $proofRecord->id,
+        ], 200);
+    }
+}

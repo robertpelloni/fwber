@@ -1,0 +1,214 @@
+{
+  "version": 1,
+  "savedAt": "2026-05-08T19:27:06.316Z",
+  "memories": [
+    {
+      "id": "45140ae394dc0f8c",
+      "type": "working",
+      "namespace": "project",
+      "content": "set_capacity failed\nset_capacity failed after 4ms. this.terminalService.getTools is not a function\nFacts:\n- Tool: set_capacity\n- Duration: 4ms\n- Failure: this.terminalService.getTools is not a function",
+      "metadata": {
+        "source": "tool_execution",
+        "tags": [
+          "tool-execution",
+          "set_capacity",
+          "failure",
+          "set",
+          "capacity",
+          "warning"
+        ],
+        "durationMs": 4,
+        "success": false,
+        "structuredObservation": {
+          "type": "warning",
+          "title": "set_capacity failed",
+          "narrative": "set_capacity failed after 4ms. this.terminalService.getTools is not a function",
+          "facts": [
+            "Tool: set_capacity",
+            "Duration: 4ms",
+            "Failure: this.terminalService.getTools is not a function"
+          ],
+          "concepts": [
+            "tool-execution",
+            "set_capacity",
+            "failure",
+            "set",
+            "capacity",
+            "warning"
+          ],
+          "filesRead": [],
+          "filesModified": [],
+          "toolName": "set_capacity",
+          "contentHash": "45f2bc22d9bfc25e73cd6ca71464ab0c3cf0b49ea84e29a80832bf49aa680a1a",
+          "recordedAt": 1778268199317
+        },
+        "observationType": "warning",
+        "observationHash": "45f2bc22d9bfc25e73cd6ca71464ab0c3cf0b49ea84e29a80832bf49aa680a1a",
+        "toolName": "set_capacity",
+        "filesRead": [],
+        "filesModified": [],
+        "rawInput": "{\n  \"maxLoadedTools\": 16,\n  \"maxHydratedSchemas\": 8\n}",
+        "rawOutput": "{}"
+      },
+      "createdAt": "2026-05-08T19:23:19.318Z",
+      "accessedAt": "2026-05-08T19:23:19.318Z",
+      "accessCount": 0
+    },
+    {
+      "id": "4256d311df1d7de9",
+      "type": "working",
+      "namespace": "project",
+      "content": "set_capacity failed\nset_capacity failed after 4ms. this.terminalService.getTools is not a function\nFacts:\n- Tool: set_capacity\n- Duration: 4ms\n- Failure: this.terminalService.getTools is not a function",
+      "metadata": {
+        "source": "tool_execution",
+        "tags": [
+          "tool-execution",
+          "set_capacity",
+          "failure",
+          "set",
+          "capacity",
+          "warning"
+        ],
+        "durationMs": 4,
+        "success": false,
+        "structuredObservation": {
+          "type": "warning",
+          "title": "set_capacity failed",
+          "narrative": "set_capacity failed after 4ms. this.terminalService.getTools is not a function",
+          "facts": [
+            "Tool: set_capacity",
+            "Duration: 4ms",
+            "Failure: this.terminalService.getTools is not a function"
+          ],
+          "concepts": [
+            "tool-execution",
+            "set_capacity",
+            "failure",
+            "set",
+            "capacity",
+            "warning"
+          ],
+          "filesRead": [],
+          "filesModified": [],
+          "toolName": "set_capacity",
+          "contentHash": "45f2bc22d9bfc25e73cd6ca71464ab0c3cf0b49ea84e29a80832bf49aa680a1a",
+          "recordedAt": 1778268280929
+        },
+        "observationType": "warning",
+        "observationHash": "45f2bc22d9bfc25e73cd6ca71464ab0c3cf0b49ea84e29a80832bf49aa680a1a",
+        "toolName": "set_capacity",
+        "filesRead": [],
+        "filesModified": [],
+        "rawInput": "{\n  \"maxLoadedTools\": 16,\n  \"maxHydratedSchemas\": 8\n}",
+        "rawOutput": "{}"
+      },
+      "createdAt": "2026-05-08T19:24:40.929Z",
+      "accessedAt": "2026-05-08T19:24:40.929Z",
+      "accessCount": 0
+    },
+    {
+      "id": "8e94a0ab8d741678",
+      "type": "working",
+      "namespace": "project",
+      "content": "set_capacity failed\nset_capacity failed after 5ms. this.terminalService.getTools is not a function\nFacts:\n- Tool: set_capacity\n- Duration: 5ms\n- Failure: this.terminalService.getTools is not a function",
+      "metadata": {
+        "source": "tool_execution",
+        "tags": [
+          "tool-execution",
+          "set_capacity",
+          "failure",
+          "set",
+          "capacity",
+          "warning"
+        ],
+        "durationMs": 5,
+        "success": false,
+        "structuredObservation": {
+          "type": "warning",
+          "title": "set_capacity failed",
+          "narrative": "set_capacity failed after 5ms. this.terminalService.getTools is not a function",
+          "facts": [
+            "Tool: set_capacity",
+            "Duration: 5ms",
+            "Failure: this.terminalService.getTools is not a function"
+          ],
+          "concepts": [
+            "tool-execution",
+            "set_capacity",
+            "failure",
+            "set",
+            "capacity",
+            "warning"
+          ],
+          "filesRead": [],
+          "filesModified": [],
+          "toolName": "set_capacity",
+          "contentHash": "749459f2fa52a67311e347dc8322407b6db49b0c4c34ad45db8cf0dd6f098e23",
+          "recordedAt": 1778268345634
+        },
+        "observationType": "warning",
+        "observationHash": "749459f2fa52a67311e347dc8322407b6db49b0c4c34ad45db8cf0dd6f098e23",
+        "toolName": "set_capacity",
+        "filesRead": [],
+        "filesModified": [],
+        "rawInput": "{\n  \"maxLoadedTools\": 16,\n  \"maxHydratedSchemas\": 8\n}",
+        "rawOutput": "{}"
+      },
+      "createdAt": "2026-05-08T19:25:45.635Z",
+      "accessedAt": "2026-05-08T19:25:45.635Z",
+      "accessCount": 0
+    },
+    {
+      "id": "3f0278bbcb654716",
+      "type": "working",
+      "namespace": "project",
+      "content": "set_capacity failed\nset_capacity failed after 5ms. this.terminalService.getTools is not a function\nFacts:\n- Tool: set_capacity\n- Duration: 5ms\n- Failure: this.terminalService.getTools is not a function",
+      "metadata": {
+        "source": "tool_execution",
+        "tags": [
+          "tool-execution",
+          "set_capacity",
+          "failure",
+          "set",
+          "capacity",
+          "warning"
+        ],
+        "durationMs": 5,
+        "success": false,
+        "structuredObservation": {
+          "type": "warning",
+          "title": "set_capacity failed",
+          "narrative": "set_capacity failed after 5ms. this.terminalService.getTools is not a function",
+          "facts": [
+            "Tool: set_capacity",
+            "Duration: 5ms",
+            "Failure: this.terminalService.getTools is not a function"
+          ],
+          "concepts": [
+            "tool-execution",
+            "set_capacity",
+            "failure",
+            "set",
+            "capacity",
+            "warning"
+          ],
+          "filesRead": [],
+          "filesModified": [],
+          "toolName": "set_capacity",
+          "contentHash": "749459f2fa52a67311e347dc8322407b6db49b0c4c34ad45db8cf0dd6f098e23",
+          "recordedAt": 1778268421308
+        },
+        "observationType": "warning",
+        "observationHash": "749459f2fa52a67311e347dc8322407b6db49b0c4c34ad45db8cf0dd6f098e23",
+        "toolName": "set_capacity",
+        "filesRead": [],
+        "filesModified": [],
+        "rawInput": "{\n  \"maxLoadedTools\": 16,\n  \"maxHydratedSchemas\": 8\n}",
+        "rawOutput": "{}"
+      },
+      "createdAt": "2026-05-08T19:27:01.308Z",
+      "accessedAt": "2026-05-08T19:27:01.308Z",
+      "accessCount": 0
+    }
+  ]
+}

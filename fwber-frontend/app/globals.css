@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --app-sidebar-width: 18rem;
+    --background: 210 33% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 214 32% 94%;
+    --muted-foreground: 215 16% 38%;
+    --accent: 214 32% 94%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 24% 88%;
+    --input: 214 24% 88%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.85rem;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 40% 98%;
+    --card: 222 39% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 39% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 222 29% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 222 29% 18%;
+    --muted-foreground: 215 20% 72%;
+    --accent: 222 29% 18%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 24% 22%;
+    --input: 222 24% 22%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    /* Performance optimizations */
+    font-display: swap;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (min-width: 1024px) {
+    body.app-shell-sidebar {
+      padding-left: var(--app-sidebar-width);
+    }
+
+    .app-header-with-sidebar {
+      margin-left: calc(var(--app-sidebar-width) * -1);
+      width: calc(100% + var(--app-sidebar-width));
+    }
+  }
+  
+  /* Optimize images */
+  img {
+    content-visibility: auto;
+  }
+  
+  /* Optimize animations */
+  * {
+    will-change: auto;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Optimized form components */
+  .form-input {
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:ring-2 focus:ring-primary focus:border-primary;
+  }
+  
+  .form-select {
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:ring-2 focus:ring-primary focus:border-primary;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-[length:200%_auto] animate-gradient-x text-white border-none;
+    @apply hover:opacity-90 active:opacity-100;
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:ring-2 focus:ring-purple-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground;
+    @apply hover:bg-secondary/80 active:bg-secondary/90;
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  /* Loading states */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  /* Optimized cards */
+  .card {
+    @apply bg-card text-card-foreground rounded-lg border shadow-sm;
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:shadow-md;
+  }
+}
+
+@layer utilities {
+  /* Performance utilities */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Text optimization */
+  .text-optimized {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@keyframes hue-cycle {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5)); }
+  50% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)); }
+}
+
+.animate-hue-cycle {
+  animation: hue-cycle 10s linear infinite;
+}
+
+.animate-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 3s ease infinite;
+}

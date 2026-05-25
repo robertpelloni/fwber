@@ -1,0 +1,98 @@
+{
+  "nextId": 12,
+  "tasks": [
+    {
+      "id": "4",
+      "subject": "Port Backend to TypeScript (v2.0 Architecture)",
+      "description": "Perform a systematic port of the Laravel PHP backend to a TypeScript-based architecture (likely NestJS or similar for high compatibility with Laravel patterns). \n\n1. Analyze existing Laravel structure (Models, Controllers, Services, Migrations).\n2. Initialize a new TypeScript backend environment in `fwber-backend-ts/`.\n3. Port core Models and Database Schemas to Prisma/TypeORM.\n4. Port Business Logic (Services) to TypeScript.\n5. Port API Routes and Controllers.\n6. Implement Auth (JWT/Passport equivalent) and Middleware.\n7. Verify API parity with the current frontend.\n8. Plan the final swap/migration strategy.",
+      "status": "in_progress",
+      "activeForm": "Porting backend to TypeScript",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776119300460,
+      "updatedAt": 1776119302369
+    },
+    {
+      "id": "5",
+      "subject": "Finalize Backend Port & Prepare Frontend Integration",
+      "description": "Finalize the TypeScript backend port by ensuring all services are fully integrated, documentation is updated, and a clear path for frontend integration is established. This includes a final audit of the ported services and providing a summary for the next agent.",
+      "status": "completed",
+      "activeForm": "Finalizing backend port and preparing for frontend integration...",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776130471158,
+      "updatedAt": 1776130484253
+    },
+    {
+      "id": "6",
+      "subject": "Integrate Next.js Frontend with TS Backend",
+      "description": "Integrate the Next.js frontend with the newly created TypeScript backend. This involves updating API endpoints, switching to socket.io-client, and ensuring data consistency across the stack.",
+      "status": "in_progress",
+      "activeForm": "Analyzing frontend integration strategy...",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776130726202,
+      "updatedAt": 1776130727978
+    },
+    {
+      "id": "7",
+      "subject": "Fix frontend API base URL to use api.fwber.me directly",
+      "description": "The Next.js /api rewrite doesn't work on Vercel because /api is reserved for Next.js API routes (app/api/auth, app/api/oembed exist). Change the browser-side base URL from '/api' to 'https://api.fwber.me/api' in lib/api/client.ts. Also check auth-context.tsx line 447 for similar issue.",
+      "status": "completed",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776689666316,
+      "updatedAt": 1776689846417
+    },
+    {
+      "id": "8",
+      "subject": "Fix sti_status TypeError on profile page",
+      "description": "TypeError: (t.sti_status || []).includes is not a function - the sti_status field is not an array. Need to find where this is used in the profile page and ensure it's wrapped with Array.isArray() check.",
+      "status": "completed",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776689666321,
+      "updatedAt": 1776689971304
+    },
+    {
+      "id": "9",
+      "subject": "Fix deprecated apple-mobile-web-app-capable meta tag",
+      "description": "Replace apple-mobile-web-app-capable with mobile-web-app-capable in the layout or meta configuration.",
+      "status": "completed",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776689666324,
+      "updatedAt": 1776690025754
+    },
+    {
+      "id": "10",
+      "subject": "Fix dark mode readability across all frontend pages",
+      "description": "Replace all hardcoded light-only Tailwind colors with dark-mode-aware equivalents across all app pages. Pattern: text-gray-900 → text-gray-900 dark:text-white, bg-white → bg-white dark:bg-gray-800, etc. 1367 instances across settings (170), profile (71), matches (28), dashboard (23), register (15), messages (14), login (13), onboarding (3), and other pages.",
+      "status": "completed",
+      "activeForm": "Fixing dark mode readability across all pages",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776980878719,
+      "updatedAt": 1776981166389
+    },
+    {
+      "id": "11",
+      "subject": "Fix Socket.io cycling and .map() TypeError crash",
+      "description": "1. Socket.io connects/disconnects repeatedly - check backend socket config and frontend connection logic\\n2. TypeError: Cannot read properties of undefined (reading 'map') in page-8c36468e3ae69f79.js at useMemo - find the page and add null guards",
+      "status": "completed",
+      "activeForm": "Fixing Socket.io cycling and .map() crash",
+      "metadata": {},
+      "blocks": [],
+      "blockedBy": [],
+      "createdAt": 1776982010210,
+      "updatedAt": 1776982511941
+    }
+  ]
+}

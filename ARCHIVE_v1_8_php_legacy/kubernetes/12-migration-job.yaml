@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fwber-migrate
+  namespace: fwber
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: fwber-backend:latest
+        command: ["php", "artisan", "migrate", "--force"]
+        env:
+        - name: DB_CONNECTION
+          value: "mysql"
+        - name: DB_HOST
+          value: "fwber-mysql"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_DATABASE
+          value: "fwber_dev"
+        - name: DB_USERNAME
+          value: "fwber_user"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: DB_PASSWORD
+      restartPolicy: Never
+  backoffLimit: 4

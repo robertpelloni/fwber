@@ -1,0 +1,271 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Traits\SafelyHydratesAttributes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+
+/**
+ * Photo Model - User Photo Management
+ *
+ * AI Model: Claude 4.5 - Multi-AI Orchestration
+ * Phase: 4A - Laravel Photo Upload System
+ * Purpose: Model for user photo storage and management
+ *
+ * Created: 2025-01-19
+ * Multi-AI: Serena analysis + Chroma knowledge + Sequential thinking
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $filename
+ * @property string|null $original_filename
+ * @property string|null $file_path
+ * @property string|null $thumbnail_path
+ * @property string|null $mime_type
+ * @property int|null $file_size
+ * @property int|null $width
+ * @property int|null $height
+ * @property bool $is_primary
+ * @property bool $is_private
+ * @property numeric|null $unlock_price
+ * @property int $sort_order
+ * @property array<array-key, mixed>|null $metadata
+ * @property string|null $original_path
+ * @property bool $is_encrypted
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read bool $is_unlocked
+ * @property-read string $thumbnail_url
+ * @property-read string $url
+ * @property-read \App\Models\User $user
+ *
+ * @method static \Database\Factories\PhotoFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo primary()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo private()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo public()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereFilePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereFileSize($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereHeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereIsEncrypted($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereIsPrimary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereIsPrivate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereMetadata($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereOriginalFilename($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereOriginalPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereSortOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereThumbnailPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUnlockPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Photo whereWidth($value)
+ *
+ * @mixin \Eloquent
+ */
+class Photo extends Model
+{
+    use HasFactory, SafelyHydratesAttributes;
+
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = [
+        'user_id',
+        'filename',
+        'original_filename',
+        'file_path',
+        'thumbnail_path',
+        'mime_type',
+        'file_size',
+        'width',
+        'height',
+        'is_primary',
+        'is_private',
+        'sort_order',
+        'metadata',
+        'original_path',
+        'is_encrypted',
+        'unlock_price',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'is_primary' => 'boolean',
+        'is_private' => 'boolean',
+        'is_encrypted' => 'boolean',
+        'metadata' => 'array',
+        'file_size' => 'integer',
+        'width' => 'integer',
+        'height' => 'integer',
+        'sort_order' => 'integer',
+        'unlock_price' => 'decimal:2',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = ['url', 'thumbnail_url', 'is_unlocked'];
+
+    /**
+     * Get the user that owns the photo.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the full URL for the photo.
+     */
+    public function getUrlAttribute(): string
+    {
+        if (! $this->file_path) {
+            return '';
+        }
+
+        try {
+            return Storage::disk('public')->url($this->file_path);
+        } catch (\Throwable $exception) {
+            return '';
+        }
+    }
+
+    /**
+     * Get the full URL for the thumbnail.
+     */
+    public function getThumbnailUrlAttribute(): string
+    {
+        $path = $this->thumbnail_path ?: $this->file_path;
+
+        if (! $path) {
+            return '';
+        }
+
+        try {
+            return Storage::disk('public')->url($path);
+        } catch (\Throwable $exception) {
+            return '';
+        }
+    }
+
+    /**
+     * Check if the photo is unlocked for the current user.
+     */
+    public function getIsUnlockedAttribute(): bool
+    {
+        try {
+            $user = auth()->user();
+
+            if (! $user) {
+                return false;
+            }
+
+            // Owner always has access
+            if ($this->user_id === $user->id) {
+                return true;
+            }
+
+            // Public photos are always unlocked
+            if (! $this->is_private) {
+                return true;
+            }
+
+            // Check if unlocked via tokens
+            return \App\Models\PhotoUnlock::where('user_id', $user->id)
+                ->where('photo_id', $this->id)
+                ->exists();
+        } catch (\Exception $e) {
+            // Fail safe if table doesn't exist or other DB error
+            return false;
+        }
+    }
+
+    /**
+     * Scope to get only public photos.
+     */
+    public function scopePublic($query)
+    {
+        return $query->where('is_private', false);
+    }
+
+    /**
+     * Scope to get only private photos.
+     */
+    public function scopePrivate($query)
+    {
+        return $query->where('is_private', true);
+    }
+
+    /**
+     * Scope to get photos ordered by sort order.
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('created_at');
+    }
+
+    /**
+     * Scope to get the primary photo.
+     */
+    public function scopePrimary($query)
+    {
+        return $query->where('is_primary', true);
+    }
+
+    /**
+     * Set this photo as the primary photo for the user.
+     */
+    public function setAsPrimary(): void
+    {
+        // Remove primary status from other photos
+        static::where('user_id', $this->user_id)
+            ->where('id', '!=', $this->id)
+            ->update(['is_primary' => false]);
+
+        // Set this photo as primary
+        $this->update(['is_primary' => true]);
+    }
+
+    /**
+     * Delete the photo file from storage.
+     */
+    public function deleteFile(): bool
+    {
+        $deleted = true;
+
+        if ($this->file_path && Storage::disk('public')->exists($this->file_path)) {
+            $deleted = Storage::disk('public')->delete($this->file_path) && $deleted;
+        }
+
+        if ($this->thumbnail_path && Storage::disk('public')->exists($this->thumbnail_path)) {
+            $deleted = Storage::disk('public')->delete($this->thumbnail_path) && $deleted;
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * Boot method to handle model events.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When deleting a photo, also delete the files
+        static::deleting(function ($photo) {
+            $photo->deleteFile();
+        });
+    }
+}

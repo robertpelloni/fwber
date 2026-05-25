@@ -1,0 +1,556 @@
+{
+  "version": 1,
+  "files": {
+    "fwber-frontend\\app\\matches\\page.tsx": {
+      "latest": {
+        "commit": "567f14f99",
+        "timestamp": "2026-04-29T18:05:40.225Z",
+        "mi": 17.6,
+        "cognitive": 74,
+        "nesting": 4,
+        "lines": 378,
+        "maxCyclomatic": 68,
+        "entropy": 6.31
+      },
+      "history": [
+        {
+          "commit": "f2dfe5b90",
+          "timestamp": "2026-04-29T17:28:59.967Z",
+          "mi": 19.5,
+          "cognitive": 74,
+          "nesting": 4,
+          "lines": 311,
+          "maxCyclomatic": 68,
+          "entropy": 6.33
+        },
+        {
+          "commit": "567f14f99",
+          "timestamp": "2026-04-29T18:05:40.225Z",
+          "mi": 17.6,
+          "cognitive": 74,
+          "nesting": 4,
+          "lines": 378,
+          "maxCyclomatic": 68,
+          "entropy": 6.31
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\CreateBountyModal.tsx": {
+      "latest": {
+        "commit": "48fec365c",
+        "timestamp": "2026-04-29T18:54:06.670Z",
+        "mi": 29.8,
+        "cognitive": 23,
+        "nesting": 5,
+        "lines": 144,
+        "maxCyclomatic": 17,
+        "entropy": 6.27
+      },
+      "history": [
+        {
+          "commit": "48fec365c",
+          "timestamp": "2026-04-29T18:54:06.670Z",
+          "mi": 29.8,
+          "cognitive": 23,
+          "nesting": 5,
+          "lines": 144,
+          "maxCyclomatic": 17,
+          "entropy": 6.27
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\hooks\\useWallet.ts": {
+      "latest": {
+        "commit": "48fec365c",
+        "timestamp": "2026-04-29T18:54:41.804Z",
+        "mi": 46,
+        "cognitive": 4,
+        "nesting": 4,
+        "lines": 43,
+        "maxCyclomatic": 1,
+        "entropy": 5.34
+      },
+      "history": [
+        {
+          "commit": "48fec365c",
+          "timestamp": "2026-04-29T18:54:41.804Z",
+          "mi": 46,
+          "cognitive": 4,
+          "nesting": 4,
+          "lines": 43,
+          "maxCyclomatic": 1,
+          "entropy": 5.34
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\messages\\page.tsx": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:54:14.904Z",
+        "mi": 16.7,
+        "cognitive": 94,
+        "nesting": 7,
+        "lines": 399,
+        "maxCyclomatic": 80,
+        "entropy": 6.52
+      },
+      "history": [
+        {
+          "commit": "48fec365c",
+          "timestamp": "2026-04-29T18:55:52.800Z",
+          "mi": 18.7,
+          "cognitive": 93,
+          "nesting": 7,
+          "lines": 331,
+          "maxCyclomatic": 78,
+          "entropy": 6.51
+        },
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:54:14.904Z",
+          "mi": 16.7,
+          "cognitive": 94,
+          "nesting": 7,
+          "lines": 399,
+          "maxCyclomatic": 80,
+          "entropy": 6.52
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\RealTimeChat.tsx": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:56:03.124Z",
+        "mi": 9.3,
+        "cognitive": 269,
+        "nesting": 8,
+        "lines": 978,
+        "maxCyclomatic": 174,
+        "entropy": 7.12
+      },
+      "history": [
+        {
+          "commit": "48fec365c",
+          "timestamp": "2026-04-29T18:56:33.470Z",
+          "mi": 11.6,
+          "cognitive": 267,
+          "nesting": 8,
+          "lines": 796,
+          "maxCyclomatic": 170,
+          "entropy": 7.12
+        },
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:56:03.124Z",
+          "mi": 9.3,
+          "cognitive": 269,
+          "nesting": 8,
+          "lines": 978,
+          "maxCyclomatic": 174,
+          "entropy": 7.12
+        }
+      ],
+      "trend": "regressing"
+    },
+    "fwber-frontend\\lib\\hooks\\use-websocket.ts": {
+      "latest": {
+        "commit": "8494eee3c",
+        "timestamp": "2026-04-29T20:38:49.326Z",
+        "mi": 36.6,
+        "cognitive": 16,
+        "nesting": 4,
+        "lines": 133,
+        "maxCyclomatic": 9,
+        "entropy": 6.03
+      },
+      "history": [
+        {
+          "commit": "48fec365c",
+          "timestamp": "2026-04-29T18:57:49.768Z",
+          "mi": 36.6,
+          "cognitive": 16,
+          "nesting": 4,
+          "lines": 133,
+          "maxCyclomatic": 9,
+          "entropy": 6.03
+        },
+        {
+          "commit": "8494eee3c",
+          "timestamp": "2026-04-29T20:38:49.326Z",
+          "mi": 36.6,
+          "cognitive": 16,
+          "nesting": 4,
+          "lines": 133,
+          "maxCyclomatic": 9,
+          "entropy": 6.03
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\hooks\\use-socket-logic.ts": {
+      "latest": {
+        "commit": "0d9059985",
+        "timestamp": "2026-04-29T22:24:27.283Z",
+        "mi": 33.8,
+        "cognitive": 19,
+        "nesting": 6,
+        "lines": 115,
+        "maxCyclomatic": 17,
+        "entropy": 5.74
+      },
+      "history": [
+        {
+          "commit": "48fec365c",
+          "timestamp": "2026-04-29T18:58:10.886Z",
+          "mi": 33.8,
+          "cognitive": 19,
+          "nesting": 6,
+          "lines": 115,
+          "maxCyclomatic": 17,
+          "entropy": 5.74
+        },
+        {
+          "commit": "0d9059985",
+          "timestamp": "2026-04-29T22:24:27.283Z",
+          "mi": 33.8,
+          "cognitive": 19,
+          "nesting": 6,
+          "lines": 115,
+          "maxCyclomatic": 17,
+          "entropy": 5.74
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\VideoCall\\CallHistory.tsx": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:29:38.785Z",
+        "mi": 37.1,
+        "cognitive": 21,
+        "nesting": 4,
+        "lines": 74,
+        "maxCyclomatic": 23,
+        "entropy": 5.53
+      },
+      "history": [
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:29:38.785Z",
+          "mi": 37.1,
+          "cognitive": 21,
+          "nesting": 4,
+          "lines": 74,
+          "maxCyclomatic": 23,
+          "entropy": 5.53
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\video.ts": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:29:57.326Z",
+        "mi": 43.8,
+        "cognitive": 0,
+        "nesting": 1,
+        "lines": 58,
+        "maxCyclomatic": 1,
+        "entropy": 4.85
+      },
+      "history": [
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:29:57.326Z",
+          "mi": 43.8,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 58,
+          "maxCyclomatic": 1,
+          "entropy": 4.85
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\realtime\\PresenceComponents.tsx": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:30:10.983Z",
+        "mi": 25,
+        "cognitive": 61,
+        "nesting": 4,
+        "lines": 266,
+        "maxCyclomatic": 20,
+        "entropy": 5.8
+      },
+      "history": [
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:30:10.983Z",
+          "mi": 25,
+          "cognitive": 61,
+          "nesting": 4,
+          "lines": 266,
+          "maxCyclomatic": 20,
+          "entropy": 5.8
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\messages.ts": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:58:06.135Z",
+        "mi": 41.9,
+        "cognitive": 29,
+        "nesting": 6,
+        "lines": 125,
+        "maxCyclomatic": 10,
+        "entropy": 5.45
+      },
+      "history": [
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:58:06.135Z",
+          "mi": 41.9,
+          "cognitive": 29,
+          "nesting": 6,
+          "lines": 125,
+          "maxCyclomatic": 10,
+          "entropy": 5.45
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\client.ts": {
+      "latest": {
+        "commit": "62c71f648",
+        "timestamp": "2026-04-29T19:58:40.655Z",
+        "mi": 24.9,
+        "cognitive": 146,
+        "nesting": 7,
+        "lines": 452,
+        "maxCyclomatic": 68,
+        "entropy": 6.84
+      },
+      "history": [
+        {
+          "commit": "62c71f648",
+          "timestamp": "2026-04-29T19:58:40.655Z",
+          "mi": 24.9,
+          "cognitive": 146,
+          "nesting": 7,
+          "lines": 452,
+          "maxCyclomatic": 68,
+          "entropy": 6.84
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\ai\\WingmanSuggestions.tsx": {
+      "latest": {
+        "commit": "8494eee3c",
+        "timestamp": "2026-04-29T20:39:28.618Z",
+        "mi": 38.5,
+        "cognitive": 7,
+        "nesting": 3,
+        "lines": 74,
+        "maxCyclomatic": 6,
+        "entropy": 4.98
+      },
+      "history": [
+        {
+          "commit": "8494eee3c",
+          "timestamp": "2026-04-29T20:39:28.618Z",
+          "mi": 38.5,
+          "cognitive": 7,
+          "nesting": 3,
+          "lines": 74,
+          "maxCyclomatic": 6,
+          "entropy": 4.98
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\nearby\\page.tsx": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:49:22.013Z",
+        "mi": 18.3,
+        "cognitive": 99,
+        "nesting": 6,
+        "lines": 337,
+        "maxCyclomatic": 76,
+        "entropy": 6.48
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:49:22.013Z",
+          "mi": 18.3,
+          "cognitive": 99,
+          "nesting": 6,
+          "lines": 337,
+          "maxCyclomatic": 76,
+          "entropy": 6.48
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\location.ts": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:49:38.497Z",
+        "mi": 35.2,
+        "cognitive": 8,
+        "nesting": 3,
+        "lines": 205,
+        "maxCyclomatic": 4,
+        "entropy": 5.88
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:49:38.497Z",
+          "mi": 35.2,
+          "cognitive": 8,
+          "nesting": 3,
+          "lines": 205,
+          "maxCyclomatic": 4,
+          "entropy": 5.88
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\profile\\ProfilePageClient.tsx": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:52:40.129Z",
+        "mi": 10.1,
+        "cognitive": 242,
+        "nesting": 6,
+        "lines": 699,
+        "maxCyclomatic": 258,
+        "entropy": 7.76
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:52:40.129Z",
+          "mi": 10.1,
+          "cognitive": 242,
+          "nesting": 6,
+          "lines": 699,
+          "maxCyclomatic": 258,
+          "entropy": 7.76
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\api\\profile.ts": {
+      "latest": {
+        "commit": "a35a678e1",
+        "timestamp": "2026-04-29T20:57:39.413Z",
+        "mi": 19.4,
+        "cognitive": 43,
+        "nesting": 5,
+        "lines": 412,
+        "maxCyclomatic": 38,
+        "entropy": 6.24
+      },
+      "history": [
+        {
+          "commit": "a35a678e1",
+          "timestamp": "2026-04-29T20:57:39.413Z",
+          "mi": 19.4,
+          "cognitive": 43,
+          "nesting": 5,
+          "lines": 412,
+          "maxCyclomatic": 38,
+          "entropy": 6.24
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\routes\\profile.ts": {
+      "latest": {
+        "commit": "325988b49",
+        "timestamp": "2026-04-29T21:47:07.166Z",
+        "mi": 14.9,
+        "cognitive": 534,
+        "nesting": 6,
+        "lines": 393,
+        "maxCyclomatic": 121,
+        "entropy": 6.8
+      },
+      "history": [
+        {
+          "commit": "325988b49",
+          "timestamp": "2026-04-29T21:47:07.166Z",
+          "mi": 14.9,
+          "cognitive": 534,
+          "nesting": 6,
+          "lines": 393,
+          "maxCyclomatic": 121,
+          "entropy": 6.8
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\chat\\ConversationCoach.tsx": {
+      "latest": {
+        "commit": "0d9059985",
+        "timestamp": "2026-04-29T22:20:55.398Z",
+        "mi": 32,
+        "cognitive": 19,
+        "nesting": 4,
+        "lines": 122,
+        "maxCyclomatic": 11,
+        "entropy": 5.51
+      },
+      "history": [
+        {
+          "commit": "0d9059985",
+          "timestamp": "2026-04-29T22:20:55.398Z",
+          "mi": 32,
+          "cognitive": 19,
+          "nesting": 4,
+          "lines": 122,
+          "maxCyclomatic": 11,
+          "entropy": 5.51
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\chat\\TierUnlockGuide.tsx": {
+      "latest": {
+        "commit": "0d9059985",
+        "timestamp": "2026-04-29T22:23:36.025Z",
+        "mi": 25.1,
+        "cognitive": 51,
+        "nesting": 5,
+        "lines": 192,
+        "maxCyclomatic": 55,
+        "entropy": 5.74
+      },
+      "history": [
+        {
+          "commit": "0d9059985",
+          "timestamp": "2026-04-29T22:23:36.025Z",
+          "mi": 25.1,
+          "cognitive": 51,
+          "nesting": 5,
+          "lines": 192,
+          "maxCyclomatic": 55,
+          "entropy": 5.74
+        }
+      ],
+      "trend": "stable"
+    }
+  },
+  "capturedAt": "2026-04-29T22:24:32.287Z"
+}

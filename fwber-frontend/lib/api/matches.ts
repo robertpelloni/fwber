@@ -1,0 +1,224 @@
+/**
+ * Matches API Client
+ * 
+ * AI Model: Claude 4.5 - Multi-AI Orchestration
+ * Phase: 3B - Matching System Integration
+ * Purpose: Type-safe API client for match operations
+ * 
+ * Created: 2025-01-19
+ */
+
+import { api } from './client';
+
+export interface SceneTopic {
+  id: number;
+  slug: string;
+  label: string;
+  emoji?: string | null;
+}
+
+export interface SceneOverlap {
+  headline: string | null;
+  score: number;
+  shared_topics: SceneTopic[];
+  shared_topic_count: number;
+  shared_scene_tags: string[];
+  shared_scene_tag_count: number;
+}
+
+export interface Match {
+  id: number;
+  name: string;
+  email: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
+  locationDescription: string | null;
+  distance: number;
+  compatibilityScore: number;
+  lastSeenAt: string | null;
+  age?: number | null;
+  gender?: string | null;
+  is_verified?: boolean;
+  is_confessional?: boolean;
+  voice_intro_url?: string | null;
+  photos?: Array<{
+    id: number;
+    url: string;
+    is_private: boolean;
+    is_primary: boolean;
+    is_unlocked?: boolean;
+    unlock_price?: number;
+  }>;
+  shared_interests?: string[];
+  shared_interest_count?: number;
+  scene_overlap?: SceneOverlap | null;
+  profile?: {
+    display_name: string | null;
+    bio: string | null;
+    age: number | null;
+    gender: string | null;
+    looking_for: string[];
+    location: {
+      latitude: number | null;
+      longitude: number | null;
+      max_distance: number;
+      city: string | null;
+      state: string | null;
+    };
+    photos?: Array<{
+      id: number;
+      url: string;
+      is_private: boolean;
+      is_primary: boolean;
+    }>;
+    profile_complete: boolean;
+    completion_percentage: number;
+  };
+}
+
+export type MatchAction = 'like' | 'pass' | 'super_like';
+
+export interface MatchActionRequest {
+  action: MatchAction;
+  target_user_id: number;
+}
+
+export interface MatchActionResponse {
+  action: string;
+  is_match: boolean;
+  message: string;
+}
+
+/**
+ * Fetch potential matches for the authenticated user
+ */
+export async function getMatches(filters: any = {}): Promise<Match[]> {
+  const response = await api.get<{ matches: any[], total: number }>('/matches', { params: filters });
+
+  // The API returns { matches: [...], total: ... }
+  // But the component expects an array.
+  // Also we need to map the flat structure to the nested profile structure expected by the UI
+  const matches = response.matches || [];
+
+  return matches.map((m: any) => ({
+    ...m,
+    age: m.age ?? null,
+    gender: m.gender ?? null,
+    photos: m.photos ?? (m.avatarUrl ? [{ id: 0, url: m.avatarUrl, is_private: false, is_primary: true }] : []),
+    // Map flat fields to profile object for UI compatibility
+    profile: {
+      display_name: m.name,
+      bio: m.bio,
+      age: m.age ?? null,
+      gender: m.gender ?? null,
+      looking_for: m.looking_for || [],
+      location: {
+        latitude: null,
+        longitude: null,
+        max_distance: 0,
+        city: m.locationDescription,
+        state: null,
+      },
+      photos: m.photos ?? (m.avatarUrl ? [{ id: 0, url: m.avatarUrl, is_private: false, is_primary: true }] : []),
+      profile_complete: Boolean(m.profile_complete ?? false),
+      completion_percentage: Number(m.completion_percentage ?? 0),
+    }
+  }));
+}
+
+/**
+ * Perform an action on a potential match (like, pass, super like)
+ */
+export async function performMatchAction(
+  targetUserId: number,
+  action: MatchAction
+): Promise<MatchActionResponse> {
+  return api.post<MatchActionResponse>('/matches/action', {
+    target_user_id: targetUserId,
+    action: action,
+  });
+}
+
+/**
+ * Get match history for the authenticated user
+ */
+export async function getMatchHistory(): Promise<Match[]> {
+  const response = await api.get<{ data: Match[] } | Match[]>('/matches/history');
+  // Handle both wrapped and unwrapped responses just in case
+  return Array.isArray(response) ? response : response.data;
+}
+
+/**
+ * Get mutual matches (both users liked each other)
+ */
+export async function getMutualMatches(): Promise<Match[]> {
+  const response = await api.get<{ data: any[] }>('/matches/established');
+  const conversations = response.data || [];
+
+  return conversations.map((c: any) => {
+    const otherUser = c.other_user;
+    const profile = otherUser.profile || {};
+
+    return {
+      id: otherUser.id, // Use User ID as the ID for consistency with getMatches
+      name: profile.display_name || otherUser.name,
+      email: otherUser.email,
+      avatarUrl: profile.avatar_url,
+      bio: profile.bio,
+      locationDescription: profile.location_description,
+      distance: 0, // Not available in established matches
+      compatibilityScore: 0, // Not available in established matches
+      lastSeenAt: otherUser.last_seen_at,
+      profile: {
+        display_name: profile.display_name || otherUser.name,
+        bio: profile.bio,
+        age: profile.date_of_birth ? new Date().getFullYear() - new Date(profile.date_of_birth).getFullYear() : null,
+        gender: profile.gender,
+        looking_for: profile.looking_for || [],
+        location: {
+          latitude: profile.location_latitude,
+          longitude: profile.location_longitude,
+          max_distance: 0,
+          city: profile.location_description,
+          state: null,
+        },
+        photos: otherUser.photos ? otherUser.photos.map((p: any) => ({
+          id: p.id,
+          url: p.url || p.file_path, // Handle both cases if needed
+          is_private: p.is_private,
+          is_primary: p.is_primary
+        })) : [],
+        profile_complete: Boolean(profile.profile_complete ?? false),
+        completion_percentage: Number(profile.completion_percentage ?? 0),
+      }
+    };
+  });
+}
+
+/**
+ * Post-Date Feedback operations
+ */
+export interface DateFeedbackRequest {
+  rating: number;
+  feedback_text?: string;
+  safety_concerns?: boolean;
+}
+
+export interface DateFeedbackResponse {
+  message?: string;
+  submitted?: boolean;
+  feedback?: {
+    id: number;
+    rating: number;
+    feedback_text: string | null;
+    safety_concerns: boolean;
+  };
+}
+
+export async function submitDateFeedback(matchId: number, data: DateFeedbackRequest): Promise<DateFeedbackResponse> {
+  return api.post<DateFeedbackResponse>(`/matches/${matchId}/feedback`, data);
+}
+
+export async function checkDateFeedback(matchId: number): Promise<DateFeedbackResponse> {
+  return api.get<DateFeedbackResponse>(`/matches/${matchId}/feedback`);
+}

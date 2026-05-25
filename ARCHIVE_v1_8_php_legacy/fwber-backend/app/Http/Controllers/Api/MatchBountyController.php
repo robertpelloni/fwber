@@ -1,0 +1,186 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Bounty\StoreBountyRequest;
+use App\Http\Requests\Bounty\SuggestCandidateRequest;
+use App\Models\MatchAssist;
+use App\Models\MatchBounty;
+use App\Services\TokenDistributionService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+class MatchBountyController extends Controller
+{
+    protected $tokenDistributionService;
+
+    /**
+     * The related user payload the bounty surfaces need for cards and detail views.
+     */
+    private const BOUNTY_USER_RELATIONS = [
+        'user:id,name,avatar_url',
+        'user.profile:id,user_id,display_name,bio,birthdate,gender',
+        'user.photos:id,user_id,file_path,thumbnail_path,is_primary,is_private',
+    ];
+
+    public function __construct(TokenDistributionService $tokenDistributionService)
+    {
+        $this->tokenDistributionService = $tokenDistributionService;
+    }
+
+    /**
+     * List all active bounties for discovery.
+     */
+    public function index(Request $request)
+    {
+        $query = MatchBounty::with(self::BOUNTY_USER_RELATIONS)
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
+
+        // Optional filters
+        if ($request->has('min_reward')) {
+            $query->where('token_reward', '>=', $request->min_reward);
+        }
+
+        if ($request->has('sort')) {
+            $sort = $request->sort;
+            if ($sort === 'reward' || $sort === 'reward_high') {
+                $query->orderByDesc('token_reward');
+            } elseif ($sort === 'reward_low') {
+                $query->orderBy('token_reward');
+            } elseif ($sort === 'newest') {
+                $query->orderByDesc('created_at');
+            } elseif ($sort === 'expiring') {
+                $query->whereNotNull('expires_at')->orderBy('expires_at');
+            }
+        } else {
+            $query->orderByDesc('token_reward'); // Default: highest reward first
+        }
+
+        $bounties = $query->paginate($request->per_page ?? 20);
+
+        return response()->json($bounties);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreBountyRequest $request)
+    {
+        $user = $request->user();
+        $tokenReward = $request->token_reward;
+
+        // Ensure user has enough tokens
+        if ($user->token_balance < $tokenReward) {
+            return response()->json(['message' => 'Insufficient token balance.'], 402);
+        }
+
+        try {
+            return DB::transaction(function () use ($user, $request, $tokenReward) {
+                // Deduct tokens (Escrow)
+                $this->tokenDistributionService->spendTokens(
+                    $user,
+                    $tokenReward,
+                    'Escrow for Match Bounty creation'
+                );
+
+                $slug = Str::random(8);
+                while (MatchBounty::where('slug', $slug)->exists()) {
+                    $slug = Str::random(8);
+                }
+
+                $bounty = MatchBounty::create([
+                    'user_id' => $user->id,
+                    'slug' => $slug,
+                    'token_reward' => $tokenReward,
+                    'description' => $request->description,
+                    'status' => 'active',
+                    'expires_at' => $request->expires_in_days ? now()->addDays($request->expires_in_days) : null,
+                ]);
+
+                return response()->json([
+                    'message' => 'Bounty created successfully',
+                    'bounty' => $bounty,
+                    'share_url' => config('app.url').'/bounty/'.$bounty->slug,
+                ], 201);
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to create match bounty: '.$e->getMessage());
+
+            return response()->json(['message' => 'Failed to create bounty.'], 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($slug)
+    {
+        $bounty = MatchBounty::with(self::BOUNTY_USER_RELATIONS)->where('slug', $slug)->firstOrFail();
+
+        return response()->json([
+            'bounty' => $bounty,
+        ]);
+    }
+
+    /**
+     * Suggest a candidate for the bounty.
+     */
+    public function suggest(SuggestCandidateRequest $request, $slug)
+    {
+        $bounty = MatchBounty::where('slug', $slug)->firstOrFail();
+
+        if ($bounty->status !== 'active') {
+            return response()->json(['message' => 'This bounty is no longer active.'], 400);
+        }
+
+        if ($bounty->expires_at && $bounty->expires_at->isPast()) {
+            return response()->json(['message' => 'This bounty has expired.'], 400);
+        }
+
+        $matchmaker = $request->user();
+        $candidateId = $request->candidate_id;
+
+        // Prevent self-suggestion if needed, though arguably funny? Let's block it for now.
+        if ($candidateId == $bounty->user_id) {
+            return response()->json(['message' => 'You cannot suggest the bounty creator to themselves.'], 400);
+        }
+
+        // Prevent matchmaker from suggesting themselves to the bounty creator?
+        // Actually, maybe that's allowed? "I'm the match!"
+        // For now, let's allow it unless specific logic forbids.
+
+        // Check if suggestion already exists
+        $existing = MatchAssist::where('matchmaker_id', $matchmaker->id)
+            ->where('subject_id', $candidateId) // The candidate being suggested
+            ->where('target_id', $bounty->user_id) // The bounty creator
+            ->first();
+
+        if ($existing) {
+            return response()->json(['message' => 'You have already suggested this candidate.'], 409);
+        }
+
+        $assist = MatchAssist::create([
+            'matchmaker_id' => $matchmaker->id,
+            'subject_id' => $candidateId,
+            'target_id' => $bounty->user_id,
+            'status' => 'viewed', // Default status
+            'match_bounty_id' => $bounty->id,
+        ]);
+
+        // In a real implementation, we would likely link the MatchAssist to the MatchBounty
+        // so we know which suggestion claimed the reward.
+        // For this step, we'll assume the MatchAssist creation is enough to trigger the notification flow later.
+
+        return response()->json([
+            'message' => 'Candidate suggested successfully!',
+            'assist' => $assist,
+        ], 201);
+    }
+}

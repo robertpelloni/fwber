@@ -1,0 +1,55 @@
+# Dependency directories
+node_modules/
+fwber-frontend/node_modules/
+fwber-backend-ts/node_modules/
+mobile/node_modules/
+
+# Next.js build output
+fwber-frontend/.next/
+fwber-frontend/out/
+
+# TypeScript build output
+fwber-backend-ts/dist/
+dist/
+
+# Test coverage
+coverage/
+fwber-backend-ts/coverage/
+
+# Misc
+.DS_Store
+*.log
+logs/
+
+# Backup and temporary files
+*.bak
+*~
+*_backup
+*.tmp
+
+# Archive (legacy codebase)
+archive/
+
+# Legacy one-off files (already committed to gitignore history)
+_secrets.php
+test-db-connection.php
+test-token.txt
+fwber-backend/.env.mysql
+fwber-frontend/.env.local.production
+/fwber-frontend/node_modules_locked_trash_*
+/tools_config_files/handshake_proxy/bin
+/tools_config_files/handshake_proxy/obj
+/tools_config_files/handshake_proxy/out
+metamcp.db
+frontend_build.tar.gz
+
+# Build artifacts
+*.tar.gz
+temp_build/
+metamcp.db
+metamcp.db*
+.jules/
+# Environment files with secrets
+.env
+.env.*
+!.env.example

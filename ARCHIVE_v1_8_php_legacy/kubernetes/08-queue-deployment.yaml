@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-queue
+  namespace: fwber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fwber-queue
+  template:
+    metadata:
+      labels:
+        app: fwber-queue
+    spec:
+      containers:
+      - name: queue
+        image: fwber-backend:latest
+        imagePullPolicy: IfNotPresent
+        command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=60"]
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: DB_CONNECTION
+          value: "mysql"
+        - name: DB_HOST
+          value: "fwber-mysql"
+        - name: DB_READ_HOST
+          value: "fwber-mysql-read"
+        - name: DB_DATABASE
+          value: "fwber_dev"
+        - name: DB_USERNAME
+          value: "fwber_user"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: DB_PASSWORD
+        - name: REDIS_HOST
+          value: "fwber-redis-master"
+        - name: QUEUE_CONNECTION
+          value: "redis"

@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\LoginWithWalletRequest;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\User;
+use App\Services\TokenDistributionService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+class AuthController extends Controller
+{
+    private function hydrateAuthUser(User $user): User
+    {
+        $tokenService = app(TokenDistributionService::class);
+        $tokenService->ensureReferralCode($user);
+
+        return $user->load('profile')->loadCount(['referrals', 'vouches']);
+    }
+
+    public function register(RegisterRequest $request, TokenDistributionService $tokenService)
+    {
+        $validated = $request->validated();
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'referral_code' => $tokenService->generateReferralCode(),
+        ]);
+
+        // Send email verification
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to send verification email: ' . $e->getMessage());
+        }
+
+        // Process tokens
+        $tokenService->processSignupBonus($user, $validated['referral_code'] ?? null);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $this->hydrateAuthUser($user),
+        ]);
+    }
+
+    public function login(LoginRequest $request)
+    {
+        $validated = $request->validated();
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'email' => ['Invalid credentials'],
+            ]);
+        }
+
+        // Standard authentication
+        $isStandardAuth = Hash::check($validated['password'], $user->password);
+
+        // Decoy authentication
+        $isDecoyAuth = ! $isStandardAuth && $user->decoy_password && Hash::check($validated['password'], $user->decoy_password);
+
+        if (! $isStandardAuth && ! $isDecoyAuth) {
+            throw ValidationException::withMessages([
+                'email' => ['Invalid credentials'],
+            ]);
+        }
+
+        if ($isDecoyAuth) {
+            // Swap to the actual decoy user object
+            if (! $user->decoy_user_id) {
+                // Failsafe in case decoy_user_id is missing but password matched
+                throw ValidationException::withMessages([
+                    'email' => ['Invalid credentials'],
+                ]);
+            }
+            $user = User::find($user->decoy_user_id);
+            if (! $user) {
+                throw ValidationException::withMessages([
+                    'email' => ['Invalid credentials'],
+                ]);
+            }
+        }
+
+        if ($user->hasEnabledTwoFactorAuthentication()) {
+            return response()->json([
+                'two_factor' => true,
+                'message' => 'Two factor authentication required.',
+            ]);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $this->hydrateAuthUser($user),
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        if ($user && $user->currentAccessToken()) {
+            \App\Facades\SecurityLog::authSuccess([
+                'action' => 'logout',
+                'user_id' => $user->id,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            $user->currentAccessToken()->delete();
+        }
+
+        return response()->json(['message' => 'Logged out successfully']);
+    }
+
+    public function me(Request $request)
+    {
+        return $this->hydrateAuthUser($request->user());
+    }
+
+    public function checkReferralCode($code)
+    {
+        $referrer = User::where('referral_code', $code)->withCount('vouches')->first();
+
+        if (! $referrer) {
+            return response()->json(['valid' => false], 404);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'referrer_name' => $referrer->name,
+            'referrer_avatar' => $referrer->avatar_url, // Assuming this exists
+            'has_golden_tickets' => $referrer->golden_tickets_remaining > 0,
+            'vouches_count' => $referrer->vouches_count,
+        ]);
+    }
+
+    public function loginWithWallet(LoginWithWalletRequest $request)
+    {
+        $validated = $request->validated();
+
+        $walletAddress = $validated['wallet_address'];
+        $signature = $validated['signature'];
+        $message = $validated['message'];
+
+        // Verify the signature using the Node.js script
+        $scriptPath = base_path('scripts/solana/verify_signature.cjs');
+        $command = "node {$scriptPath} ".escapeshellarg($message).' '.escapeshellarg($signature).' '.escapeshellarg($walletAddress).' 2>&1';
+
+        $output = shell_exec($command);
+        \Illuminate\Support\Facades\Log::info('Signature verification output: '.$output);
+        $result = json_decode($output, true);
+
+        if (! $result || ! isset($result['verified']) || ! $result['verified']) {
+            throw ValidationException::withMessages([
+                'signature' => ['Invalid wallet signature.'],
+            ]);
+        }
+
+        // Check if user exists with this wallet address
+        $user = User::where('wallet_address', $walletAddress)->first();
+
+        if (! $user) {
+            // Create a new user for this wallet
+            // We use a placeholder email and a random password
+            $shortAddress = substr($walletAddress, 0, 6).'...'.substr($walletAddress, -4);
+            $user = User::create([
+                'name' => "Wallet User {$shortAddress}",
+                'email' => "wallet_{$walletAddress}@fwber.com", // Unique placeholder
+                'password' => Hash::make(\Illuminate\Support\Str::random(32)),
+                'wallet_address' => $walletAddress,
+                'token_balance' => 0, // Signup bonus handled below
+            ]);
+
+            // Distribute signup bonus for new wallet user
+            /** @var \App\Services\TokenDistributionService $tokenService */
+            $tokenService = app(\App\Services\TokenDistributionService::class);
+            $tokenService->processSignupBonus($user);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $this->hydrateAuthUser($user),
+            'is_new_user' => $user->wasRecentlyCreated,
+        ]);
+    }
+}

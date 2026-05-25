@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path . -Force)",
+      "Bash(Select-Object Name, Mode, Length, LastWriteTime)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(chmod:*)",
+      "Bash(bash:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git mv AI_MODEL_INSTRUCTIONS_AND_COMMANDS.md API_CONFIGURATION_SOLUTION_2025_01_21.md CHROMA_SETUP_GUIDE.md CODEX_MCP_FIXES_2025_01_19.md COMPREHENSIVE_DEVELOPMENT_STATUS_2025_01_19.md COMPREHENSIVE_MEMORY_STORAGE_SUMMARY.md DEVELOPMENT_STATUS_2025_01_19.md FINAL_MCP_CLI_STATUS_REPORT_2025_01_19.md FWBER_API_KEY_ISSUES_AND_SOLUTIONS.md GEMINI_API_KEY_TROUBLESHOOTING_GUIDE.md KILOCODE_AUTHENTICATION_FIX_2025_01_19.md MCP_AND_CLI_FIXES_SUMMARY_2025_01_19.md MCP_SERVER_CONNECTION_FIX_GUIDE.md MCP_TOOL_COMPREHENSIVE_EVALUATION_2025_01_21.md archive/docs/2025-01-migration/)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git stash:*)",
+      "Bash(git branch:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

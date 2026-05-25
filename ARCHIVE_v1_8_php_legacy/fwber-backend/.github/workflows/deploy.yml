@@ -1,0 +1,39 @@
+name: Deploy to DreamHost
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DREAMHOST_HOST }}
+          username: ${{ secrets.DREAMHOST_USERNAME }}
+          key: ${{ secrets.DREAMHOST_SSH_KEY }}
+          port: 22
+          script: |
+            # Create directory structure if it doesn't exist
+            mkdir -p ~/fwber/fwber-backend
+            cd ~/fwber/fwber-backend
+            
+            # Check if it's a git repo, if not clone/init
+            if [ ! -d ".git" ]; then
+              echo "Initializing repository..."
+              git init
+              # We assume the repository name matches the one triggering this workflow
+              git remote add origin "git@github.com:${{ github.repository }}.git"
+              git fetch origin
+              git checkout main
+            fi
+            
+            # Pull latest changes to ensure we have the latest deploy script
+            git fetch origin
+            git reset --hard origin/main
+            
+            # Run deployment script
+            bash deploy.sh --env=production --force

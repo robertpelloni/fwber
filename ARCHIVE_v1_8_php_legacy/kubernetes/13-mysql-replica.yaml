@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-mysql-read
+  namespace: fwber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fwber-mysql-read
+  template:
+    metadata:
+      labels:
+        app: fwber-mysql-read
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_DATABASE
+          value: "fwber_dev"
+        - name: MYSQL_USER
+          value: "fwber_user"
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: DB_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: DB_ROOT_PASSWORD
+        # In a real production setup, you would configure replication here
+        # For now, this acts as a placeholder or a second standalone instance
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-read-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-read-storage
+        emptyDir: {} # Ephemeral storage for the replica in this simple example
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-mysql-read
+  namespace: fwber
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: fwber-mysql-read

@@ -1,0 +1,185 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Events\AudioRoomParticipantJoined;
+use App\Events\AudioRoomParticipantLeft;
+use App\Events\AudioRoomSignal;
+use App\Models\AudioRoom;
+use App\Models\AudioRoomParticipant;
+use App\Services\AudioRoomRankingService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class AudioRoomController extends Controller
+{
+    public function __construct(
+        private readonly AudioRoomRankingService $audioRoomRankingService,
+    ) {
+    }
+
+    /**
+     * List all active audio rooms.
+     */
+    public function index(Request $request)
+    {
+        $validated = $request->validate([
+            'ranking_strategy' => 'sometimes|string|in:default,trust-aware',
+            'latitude' => 'sometimes|numeric|between:-90,90',
+            'longitude' => 'sometimes|numeric|between:-180,180',
+        ]);
+
+        $rankingStrategy = $validated['ranking_strategy'] ?? 'default';
+        $rooms = AudioRoom::withCount('participants')
+            ->with(['host:id,name,avatar_url,tier', 'host.profile', 'participants'])
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($rankingStrategy !== 'trust-aware') {
+            return response()->json($rooms);
+        }
+
+        $viewer = Auth::user();
+        $rankedRooms = $viewer
+            ? $this->audioRoomRankingService->rankLobby(
+                $viewer,
+                $rooms,
+                isset($validated['latitude']) ? (float) $validated['latitude'] : null,
+                isset($validated['longitude']) ? (float) $validated['longitude'] : null
+            )
+            : $rooms;
+
+        return response()->json([
+            'data' => $rankedRooms,
+            'rooms' => $rankedRooms,
+            'meta' => [
+                'ranking_strategy' => $this->audioRoomRankingService->buildRankingStrategy(),
+            ],
+        ]);
+    }
+
+    /**
+     * Create a new audio room.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'topic' => 'required|string|max:255',
+            'name' => 'nullable|string|max:100',
+        ]);
+
+        $room = DB::transaction(function () use ($request) {
+            $room = AudioRoom::create([
+                'name' => $request->name,
+                'topic' => $request->topic,
+                'host_id' => Auth::id(),
+                'status' => 'active',
+            ]);
+
+            // Host joins automatically as speaker, unmuted (managed by frontend state, but default here)
+            AudioRoomParticipant::create([
+                'audio_room_id' => $room->id,
+                'user_id' => Auth::id(),
+                'role' => 'speaker',
+                'is_muted' => false,
+            ]);
+
+            return $room;
+        });
+
+        // Eager load for the response
+        $room->load(['host', 'participants.user']);
+        $room->participants_count = 1;
+
+        return response()->json($room, 201);
+    }
+
+    /**
+     * Get specific room details.
+     */
+    public function show($id)
+    {
+        $room = AudioRoom::with(['host', 'participants.user'])->findOrFail($id);
+
+        return response()->json($room);
+    }
+
+    /**
+     * Join an existing audio room.
+     */
+    public function join(Request $request, $id)
+    {
+        $room = AudioRoom::where('status', 'active')->findOrFail($id);
+        $userId = Auth::id();
+
+        $participant = AudioRoomParticipant::firstOrCreate(
+            ['audio_room_id' => $room->id, 'user_id' => $userId],
+            ['role' => 'listener', 'is_muted' => true]
+        );
+
+        $participant->load('user');
+
+        // Broadcast event that user joined
+        broadcast(new AudioRoomParticipantJoined($room, $participant))->toOthers();
+
+        return response()->json([
+            'message' => 'Joined room successfully',
+            'room' => $room->load(['host']),
+            'participant' => $participant,
+            'participants' => $room->participants()->with('user')->get(),
+        ]);
+    }
+
+    /**
+     * Leave an audio room.
+     */
+    public function leave(Request $request, $id)
+    {
+        $room = AudioRoom::findOrFail($id);
+        $userId = Auth::id();
+
+        AudioRoomParticipant::where('audio_room_id', $room->id)
+            ->where('user_id', $userId)
+            ->delete();
+
+        // Broadcast event that user left
+        broadcast(new AudioRoomParticipantLeft($room, $userId))->toOthers();
+
+        // If host leaves, end the room
+        if ($room->host_id === $userId) {
+            $room->update(['status' => 'ended']);
+            // A separate room ended event could be fired here, but for now ParticipantLeft with host ID suffices.
+        }
+
+        return response()->json(['message' => 'Left room successfully']);
+    }
+
+    /**
+     * Handle WebRTC signaling exchange (Offers, Answers, ICE candidates).
+     * This relies heavily on Laravel Reverb / Pusher broadcast channels.
+     */
+    public function signal(Request $request, $id)
+    {
+        $request->validate([
+            'target_user_id' => 'required|exists:users,id',
+            'type' => 'required|string|in:offer,answer,ice-candidate',
+            'payload' => 'required',
+        ]);
+
+        $room = AudioRoom::findOrFail($id);
+        $senderId = Auth::id();
+        $targetId = $request->target_user_id;
+
+        broadcast(new AudioRoomSignal(
+            $room->id,
+            $senderId,
+            $targetId,
+            $request->type,
+            $request->payload
+        ))->toOthers();
+
+        return response()->json(['message' => 'Signal dispatched']);
+    }
+}

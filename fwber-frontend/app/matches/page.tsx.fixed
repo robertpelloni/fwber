@@ -1,0 +1,160 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Heart, X, Star, MessageCircle, MapPin } from 'lucide-react';
+import { api } from '@/lib/api/client';
+import { useToast } from '@/lib/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import MatchFilter from '@/components/MatchFilter';
+
+export default function MatchesPage() {
+  const [matches, setMatches] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchMatches();
+  }, []);
+
+  const fetchMatches = async (filters = {}) => {
+    try {
+      setLoading(true);
+      const response = await api.get('/matches', { params: filters });
+      setMatches(response.data.matches || []);
+      setCurrentIndex(0);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load matches',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAction = async (action: 'like' | 'pass' | 'super_like') => {
+    if (!matches[currentIndex]) return;
+
+    const targetUserId = matches[currentIndex].id;
+    
+    // Optimistic update
+    const nextIndex = currentIndex + 1;
+    setCurrentIndex(nextIndex);
+
+    try {
+      const response = await api.post('/matches/action', {
+        target_user_id: targetUserId,
+        action,
+      });
+
+      if (response.data.is_match) {
+        toast({
+          title: "It's a Match!",
+          description: `You matched with ${matches[currentIndex].name}!`,
+        });
+        // Optionally show match modal
+      }
+    } catch (error) {
+      console.error('Error performing match action:', error);
+      // Revert optimistic update if needed, or just show error
+      toast({
+        title: 'Error',
+        description: 'Failed to perform action',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleFilterChange = (filters: any) => {
+    fetchMatches(filters);
+  };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading matches...</div>;
+  }
+
+  if (matches.length === 0 || currentIndex >= matches.length) {
+    return (
+      <div className="container mx-auto p-4 max-w-md text-center">
+        <h2 className="text-2xl font-bold mb-4">No more matches</h2>
+        <p className="text-gray-500 mb-6">Check back later or adjust your filters.</p>
+        <Button onClick={() => fetchMatches()}>Refresh</Button>
+      </div>
+    );
+  }
+
+  const currentMatch = matches[currentIndex];
+
+  return (
+    <div className="container mx-auto p-4 max-w-md">
+      <div className="mb-4">
+        <MatchFilter onFilterChange={handleFilterChange} />
+      </div>
+
+      <Card className="overflow-hidden h-[600px] relative">
+        <div className="h-full relative">
+          {/* Image would go here */}
+          <div className="h-3/4 bg-gray-200 flex items-center justify-center">
+            {currentMatch.avatarUrl ? (
+              <img 
+                src={currentMatch.avatarUrl} 
+                alt={currentMatch.name} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-4xl text-gray-400">{currentMatch.name?.charAt(0)}</span>
+            )}
+          </div>
+          
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white h-1/2 flex flex-col justify-end">
+            <h2 className="text-3xl font-bold flex items-center gap-2">
+              {currentMatch.name}, {currentMatch.age}
+              {currentMatch.is_verified && <span className="text-blue-400 text-sm">✓</span>}
+            </h2>
+            <div className="flex items-center gap-1 text-gray-200 mb-2">
+              <MapPin className="h-4 w-4" />
+              <span>{currentMatch.distance} miles away</span>
+            </div>
+            <p className="line-clamp-2 mb-16">{currentMatch.bio}</p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-6">
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-14 w-14 rounded-full border-2 border-red-500 text-red-500 hover:bg-red-50"
+              onClick={() => handleAction('pass')}
+            >
+              <X className="h-8 w-8" />
+            </Button>
+            
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-10 w-10 rounded-full border-2 border-blue-400 text-blue-400 hover:bg-blue-50 mt-2"
+              onClick={() => handleAction('super_like')}
+            >
+              <Star className="h-5 w-5" />
+            </Button>
+
+            <Button
+              size="icon"
+              variant="outline"
+              className="h-14 w-14 rounded-full border-2 border-green-500 text-green-500 hover:bg-green-50"
+              onClick={() => handleAction('like')}
+            >
+              <Heart className="h-8 w-8" />
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}

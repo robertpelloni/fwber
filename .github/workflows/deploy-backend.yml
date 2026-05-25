@@ -1,0 +1,44 @@
+name: Deploy Backend (Hetzner)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'fwber-backend-ts/**'
+      - 'ops/hetzner/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to Hetzner via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          HETZNER_PROJECT_PATH: ${{ secrets.HETZNER_PROJECT_PATH }}
+          FWBER_RUN_SMOKE_CHECK: ${{ vars.FWBER_RUN_SMOKE_CHECK }}
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          port: 22
+          envs: HETZNER_PROJECT_PATH,FWBER_RUN_SMOKE_CHECK
+          script: |
+            set -euo pipefail
+            REPO_ROOT="${HETZNER_PROJECT_PATH:-/var/www/fwber/repo}"
+            cd "$REPO_ROOT"
+            sudo chown -R $(whoami):$(whoami) . 2>/dev/null || true
+            git checkout -- . 2>/dev/null || true
+            git clean -fd 2>/dev/null || true
+            git fetch origin main
+            git reset --hard origin/main
+            cd fwber-backend-ts
+            npm install --production
+            npx prisma generate
+            npm run build
+            pm2 restart fwber-backend-ts || pm2 start dist/index.js --name "fwber-backend-ts"
+            sudo systemctl reload nginx || true
+            echo "Deploy complete"

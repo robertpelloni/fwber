@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fwber-frontend
+  namespace: fwber
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fwber-frontend
+  template:
+    metadata:
+      labels:
+        app: fwber-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: fwber-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: NEXT_PUBLIC_API_URL
+          value: "/api"
+        - name: NEXTAUTH_URL
+          value: "http://localhost" # Should be domain in prod
+        - name: NEXTAUTH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: fwber-secrets
+              key: NEXTAUTH_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwber-frontend
+  namespace: fwber
+spec:
+  ports:
+  - port: 3000
+  selector:
+    app: fwber-frontend

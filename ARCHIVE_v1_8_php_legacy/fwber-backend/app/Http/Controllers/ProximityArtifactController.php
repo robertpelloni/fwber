@@ -1,0 +1,740 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Events\ProximityArtifactEvent;
+use App\Http\Requests\LocalPulseRequest;
+use App\Http\Requests\Proximity\ClaimProximityArtifactRequest;
+use App\Http\Requests\ProximityFeedRequest;
+use App\Http\Requests\StoreProximityArtifactRequest;
+use App\Models\Promotion;
+use App\Models\ProximityArtifact;
+use App\Services\AIMatchingService;
+use App\Services\GeoScreenerClient;
+use App\Services\GeoSpoofDetectionService;
+use App\Services\LocalPulseRankingService;
+use App\Services\ProximityArtifactService;
+use App\Services\ShadowThrottleService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+
+class ProximityArtifactController extends Controller
+{
+    public function __construct(
+        private ShadowThrottleService $shadowThrottleService,
+        private GeoSpoofDetectionService $geoSpoofService,
+        private GeoScreenerClient $geoScreener,
+        private AIMatchingService $matchingService,
+        private LocalPulseRankingService $localPulseRankingService,
+        private \App\Services\ActivityPubService $apService
+    ) {}
+
+    /**
+     * @OA\Get(
+     *   path="/proximity/feed",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Get proximity artifacts feed",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="radius", in="query", @OA\Schema(type="integer", minimum=100, maximum=10000)),
+     *   @OA\Parameter(name="type", in="query", @OA\Schema(type="string", enum={"chat", "board_post", "announce"})),
+     *
+     *   @OA\Response(
+     *     response=200,
+     *     description="Proximity artifacts",
+     *
+     *     @OA\JsonContent(
+     *
+     *       @OA\Property(property="artifacts", type="array", @OA\Items(ref="#/components/schemas/ProximityArtifact"))
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function index(ProximityFeedRequest $request): JsonResponse
+    {
+        $user = auth()->user();
+        $validated = $request->validated();
+
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = (int) ($validated['radius'] ?? 1000);
+        $type = $validated['type'] ?? 'all';
+        $topicSlug = $validated['topic_slug'] ?? null;
+
+        // Round coordinates to ~110m precision for caching grid
+        $gridLat = round($lat, 3);
+        $gridLng = round($lng, 3);
+
+        $cacheKey = "proximity:feed:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:type:{$type}:topic:".($topicSlug ?? 'all');
+
+        $artifacts = Cache::remember($cacheKey, 60, function () use ($lat, $lng, $radius, $validated, $user, $topicSlug) {
+            $q = ProximityArtifact::query()
+                ->withCount('comments')
+                ->withSum('votes', 'value')
+                ->with(['votes' => function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                }])
+                ->active()
+                ->withinBox($lat, $lng, $radius);
+            if (isset($validated['type'])) {
+                $q->type($validated['type']);
+            }
+
+            if ($topicSlug) {
+                $q->where('meta->topic_slug', $topicSlug);
+            }
+
+            return $q->orderByDesc('created_at')->limit(100)->get()
+                ->map(function (ProximityArtifact $a) {
+                    return [
+                        'id' => $a->id,
+                        'type' => $a->type,
+                        'content' => $a->content,
+                        'lat' => $a->fuzzed_latitude,
+                        'lng' => $a->fuzzed_longitude,
+                        'radius' => $a->visibility_radius_m,
+                        'expires_at' => $a->expires_at?->toIso8601String(),
+                        'moderation_status' => $a->moderation_status,
+                        'meta' => $a->meta,
+                        'user_id' => $a->user_id,
+                        'comments_count' => $a->comments_count ?? 0,
+                        'votes_sum_value' => (int) $a->votes_sum_value ?? 0,
+                        'user_vote' => $a->votes->first()?->value ?? 0,
+                    ];
+                });
+        });
+
+        return response()->json(['artifacts' => $artifacts, 'meta' => ['cache_hit' => Cache::has($cacheKey)]]);
+    }
+
+    /**
+     * @OA\Post(
+     *   path="/proximity/artifacts",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Create proximity artifact",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\RequestBody(
+     *     required=true,
+     *
+     *     @OA\JsonContent(
+     *       required={"type", "content", "lat", "lng"},
+     *
+     *       @OA\Property(property="type", type="string", enum={"chat", "board_post", "announce"}),
+     *       @OA\Property(property="content", type="string"),
+     *       @OA\Property(property="lat", type="number"),
+     *       @OA\Property(property="lng", type="number"),
+     *       @OA\Property(property="radius", type="integer", minimum=100, maximum=10000)
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=201, description="Artifact created"),
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function store(StoreProximityArtifactRequest $request, ProximityArtifactService $service): JsonResponse
+    {
+        $user = auth()->user();
+        $validated = $request->validated();
+
+        // Detect potential geo-spoofing
+        $ipAddress = $request->ip();
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+
+        $this->geoSpoofService->detectSpoof($user->id, $lat, $lng, $ipAddress);
+
+        try {
+            $artifact = $service->createArtifact($user, [
+                'type' => $validated['type'],
+                'content' => $validated['content'],
+                'location_lat' => $lat,
+                'location_lng' => $lng,
+                'visibility_radius_m' => (int) ($validated['radius'] ?? 1000),
+                'amount' => $validated['amount'] ?? 0,
+                'meta' => array_filter([
+                    'topic_slug' => $validated['topic_slug'] ?? null,
+                ], fn ($value) => $value !== null && $value !== ''),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+
+        // Publish a lightweight real-time event (clients can refresh Local Pulse)
+        try {
+            ProximityArtifactEvent::dispatch('artifact_created', [
+                'artifact_id' => $artifact->id,
+                'user_id' => $user->id,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('Pusher publish failed for artifact_created', [
+                'artifact_id' => $artifact->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // ActivityPub Federation: Broadcast public board posts to followers
+        if ($artifact->type === 'board_post') {
+            try {
+                $this->apService->broadcastToFollowers($user, [
+                    'type' => 'Create',
+                    'actor' => url("/api/federation/users/{$user->id}"),
+                    'object' => [
+                        'type' => 'Note',
+                        'content' => $artifact->content,
+                        'attributedTo' => url("/api/federation/users/{$user->id}"),
+                        'to' => ['https://www.w3.org/ns/activitystreams#Public'],
+                    ],
+                ]);
+            } catch (\Throwable $e) {
+                \Log::error("ActivityPub: Broadcast failed for artifact {$artifact->id}: ".$e->getMessage());
+            }
+        }
+
+        return response()->json(['artifact' => [
+            'id' => $artifact->id,
+            'type' => $artifact->type,
+            'content' => $artifact->content,
+            'lat' => $artifact->fuzzed_latitude,
+            'lng' => $artifact->fuzzed_longitude,
+            'radius' => $artifact->visibility_radius_m,
+            'expires_at' => $artifact->expires_at?->toIso8601String(),
+            'moderation_status' => $artifact->moderation_status,
+            'meta' => $artifact->meta,
+            'user_id' => $artifact->user_id,
+        ]], 201);
+    }
+
+    /**
+     * @OA\Get(
+     *   path="/proximity/artifacts/{id}",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Get single artifact",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(response=200, description="Artifact details"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function show(int $id): JsonResponse
+    {
+        $user = auth()->user();
+        $artifact = ProximityArtifact::active()
+            ->withCount('comments')
+            ->withSum('votes', 'value')
+            ->with(['votes' => function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            }])
+            ->findOrFail($id);
+
+        return response()->json(['artifact' => [
+            'id' => $artifact->id,
+            'type' => $artifact->type,
+            'content' => $artifact->content,
+            'lat' => $artifact->fuzzed_latitude,
+            'lng' => $artifact->fuzzed_longitude,
+            'radius' => $artifact->visibility_radius_m,
+            'expires_at' => $artifact->expires_at?->toIso8601String(),
+            'moderation_status' => $artifact->moderation_status,
+            'meta' => $artifact->meta,
+            'user_id' => $artifact->user_id,
+            'comments_count' => $artifact->comments_count ?? 0,
+            'votes_sum_value' => (int) $artifact->votes_sum_value ?? 0,
+            'user_vote' => $artifact->votes->first()?->value ?? 0,
+        ]]);
+    }
+
+    /**
+     * @OA\Post(
+     *   path="/proximity/artifacts/{id}/claim",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Claim a token drop",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\RequestBody(required=true, @OA\JsonContent(required={"lat","lng"}, @OA\Property(property="lat", type="number"), @OA\Property(property="lng", type="number"))),
+     *
+     *   @OA\Response(response=200, description="Claim successful"),
+     *   @OA\Response(response=400, description="Claim failed")
+     * )
+     */
+    public function claim(int $id, ClaimProximityArtifactRequest $request, ProximityArtifactService $service): JsonResponse
+    {
+
+        $user = auth()->user();
+        $artifact = ProximityArtifact::active()->findOrFail($id);
+
+        try {
+            $amount = $service->claimArtifact($artifact, $user, (float) $request->lat, (float) $request->lng);
+
+            return response()->json([
+                'message' => "Claimed {$amount} tokens!",
+                'amount' => $amount,
+                'new_balance' => $user->fresh()->token_balance,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *   path="/proximity/artifacts/{id}/flag",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Flag artifact for moderation",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(response=200, description="Flag recorded", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function flag(int $id, Request $request, ProximityArtifactService $service): JsonResponse
+    {
+        $user = auth()->user();
+        $artifact = ProximityArtifact::findOrFail($id);
+        $service->flagArtifact($artifact, $user);
+
+        // Publish real-time flag event
+        try {
+            ProximityArtifactEvent::dispatch('artifact_flagged', [
+                'artifact_id' => $artifact->id,
+                'flagged_by' => $user->id,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('Pusher publish failed for artifact_flagged', [
+                'artifact_id' => $artifact->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return response()->json(['message' => 'Flag recorded']);
+    }
+
+    /**
+     * @OA\Delete(
+     *   path="/proximity/artifacts/{id}",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Remove artifact (owner only)",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *   @OA\Response(response=200, description="Artifact removed", @OA\JsonContent(ref="#/components/schemas/SimpleMessageResponse")),
+     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *   @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $user = auth()->user();
+        $artifact = ProximityArtifact::findOrFail($id);
+        if ($artifact->user_id !== $user->id) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+        $artifact->moderation_status = 'removed';
+        $artifact->save();
+
+        // Publish real-time removal event
+        try {
+            ProximityArtifactEvent::dispatch('artifact_removed', [
+                'artifact_id' => $artifact->id,
+                'removed_by' => $user->id,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::warning('Pusher publish failed for artifact_removed', [
+                'artifact_id' => $artifact->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return response()->json(['message' => 'Removed']);
+    }
+
+    /**
+     * Local Pulse - Merged feed of proximity artifacts + nearby match candidates
+     * This combines the draw of hyperlocal ephemeral content with mutual-match discovery
+     *
+     * @OA\Get(
+     *   path="/proximity/local-pulse",
+     *   tags={"Proximity Artifacts"},
+     *   summary="Local Pulse: ephemeral content + nearby matches",
+     *   security={{"bearerAuth":{}}},
+     *
+     *   @OA\Parameter(name="lat", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="lng", in="query", required=true, @OA\Schema(type="number")),
+     *   @OA\Parameter(name="radius", in="query", @OA\Schema(type="integer", minimum=100, maximum=10000)),
+     *
+     *   @OA\Response(
+     *     response=200,
+     *     description="Local pulse feed",
+     *
+     *     @OA\JsonContent(
+     *
+     *       @OA\Property(property="artifacts", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="candidates", type="array", @OA\Items(type="object")),
+     *       @OA\Property(property="meta", type="object")
+     *     )
+     *   ),
+     *
+     *   @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function localPulse(LocalPulseRequest $request): JsonResponse
+    {
+        $user = auth()->user();
+        $profile = $user->profile;
+
+        if (! $profile) {
+            return response()->json(['error' => 'Profile required'], 422);
+        }
+
+        $validated = $request->validated();
+
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+        $radius = (int) ($validated['radius'] ?? 1000);
+        $topicSlug = $validated['topic_slug'] ?? null;
+
+        // Round coordinates to ~110m precision for caching grid
+        $gridLat = round($lat, 3);
+        $gridLng = round($lng, 3);
+
+        $cacheKey = "proximity:pulse:user:{$user->id}:lat:{$gridLat}:lng:{$gridLng}:radius:{$radius}:topic:".($topicSlug ?? 'all');
+
+        // Cache for 2 minutes
+        $response = Cache::remember($cacheKey, 120, function () use ($user, $profile, $lat, $lng, $radius, $topicSlug) {
+            // Get proximity artifacts with shadow throttle filtering
+            $artifactQuery = ProximityArtifact::query()
+                ->withCount('comments')
+                ->withSum('votes', 'value')
+                ->with(['votes' => function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                }])
+                ->active()
+                ->withinBox($lat, $lng, $radius)
+                ->orderByDesc('created_at');
+
+            if ($topicSlug) {
+                $artifactQuery->where('meta->topic_slug', $topicSlug);
+            }
+
+            $artifactModels = $artifactQuery
+                ->limit(100) // Get more, then filter and limit
+                ->get()
+                ->filter(function (ProximityArtifact $a) {
+                    // Apply shadow throttle probabilistic filtering
+                    $visibility = $this->shadowThrottleService->getVisibilityMultiplier($a->user_id);
+
+                    if ($visibility >= 1.0) {
+                        return true; // Always show if not throttled
+                    }
+
+                    // Probabilistic inclusion based on visibility multiplier
+                    return (mt_rand() / mt_getrandmax()) < $visibility;
+                });
+
+            $trustMap = $this->localPulseRankingService->buildTrustMap(
+                $user,
+                $artifactModels->pluck('user_id')->filter()->map(fn ($id) => (int) $id)->all()
+            );
+
+            $artifacts = $artifactModels
+                ->map(function (ProximityArtifact $a) use ($user, $trustMap) {
+                    $sceneSignals = $this->matchingService->getSceneSignalsForValues($user, array_filter([
+                        $a->content,
+                        $a->meta['topic_slug'] ?? null,
+                        ...((array) ($a->meta['tags'] ?? [])),
+                    ]));
+
+                    return [
+                        'id' => $a->id,
+                        'type' => $a->type,
+                        'content' => $a->content,
+                        'lat' => $a->fuzzed_latitude,
+                        'lng' => $a->fuzzed_longitude,
+                        'radius' => $a->visibility_radius_m,
+                        'expires_at' => $a->expires_at?->toIso8601String(),
+                        'created_at' => $a->created_at?->toIso8601String(),
+                        'meta' => $a->meta,
+                        'user_id' => $a->user_id,
+                        'comments_count' => $a->comments_count ?? 0,
+                        'votes_sum_value' => (int) $a->votes_sum_value ?? 0,
+                        'user_vote' => $a->votes->first()?->value ?? 0,
+                        'scene_signals' => $sceneSignals,
+                        'ranking_score' => $this->localPulseRankingService->calculateCompositeScore(
+                            $user,
+                            $a->user_id ? (int) $a->user_id : null,
+                            $a->created_at,
+                            $sceneSignals,
+                            $trustMap
+                        ),
+                    ];
+                });
+
+            // Get active promotions
+            $promotions = Promotion::query()
+                ->where('is_active', true)
+                ->where('starts_at', '<=', now())
+                ->where('expires_at', '>', now())
+                ->withinBox($lat, $lng, $radius)
+                ->with('merchantProfile')
+                ->limit(20)
+                ->get()
+                ->map(function (Promotion $p) use ($user, $topicSlug) {
+                    $sceneSignals = $this->matchingService->getSceneSignalsForValues($user, array_filter([
+                        $p->title,
+                        $p->description,
+                        $p->merchantProfile->business_name ?? null,
+                        $topicSlug,
+                    ]));
+
+                    return [
+                        'id' => $p->id,
+                        'type' => 'promotion',
+                        'content' => $p->description ?? $p->title,
+                        'lat' => $p->lat,
+                        'lng' => $p->lng,
+                        'radius' => $p->radius,
+                        'expires_at' => $p->expires_at?->toIso8601String(),
+                        'created_at' => $p->starts_at?->toIso8601String(),
+                        'meta' => [
+                            'title' => $p->title,
+                            'discount' => $p->discount_value,
+                            'merchant_name' => $p->merchantProfile->business_name ?? 'Merchant',
+                            'promo_code' => $p->promo_code,
+                            'is_sponsored' => true,
+                        ],
+                        'user_id' => null,
+                        'comments_count' => 0,
+                        'votes_sum_value' => 0,
+                        'user_vote' => 0,
+                        'scene_signals' => $sceneSignals,
+                        'ranking_score' => $this->localPulseRankingService->calculateCompositeScore(
+                            $user,
+                            null,
+                            $p->starts_at,
+                            $sceneSignals,
+                            []
+                        ),
+                    ];
+                });
+
+            // Merge artifacts and promotions, then rank by trust + scene alignment + freshness.
+            $mixedArtifacts = $artifacts
+                ->concat($promotions)
+                ->sortByDesc('created_at')
+                ->sortByDesc('ranking_score')
+                ->take(20)
+                ->values()
+                ->map(function (array $artifact) {
+                    unset($artifact['ranking_score']);
+
+                    return $artifact;
+                });
+
+            // Get nearby match candidates (lightweight previews)
+            $candidates = $this->getNearbyCompatibleCandidates($user, $profile, $lat, $lng, $radius, 10);
+
+            return [
+                'artifacts' => $mixedArtifacts,
+                'candidates' => $candidates,
+                'meta' => [
+                    'center_lat' => $lat,
+                    'center_lng' => $lng,
+                    'radius_m' => $radius,
+                    'topic_slug' => $topicSlug,
+                    'artifacts_count' => $mixedArtifacts->count(),
+                    'candidates_count' => count($candidates),
+                    'ranking_strategy' => [
+                        'scene_alignment' => true,
+                        'trusted_connections' => true,
+                        'freshness' => true,
+                    ],
+                    'generated_at' => now()->toISOString(),
+                ],
+            ];
+        });
+
+        // Add cache hit status to meta (outside the cached array)
+        $response['meta']['cache_hit'] = Cache::has($cacheKey);
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get nearby users with mutual wants compatibility
+     * Returns lightweight candidate previews
+     */
+    private function getNearbyCompatibleCandidates(
+        \App\Models\User $user,
+        \App\Models\UserProfile $profile,
+        float $lat,
+        float $lng,
+        int $radiusMeters,
+        int $limit
+    ): array {
+
+        // Check Rust Geo-Screener First (O(1) Grid Hash Lookup vs SQL Haversine)
+        $h3CandidateIds = $this->geoScreener->getNearbyUsers($lat, $lng, $radiusMeters);
+
+        $query = \App\Models\User::query()
+            ->where('id', '!=', $user->id);
+
+        if (! empty($h3CandidateIds)) {
+            // Fallback to array IN sweep (Instant Index Match)
+            $query->whereIn('id', $h3CandidateIds);
+        } else {
+            // Standard SQL Fallback Map
+            $radiusMiles = $radiusMeters / 1609.34;
+            $latDist = (1.1 * $radiusMiles) / 69.0;
+            $lonDist = (1.1 * $radiusMiles) / 69.1;
+
+            $query->whereHas('profile', function ($q) use ($lat, $lng, $latDist, $lonDist) {
+                $q->whereBetween('location_latitude', [$lat - $latDist, $lat + $latDist])
+                    ->whereBetween('location_longitude', [$lng - $lonDist, $lng + $lonDist]);
+            });
+        }
+
+        // Gender preference filter
+        if ($profile->preferences && isset($profile->preferences['gender_preferences'])) {
+            $genderPrefs = $profile->preferences['gender_preferences'];
+            $query->whereHas('profile', function ($q) use ($genderPrefs) {
+                $q->whereIn('gender', array_keys(array_filter($genderPrefs)));
+            });
+        }
+
+        // Age filter from preferences
+        $ageMin = $profile->preferences['age_range']['min'] ?? 18;
+        $ageMax = $profile->preferences['age_range']['max'] ?? 100;
+
+            $query->whereHas('profile', function ($q) use ($ageMin, $ageMax) {
+                // Support both SQLite (testing) and MySQL (production)
+                $sql = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite'
+                    ? "(julianday('now') - julianday(birthdate)) / 365.25 BETWEEN ? AND ?"
+                    : 'TIMESTAMPDIFF(YEAR, birthdate, NOW()) BETWEEN ? AND ?';
+
+                $q->whereRaw($sql, [$ageMin, $ageMax]);
+            });
+
+        // Exclude users already interacted with
+        $excludedIds = \Illuminate\Support\Facades\DB::table('match_actions')
+            ->where('user_id', $user->id)
+            ->pluck('target_user_id')
+            ->toArray();
+
+        if (! empty($excludedIds)) {
+            $query->whereNotIn('id', $excludedIds);
+        }
+
+        $candidates = $query->limit($limit * 2)->get() // Get extra to filter
+            ->filter(function (\App\Models\User $candidate) {
+                // Filter out shadow throttled users probabilistically
+                $visibility = $this->shadowThrottleService->getVisibilityMultiplier($candidate->id);
+
+                if ($visibility >= 1.0) {
+                    return true;
+                }
+
+                return (mt_rand() / mt_getrandmax()) < $visibility;
+            })
+            ->take($limit);
+
+        $candidateIds = $candidates->pluck('id')->toArray();
+        $recentArtifactCounts = [];
+        
+        if (!empty($candidateIds)) {
+            $counts = \Illuminate\Support\Facades\DB::table('proximity_artifacts')
+                ->whereIn('user_id', $candidateIds)
+                ->where('created_at', '>=', now()->subHours(24))
+                ->groupBy('user_id')
+                ->select('user_id', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+                ->get();
+                
+            foreach ($counts as $count) {
+                $recentArtifactCounts[$count->user_id] = $count->count;
+            }
+        }
+
+        // Return lightweight previews (no full profiles, just teasers)
+        return $candidates->map(function (\App\Models\User $candidate) use ($profile, $recentArtifactCounts) {
+            $candidateProfile = $candidate->profile;
+
+            // Calculate simplified compatibility (just mutual wants indicators)
+            $compatibilityIndicators = $this->getCompatibilityIndicators($profile, $candidateProfile, $recentArtifactCounts[$candidate->id] ?? 0);
+
+            return [
+                'user_id' => $candidate->id,
+                'age' => $candidateProfile->birthdate?->diffInYears(now()),
+                'gender' => $candidateProfile->gender,
+                'distance_miles' => $this->calculateDistance($profile, $candidateProfile),
+                'compatibility_indicators' => $compatibilityIndicators,
+                'last_seen' => $candidate->last_seen_at?->diffForHumans(),
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Calculate distance between two profiles in miles
+     */
+    private function calculateDistance(\App\Models\UserProfile $profile1, \App\Models\UserProfile $profile2): float
+    {
+        if (! $profile1->location_latitude || ! $profile2->location_latitude) {
+            return 0;
+        }
+
+        $lat1 = $profile1->location_latitude;
+        $lon1 = $profile1->location_longitude;
+        $lat2 = $profile2->location_latitude;
+        $lon2 = $profile2->location_longitude;
+
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +
+                cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+
+        return round($miles, 1);
+    }
+
+    /**
+     * Get compatibility indicators showing mutual wants/preferences alignment
+     */
+    private function getCompatibilityIndicators(\App\Models\UserProfile $userProfile, \App\Models\UserProfile $candidateProfile, int $recentProximityPosts = 0): array
+    {
+        $indicators = [];
+
+        // Check for shared interests/preferences
+        if ($userProfile->preferences && $candidateProfile->preferences) {
+            $userPrefs = $userProfile->preferences;
+            $candidatePrefs = $candidateProfile->preferences;
+
+            // Example indicators (adjust based on your preference schema)
+            if (isset($userPrefs['relationship_type']) && isset($candidatePrefs['relationship_type'])) {
+                $commonTypes = array_intersect(
+                    array_keys(array_filter($userPrefs['relationship_type'] ?? [])),
+                    array_keys(array_filter($candidatePrefs['relationship_type'] ?? []))
+                );
+                if (! empty($commonTypes)) {
+                    $indicators[] = 'shared_relationship_goals';
+                }
+            }
+
+            // Proximity engagement indicator
+            if ($recentProximityPosts > 0) {
+                $indicators[] = 'active_locally';
+            }
+        }
+
+        return $indicators;
+    }
+}

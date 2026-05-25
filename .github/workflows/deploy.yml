@@ -1,0 +1,85 @@
+name: Container Publish (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_backend:
+        description: 'Build and publish the backend image'
+        required: false
+        default: 'false'
+      publish_queue:
+        description: 'Build and publish the queue image'
+        required: false
+        default: 'false'
+      publish_frontend:
+        description: 'Build and publish the frontend image'
+        required: false
+        default: 'false'
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain current deployment topology
+        run: |
+          echo "Primary production deployment is now Vercel frontend + Hetzner backend."
+          echo "This manual workflow is retained only for optional Docker image publishing."
+          echo "Use .github/workflows/deploy-backend.yml for the real Hetzner backend deployment path."
+
+  build-docker-backend:
+    needs: summary
+    if: ${{ github.event.inputs.publish_backend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./fwber-backend
+          file: ./fwber-backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/fwber-backend:latest
+
+  build-docker-queue:
+    needs: summary
+    if: ${{ github.event.inputs.publish_queue == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push Queue
+        uses: docker/build-push-action@v5
+        with:
+          context: ./fwber-backend
+          file: ./fwber-backend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/fwber-queue:latest
+          target: queue-worker
+
+  build-docker-frontend:
+    needs: summary
+    if: ${{ github.event.inputs.publish_frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./fwber-frontend
+          file: ./fwber-frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/fwber-frontend:latest
