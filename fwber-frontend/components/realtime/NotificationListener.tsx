@@ -57,6 +57,30 @@ const NOTIFICATION_HANDLERS: Record<string, {
     getMessage: (n) => n.message || 'Someone started following you.',
     getAction: () => undefined,
   },
+  follow: {
+    getTitle: (n) => n.title || 'New Follower',
+    getMessage: (n) => n.body || 'Someone started following you.',
+    getAction: (_, router) => ({
+      label: 'View Activity',
+      onClick: () => router.push('/settings/federation/activity'),
+    }),
+  },
+  like: {
+    getTitle: (n) => n.title || 'New Interaction',
+    getMessage: (n) => n.body || 'Someone liked your post.',
+    getAction: (_, router) => ({
+      label: 'View Activity',
+      onClick: () => router.push('/settings/federation/activity'),
+    }),
+  },
+  boost: {
+    getTitle: (n) => n.title || 'New Boost',
+    getMessage: (n) => n.body || 'Someone boosted your post.',
+    getAction: (_, router) => ({
+      label: 'View Activity',
+      onClick: () => router.push('/settings/federation/activity'),
+    }),
+  },
 
   // ── Engagement ────────────────────────────────
   relationship_tier_upgraded: {
