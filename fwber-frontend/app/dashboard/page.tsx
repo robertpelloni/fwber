@@ -153,6 +153,16 @@ export default function DashboardPage() {
                   color={stats?.reverb_healthy ? 'green' : 'yellow'}
                   link="/support"
                 />
+                {(user as any)?.is_moderator && (
+                  <StatCard
+                    icon={<Cpu className="w-6 h-6" />}
+                    label="Autonomous Protocol"
+                    value="Active"
+                    subtext="View execution monitor"
+                    color="purple"
+                    link="/admin/monitoring"
+                  />
+                )}
               </div>
             )}
 

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as h3 from 'h3-js';
 import redis from '../lib/redis.js';
+import { AutonomousService } from './AutonomousService.js';
 
 export class GeoScreenerService {
   private enabled: boolean;
@@ -75,7 +76,13 @@ export class GeoScreenerService {
       });
 
       if (response.status === 200) {
-        return response.data.users || [];
+        const users = response.data.users || [];
+        if (users.length > 50) {
+            await AutonomousService.logAction('High Density Proximity', 'Completed', {
+                lat, lng, radiusMeters, user_count: users.length
+            });
+        }
+        return users;
       }
       return null;
     } catch (error) {

@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import axios from 'axios';
 import crypto from 'crypto';
+import { AutonomousService } from './AutonomousService.js';
 
 export class FederationService {
   /**
@@ -77,43 +78,173 @@ export class FederationService {
         await this.handleAccept(activity, targetUserId);
         break;
       case 'Create':
+        await this.handleCreate(activity, targetUserId);
+        break;
       case 'Like':
-        console.log(`[Federation] Processed ${activity.type} interaction.`);
+        await this.handleLike(activity, targetUserId);
+        break;
+      case 'Announce':
+        await this.handleAnnounce(activity, targetUserId);
         break;
       default:
         console.log(`[Federation] Unhandled activity type: ${activity.type}`);
     }
   }
 
-  private async handleFollow(activity: any, targetUserId: bigint) {
-    const actorIdStr = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
-    console.log(`[Federation] ${actorIdStr} wants to follow local user ${targetUserId}`);
+  private async handleCreate(activity: any, targetUserId: bigint) {
+    console.log(`[Federation] Received Create activity for user ${targetUserId}`);
+    // Future: Check if it's a reply to a local post or a mention
+  }
 
-    // Create federation_follows record
-    // We mock the follower_id for this phase
-    const remoteActorInternalId = BigInt(Math.floor(Math.random() * 100000));
+  private async handleLike(activity: any, targetUserId: bigint) {
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const objectUri = typeof activity.object === 'string' ? activity.object : activity.object.id;
+
+    console.log(`[Federation] ${actorUri} liked ${objectUri} for user ${targetUserId}`);
+
+    // If the object is a local outbox item, we can track it
+    if (objectUri.includes('api.fwber.me')) {
+        const outboxItem = await prisma.federation_outbox.findUnique({
+            where: { activity_id: objectUri }
+        });
+
+        if (outboxItem) {
+            console.log(`[Federation] Local object ${outboxItem.id} was liked by remote actor.`);
+            // In the future: Increment a like counter or create a notification
+        }
+    }
+  }
+
+  private async handleAnnounce(activity: any, targetUserId: bigint) {
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const objectUri = typeof activity.object === 'string' ? activity.object : activity.object.id;
+
+    console.log(`[Federation] ${actorUri} announced (boosted) ${objectUri} for user ${targetUserId}`);
+
+    if (objectUri.includes('api.fwber.me')) {
+        const outboxItem = await prisma.federation_outbox.findUnique({
+            where: { activity_id: objectUri }
+        });
+
+        if (outboxItem) {
+            console.log(`[Federation] Local object ${outboxItem.id} was boosted by remote actor.`);
+        }
+    }
+  }
+
+  private async handleFollow(activity: any, targetUserId: bigint) {
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
+
+    console.log(`[Federation] ${actorUri} wants to follow local user ${targetUserId}`);
 
     try {
-      await (prisma as any).federation_follows.create({
+        const user = await prisma.users.findUnique({
+            where: { id: targetUserId },
+            select: { private_key: true }
+        });
+
+        // Find or create remote user record
+        let remoteUser = await prisma.users.findUnique({
+            where: { actor_uri: actorUri }
+        });
+
+        if (!remoteUser) {
+            try {
+                const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+                remoteUser = await prisma.users.create({
+                    data: {
+                        name: actorRes.data.preferredUsername || 'remote_user',
+                        email: `remote-${Date.now()}@federated`,
+                        password: 'REMOTE_ACCOUNT_NO_LOGIN',
+                        actor_uri: actorUri,
+                        is_remote: true,
+                        public_key: actorRes.data.publicKey?.publicKeyPem || null
+                    }
+                });
+            } catch (err) {
+                remoteUser = await prisma.users.create({
+                    data: {
+                        name: 'remote_user',
+                        email: `remote-${Date.now()}@federated`,
+                        password: 'REMOTE_ACCOUNT_NO_LOGIN',
+                        actor_uri: actorUri,
+                        is_remote: true
+                    }
+                });
+            }
+        }
+
+      await prisma.federation_follows.create({
         data: {
-          follower_id: remoteActorInternalId,
-          following_id: targetUserId,
+          actor_uri: actorUri,
+          target_uri: targetUri,
           status: 'accepted'
         }
       });
-      console.log(`[Federation] Auto-accepted follow request from ${actorIdStr}`);
+      console.log(`[Federation] Auto-accepted follow request from ${actorUri}`);
+
+      // Send Accept activity back
+      if (user?.private_key) {
+          const acceptActivity = {
+              '@context': 'https://www.w3.org/ns/activitystreams',
+              id: `https://api.fwber.me/api/federation/activities/accept-${Date.now()}`,
+              type: 'Accept',
+              actor: targetUri,
+              object: activity
+          };
+
+          try {
+              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const inbox = actorRes.data.inbox;
+              if (inbox) {
+                  await this.sendSignedRequest(inbox, acceptActivity, user.private_key, targetUri);
+                  console.log(`[Federation] Sent Accept activity to ${inbox}`);
+              }
+          } catch (err: any) {
+              console.error(`[Federation] Failed to send Accept to ${actorUri}:`, err.message);
+          }
+      }
     } catch (e) {
       console.error('[Federation] Error recording follow:', e);
     }
   }
 
   private async handleUndoFollow(activity: any, targetUserId: bigint) {
-    const actorIdStr = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
-    console.log(`[Federation] ${actorIdStr} unfollowed local user ${targetUserId}`);
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
+
+    console.log(`[Federation] ${actorUri} unfollowed local user ${targetUserId}`);
+
+    try {
+        await prisma.federation_follows.deleteMany({
+            where: {
+                actor_uri: actorUri,
+                target_uri: targetUri
+            }
+        });
+    } catch (err) {
+        console.error('[Federation] Error undoing follow:', err);
+    }
   }
 
   private async handleAccept(activity: any, targetUserId: bigint) {
-    console.log(`[Federation] Follow request accepted by remote actor.`);
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
+
+    console.log(`[Federation] Follow request accepted by remote actor ${actorUri}.`);
+
+    try {
+        await prisma.federation_follows.updateMany({
+            where: {
+                actor_uri: targetUri,
+                target_uri: actorUri
+            },
+            data: { status: 'accepted' }
+        });
+    } catch (err) {
+        console.error('[Federation] Error handling accept:', err);
+    }
   }
 
   /**
@@ -122,14 +253,77 @@ export class FederationService {
   async broadcastUpdate(userId: bigint, objectPayload: any) {
     const user = await prisma.users.findUnique({
       where: { id: userId },
-      select: { private_key: true, actor_uri: true }
+      select: { private_key: true, name: true }
     });
 
     if (!user || !user.private_key) {
-      console.warn('[Federation] Cannot broadcast: User missing keys');
+      console.warn(`[Federation] Cannot broadcast: User ${userId} missing keys`);
       return;
     }
 
-    console.log(`[Federation] Broadcasting Create for user ${userId} to external inboxes.`);
+    const actorUri = `https://api.fwber.me/api/federation/actors/${userId}`;
+    const followers = await prisma.federation_follows.findMany({
+        where: { target_uri: actorUri, status: 'accepted' }
+    });
+
+    if (followers.length === 0) return;
+
+    const activity = {
+        '@context': 'https://www.w3.org/ns/activitystreams',
+        id: `https://api.fwber.me/api/federation/activities/${Date.now()}`,
+        type: 'Create',
+        actor: actorUri,
+        object: objectPayload
+    };
+
+    const taskLabel = `ActivityPub Broadcast (User ${userId})`;
+    await AutonomousService.logAction(taskLabel, 'Started', { follower_count: followers.length, object_type: objectPayload.type });
+
+    console.log(`[Federation] Broadcasting to ${followers.length} followers for user ${userId}.`);
+
+    let successCount = 0;
+    for (const follower of followers) {
+        try {
+            const actorRes = await axios.get(follower.actor_uri, { headers: { Accept: 'application/activity+json' }});
+            const inbox = actorRes.data.inbox;
+
+            if (inbox) {
+                await this.sendSignedRequest(inbox, activity, user.private_key, actorUri);
+                successCount++;
+            }
+        } catch (err: any) {
+            console.error(`[Federation] Failed to deliver to ${follower.actor_uri}:`, err.message);
+        }
+    }
+
+    await AutonomousService.logAction(taskLabel, 'Completed', {
+        success_count: successCount,
+        total_count: followers.length
+    });
+  }
+
+  private async sendSignedRequest(inboxUrl: string, activity: any, privateKey: string, actorUri: string) {
+    const url = new URL(inboxUrl);
+    const date = new Date().toUTCString();
+    const digest = crypto.createHash('sha256').update(JSON.stringify(activity)).digest('base64');
+
+    const stringToSign = `(request-target): post ${url.pathname}\nhost: ${url.host}\ndate: ${date}\ndigest: SHA-256=${digest}`;
+
+    const signer = crypto.createSign('RSA-SHA256');
+    signer.update(stringToSign);
+    const signature = signer.sign(privateKey, 'base64');
+
+    const signatureHeader = `keyId="${actorUri}#main-key",algorithm="rsa-sha256",headers="(request-target) host date digest",signature="${signature}"`;
+
+    await axios.post(inboxUrl, activity, {
+        headers: {
+            'Host': url.host,
+            'Date': date,
+            'Digest': `SHA-256=${digest}`,
+            'Signature': signatureHeader,
+            'Content-Type': 'application/activity+json',
+            'Accept': 'application/activity+json'
+        }
+    });
   }
 }

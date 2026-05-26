@@ -1,7 +1,7 @@
 # VISION.md — The Ultimate fwber Architecture & Philosophy
 
-> **Last Updated:** 2026-03-25
-> **Version:** 0.99.1 (Gold Pre-release)
+> **Last Updated:** 2026-05-23
+> **Version:** 2.0.16 (ActivityPub Hardened)
 > **Goal:** To serve as the definitive North Star for all human and AI agents working on the fwber project.
 
 ---
@@ -72,3 +72,6 @@ All AI agents (Claude, Gemini, GPT) working on this repository must adhere to th
 3.  **No `console.log` in Production**: Use structured logging.
 4.  **UX Anti-Patterns**: Never use native `alert()` or `confirm()`. Use the established Toast system or custom Modals.
 5.  **Autonomous Progression**: When executing a protocol, push through to completion. Anticipate edge cases. Update the `VERSION` and `CHANGELOG.md` autonomously.
+
+## The Autonomous Execution Protocol (v2.0.21)
+The fwber platform operates on a "Self-Correcting Autonomous Protocol". This system uses AI agents to monitor repository health, execute maintenance tasks, and adjust behavioral settings (Strict Mode, Subagent Delegation) in real-time. The goal is a zero-maintenance, self-evolving social graph that scales without human intervention.

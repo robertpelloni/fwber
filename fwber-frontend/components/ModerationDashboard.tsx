@@ -13,9 +13,9 @@ import {
   useRemoveThrottleMutation,
   useUserModerationProfile,
 } from '@/lib/hooks/use-moderation';
-import { ShieldAlert, Flag, Gauge, Ban, CheckCircle2, Trash2, Zap, User, X, AlertTriangle, Clock, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Flag, Gauge, Ban, CheckCircle2, Trash2, Zap, User, X, AlertTriangle, Clock, RefreshCw, Cpu } from 'lucide-react';
 
-type Tab = 'flagged' | 'spoofs' | 'throttles' | 'actions';
+type Tab = 'flagged' | 'spoofs' | 'throttles' | 'actions' | 'autonomous';
 
 export default function ModerationDashboard() {
   const { token } = useAuth();
@@ -52,6 +52,7 @@ export default function ModerationDashboard() {
     { id: 'spoofs', label: 'Geo-Spoofs', icon: <Zap className="h-4 w-4" />, count: dashboard.data?.stats.pending_spoof_detections },
     { id: 'throttles', label: 'Throttles', icon: <Gauge className="h-4 w-4" />, count: dashboard.data?.stats.active_throttles },
     { id: 'actions', label: 'Actions', icon: <CheckCircle2 className="h-4 w-4" /> },
+    { id: 'autonomous', label: 'Autonomous Monitor', icon: <Cpu className="h-4 w-4" /> },
   ];
 
   return (
@@ -152,6 +153,24 @@ export default function ModerationDashboard() {
             setPage={setActionsPage}
             onViewUser={setSelectedUserId}
           />
+        )}
+        {activeTab === 'autonomous' && (
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Cpu className="h-5 w-5 text-primary" /> Autonomous Execution Protocol
+              </h3>
+              <a
+                href="/admin/monitoring"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+              >
+                Open Full Monitor
+              </a>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              The autonomous protocol is managing dependency synchronization, versioning, and branch reconciliation.
+            </p>
+          </div>
         )}
       </div>
 

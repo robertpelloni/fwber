@@ -28,6 +28,8 @@ import {
   type FederationOutboxActivity,
   type FederatedPost,
   type FederationConnection,
+  type UnifiedActivityItem,
+  type UnifiedActivityResponse,
 } from '@/lib/api/activitypub'
 import { useAuth } from '@/lib/auth-context'
 
@@ -46,25 +48,7 @@ interface PostsResponse {
 type ActivityItem =
   | {
       id: string
-      kind: 'post'
-      title: string
-      subtitle: string
-      timestamp: string
-      content: string
-      actorUri: string
-    }
-  | {
-      id: string
-      kind: 'follower'
-      title: string
-      subtitle: string
-      timestamp: string
-      content: string
-      actorUri: string
-    }
-  | {
-      id: string
-      kind: 'outbox'
+      kind: 'post' | 'follower' | 'outbox' | 'like' | 'announce'
       title: string
       subtitle: string
       timestamp: string
@@ -78,6 +62,7 @@ export default function FederationActivityPage() {
   const [following, setFollowing] = useState<FederationConnection[]>([])
   const [posts, setPosts] = useState<FederatedPost[]>([])
   const [outboxActivities, setOutboxActivities] = useState<FederationOutboxActivity[]>([])
+  const [unifiedActivity, setUnifiedActivity] = useState<UnifiedActivityItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -85,11 +70,12 @@ export default function FederationActivityPage() {
 
     const load = async () => {
       try {
-        const [followersResponse, followingResponse, postsResponse, outboxResponse] = await Promise.all([
+        const [followersResponse, followingResponse, postsResponse, outboxResponse, activityResponse] = await Promise.all([
           api.get<FollowersResponse>('/federation/followers'),
           api.get<FollowingResponse>('/federation/following'),
           api.get<PostsResponse>('/federation/posts'),
           user?.id ? getFederationOutbox(user.id, { limit: 12 }) : Promise.resolve({ orderedItems: [], totalItems: 0, id: '', type: 'OrderedCollectionPage' }),
+          api.get<UnifiedActivityResponse>('/federation/activity'),
         ])
 
         if (cancelled) {
@@ -100,6 +86,7 @@ export default function FederationActivityPage() {
         setFollowing(Array.isArray(followingResponse.following) ? followingResponse.following : [])
         setPosts(Array.isArray(postsResponse.posts) ? postsResponse.posts : [])
         setOutboxActivities(Array.isArray(outboxResponse.orderedItems) ? outboxResponse.orderedItems : [])
+        setUnifiedActivity(Array.isArray(activityResponse.activity) ? activityResponse.activity : [])
       } catch (error) {
         console.error('Failed to load federation activity:', error)
 
@@ -124,26 +111,28 @@ export default function FederationActivityPage() {
   }, [user?.id])
 
   const activityItems = useMemo<ActivityItem[]>(() => {
-    const followerItems = followers.map((follower) => ({
-      id: `follower-${follower.id}`,
-      kind: 'follower' as const,
-      title: `${formatFederationHandle(follower.username, follower.domain, follower.actor_uri)} followed you`,
-      subtitle: follower.status ? `Status: ${follower.status}` : 'Remote follower',
-      timestamp: follower.updated_at || follower.created_at || new Date().toISOString(),
-      content: 'A federated profile connected to your public ActivityPub identity.',
-      actorUri: follower.actor_uri,
-    }))
+    const merged = unifiedActivity.map((item) => {
+      let kind: ActivityItem['kind'] = 'outbox'
+      if (item.type === 'Follow') kind = 'follower'
+      else if (item.type === 'Create') kind = 'post'
+      else if (item.type === 'Like') kind = 'like'
+      else if (item.type === 'Announce') kind = 'announce'
 
-    const postItems = posts.slice(0, 20).map((post) => ({
-      id: `post-${post.id}`,
-      kind: 'post' as const,
-      title: post.metadata?.name || formatFederationHandle(post.actor_username, post.actor_domain, post.actor_uri),
-      subtitle: formatFederationHandle(post.actor_username, post.actor_domain, post.actor_uri),
-      timestamp: post.published_at,
-      content: post.content,
-      actorUri: post.actor_uri,
-    }))
+      return {
+        id: `unified-${item.id}`,
+        kind,
+        title: item.type === 'Follow'
+            ? `${formatFederationHandle(item.actor_username, item.actor_domain, item.actor_uri)} followed you`
+            : (item.type === 'Like' ? `${item.actor_username} liked your post` :
+               (item.type === 'Announce' ? `${item.actor_username} boosted your post` : `${item.type} activity`)),
+        subtitle: formatFederationHandle(item.actor_username, item.actor_domain, item.actor_uri),
+        timestamp: item.timestamp,
+        content: item.content || `Activity type: ${item.type}`,
+        actorUri: item.actor_uri,
+      }
+    })
 
+    // Keep legacy local outbox items too
     const outboxItems = outboxActivities.map((activity) => ({
       id: `outbox-${activity.id}`,
       kind: 'outbox' as const,
@@ -154,10 +143,10 @@ export default function FederationActivityPage() {
       actorUri: activity.actor,
     }))
 
-    return [...followerItems, ...outboxItems, ...postItems]
+    return [...merged, ...outboxItems]
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 12)
-  }, [followers, outboxActivities, posts])
+      .slice(0, 20)
+  }, [unifiedActivity, outboxActivities])
 
   return (
     <ProtectedRoute>
@@ -276,7 +265,10 @@ export default function FederationActivityPage() {
                               </Link>
                             </div>
                             <Badge variant="outline" className="shrink-0">
-                              {item.kind === 'post' ? 'Post' : item.kind === 'outbox' ? 'Outbox' : 'Follower'}
+                              {item.kind === 'post' ? 'Post' :
+                               item.kind === 'outbox' ? 'Outbox' :
+                               item.kind === 'follower' ? 'Follower' :
+                               item.kind === 'like' ? 'Like' : 'Boost'}
                             </Badge>
                           </div>
                           <div

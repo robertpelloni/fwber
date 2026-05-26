@@ -152,3 +152,23 @@
 ## 2026-04-05 — v1.6.6 Daily-log shared write should use ACLs, not Monolog chmod from deploy user
 - The first live deploy after the backend stability patch failed because Monolog's `permission` option tried to chmod a daily log file owned by `www-data` from a deploy-user artisan process.
 - The correct repair shape is shared ACLs on `storage/logs` plus removing the Monolog permission override, not repeated per-file chmod attempts in deploy code.
+
+## 2026-05-23 — v2.0.16 Unified activity aggregation simplifies frontend state management
+- Replacing multiple separate API calls (followers, following, posts, outbox) with a single `/api/federation/activity` aggregator endpoint significantly reduced Activity Center complexity.
+- This pattern (Unified Activity) allows for easier sorting and badging of diverse ActivityPub interaction types (Follow, Like, Boost, Create) in a merged timeline.
+- The `FederationService` enhancement to handle `Like` and `Announce` (Boost) activities provides the backend foundation for these new timeline items.
+
+## 2026-05-23 — v2.0.21 Real-time metrics provide critical protocol visibility
+- Grouping autonomous actions by status over a 24-hour window allows for real-time success rate calculations without heavy database scans.
+- Visualizing the execution pipeline as a bar chart significantly improves administrative oversight of AI agent behavior.
+- Differentiating between 'Monitoring' and 'Executing' states helps operators understand when background tasks are actively mutating the codebase.
+
+## 2026-05-23 — Autonomous System Finalized
+- Centralized 'AuthService' and 'ContactSyncService' into the primary TypeScript backend.
+- Implemented real-time autonomous monitor with heartbeat signaling.
+- Hardened Federation logic with RSA-SHA256 signatures and remote actor persistence.
+
+## 2026-05-24 — v2.0.24 Total Integration
+- Successfully bridged backend services (Security, Proximity, Federation) with high-fidelity frontend dashboard and activity surfaces.
+- Unified Next.js API proxy routes to simplify frontend data fetching.
+- Autonomous Monitoring now tracks Geo-Spoofing detections and High-Density proximity events.

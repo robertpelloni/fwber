@@ -1,28 +1,103 @@
 # Changelog
 
+## [2.0.24] - 2026-05-23
+## [2.0.24] - 2026-05-24
+
+### Added
+- **Service Instrumentation**: Integrated `GeoSpoofDetectionService` and `GeoScreenerService` into the autonomous execution protocol for real-time monitoring of security and proximity health.
+- **Activity Center UI**: Finalized the frontend Activity Center (`/settings/federation/activity`) to display unified ActivityPub interactions (Follows, Likes, Boosts).
+- **Integrated Contact Sync**: Finalized the Connected Accounts UI and Next.js API proxy for Google, Microsoft, and Facebook contact synchronization.
+
+### Fixed
+- **API Proxies**: Corrected Next.js internal API routes to map accurately to the primary TypeScript backend ports.
+- **Type Safety**: Enforced strict typing in Federation route handlers to satisfy compiler null-checks.
+
+
+### Added
+- **Real-Time Execution Metrics**: Integrated real-time success rate and task volume metrics into the Autonomous Monitoring dashboard.
+- **Metric Visualizations**: Added an interactive "Execution Pipeline" bar chart to the monitoring UI, providing visual feedback on Started, Completed, and Failed agent tasks.
+- **System Integrity Tracking**: The monitoring API now calculates system integrity based on historical performance (24h) and detects active agent execution states.
+
+### Fixed
+- **Token Flow Visibility**: Integrated `AutonomousService` into `TokenDistributionService` to log token awards and spend events for real-time monitoring.
+- **Proximity Service Monitoring**: Wired `MatchMakerService` into the autonomous execution protocol to log match bounty creation, candidate suggestions, and wingman rewards.
+- **Logic Resilience**: Hardened monitoring route logic with group-by performance optimizations and comprehensive error handling.
+- **Stability**: Verified all logic-level tests pass (Auth, Federation, Monitoring).
+
+## [2.0.20] - 2026-05-23
+
+### Added
+- **Real-Time Action Logging**: Integrated `AutonomousService` into `FederationService.ts` to log outbound ActivityPub broadcast tasks. The system now records 'Started' and 'Completed' states for federation events.
+- **Enhanced Monitoring UX**: Added descriptive tooltips to the Autonomous Monitoring dashboard adjustment switches, clarifying the impact of behavioral toggles like 'Strict Mode' and 'Subagent Delegation'.
+
+### Fixed
+- **Service Patterns**: Standardized the use of `AutonomousService` for system-level logging across backend services.
+
+## [2.0.19] - 2026-05-23
+
+### Fixed
+- **Monitoring Logic Verification**: Refactored monitoring route handlers for isolated testability and added a logic-level test suite (`MonitoringLogic.test.ts`) to verify authorization and adjustment persistence without triggering app initialization timeouts.
+- **Submodule Documentation**: Updated the submodule dashboard to reflect the current TypeScript architecture and autonomous protocol hooks.
+
+## [2.0.18] - 2026-05-23
+
+### Added
+- **Autonomous Monitoring Dashboard**: Integrated a real-time monitor for the autonomous execution protocol, allowing moderators to track AI agent actions and fine-tune automated adjustment settings.
+- **Monitoring API**: Added backend endpoints for tracking autonomous protocol status and managing adjustments, backed by new `autonomous_actions` and `autonomous_settings` tables.
+- **UI Integration**: Added "Autonomous Monitor" to the Moderation Dashboard and main Dashboard for privileged users.
+
+### Fixed
+- **Security Hardening**: Secured the contact synchronization OAuth flow by implementing a signed JWT `state` parameter, preventing unauthorized account linking.
+- **System Stability**: Verified full system builds and introduced regression tests for the monitoring infrastructure.
+
+## [2.0.17] - 2026-05-23
+
+### Fixed
+- **Repository Synchronization**: Executed a dual-direction intelligent merge, synchronizing 'main' with active feature branches and resolving conflicts in core documentation and configuration.
+- **Hygiene**: Updated '.gitignore' to exclude '.jules/' and other AI session metadata.
+
+## [2.0.16] - 2026-05-23
+
+### Added
+- **Unified Activity Center**: Implemented a central ActivityPub activity aggregator endpoint in the backend and rewired the frontend Activity Center to use it.
+- **Enhanced Inbox Processing**: Added support for 'Like' and 'Announce' (Boost) activities in the 'FederationService', including automated detection of interactions with local outbox content.
+- **Activity Types**: Frontend now supports and badges 'Like' and 'Boost' activities alongside 'Follow' and 'Create'.
+
+## [2.0.15] - 2026-05-22
+
+### Added
+- **Federation Automation**: New proximity artifacts are now automatically broadcast to the Fediverse if federation is enabled for the user.
+- **Handshake Completion**: Implemented outbound signed 'Accept' activities to complete the follow handshake with remote servers.
+- **Inbox Processing**: Connected the '/inbox' endpoint to the 'FederationService' processing logic.
+
+## [2.0.14] - 2026-05-22
+
+### Added
+- **Auth Hardening**: Integrated centralized 'AuthService' with dedicated unit tests.
+- **Contact Sync**: Integrated 'ContactSyncService' and OAuth routes for Google, Microsoft, and Facebook contact synchronization.
+- **Integration UI**: Added "Connected Accounts" and "Synced Contacts" pages to the frontend.
+
+### Fixed
+- **Build Stabilization**: Resolved TypeScript and Webpack errors in newly integrated components; added missing 'Tooltip' UI component.
+- **Prisma Schema**: Synchronized 'UserIntegration' and 'SyncedContact' models into the master schema.
+- **Security**: Fixed critical OAuth callback vulnerability by implementing a JWT-signed 'state' parameter to preserve 'userId'.
+
 ## [2.0.13] - 2026-05-21
 
 ### Added
-- **Performance Analytics**: Hooked up the `/api/analytics/slow-requests` routes to `fwber-backend-ts` to enable live APM signals and performance monitoring insights.
+- **Performance Analytics**: Hooked up the '/api/analytics/slow-requests' routes to 'fwber-backend-ts' to enable live APM signals and performance monitoring insights.
 
 ## [2.0.12] - 2026-05-21
 
 ### Added
-- **Referral Polish**: Hooked up the `/api/referrals/summary` endpoint to properly return `vouch_link`, `referral_link`, and calculate `levels` based on `token_balance` and real cash values to support the frontend's referral modal.
+- **Referral Polish**: Hooked up the '/api/referrals/summary' endpoint to properly return 'vouch_link', 'referral_link', and calculate 'levels' based on 'token_balance' and real cash values to support the frontend's referral modal.
 
 ## [2.0.11] - 2026-05-20
 
 ### Added
-- **ActivityPub Models**: Added `federation_follows`, `federation_inbox`, and `federation_outbox` Prisma models. Added `public_key` and `private_key` to `users`.
-- **WebFinger**: Added `/.well-known/webfinger` route to correctly resolve external actor handles.
-- **ActivityPub Endpoints**: Wired `/api/federation/actors/:id`, `/api/federation/users/:id/inbox`, and `/api/federation/users/:userId/outbox` endpoints in `routes/federation.ts`.
-
-## [2.0.11] - 2026-05-20
-
-### Added
-- **ActivityPub Models**: Added `federation_follows`, `federation_inbox`, and `federation_outbox` Prisma models. Added `public_key` and `private_key` to `users`.
-- **WebFinger**: Added `/.well-known/webfinger` route to correctly resolve external actor handles.
-- **ActivityPub Endpoints**: Wired `/api/federation/actors/:id`, `/api/federation/users/:id/inbox`, and `/api/federation/users/:userId/outbox` endpoints in `routes/federation.ts`.
+- **ActivityPub Models**: Added 'federation_follows', 'federation_inbox', and 'federation_outbox' Prisma models. Added 'public_key' and 'private_key' to 'users'.
+- **WebFinger**: Added '/.well-known/webfinger' route to correctly resolve external actor handles.
+- **ActivityPub Endpoints**: Wired '/api/federation/actors/:id', '/api/federation/users/:id/inbox', and '/api/federation/users/:userId/outbox' endpoints in 'routes/federation.ts'.
 
 All notable changes to this project will be documented in this file.
 

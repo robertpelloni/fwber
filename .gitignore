@@ -96,5 +96,5 @@ temp_build/
 metamcp.db
 metamcp.db*
 
-# Jules AI session logs (auto-generated, not needed in repo)
-.jules/sessions/
+# AI Agent session logs and metadata
+.jules/
