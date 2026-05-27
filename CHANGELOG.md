@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.2] - 2026-05-24
+
+### Added
+- **Autonomous Decision Engine**: Implemented `AutonomousDecisionEngine` to evaluate proposed actions against system health and protocol settings.
+- **Heuristic Safety**: The engine automatically denies medium/high impact actions if protocol consistency is low, or delegates them if strict mode is enabled.
+
 ## [2.0.29] - 2026-05-24
 
 ### Changed

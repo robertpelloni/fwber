@@ -1,6 +1,7 @@
 import { Router, type Response } from 'express';
 import { authenticate, type AuthRequest } from '../middleware/auth.js';
 import prisma, { serialize } from '../lib/prisma.js';
+import { ProtocolVerificationService } from '../services/ProtocolVerificationService.js';
 
 const router = Router();
 
@@ -116,10 +117,28 @@ export const updateAdjustment = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * GET /api/monitoring/verify
+ */
+export const verifyProtocol = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user?.is_moderator) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const result = await ProtocolVerificationService.verifyProtocol();
+    res.json(result);
+  } catch (error: any) {
+    console.error('[Monitoring] Verify error:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 // All routes require authentication
 router.use(authenticate);
 
 router.get('/autonomous', getAutonomousStatus);
+router.get('/verify', verifyProtocol);
 router.post('/adjust', updateAdjustment);
 
 export default router;
