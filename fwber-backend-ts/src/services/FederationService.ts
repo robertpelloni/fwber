@@ -111,7 +111,7 @@ export class FederationService {
               const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
               const actorName = actorRes.data.preferredUsername || 'Someone';
               const actorDomain = new URL(actorUri).hostname;
-              const meta = outboxItem.activity_payload as any;
+              const meta = outboxItem.payload as any;
               const objectTitle = meta?.object?.content || 'your post';
 
               await ActivityNotificationService.notifyLike(targetUserId, actorName, actorDomain, objectTitle);
@@ -138,7 +138,7 @@ export class FederationService {
               const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
               const actorName = actorRes.data.preferredUsername || 'Someone';
               const actorDomain = new URL(actorUri).hostname;
-              const meta = outboxItem.activity_payload as any;
+              const meta = outboxItem.payload as any;
               const objectTitle = meta?.object?.content || 'your post';
 
               await ActivityNotificationService.notifyBoost(targetUserId, actorName, actorDomain, objectTitle);

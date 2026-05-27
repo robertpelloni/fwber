@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.29] - 2026-05-24
+
+### Changed
+- **Repository Synchronization**: Executed an intensive repository refresh, synchronized submodules, and reconciled all active feature branches into `main`.
+- **Submodule Sanitization**: Updated all recursive submodules to latest tracking commits and verified workspace hygiene.
+
 ## [2.0.28] - 2026-05-24
 
 ### Added
