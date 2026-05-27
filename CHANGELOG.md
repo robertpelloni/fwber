@@ -1,13 +1,5 @@
 # Changelog
 
-## [2.1.0] - 2026-05-24
-
-### Added
-- **Production Release**: Finalized monorepo consolidation and service instrumentation for public pilot deployment.
-- **Environment Hardening**: Added comprehensive `.env.example` templates and audited all core backend services (Auth, Matching, Messaging, Federation).
-- **Stability Heartbeat**: Fully verified the `MaintenanceService` autonomous self-correction loop.
-- **Real-Time Federation**: Verified real-time ActivityPub notifications (Follow, Like, Boost) with interactive UI toasts.
-
 ## [2.0.29] - 2026-05-24
 
 ### Changed
