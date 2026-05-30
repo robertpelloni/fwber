@@ -17,12 +17,11 @@ git checkout -- . 2>/dev/null || true
 git fetch origin main
 git reset --hard origin/main
 
-cd \"$BACKEND_DIR\"
+cd "$BACKEND_DIR"
 npm install --include=dev
 npx prisma generate
-npx prisma migrate deploy || echo \"⚠️ Migration failed, proceed with build...\"
+npx prisma migrate deploy || echo "⚠️ Migration failed, proceed with build..."
 npm run build
-
 
 # Restart service via PM2
 if command -v pm2 &> /dev/null; then
