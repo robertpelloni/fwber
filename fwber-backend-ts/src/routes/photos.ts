@@ -111,8 +111,6 @@ router.get('/', authenticate, async (req: any, res: Response) => {
 
 // POST /api/photos — Upload a photo
 router.post('/', authenticate, (req: any, _res, next) => {
-  console.log('[photos] POST headers:', JSON.stringify(req.headers['content-type']));
-  console.log('[photos] POST body type:', typeof req.body, req.body ? Object.keys(req.body) : 'null');
   next();
 }, upload.single('photo'), async (req: any, res: Response) => {
   try {
@@ -204,8 +202,7 @@ router.post('/', authenticate, (req: any, _res, next) => {
   }
 });
 
-// PUT /api/photos/:id — Update a photo
-// PUT /api/photos/reorder — alias for POST
+// PUT /api/photos/reorder — Reorder photos
 router.put('/reorder', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
@@ -231,8 +228,12 @@ router.put('/reorder', authenticate, async (req: any, res: Response) => {
   }
 });
 
-router.put('/:id(\\d+)', authenticate, async (req: any, res: Response) => {
+// PUT /api/photos/:id — Update a photo
+router.put('/:id', authenticate, async (req: any, res: Response, next: any) => {
   try {
+    if (req.params.id === 'reorder' || isNaN(Number(req.params.id))) {
+      return next();
+    }
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
 
@@ -277,8 +278,9 @@ router.put('/:id(\\d+)', authenticate, async (req: any, res: Response) => {
 });
 
 // DELETE /api/photos/:id — Delete a photo
-router.delete('/:id(\\d+)', authenticate, async (req: any, res: Response) => {
+router.delete('/:id', authenticate, async (req: any, res: Response, next: any) => {
   try {
+    if (isNaN(Number(req.params.id))) return next();
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
 
@@ -353,8 +355,9 @@ router.post('/reorder', authenticate, async (req: any, res: Response) => {
 });
 
 // POST /api/photos/:id/set-primary — Set as primary photo
-router.post('/:id(\\d+)/set-primary', authenticate, async (req: any, res: Response) => {
+router.post('/:id/set-primary', authenticate, async (req: any, res: Response, next: any) => {
   try {
+    if (isNaN(Number(req.params.id))) return next();
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
 
@@ -414,18 +417,21 @@ router.get('/settings', authenticate, async (_req: any, res: Response) => {
 });
 
 // POST /api/photos/:id/reveal — Request photo reveal
-router.post('/:id(\\d+)/reveal', authenticate, async (req: any, res: Response) => {
+router.post('/:id/reveal', authenticate, async (req: any, res: Response, next: any) => {
+  if (isNaN(Number(req.params.id))) return next();
   res.json({ success: true, status: 'requested' });
 });
 
 // POST /api/photos/:id/unlock — Unlock a private photo
-router.post('/:id(\\d+)/unlock', authenticate, async (req: any, res: Response) => {
+router.post('/:id/unlock', authenticate, async (req: any, res: Response, next: any) => {
+  if (isNaN(Number(req.params.id))) return next();
   res.json({ success: true, message: 'Unlocked', balance: 0 });
 });
 
 // GET /api/photos/:id/original — Get original photo
-router.get('/:id(\\d+)/original', authenticate, async (req: any, res: Response) => {
+router.get('/:id/original', authenticate, async (req: any, res: Response, next: any) => {
   try {
+    if (isNaN(Number(req.params.id))) return next();
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
     const photo = await prisma.photos.findFirst({ where: { id: photoId } });
@@ -448,8 +454,5 @@ router.get('/:id(\\d+)/original', authenticate, async (req: any, res: Response) 
 router.get('/reveals', authenticate, async (_req: any, res: Response) => {
   res.json({ success: true, data: [], count: 0 });
 });
-
-
-
 
 export default router;
