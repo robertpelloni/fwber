@@ -25,6 +25,9 @@ export default function IntegrationsPage() {
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
         window.location.href = `${backendUrl}/integrations/contacts/auth/${provider}`;
 
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+        window.location.href = `${apiUrl}/integrations/contacts/auth/${provider}`;
+
         // Timeout just to reset UI state if the redirect fails or is blocked
         setTimeout(() => setConnecting(null), 5000);
     };

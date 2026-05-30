@@ -148,6 +148,8 @@ class AnalyticsController extends Controller
             ->orderByDesc('count')
             ->limit(5)
             ->get()
+            ->map(function (Feedback $item) {
+
             ->map(function ($item) {
                 return [
                     'category' => $item->category,

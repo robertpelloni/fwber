@@ -445,6 +445,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const API_BASE_URL = typeof window !== 'undefined'
     ? BROWSER_API_BASE_URL
     : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api')
+  // API base URL - Ensure relative /api in browser for proxying
+  const API_BASE_URL = typeof window !== 'undefined' 
+    ? '/api' 
+    : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 
   // Login function
   const login = useCallback(async (email: string, password: string) => {

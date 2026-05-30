@@ -27,6 +27,8 @@ jest.unstable_mockModule('../src/lib/prisma.js', () => ({
       deleteMany: jest.fn(),
     },
     $disconnect: jest.fn()
+
+     $disconnect: jest.fn() }, serialize: (obj: any) => obj, sanitizeUser: (obj: any) => obj,
   }
 }));
 

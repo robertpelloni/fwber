@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth-context';
 
+import { api } from '../api/client';
+
 export interface Boost {
   id: number;
   user_id: number;
@@ -25,7 +27,10 @@ export function useActiveBoost() {
       try {
         const response = await api.get<ActiveBoostResponse>('/boosts/active');
         return response.data;
+
+        return await api.get<Boost>('/boosts/active');
       } catch (error: any) {
+        if (error.status === 404) {
         if (error.response?.status === 404) {
           return null;
         }
@@ -45,6 +50,10 @@ export function useBoostHistory() {
     queryKey: ['boost-history'],
     enabled: isAuthenticated && !!token,
     queryFn: () => api.get<Boost[]>('/boosts/history'),
+
+    queryFn: async () => {
+      return await api.get<Boost[]>('/boosts/history');
+    },
   });
 }
 

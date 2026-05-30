@@ -8,8 +8,9 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import emailRoutes from './routes/email.js';
-import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync.js';
-import contactsIntegrationRoutes from './routes/contacts-integration.js';
+import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync';
+import contactsIntegrationRoutes from './routes/contacts-integration';
+
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
 import dashboardRoutes from './routes/dashboard.js';
@@ -70,6 +71,8 @@ import messagesRoutes from './routes/messages.js';
 import federationRoutes from './routes/federation.js';
 import monitoringRoutes from './routes/monitoring.js';
 import paymentsRoutes from './routes/payments.js';
+import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync.js';
+import contactsIntegrationRoutes from './routes/contacts-integration.js';
 import shareUnlocksRoutes from './routes/share-unlocks.js';
 import viralContentRoutes from './routes/viral-content.js';
 import configRoutes from './routes/config.js';
@@ -129,6 +132,7 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 app.use('/api/auth', authRoutes);
 app.use('/api/integrations/contacts/data', contactsIntegrationSyncRoutes);
 app.use('/api/integrations/contacts', contactsIntegrationRoutes);
+
 app.use('/api/email', emailRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -196,6 +200,8 @@ app.use('/api/messages', messagesRoutes);
 app.use('/api/federation', federationRoutes);
 app.use('/api/monitoring', monitoringRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/integrations/contacts/data', contactsIntegrationSyncRoutes);
+app.use('/api/integrations/contacts', contactsIntegrationRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/ice-breakers', iceBreakersRoutes);
 app.use('/api/settings', settingsRoutes);
@@ -269,3 +275,23 @@ const server = httpServer.listen(port, () => {
 
 (app as any).close = () => server.close();
 export default app;
+
+let server: any;
+if (process.env.NODE_ENV !== 'test') {
+  server = httpServer.listen(port, () => {
+}
+
+(app as any).close = () => {
+  if (server) server.close();
+};
+
+// Autonomous Protocol Heartbeat (Periodic System Integrity Check)
+import { MaintenanceService } from './services/MaintenanceService.js';
+  setInterval(async () => {
+    try {
+      await MaintenanceService.performMaintenance();
+    } catch (err) {
+      // Silent fail for heartbeat
+    }
+  }, 300000); // Every 5 minutes
+}

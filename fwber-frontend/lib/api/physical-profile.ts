@@ -1,5 +1,9 @@
 import { apiClient } from './client';
 
+import axios from 'axios';
+
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 export type PhysicalProfile = {
   height_cm?: number | null;
   body_type?: string;

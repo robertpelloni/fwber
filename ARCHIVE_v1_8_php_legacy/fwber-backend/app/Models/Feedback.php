@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $is_analyzed
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $count
+
  * @property-read \App\Models\User|null $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Feedback newModelQuery()

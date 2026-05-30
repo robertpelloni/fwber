@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import type { geo_spoof_detections } from '@prisma/client';
+import { AutonomousService } from './AutonomousService.js';
 
 export interface IpIntelligenceData {
   latitude: number;
@@ -105,6 +106,8 @@ export class GeoSpoofDetectionService {
 
     if (suspicionScore >= 25) {
       return await prisma.geo_spoof_detections.create({
+
+      const detection = await prisma.geo_spoof_detections.create({
         data: {
           user_id: userId,
           ip_address: ipAddress,
@@ -120,6 +123,14 @@ export class GeoSpoofDetectionService {
           detected_at: new Date()
         }
       });
+      await AutonomousService.logAction('Geo-Spoof Detected', 'Completed', {
+        userId,
+        suspicionScore,
+        flags: detectionFlags,
+        velocityKmh
+      });
+
+      return detection;
     }
 
     return null;

@@ -5,6 +5,11 @@
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the product simplification. The repository is now intentionally centered on the privacy-first local matching loop rather than federation, tokenomics, governance, or marketplace systems.
 
+> **Generated on:** 2026-05-23
+> **Current Global Version:** 2.0.21
+
+This dashboard lists the active logical packages inside the `fwber` monorepo after the TypeScript migration and repository unification.
+
 ## 🗂️ Project Directory Structure
 
 ```text
@@ -19,6 +24,12 @@ fwber/
 ├── _archive/                  # Retired systems preserved for reference, not active product scope
 ├── submodules/                # Reserved location for external submodules (currently unused)
 └── .github/workflows/         # CI/CD automation for backend tests, frontend builds, and mobile release flows
+
+├── fwber-backend-ts/          # Node.js/Express API for auth, onboarding, matching, messaging, safety, federation
+├── fwber-frontend/            # Next.js app-router web client for discovery, chat, profile, federation monitor
+├── mobile/                    # Expo / React Native shell wrapping the web experience
+├── ARCHIVE_v1_8_php_legacy/   # Retired PHP systems preserved for reference
+└── .github/workflows/         # CI/CD automation
 ```
 
 ## 📦 Active Logical Packages
@@ -30,7 +41,6 @@ fwber/
 - **Key stack:** Laravel 12, Sanctum, PHPUnit.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `1.8.27`
 - **Role:** Main user-facing product surface.
 - **Owns:** app shell, discovery feed, messages, profile editing, security settings, recovery prompts.
 - **Key stack:** Next.js app router, React, Tailwind CSS.
@@ -46,7 +56,6 @@ fwber/
 - **Notes:** frontend includes graceful fallbacks when WASM tooling or artifacts are unavailable.
 
 ### 5. `mobile`
-- **Version:** inherits global `1.8.27`
 - **Role:** Native mobile shell for push notifications, secure token storage, NFC, and background location.
 - **Key stack:** Expo, React Native WebView, expo-notifications, expo-location.
 
@@ -86,3 +95,23 @@ fwber/
 - Merchant moderation and trust scoring are active again through restored moderation routes, trust-weighted ranking, and moderation dashboard merchant review tooling.
 - Merchant review prioritization is active through queue priority scoring, search, and inline note workflows.
 - Archived systems remain preserved under `_archive/` and should not be treated as active dependencies unless explicitly restored.
+
+### 1. `fwber-backend-ts`
+- **Version:** inherits global `2.0.21`
+- **Role:** Primary API and real-time engine (Socket.io).
+- **Owns:** auth, onboarding, federation, monitoring, matching, messaging.
+- \*\*Key stack:\*\* Node.js 22, Express, Prisma, TypeScript.
+
+- **Owns:** app shell, discovery, activity center, autonomous monitor.
+- \*\*Key stack:\*\* Next.js 15, React 19, Tailwind CSS.
+
+- **Role:** High-speed geospatial indexing (H3).
+
+## 🔄 Autonomous Execution Protocol (ACTIVE)
+The monorepo now features an integrated autonomous execution protocol with real-time monitoring:
+- **Backend API**: `/api/monitoring/autonomous`
+- **Admin UI**: `/admin/monitoring`
+- **Metrics**: Real-time success rate, task volume, and integrity tracking.
+- **Tracking**: Persistent action logging in `autonomous_actions`.
+- **Adjustments**: Persistent behavioral toggles in `autonomous_settings`.
+

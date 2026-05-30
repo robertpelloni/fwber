@@ -10,6 +10,10 @@ import { apiClient } from './client';
 
 /* ── Types ──────────────────────────────────────────────────────────── */
 
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
+/* ── Legacy Types & Functions (Restored for Build Compatibility) ──────────────── */
+
 export interface BlockResponse {
   data: {
     id: number;

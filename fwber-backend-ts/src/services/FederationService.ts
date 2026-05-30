@@ -1,6 +1,8 @@
 import prisma from '../lib/prisma.js';
 import axios from 'axios';
 import crypto from 'crypto';
+import { AutonomousService } from './AutonomousService.js';
+import { ActivityNotificationService } from './ActivityNotificationService.js';
 
 export class FederationService {
   /**
@@ -23,6 +25,7 @@ export class FederationService {
 
       // 1. Fetch remote actor public key
       // SSRF Mitigation: Ensure URL is valid and not pointing to localhost/internal IPs
+
       const url = new URL(parts.keyId);
       if (['localhost', '127.0.0.1'].includes(url.hostname) || url.hostname.startsWith('10.') || url.hostname.startsWith('192.168.')) {
         console.warn(`[Federation] Blocked SSRF attempt: ${parts.keyId}`);
@@ -93,6 +96,7 @@ export class FederationService {
   private async handleCreate(activity: any, targetUserId: bigint) {
     console.log(`[Federation] Received Create activity for user ${targetUserId}`);
     // Future: Check if it's a reply to a local post or a mention
+
   }
 
   private async handleLike(activity: any, targetUserId: bigint) {
@@ -102,6 +106,7 @@ export class FederationService {
     console.log(`[Federation] ${actorUri} liked ${objectUri} for user ${targetUserId}`);
 
     // If the object is a local outbox item, we can track it
+
     if (objectUri.includes('api.fwber.me')) {
         const outboxItem = await prisma.federation_outbox.findUnique({
             where: { activity_id: objectUri }
@@ -110,6 +115,18 @@ export class FederationService {
         if (outboxItem) {
             console.log(`[Federation] Local object ${outboxItem.id} was liked by remote actor.`);
             // In the future: Increment a like counter or create a notification
+
+            try {
+              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const actorName = actorRes.data.preferredUsername || 'Someone';
+              const actorDomain = new URL(actorUri).hostname;
+              const meta = outboxItem.payload as any;
+              const objectTitle = meta?.object?.content || 'your post';
+
+              await ActivityNotificationService.notifyLike(targetUserId, actorName, actorDomain, objectTitle);
+            } catch (err) {
+              await ActivityNotificationService.notifyLike(targetUserId, 'Someone', 'remote', 'your post');
+            }
         }
     }
   }
@@ -127,6 +144,18 @@ export class FederationService {
 
         if (outboxItem) {
             console.log(`[Federation] Local object ${outboxItem.id} was boosted by remote actor.`);
+
+            try {
+              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const actorName = actorRes.data.preferredUsername || 'Someone';
+              const actorDomain = new URL(actorUri).hostname;
+              const meta = outboxItem.payload as any;
+              const objectTitle = meta?.object?.content || 'your post';
+
+              await ActivityNotificationService.notifyBoost(targetUserId, actorName, actorDomain, objectTitle);
+            } catch (err) {
+              await ActivityNotificationService.notifyBoost(targetUserId, 'Someone', 'remote', 'your post');
+            }
         }
     }
   }
@@ -144,6 +173,7 @@ export class FederationService {
         });
 
         // Find or create remote user record
+
         let remoteUser = await prisma.users.findUnique({
             where: { actor_uri: actorUri }
         });
@@ -175,6 +205,8 @@ export class FederationService {
         }
 
       await (prisma as any).federation_follows.create({
+
+      await prisma.federation_follows.create({
         data: {
           actor_uri: actorUri,
           target_uri: targetUri,
@@ -184,6 +216,10 @@ export class FederationService {
       console.log(`[Federation] Auto-accepted follow request from ${actorUri}`);
 
       // Send Accept activity back
+
+      const actorDomain = new URL(actorUri).hostname;
+      await ActivityNotificationService.notifyFollow(targetUserId, remoteUser.name, actorDomain);
+
       if (user?.private_key) {
           const acceptActivity = {
               '@context': 'https://www.w3.org/ns/activitystreams',
@@ -203,6 +239,9 @@ export class FederationService {
           } catch (err: any) {
               console.error(`[Federation] Failed to send Accept to ${actorUri}:`, err.message);
           }
+
+              }
+          } catch (err: any) {}
       }
     } catch (e) {
       console.error('[Federation] Error recording follow:', e);
@@ -212,7 +251,6 @@ export class FederationService {
   private async handleUndoFollow(activity: any, targetUserId: bigint) {
     const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
     const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
-
     console.log(`[Federation] ${actorUri} unfollowed local user ${targetUserId}`);
 
     try {
@@ -225,12 +263,15 @@ export class FederationService {
     } catch (err) {
         console.error('[Federation] Error undoing follow:', err);
     }
+
+        await prisma.federation_follows.deleteMany({
+            where: { actor_uri: actorUri, target_uri: targetUri }
+    } catch (err) {}
   }
 
   private async handleAccept(activity: any, targetUserId: bigint) {
     const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
     const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
-
     console.log(`[Federation] Follow request accepted by remote actor ${actorUri}.`);
 
     try {
@@ -249,6 +290,12 @@ export class FederationService {
   /**
    * Sync an internal action to the external Fediverse
    */
+
+        await prisma.federation_follows.updateMany({
+            where: { actor_uri: targetUri, target_uri: actorUri },
+    } catch (err) {}
+  }
+
   async broadcastUpdate(userId: bigint, objectPayload: any) {
     const user = await prisma.users.findUnique({
       where: { id: userId },
@@ -262,6 +309,10 @@ export class FederationService {
 
     const actorUri = `https://api.fwber.me/api/federation/actors/${userId}`;
     const followers = await (prisma as any).federation_follows.findMany({
+
+    if (!user || !user.private_key) return;
+
+    const followers = await prisma.federation_follows.findMany({
         where: { target_uri: actorUri, status: 'accepted' }
     });
 
@@ -277,6 +328,10 @@ export class FederationService {
 
     console.log(`[Federation] Broadcasting to ${followers.length} followers for user ${userId}.`);
 
+    const taskLabel = `ActivityPub Broadcast (User ${userId})`;
+    await AutonomousService.logAction(taskLabel, 'Started', { follower_count: followers.length, object_type: objectPayload.type });
+
+    let successCount = 0;
     for (const follower of followers) {
         try {
             const actorRes = await axios.get(follower.actor_uri, { headers: { Accept: 'application/activity+json' }});
@@ -289,6 +344,16 @@ export class FederationService {
             console.error(`[Federation] Failed to deliver to ${follower.actor_uri}:`, err.message);
         }
     }
+
+                successCount++;
+            }
+        } catch (err: any) {}
+    }
+
+    await AutonomousService.logAction(taskLabel, 'Completed', {
+        success_count: successCount,
+        total_count: followers.length
+    });
   }
 
   private async sendSignedRequest(inboxUrl: string, activity: any, privateKey: string, actorUri: string) {

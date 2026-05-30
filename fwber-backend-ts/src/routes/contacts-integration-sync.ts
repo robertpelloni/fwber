@@ -13,6 +13,9 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const integrations = await (prisma as any).userIntegration.findMany({
             where: { userId: BigInt(req.user.id) },
+
+        const integrations = await prisma.userIntegration.findMany({
+            where: { userId: BigInt(req.user!.id) },
             include: { syncedContacts: true }
         });
 
@@ -36,6 +39,9 @@ router.post('/sync', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const integrations = await (prisma as any).userIntegration.findMany({
             where: { userId: BigInt(req.user.id) }
+
+        const integrations = await prisma.userIntegration.findMany({
+            where: { userId: BigInt(req.user!.id) }
         });
 
         for (const integration of integrations) {

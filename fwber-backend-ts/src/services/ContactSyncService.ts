@@ -4,6 +4,8 @@ import axios from 'axios';
 export class ContactSyncService {
     static async syncAllActiveIntegrations() {
         const integrations = await (prisma as any).userIntegration.findMany({
+
+        const integrations = await prisma.userIntegration.findMany({
             where: {
                 tokenExpiresAt: {
                     gt: new Date()
@@ -22,6 +24,8 @@ export class ContactSyncService {
 
     static async syncContactsForIntegration(integrationId: string) {
         const integration = await (prisma as any).userIntegration.findUnique({
+
+        const integration = await prisma.userIntegration.findUnique({
             where: { id: integrationId }
         });
 
@@ -115,6 +119,8 @@ export class ContactSyncService {
             }
 
             await (prisma as any).syncedContact.create({
+
+            await prisma.syncedContact.create({
                 data: {
                     userIntegrationId: integrationId,
                     firstName,
@@ -122,6 +128,8 @@ export class ContactSyncService {
                     emails: emails as any,
                     phones: phones as any,
                     rawProviderData: raw
+
+                    rawProviderData: raw as any
                 }
             });
         }

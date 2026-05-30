@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import prisma from '../lib/prisma.js';
+
+import prisma, { serialize, sanitizeUser } from '../lib/prisma.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email.js';
 import { createVerificationToken } from '../lib/verification-store.js';
 
@@ -37,16 +39,12 @@ export class AuthService {
   ];
 
   sanitizeUser(obj: any): any {
-    if (obj === null || obj === undefined) return obj;
     if (Array.isArray(obj)) return obj.map((v: any) => this.sanitizeUser(v));
     if (typeof obj !== 'object' || obj instanceof Date) return obj;
 
-    const out: any = {};
-    for (const key of Object.keys(obj)) {
       if (this.SENSITIVE_FIELDS.includes(key)) continue;
       out[key] = this.sanitizeUser(obj[key]);
     }
-    return out;
   }
 
   async hydrateUser(user: any) {
@@ -55,6 +53,8 @@ export class AuthService {
     });
 
     return this.sanitizeUser(this.serialize({
+
+    return sanitizeUser(serialize({
       ...user,
       referrals_count: referralsCount,
       vouches_count: 0,

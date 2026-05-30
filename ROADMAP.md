@@ -1,6 +1,8 @@
 # ROADMAP.md — fwber Project Trajectory
 
 > **Current Version:** 2.0.16 "ActivityPub Hardened"
+
+> **Current Version:** 2.0.20 "Real-Time Tracking"
 > **Last Updated:** 2026-05-23
 
 ---
@@ -154,3 +156,16 @@ Explicitly still excluded from restoration:
 2. **Performance Monitoring Pass:** Systematically optimize API latency across newly restored hub routes using live APM signals. ✅
 3. **Mobile Store Prep:** Verify all native Expo capabilities (NFC, Push) against final iOS/Android store guidelines for distribution.
 4. **Fediverse Interop Testing:** Verify end-to-end handle discovery and activity delivery with external servers (Mastodon/Pleroma).
+
+### The Autonomous System Hardening (COMPLETED - v2.0.23)
+The autonomous system now features real-time action logging and an enhanced management interface.
+
+**Hardening Highlights:**
+- **ActivityPub Integration**: Federation broadcast tasks are now monitored in real-time by the autonomous execution engine.
+- **UX Refinement**: Descriptive tooltips in the Admin UI improve operator understanding of automated adjustment impacts.
+- **Infrastructure**: `AutonomousService` provides a standardized utility for logging system tasks and checking adjustment state.
+
+### The Autonomous System Integration (COMPLETED - v2.0.18/v2.0.19)
+Integrated the autonomous execution protocol into the main system with real-time monitoring and logic-level verification.
+
+[... Rest of file ...]

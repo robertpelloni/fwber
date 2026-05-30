@@ -5,6 +5,8 @@ import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedT
 import dynamic from 'next/dynamic';
 import { useWallet as useInternalWallet } from '@/lib/hooks/useWallet';
 import { useState } from 'react';
+import { api } from '@/lib/api/client';
+
 import { apiClient } from '@/lib/api/client';
 import { Loader2, ArrowDownCircle, ArrowUpCircle, Send, Key, Copy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -35,6 +37,8 @@ export default function WalletDashboard() {
         if (!publicKey || !withdrawAmount) return;
         setLoading(true);
         try {
+            await api.post('/wallet/withdraw', {
+
             await apiClient.post('/wallet/withdraw', {
                 amount: parseFloat(withdrawAmount),
                 destination_address: publicKey.toBase58()
@@ -43,6 +47,8 @@ export default function WalletDashboard() {
             setWithdrawAmount('');
             alert('Withdrawal successful! Check your wallet.');
         } catch (e: any) {
+            alert('Withdrawal failed: ' + (e.error || e.message));
+
             alert('Withdrawal failed: ' + (e.response?.data?.error || e.message));
         } finally {
             setLoading(false);
@@ -68,6 +74,8 @@ export default function WalletDashboard() {
             const confirmation = await connection.confirmTransaction(signature, 'confirmed');
             if (confirmation.value.err) throw new Error('Transaction failed on-chain');
 
+            await api.post('/wallet/deposit', {
+
             await apiClient.post('/wallet/deposit', {
                 amount: parseFloat(depositAmount),
                 signature: signature
@@ -87,6 +95,9 @@ export default function WalletDashboard() {
 
     const generateMerchantKeys = async () => {
         try {
+            const res = await api.post<{ merchant_secret: string }>('/merchant/keys');
+            setMerchantKeys(res);
+
             const res = await apiClient.post('/merchant/keys');
             setMerchantKeys(res.data as { merchant_secret: string });
         } catch (e: any) {

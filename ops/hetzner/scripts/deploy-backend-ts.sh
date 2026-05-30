@@ -18,9 +18,9 @@ git fetch origin main
 git reset --hard origin/main
 
 cd "$BACKEND_DIR"
-npm install --include=dev
+npm install --production
 npx prisma generate
-npx prisma migrate deploy || echo "⚠️ Migration failed, proceed with build..."
+npx prisma migrate deploy
 npm run build
 
 # Restart service via PM2

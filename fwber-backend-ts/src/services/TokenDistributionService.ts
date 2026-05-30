@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { Decimal } from '@prisma/client/runtime/library';
+import { AutonomousService } from './AutonomousService.js';
 
 export class TokenDistributionService {
   private static SIGNUP_BONUS_BASE = 100;
@@ -104,12 +105,15 @@ export class TokenDistributionService {
     });
 
     console.log(`[TokenService] Awarded ${amount} tokens to user ${userId}: ${description}`);
+    // Log to Autonomous Monitor
+    await AutonomousService.logAction('Token Award', 'Completed', { userId, amount, type, description });
   }
 
   async spendTokens(userId: bigint, amount: number, description: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
       const user = await tx.users.findUnique({ where: { id: userId } });
       if (!user || Number(user.token_balance) < amount) {
+        await AutonomousService.logAction('Token Spend', 'Failed', { userId, amount, reason: 'Insufficient balance' });
         throw new Error('Insufficient token balance.');
       }
 
@@ -126,6 +130,7 @@ export class TokenDistributionService {
           description
         }
       });
+      await AutonomousService.logAction('Token Spend', 'Completed', { userId, amount, description });
     });
   }
 }

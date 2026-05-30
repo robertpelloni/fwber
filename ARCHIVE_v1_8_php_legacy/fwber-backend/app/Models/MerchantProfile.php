@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $category
  * @property string|null $address
  * @property string $verification_status
+ * @property float|null $latitude
+ * @property float|null $longitude
+
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Promotion> $promotions

@@ -18,12 +18,18 @@ export default function ApiTestPage() {
       addResult('Testing backend connection...');
       
       // Test 1: Check if backend is reachable
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
+      const apiUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api');
       addResult(`API URL: ${apiUrl}`);
+      
+      // Test 2: Check health by trying to access any endpoint
+      addResult('Testing backend health...');
+      try {
+        const response = await fetch(`${apiUrl}/health/readiness`, {
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
       
       // Test 2: Check CORS by trying to access any endpoint
       addResult('Testing CORS configuration...');
-      try {
         const response = await fetch(`${apiUrl.replace('/api', '')}/up`, {
           headers: {
             'Accept': 'application/json',
@@ -37,20 +43,38 @@ export default function ApiTestPage() {
           addResult(`⚠️ Backend responded with status: ${response.status}`);
         }
       } catch (error) {
+        addResult(`❌ Connection error: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      
+      // Test 3: Try to access tier endpoint (will fail without auth, but should get 401 not 404)
+      addResult('Testing protected API endpoint...');
+      try {
+        const response = await fetch(`${apiUrl}/profile/completeness`, {
+
         addResult(`❌ CORS or connection error: ${error instanceof Error ? error.message : String(error)}`);
         addResult('💡 Make sure Laravel backend is running on port 8000');
         addResult('💡 CORS should allow requests from localhost:3000');
       }
       
-      // Test 3: Try to access tier endpoint (will fail without auth, but should get 401 not 404)
       addResult('Testing tier API endpoint...');
-      try {
         const tierResponse = await fetch(`${apiUrl}/matches/1/tier`, {
           headers: {
             'Accept': 'application/json',
           }
         });
         
+        addResult(`Protected endpoint status: ${response.status}`);
+        
+        if (response.status === 401) {
+          addResult('✅ Protected endpoint exists (401 Unauthorized - auth required)');
+        } else if (response.status === 404) {
+          addResult('❌ Protected endpoint not found (404)');
+        } else {
+          addResult(`ℹ️ Response status: ${response.status}`);
+        }
+      } catch (error) {
+        addResult(`❌ Endpoint test error: ${error instanceof Error ? error.message : String(error)}`);
+
         addResult(`Tier endpoint status: ${tierResponse.status}`);
         
         if (tierResponse.status === 401) {
@@ -60,11 +84,9 @@ export default function ApiTestPage() {
         } else if (tierResponse.status === 500) {
           const errorData = await tierResponse.json();
           addResult(`⚠️ Server error: ${JSON.stringify(errorData)}`);
-        } else {
           const data = await tierResponse.json();
           addResult(`✅ Tier endpoint response: ${JSON.stringify(data).substring(0, 100)}...`);
         }
-      } catch (error) {
         addResult(`❌ Tier endpoint error: ${error instanceof Error ? error.message : String(error)}`);
       }
       

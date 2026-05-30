@@ -6,6 +6,9 @@ import Link from 'next/link'
 import { Shield, Flame, PartyPopper, CheckCircle2, User, ArrowRight, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+// In the browser, ALWAYS use the local Next.js proxy to bypass CORS
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 interface VouchClientProps {
   code: string
 }
@@ -30,6 +33,8 @@ export function VouchClient({ code }: VouchClientProps) {
       const checkCode = async () => {
         try {
           const res: any = await apiClient.get(`/auth/referral/${code}`)
+
+          const res = await axios.get(`${API_BASE_URL}/auth/referral/${code}`)
           if (res.data.valid) {
              setReferrer({
                name: res.data.referrer_name,
@@ -57,6 +62,8 @@ export function VouchClient({ code }: VouchClientProps) {
     e.preventDefault()
     try {
       await apiClient.post(`/public/vouch`, {
+
+      await axios.post(`${API_BASE_URL}/public/vouch`, {
         referral_code: code,
         type: selectedType,
         relationship_type: relationshipType,

@@ -66,7 +66,6 @@ export default function BulletinBoardsPage() {
                     <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-700">No boards nearby</h3>
                     <p className="text-gray-500">There are no active bulletin boards in your immediate vicinity. Be the first to start one!</p>
-                </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {boards.map((board) => (
@@ -77,12 +76,17 @@ export default function BulletinBoardsPage() {
                                 <div className="flex justify-between items-center text-xs text-gray-500">
                                     <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {board.distance} miles</span>
                                     <span>{board.postCount} posts</span>
-                                </div>
                             </CardContent>
-                        </Card>
                     ))}
-                </div>
             )}
-        </div>
     );
+
+import nextDynamic from 'next/dynamic';
+
+const BulletinBoardsPageClient = nextDynamic(
+  () => import('@/components/pages/BulletinBoardsPageClient'),
+  { ssr: false }
+);
+
+  return <BulletinBoardsPageClient />;
 }

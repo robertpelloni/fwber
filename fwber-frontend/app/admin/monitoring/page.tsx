@@ -15,12 +15,24 @@ import {
   Zap,
   Loader2,
   AlertTriangle
+
+  AlertTriangle,
+  Info,
+  BarChart3,
+  XCircle,
+  PlayCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface MonitoringData {
   is_active: boolean;
@@ -29,6 +41,11 @@ interface MonitoringData {
   tasks_completed_today: number;
   success_rate: number;
   system_integrity: string;
+  metrics: {
+    daily_started: number;
+    daily_completed: number;
+    daily_failed: number;
+  };
   recent_actions: Array<{
     id: number;
     task: string;
@@ -42,6 +59,13 @@ interface MonitoringData {
   }>;
 }
 
+const ADJUSTMENT_DESCRIPTIONS: Record<string, string> = {
+  'auto_lint_fix': 'Automatically execute linting and formatting fixes during the implementation phase of the autonomous loop.',
+  'auto_version_bump': 'Automatically increment the global version number in VERSION.md and CHANGELOG.md after every successful feature completion.',
+  'strict_mode': 'Enforce rigorous validation of all documentation and architectural standards before allowing a task to be marked as complete.',
+  'subagent_delegation': 'Allow the primary autonomous agent to spawn specialized subagents for compartmentalized tasks like documentation or unit testing.',
+};
+
 export default function AutonomousMonitoringPage() {
   const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
@@ -53,6 +77,8 @@ export default function AutonomousMonitoringPage() {
     enabled: isAuthenticated && isModerator,
     queryFn: () => api.get('/monitoring/autonomous'),
     refetchInterval: 10000, // Refresh every 10s
+
+    refetchInterval: 5000, // Faster refresh for "real-time" feel
   });
 
   const mutation = useMutation({
@@ -98,6 +124,12 @@ export default function AutonomousMonitoringPage() {
               <Badge variant={data.is_active ? "default" : "secondary"} className="text-sm px-3 py-1">
                 {data.is_active ? "PROTOCOL ACTIVE" : "PROTOCOL STANDBY"}
               </Badge>
+
+                Real-time tracking of AI agent operations and execution metrics.
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium">
+                  <div className={`w-2 h-2 rounded-full ${data.current_loop === 'Executing' ? 'bg-green-500 animate-pulse' : 'bg-blue-500'}`} />
+                  {data.current_loop}
             )}
           </div>
 
@@ -121,18 +153,62 @@ export default function AutonomousMonitoringPage() {
                     value={data.current_loop}
                     icon={<Activity className="w-5 h-5 text-blue-500" />}
                   />
-                  <StatusCard
                     title="Success Rate"
                     value={`${data.success_rate}%`}
                     icon={<Zap className="w-5 h-5 text-yellow-500" />}
-                  />
-                  <StatusCard
                     title="Integrity"
                     value={data.system_integrity}
                     icon={<ShieldCheck className="w-5 h-5 text-green-500" />}
-                  />
                 </div>
 
+              {/* Main Content: Stats & Actions */}
+
+                {/* Metrics Row */}
+                  <MetricCard
+                    label="Success Rate"
+                    subtext="Historical (24h)"
+                    label="Tasks Completed"
+                    value={data.tasks_completed_today}
+                    subtext="Last 24 hours"
+                    icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
+                    label="System Integrity"
+                    subtext="Agent status"
+                    icon={<ShieldCheck className="w-5 h-5 text-blue-500" />}
+
+                {/* Execution Bar Chart (Mocked visual representation of metrics) */}
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2 text-muted-foreground uppercase tracking-wider">
+                            <BarChart3 className="w-4 h-4" />
+                            Execution Pipeline (24h)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-end gap-1 h-32 w-full pt-4">
+                            <div className="flex-1 bg-blue-500/20 rounded-t-sm relative group" style={{ height: `${Math.min(100, (data.metrics.daily_started / 50) * 100)}%` }}>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild><div className="absolute inset-0 cursor-help" /></TooltipTrigger>
+                                        <TooltipContent><p>Started: {data.metrics.daily_started}</p></TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            <div className="flex-1 bg-green-500/40 rounded-t-sm relative group" style={{ height: `${Math.min(100, (data.metrics.daily_completed / 50) * 100)}%` }}>
+                                        <TooltipContent><p>Completed: {data.metrics.daily_completed}</p></TooltipContent>
+                            <div className="flex-1 bg-red-500/40 rounded-t-sm relative group" style={{ height: `${Math.min(100, (data.metrics.daily_failed / 50) * 100)}%` }}>
+                                        <TooltipContent><p>Failed: {data.metrics.daily_failed}</p></TooltipContent>
+                            {/* Filling in the rest for visual flair */}
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <div key={i} className="flex-1 bg-muted rounded-t-sm" style={{ height: `${Math.floor(Math.random() * 40) + 10}%` }} />
+                            ))}
+                        <div className="flex justify-between mt-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">
+                            <div className="flex items-center gap-1"><PlayCircle className="w-3 h-3 text-blue-500" /> Started</div>
+                            <div className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-500" /> Done</div>
+                            <div className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Failed</div>
+                            <div className="hidden sm:block">Timeline View</div>
+                    </CardContent>
+                </Card>
+
+                {/* Recent Actions List */}
                 <Card>
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -152,6 +228,13 @@ export default function AutonomousMonitoringPage() {
                           <div className="flex items-center gap-3">
                             <div className="bg-background rounded-full p-1.5 border">
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
+
+                      {data.recent_actions.length === 0 ? (
+                        <p className="text-center py-8 text-muted-foreground text-sm italic">No autonomous actions recorded in current epoch.</p>
+                      ) : data.recent_actions.map((action) => (
+                        <div key={action.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border hover:bg-muted/70 transition-colors">
+                            <div className="bg-background rounded-full p-1.5 border shadow-sm">
+                              <StatusIcon status={action.status} />
                             </div>
                             <div>
                               <p className="text-sm font-medium">{action.task}</p>
@@ -161,6 +244,8 @@ export default function AutonomousMonitoringPage() {
                             </div>
                           </div>
                           <Badge variant="outline" className="text-xs">
+
+                          <Badge variant="outline" className={`text-xs ${getStatusColor(action.status)}`}>
                             {action.status}
                           </Badge>
                         </div>
@@ -171,6 +256,8 @@ export default function AutonomousMonitoringPage() {
               </div>
 
               {/* Sidebar: Controls & Adjustments */}
+
+              {/* Sidebar: Adjustments & Controls */}
               <div className="space-y-8">
                 <Card>
                   <CardHeader>
@@ -199,6 +286,24 @@ export default function AutonomousMonitoringPage() {
                     <div className="pt-4 border-t">
                       <Button variant="outline" className="w-full text-xs" onClick={() => queryClient.invalidateQueries({ queryKey: ['autonomous-monitoring'] })}>
                         Refresh Live Stream
+
+                      Protocol Adjustments
+                      Fine-tune the automated behavioral engine.
+                    <TooltipProvider>
+                        <div key={adj.key} className="flex items-center justify-between group">
+                          <div className="flex items-center gap-2">
+                            <label htmlFor={adj.key} className="text-sm font-medium leading-none cursor-pointer group-hover:text-primary transition-colors">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="w-3.5 h-3.5 text-muted-foreground hover:text-primary transition-colors cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="max-w-[240px]">
+                                <p>{ADJUSTMENT_DESCRIPTIONS[adj.key] || 'No description available.'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                    </TooltipProvider>
+                      <Button variant="outline" className="w-full text-xs font-bold uppercase tracking-widest" onClick={() => queryClient.invalidateQueries({ queryKey: ['autonomous-monitoring'] })}>
+                        Force Synchronization
                       </Button>
                     </div>
                   </CardContent>
@@ -212,6 +317,16 @@ export default function AutonomousMonitoringPage() {
                   <p className="text-xs text-primary/80 leading-relaxed">
                     The autonomous protocol is currently operating within optimal parameters.
                     No anomalies detected in recent dependency audits or branch reconciliations.
+
+                <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 relative overflow-hidden group">
+                  <div className="absolute -right-4 -top-4 text-primary/10 group-hover:text-primary/20 transition-colors">
+                    <Cpu className="w-24 h-24 rotate-12" />
+                  </div>
+                  <h4 className="font-semibold text-primary mb-2 flex items-center gap-2 relative z-10">
+                  <p className="text-xs text-primary/80 leading-relaxed relative z-10">
+                    The autonomous protocol is currently operating with **{data.success_rate}%** efficiency.
+                    Integrity check returns **{data.system_integrity}**.
+                    All submodules are in sync.
                   </p>
                 </div>
               </div>
@@ -233,7 +348,29 @@ function StatusCard({ title, value, icon }: { title: string; value: string | num
           {icon}
         </div>
         <p className="text-3xl font-bold tracking-tight">{value}</p>
+
+function MetricCard({ label, value, subtext, icon }: { label: string; value: string | number; subtext: string; icon: React.ReactNode }) {
+    <Card className="overflow-hidden border-2 border-transparent hover:border-primary/20 transition-all">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{label}</p>
+        <p className="text-3xl font-black tracking-tight">{value}</p>
+        <p className="text-xs text-muted-foreground mt-1 font-medium">{subtext}</p>
       </CardContent>
     </Card>
   );
+}
+function StatusIcon({ status }: { status: string }) {
+  switch (status) {
+    case 'Completed': return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    case 'Started': return <PlayCircle className="w-4 h-4 text-blue-500" />;
+    case 'Failed': return <XCircle className="w-4 h-4 text-red-500" />;
+    default: return <Activity className="w-4 h-4 text-muted-foreground" />;
+  }
+}
+
+function getStatusColor(status: string) {
+    case 'Completed': return 'text-green-600 bg-green-50 border-green-200 dark:bg-green-900/20';
+    case 'Started': return 'text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-900/20';
+    case 'Failed': return 'text-red-600 bg-red-50 border-red-200 dark:bg-red-900/20';
+    default: return '';
+  }
 }

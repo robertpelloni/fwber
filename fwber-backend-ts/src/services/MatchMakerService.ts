@@ -1,6 +1,7 @@
 import type { match_bounties, match_assists } from '@prisma/client';
 import prisma from '../lib/prisma.js';
 import { TokenDistributionService } from './TokenDistributionService.js';
+import { AutonomousService } from './AutonomousService.js';
 
 export class MatchMakerService {
   private tokenService: TokenDistributionService;
@@ -32,6 +33,8 @@ export class MatchMakerService {
       expiresAt.setDate(expiresAt.getDate() + 30);
 
       return await tx.match_bounties.create({
+
+      const bounty = await tx.match_bounties.create({
         data: {
           user_id: userId,
           slug,
@@ -40,6 +43,8 @@ export class MatchMakerService {
           expires_at: expiresAt
         }
       });
+      await AutonomousService.logAction('Match Bounty Created', 'Completed', { userId, slug, tokenReward });
+      return bounty;
     });
   }
 
@@ -64,6 +69,8 @@ export class MatchMakerService {
     if (existing) return existing;
 
     return await prisma.match_assists.create({
+
+    const assist = await prisma.match_assists.create({
       data: {
         match_bounty_id: bounty.id,
         matchmaker_id: matchmakerId,
@@ -72,6 +79,8 @@ export class MatchMakerService {
         status: 'suggested'
       }
     });
+    await AutonomousService.logAction('Match Assist Suggested', 'Completed', { matchmakerId, subjectId: bounty.user_id, targetId: candidateId });
+    return assist;
   }
 
   async processMatch(user1Id: bigint, user2Id: bigint): Promise<void> {
@@ -120,6 +129,7 @@ export class MatchMakerService {
         {},
         tx
       );
+      await AutonomousService.logAction('Wingman Reward Issued', 'Completed', { matchmakerId: assist.matchmaker_id, rewardAmount, assistId });
     });
   }
 }

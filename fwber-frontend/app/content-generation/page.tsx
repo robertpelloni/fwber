@@ -15,7 +15,6 @@ export default function ContentGenerationPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [generatedContent, setGeneratedContent] = useState<string>('');
-
   const { generationStats, optimizationStats, isLoading, error } = useContentGenerationAnalytics();
 
   const tabs = [
@@ -76,7 +75,6 @@ export default function ContentGenerationPage() {
                     Create and optimize content with AI-powered suggestions and real-time analysis.
                   </p>
                 </div>
-
                 <SmartContentEditor
                   initialContent={generatedContent}
                   onContentChange={(content) => setGeneratedContent(content)}
