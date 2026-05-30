@@ -10,6 +10,8 @@
 
 import { apiClient } from './client';
 
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 export interface LocationData {
   id: number;
   latitude: number;

@@ -138,6 +138,9 @@ const postBatch = async (events: PendingTelemetryEvent[]) => {
       headers['Authorization'] = `Bearer ${token}`
     }
 
+    const apiBaseUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+    const url = `${apiBaseUrl}${ENDPOINT}`
+
     let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
     if (!baseUrl.endsWith('/api')) {
       baseUrl += '/api'

@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $emoji
  * @property string|null $color
  * @property bool $is_pinned
+ * @property bool $is_mine
+
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User $matchUser

@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import prisma from '../lib/prisma.js';
+
 import prisma, { serialize, sanitizeUser } from '../lib/prisma.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email.js';
 import { createVerificationToken } from '../lib/verification-store.js';
@@ -14,10 +16,43 @@ export class AuthService {
     );
   }
 
+  serialize(obj: any): any {
+    if (obj === null || obj === undefined) return obj;
+    if (typeof obj === 'bigint') return Number(obj);
+    if (obj && typeof obj === 'object' && typeof obj.toFixed === 'function' && 'd' in obj && 'e' in obj) return Number(obj.toString());
+    if (obj instanceof Date) return obj;
+    if (Array.isArray(obj)) return obj.map((v: any) => this.serialize(v));
+    if (typeof obj === 'object') {
+      const out: any = {};
+      for (const key of Object.keys(obj)) {
+        out[key] = this.serialize(obj[key]);
+      }
+      return out;
+    }
+    return obj;
+  }
+
+  private SENSITIVE_FIELDS = [
+    'password', 'decoy_password', 'two_factor_secret',
+    'stripe_customer_id', 'provider_id', 'provider_token',
+    'id_verification_data', 'last_login_ip'
+  ];
+
+  sanitizeUser(obj: any): any {
+    if (Array.isArray(obj)) return obj.map((v: any) => this.sanitizeUser(v));
+    if (typeof obj !== 'object' || obj instanceof Date) return obj;
+
+      if (this.SENSITIVE_FIELDS.includes(key)) continue;
+      out[key] = this.sanitizeUser(obj[key]);
+    }
+  }
+
   async hydrateUser(user: any) {
     const referralsCount = await prisma.users.count({
       where: { referrer_id: user.id }
     });
+
+    return this.sanitizeUser(this.serialize({
 
     return sanitizeUser(serialize({
       ...user,

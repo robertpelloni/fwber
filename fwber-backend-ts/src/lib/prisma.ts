@@ -28,20 +28,14 @@ const SENSITIVE_FIELDS = [
   'id_verification_data', 'last_login_ip'
 ];
 
-/**
  * Remove sensitive fields from a user object before sending it to the client.
- */
 export const sanitizeUser = (obj: any): any => {
   if (!obj || typeof obj !== 'object') return obj;
-  if (obj instanceof Date) return obj.toISOString();
   if (Array.isArray(obj)) return obj.map(sanitizeUser);
 
-  const out: any = {};
-  for (const key of Object.keys(obj)) {
     if (SENSITIVE_FIELDS.includes(key)) continue;
     out[key] = sanitizeUser(obj[key]);
   }
-  return out;
 };
 
 export default prisma;

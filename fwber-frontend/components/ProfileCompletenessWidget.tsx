@@ -2,6 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Circle, AlertTriangle } from 'lucide-react';
+import { api } from '@/lib/api/client';
+
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
@@ -27,6 +29,10 @@ export default function ProfileCompletenessWidget() {
     queryKey: ['profile-completeness'],
     enabled: isAuthenticated && !!token,
     queryFn: () => api.get<CompletenessData>('/profile/completeness'),
+
+    queryFn: async () => {
+      return await api.get<CompletenessData>('/profile/completeness');
+    },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 

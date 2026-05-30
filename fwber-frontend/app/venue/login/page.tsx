@@ -17,6 +17,9 @@ export default function VenueLoginPage() {
     setError('')
 
     try {
+      const apiUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api');
+      const res = await fetch(`${apiUrl}/venue/login`, {
+
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
       const res = await fetch(`${apiUrl}/api/venue/login`, {
         method: 'POST',

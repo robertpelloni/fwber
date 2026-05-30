@@ -83,7 +83,6 @@
 - Add merchant location persistence and a true geo-aware nearby storefront feed so `marketplace/nearby` can rank by actual distance instead of a generic latest-items fallback.
 - Add merchant verification workflow screens and moderation tooling so restored storefronts can be trust-scored before wider rollout.
 - Unify premium and merchant billing receipts under a shared purchase-history surface in user settings.
-
 ## 2026-05-23 - After Autonomous Monitoring Integration
 - Implement an **Autonomous "Time-Travel" Debugger**: Allow moderators to replay a specific autonomous loop by storing a full snapshot of the repository state (diffs) in a blob store linked to the `autonomous_actions` record.
 - Add **Subagent Sentiment Analysis**: Use a small LLM to analyze the logs of subagents and generate a "Sentiment Score" (e.g., Confident, Struggling, Blocked) to help humans intervene earlier.

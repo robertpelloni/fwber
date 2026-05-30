@@ -2511,7 +2511,6 @@ model SyncedContact {
 
   @@map("synced_contacts")
 }
-
 model autonomous_actions {
   id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
   task       String    @db.VarChar(255)

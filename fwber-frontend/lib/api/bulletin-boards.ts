@@ -3,6 +3,8 @@ import { useAuth } from '../auth-context';
 import { storeOfflineMessage } from '../offline-store';
 import { v4 as uuidv4 } from 'uuid';
 
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 export interface BulletinBoard {
   id: number;
   geohash: string;

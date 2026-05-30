@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Bell, X, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api/client';
+
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
 import { api } from '@/lib/api/client';
 
@@ -55,6 +57,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     setIsLoading(true);
     try {
       const data = await api.get<{ notifications?: Notification[]; unread_count?: number }>('/notifications');
+
+      const data = await api.get<{notifications: Notification[], unread_count: number}>('/notifications');
       setNotifications(data.notifications || []);
       setUnreadCount(data.unread_count || 0);
     } catch (error) {
@@ -324,6 +328,8 @@ export function NotificationDot({ className = '' }: { className?: string }) {
     const fetchCount = async () => {
       try {
         const data = await api.get<{ unread_count?: number }>('/notifications/count');
+
+        const data = await api.get<{unread_count: number}>('/notifications/count');
         setUnreadCount(data.unread_count || 0);
       } catch (error) {
         console.error('Failed to fetch notification count:', error);

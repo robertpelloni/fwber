@@ -2,6 +2,8 @@ import { apiClient } from './client';
 
 export type MerchantVerificationStatus = 'pending' | 'verified' | 'rejected';
 
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 export interface MerchantProfile {
   id: number;
   user_id: number;

@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Copy, Share2, Award, ExternalLink, Loader2 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
+import { api } from '@/lib/api/client'
+
 
 export function VouchLinkCard() {
   const { user, token } = useAuth()
@@ -25,11 +27,12 @@ export function VouchLinkCard() {
     const fetchLink = async () => {
       if (!user?.referral_code || !token) return
       
+      try {
+        setLoading(true)
+
       // If we already have the code locally, just construct it
       // Alternatively, we could call the API to ensure it's fresh/valid
       // Let's call the API to be safe and consistent with backend logic
-      try {
-        setLoading(true)
         const apiUrl = typeof window !== 'undefined' ? 'https://api.fwber.me/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000') + '/api';
         const response = await fetch(`${apiUrl}/vouch/generate-link`, {
             method: 'POST',
@@ -50,6 +53,9 @@ export function VouchLinkCard() {
             const baseUrl = getBaseUrl()
             setLink(`${baseUrl}/vouch/${user.referral_code}`)
         }
+        const data = await api.post<{url: string}>('/vouch/generate-link')
+        setLink(data.url)
+
       } catch (err) {
         console.error('Failed to fetch vouch link:', err)
         // Fallback

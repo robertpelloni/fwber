@@ -1,3 +1,105 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info, Share2, Users, Gift } from 'lucide-react';
+import { toast } from 'react-toastify';
+
+export default function ReferralsPage() {
+    const [referralCode, setReferralCode] = useState<string | null>(null);
+    const [stats, setStats] = useState({ totalReferrals: 0, pendingRewards: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchReferralData = async () => {
+            try {
+                const res = await fetch('/api/referrals');
+                if (!res.ok) throw new Error('Failed to fetch referral data');
+                const data = await res.json();
+                setReferralCode(data.code || 'YOUR-CODE-HERE');
+                setStats({
+                    totalReferrals: data.stats?.total || 0,
+                    pendingRewards: data.stats?.pending || 0
+                });
+            } catch (e: any) {
+                toast.error(e.message || 'Error loading referrals');
+                // Mock fallback for UI rendering if backend is unavailable
+                setReferralCode('FWBER-2024-XJZ');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchReferralData();
+    }, []);
+
+    const copyToClipboard = () => {
+        if (referralCode) {
+            navigator.clipboard.writeText(`https://fwber.me/join?ref=${referralCode}`);
+            toast.success('Referral link copied to clipboard!');
+        }
+    };
+
+    return (
+        <div className="container mx-auto p-4 md:p-8 max-w-4xl space-y-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Users className="w-8 h-8 text-primary" />
+                Refer a Friend
+            </h1>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="bg-white shadow-sm border border-gray-100">
+                    <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                            Your Invite Link
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Share this link with friends. When they join and verify, you both earn tokens.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </CardTitle>
+                        <CardDescription>
+                            Grow the community and earn rewards.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {loading ? (
+                             <div className="animate-pulse h-12 bg-gray-200 rounded w-full"></div>
+                        ) : (
+                            <div className="flex flex-col space-y-3">
+                                <div className="p-4 bg-gray-50 rounded-md border border-gray-200 font-mono text-center text-lg break-all">
+                                    https://fwber.me/join?ref={referralCode}
+                                </div>
+                                <Button onClick={copyToClipboard} className="w-full flex items-center justify-center gap-2">
+                                    <Share2 className="w-4 h-4" /> Copy Link
+                                </Button>
+                        )}
+                    </CardContent>
+                </Card>
+
+                        <CardTitle className="text-xl">Your Rewards</CardTitle>
+                        <CardDescription>Track your successful referrals</CardDescription>
+                    <CardContent>
+                             <div className="space-y-4">
+                                <div className="animate-pulse h-8 bg-gray-200 rounded w-1/2"></div>
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between p-4 bg-green-50 text-green-800 rounded-lg border border-green-100">
+                                    <div className="flex items-center gap-3">
+                                        <Users className="w-6 h-6" />
+                                        <span className="font-semibold">Friends Joined</span>
+                                    <span className="text-2xl font-bold">{stats.totalReferrals}</span>
+                                <div className="flex items-center justify-between p-4 bg-amber-50 text-amber-800 rounded-lg border border-amber-100">
+                                        <Gift className="w-6 h-6" />
+                                        <span className="font-semibold">Tokens Earned</span>
+                                    <span className="text-2xl font-bold">{stats.totalReferrals * 50}</span>
+    );
+
 'use client'
 
 import { useMemo } from 'react'
@@ -29,7 +131,6 @@ interface ReferralSummary {
   levels: ReferralLevelSummary[]
 }
 
-export default function ReferralsPage() {
   const { user } = useAuth()
   const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me')
 
@@ -51,7 +152,6 @@ export default function ReferralsPage() {
     await navigator.clipboard.writeText(value)
   }
 
-  return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader title="Referrals" />
@@ -68,13 +168,10 @@ export default function ReferralsPage() {
                   <h1 className="text-3xl font-black text-gray-900 dark:text-white">EARN GOLD COINS & REAL MONEY 💸</h1>
                   <span className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-3 py-1 text-xs font-black uppercase tracking-wider text-white shadow-sm animate-pulse">🪙 Rewards</span>
                   <span className="rounded-full bg-green-500 px-3 py-1 text-xs font-black uppercase tracking-wider text-white animate-pulse">💵 Real Cash</span>
-                </div>
                 <p className="mt-2 text-sm text-gray-700 dark:text-gray-200 font-medium">
                   Share your link, stack <span className="text-yellow-600 dark:text-yellow-400 font-bold">FWBcoin</span>, and unlock <span className="text-green-600 dark:text-green-400 font-bold">real-money bonuses</span> as your network grows. Your referrals literally pay off.
                 </p>
-              </div>
               <ReferralModal />
-            </div>
           </section>
 
           <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -82,13 +179,11 @@ export default function ReferralsPage() {
             <MetricCard icon={<Shield className="h-5 w-5" />} label="Vouches" value={summary?.vouches_count ?? user?.vouches_count ?? 0} color="purple" />
             <MetricCard icon={<Coins className="h-5 w-5" />} label="🪙 Token Rewards" value={summary?.earned_token_rewards ?? 0} color="yellow" />
             <MetricCard icon={<DollarSign className="h-5 w-5" />} label="💵 Pending Cash" value={`$${Number(summary?.pending_cash_usd ?? 0).toFixed(2)}`} color="green" />
-          </section>
 
           <section className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Invite Link</h2>
             {isLoading ? (
               <p className="mt-3 text-sm text-gray-500">Loading referral summary…</p>
-            ) : (
               <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                 <input
                   readOnly
@@ -102,11 +197,7 @@ export default function ReferralsPage() {
                   <Copy className="h-4 w-4" />
                   Copy Link
                 </button>
-              </div>
-            )}
-          </section>
         </main>
-      </div>
     </ProtectedRoute>
   )
 }
@@ -120,11 +211,8 @@ function MetricCard({ icon, label, value, color = 'emerald' }: { icon: React.Rea
     green:   { bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-600 dark:text-green-300', border: 'border-green-300 dark:border-green-700' },
   }
   const c = colorMap[color] || colorMap.emerald
-  return (
     <div className={`rounded-2xl border ${c.border} bg-white p-5 shadow-sm dark:bg-gray-900`}>
       <div className={`mb-3 inline-flex rounded-xl ${c.bg} p-3 ${c.text}`}>{icon}</div>
       <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
       <div className="mt-1 text-2xl font-black text-gray-900 dark:text-white">{value}</div>
-    </div>
-  )
 }

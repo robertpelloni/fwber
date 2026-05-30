@@ -8,6 +8,9 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import emailRoutes from './routes/email.js';
+import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync';
+import contactsIntegrationRoutes from './routes/contacts-integration';
+
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
 import dashboardRoutes from './routes/dashboard.js';
@@ -127,6 +130,9 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/integrations/contacts/data', contactsIntegrationSyncRoutes);
+app.use('/api/integrations/contacts', contactsIntegrationRoutes);
+
 app.use('/api/email', emailRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -263,21 +269,24 @@ app.get('/', (req, res) => {
   res.json({ message: 'FWBER TypeScript Backend API v2.0' });
 });
 
+const server = httpServer.listen(port, () => {
+  console.log(`[server]: Server is running at http://localhost:${port}`);
+});
+
+(app as any).close = () => server.close();
+export default app;
+
 let server: any;
 if (process.env.NODE_ENV !== 'test') {
   server = httpServer.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
-  });
 }
 
 (app as any).close = () => {
   if (server) server.close();
 };
-export default app;
 
 // Autonomous Protocol Heartbeat (Periodic System Integrity Check)
 import { MaintenanceService } from './services/MaintenanceService.js';
-if (process.env.NODE_ENV !== 'test') {
   setInterval(async () => {
     try {
       await MaintenanceService.performMaintenance();

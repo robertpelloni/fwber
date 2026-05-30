@@ -2,6 +2,8 @@
 
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { api } from '@/lib/api/client';
+
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -74,6 +76,29 @@ export default function DashboardPage() {
       } catch (error) {
         console.error('Dashboard stats fetch failed:', error);
         return null;
+      return await api.get<DashboardStats & { streak_just_updated: boolean }>('/dashboard/stats');
+    },
+  });
+
+  const { data: leaderboardData } = useQuery({
+    queryKey: ['vouch-leaderboard'],
+    queryFn: async () => {
+      return await api.get('/leaderboard');
+
+  // Effect to check if we should show the streak modal
+  useEffect(() => {
+    // Priority: Explicit backend flag (most reliable for real-time update)
+    // Fallback: LocalStorage check (prevents spam on page reload)
+    if (stats?.streak_just_updated) {
+      setShowStreakModal(true);
+    } else if (stats?.current_streak && stats.current_streak > 0) {
+      const today = new Date().toDateString();
+      const lastShown = localStorage.getItem('fwber_streak_shown_date');
+
+      // If we haven't shown it today, and user has a streak, show it
+      if (lastShown !== today) {
+        localStorage.setItem('fwber_streak_shown_date', today);
+
       }
     },
   });

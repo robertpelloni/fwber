@@ -27,6 +27,8 @@ interface ProfileInterestTopic {
   is_followed: boolean;
   match_source?: 'profile' | 'followed' | 'both';
 }
+const API_BASE_URL = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
 
 export interface UserProfile {
   id: number;

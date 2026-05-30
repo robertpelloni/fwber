@@ -11,6 +11,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   // Try to fetch user details for viral metadata
   try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api'
+
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
     const res = await fetch(`${apiUrl}/auth/referral/${code}`, { next: { revalidate: 60 } })
 

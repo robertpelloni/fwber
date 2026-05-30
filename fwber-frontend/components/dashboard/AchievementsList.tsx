@@ -5,6 +5,8 @@ import { Award, Lock, CheckCircle2, Trophy, Flame, Heart, Eye, MessageCircle, Us
 import { ApiError, apiClient } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth-context'
 
+import { api } from '@/lib/api/client'
+
 interface Achievement {
   id: number
   name: string
@@ -45,7 +47,9 @@ export function AchievementsList() {
     }
 
     apiClient.get<AchievementsResponse>('/achievements')
+    api.get<AchievementsResponse>('/achievements')
       .then(res => {
+        setAchievements(res.achievements)
         setAchievements(res.data.achievements)
         setIsLoading(false)
       })

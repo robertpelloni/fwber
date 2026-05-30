@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Loader2, Sparkles, RefreshCw, Check, X, Settings, Image as ImageIcon, Lock, Share2, Users, Camera, Wand2 } from 'lucide-react';
 import Image from 'next/image';
+import { api } from '@/lib/api/client';
+
 import axios from 'axios';
 import { useWebSocket } from '@/lib/hooks/use-websocket';
 import { useAuth } from '@/lib/auth-context';
@@ -115,6 +117,8 @@ export default function AvatarGenerationFlow({
   const traitsQuery = useQuery({
     queryKey: ['avatar-physical-traits'],
     queryFn: async (): Promise<AvatarTraitsResponse> => {
+      return await api.get('/avatar/physical-traits');
+
       const token = localStorage.getItem('fwber_token');
       const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/physical-traits`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -176,6 +180,9 @@ export default function AvatarGenerationFlow({
   const galleryQuery = useQuery({
     queryKey: ['avatar-gallery'],
     queryFn: async (): Promise<AvatarGalleryPhoto[]> => {
+        const res = await api.get<{data: AvatarGalleryPhoto[]}>('/photos');
+        const photos: AvatarGalleryPhoto[] = res.data || [];
+
         const token = localStorage.getItem('fwber_token');
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/photos`, {
              headers: { Authorization: `Bearer ${token}` }
@@ -188,8 +195,11 @@ export default function AvatarGenerationFlow({
 
   useEffect(() => {
     const fetchProviders = async () => {
-      const token = localStorage.getItem('fwber_token');
       try {
+        const res = await api.get<{providers: Record<string, ProviderConfig>}>('/avatar/providers');
+        setProviders(res.providers);
+
+      const token = localStorage.getItem('fwber_token');
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/providers`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -215,6 +225,8 @@ export default function AvatarGenerationFlow({
       if (customModel) payload.model = customModel;
       if (selectedProvider === 'replicate') payload.lora_scale = loraScale;
 
+      return await api.post('/avatar/generate', payload);
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/avatar/generate`,
         payload,
@@ -239,6 +251,8 @@ export default function AvatarGenerationFlow({
   // Photo-based generation (img2img)
   const generateFromPhotoMutation = useMutation({
     mutationFn: async (photoId: number) => {
+      return await api.post('/avatar/generate-from-photo', { 
+
       const token = localStorage.getItem('fwber_token');
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/avatar/generate-from-photo`,
@@ -247,6 +261,8 @@ export default function AvatarGenerationFlow({
           style,
           sexy_boost: sexyBoost,
           provider: selectedProvider,
+        });
+
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -267,6 +283,11 @@ export default function AvatarGenerationFlow({
 
   const acceptMutation = useMutation({
     mutationFn: async () => {
+      await api.put('/profile', { avatar_url: generatedAvatar });
+
+      if (generatedPhotoId) {
+        await api.put(`/photos/${generatedPhotoId}`, { is_primary: true });
+
       const token = localStorage.getItem('fwber_token');
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/profile`,
@@ -274,11 +295,8 @@ export default function AvatarGenerationFlow({
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (generatedPhotoId) {
-        await axios.put(
           `${process.env.NEXT_PUBLIC_API_URL}/photos/${generatedPhotoId}`,
           { is_primary: true },
-          { headers: { Authorization: `Bearer ${token}` } }
         );
       }
     },
@@ -701,6 +719,8 @@ export default function AvatarGenerationFlow({
                         }`}
                       >
                         <Image
+                          src={`${(process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me').replace('/api', '')}/storage/${photo.file_path || photo.filename}`}
+
                           src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${photo.file_path || photo.filename}`}
                           alt="Your photo"
                           fill

@@ -15,9 +15,13 @@ export default function VenueDashboard() {
       return
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const apiUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api');
     
     // Fetch venue profile
+    fetch(`${apiUrl}/venue/me`, {
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    
     fetch(`${apiUrl}/api/venue/me`, {
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -32,6 +32,8 @@ export class MatchMakerService {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
+      return await tx.match_bounties.create({
+
       const bounty = await tx.match_bounties.create({
         data: {
           user_id: userId,
@@ -41,7 +43,6 @@ export class MatchMakerService {
           expires_at: expiresAt
         }
       });
-
       await AutonomousService.logAction('Match Bounty Created', 'Completed', { userId, slug, tokenReward });
       return bounty;
     });
@@ -67,6 +68,8 @@ export class MatchMakerService {
 
     if (existing) return existing;
 
+    return await prisma.match_assists.create({
+
     const assist = await prisma.match_assists.create({
       data: {
         match_bounty_id: bounty.id,
@@ -76,7 +79,6 @@ export class MatchMakerService {
         status: 'suggested'
       }
     });
-
     await AutonomousService.logAction('Match Assist Suggested', 'Completed', { matchmakerId, subjectId: bounty.user_id, targetId: candidateId });
     return assist;
   }
@@ -127,7 +129,6 @@ export class MatchMakerService {
         {},
         tx
       );
-
       await AutonomousService.logAction('Wingman Reward Issued', 'Completed', { matchmakerId: assist.matchmaker_id, rewardAmount, assistId });
     });
   }

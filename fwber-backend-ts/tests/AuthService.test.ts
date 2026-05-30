@@ -41,6 +41,8 @@ const mockSendPasswordResetEmail = jest.fn();
 const mockCreateVerificationToken = jest.fn();
 
 jest.unstable_mockModule('../src/lib/prisma.js', () => ({
+  default: mockPrisma,
+
   default: mockPrisma, serialize: (obj: any) => obj, sanitizeUser: (obj: any) => obj,
 }));
 
