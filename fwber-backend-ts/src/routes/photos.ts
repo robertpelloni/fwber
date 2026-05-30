@@ -231,7 +231,7 @@ router.put('/reorder', authenticate, async (req: any, res: Response) => {
   }
 });
 
-router.put('/:id', authenticate, async (req: any, res: Response) => {
+router.put('/:id(\\d+)', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
@@ -277,7 +277,7 @@ router.put('/:id', authenticate, async (req: any, res: Response) => {
 });
 
 // DELETE /api/photos/:id — Delete a photo
-router.delete('/:id', authenticate, async (req: any, res: Response) => {
+router.delete('/:id(\\d+)', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
@@ -353,7 +353,7 @@ router.post('/reorder', authenticate, async (req: any, res: Response) => {
 });
 
 // POST /api/photos/:id/set-primary — Set as primary photo
-router.post('/:id/set-primary', authenticate, async (req: any, res: Response) => {
+router.post('/:id(\\d+)/set-primary', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);
@@ -414,17 +414,17 @@ router.get('/settings', authenticate, async (_req: any, res: Response) => {
 });
 
 // POST /api/photos/:id/reveal — Request photo reveal
-router.post('/:id/reveal', authenticate, async (req: any, res: Response) => {
+router.post('/:id(\\d+)/reveal', authenticate, async (req: any, res: Response) => {
   res.json({ success: true, status: 'requested' });
 });
 
 // POST /api/photos/:id/unlock — Unlock a private photo
-router.post('/:id/unlock', authenticate, async (req: any, res: Response) => {
+router.post('/:id(\\d+)/unlock', authenticate, async (req: any, res: Response) => {
   res.json({ success: true, message: 'Unlocked', balance: 0 });
 });
 
 // GET /api/photos/:id/original — Get original photo
-router.get('/:id/original', authenticate, async (req: any, res: Response) => {
+router.get('/:id(\\d+)/original', authenticate, async (req: any, res: Response) => {
   try {
     const userId = BigInt(req.user.id);
     const photoId = BigInt(req.params.id!);

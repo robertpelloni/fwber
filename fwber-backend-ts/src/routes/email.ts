@@ -52,7 +52,7 @@ router.post('/verification-notification', authenticate, async (req: any, res) =>
  */
 router.post('/verify', async (req, res) => {
   try {
-    const { token } = req.body;
+    const { token } = req.body || {};
 
     if (!token) {
       return res.status(400).json({ message: 'Token is required' });
