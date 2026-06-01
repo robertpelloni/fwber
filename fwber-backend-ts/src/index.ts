@@ -66,7 +66,10 @@ import merchantPortalRoutes from './routes/merchant-portal.js';
 import moderationRoutes from './routes/moderation.js';
 import messagesRoutes from './routes/messages.js';
 import federationRoutes from './routes/federation.js';
+import monitoringRoutes from './routes/monitoring.js';
 import paymentsRoutes from './routes/payments.js';
+import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync.js';
+import contactsIntegrationRoutes from './routes/contacts-integration.js';
 import shareUnlocksRoutes from './routes/share-unlocks.js';
 import viralContentRoutes from './routes/viral-content.js';
 import configRoutes from './routes/config.js';
@@ -189,7 +192,10 @@ app.use('/api/merchant-portal', merchantPortalRoutes);
 app.use('/api/moderation', moderationRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/federation', federationRoutes);
+app.use('/api/monitoring', monitoringRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/integrations/contacts/data', contactsIntegrationSyncRoutes);
+app.use('/api/integrations/contacts', contactsIntegrationRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/ice-breakers', iceBreakersRoutes);
 app.use('/api/settings', settingsRoutes);
@@ -257,9 +263,26 @@ app.get('/', (req, res) => {
   res.json({ message: 'FWBER TypeScript Backend API v2.0' });
 });
 
-const server = httpServer.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+let server: any;
+if (process.env.NODE_ENV !== 'test') {
+  server = httpServer.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
+}
 
-(app as any).close = () => server.close();
+(app as any).close = () => {
+  if (server) server.close();
+};
 export default app;
+
+// Autonomous Protocol Heartbeat (Periodic System Integrity Check)
+import { MaintenanceService } from './services/MaintenanceService.js';
+if (process.env.NODE_ENV !== 'test') {
+  setInterval(async () => {
+    try {
+      await MaintenanceService.performMaintenance();
+    } catch (err) {
+      // Silent fail for heartbeat
+    }
+  }, 300000); // Every 5 minutes
+}

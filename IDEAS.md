@@ -83,3 +83,16 @@
 - Add merchant location persistence and a true geo-aware nearby storefront feed so `marketplace/nearby` can rank by actual distance instead of a generic latest-items fallback.
 - Add merchant verification workflow screens and moderation tooling so restored storefronts can be trust-scored before wider rollout.
 - Unify premium and merchant billing receipts under a shared purchase-history surface in user settings.
+
+## 2026-05-23 - After Autonomous Monitoring Integration
+- Implement an **Autonomous "Time-Travel" Debugger**: Allow moderators to replay a specific autonomous loop by storing a full snapshot of the repository state (diffs) in a blob store linked to the `autonomous_actions` record.
+- Add **Subagent Sentiment Analysis**: Use a small LLM to analyze the logs of subagents and generate a "Sentiment Score" (e.g., Confident, Struggling, Blocked) to help humans intervene earlier.
+- Integrate **Auto-Healing for DB Drift**: Extend the autonomous protocol to detect missing columns/tables reported in error logs and automatically generate/apply the necessary Prisma migrations.
+
+## Autonomous Pivot Ideas
+- **AI-Managed NFT Loyalty**: Use the autonomous protocol to automatically mint "Merchant Vibe" NFTs for loyal customers based on proximity check-in volume.
+- **Auto-Federation Scaling**: Automatically spin up new federation relay nodes when outbound ActivityPub broadcast volume exceeds 10,000/hour.
+
+## 2026-05-24 - Future Integration Ideas
+- **Contact Match Notification**: Automatically notify users when a newly synced contact joins the platform, using a "Direct Proximity" signal.
+- **Autonomous Moderation**: Use the `AutonomousService` to automatically issue "Cool-down" periods for users with multiple high-score geo-spoof flags.

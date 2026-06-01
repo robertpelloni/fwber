@@ -8,17 +8,17 @@ datasource db {
 }
 
 model relationship_links {
-  id                    BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id               BigInt    @db.UnsignedBigInt
-  related_user_id       BigInt?   @db.UnsignedBigInt
-  relationship_type     String    @db.VarChar(255)
-  visibility            String    @default("public") @db.VarChar(255)
-  note                  String?   @db.Text
-  is_confirmed          Boolean   @default(false)
-  requested_by_user_id  BigInt    @db.UnsignedBigInt
-  confirmed_at          DateTime? @db.Timestamp(0)
-  created_at            DateTime? @db.Timestamp(0)
-  updated_at            DateTime? @db.Timestamp(0)
+  id                   BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id              BigInt    @db.UnsignedBigInt
+  related_user_id      BigInt?   @db.UnsignedBigInt
+  relationship_type    String    @db.VarChar(255)
+  visibility           String    @default("public") @db.VarChar(255)
+  note                 String?   @db.Text
+  is_confirmed         Boolean   @default(false)
+  requested_by_user_id BigInt    @db.UnsignedBigInt
+  confirmed_at         DateTime? @db.Timestamp(0)
+  created_at           DateTime? @db.Timestamp(0)
+  updated_at           DateTime? @db.Timestamp(0)
 
   users_relationship_links_user_idTousers         users  @relation("relationship_links_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users_relationship_links_related_user_idTousers users? @relation("relationship_links_related_user_idTousers", fields: [related_user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -1129,10 +1129,10 @@ model notifications {
 }
 
 model verification_tokens {
-  token      String   @id @db.VarChar(128)
-  user_id    BigInt   @db.UnsignedBigInt
-  email      String   @db.VarChar(255)
-  expires_at DateTime @db.Timestamp(0)
+  token      String    @id @db.VarChar(128)
+  user_id    BigInt    @db.UnsignedBigInt
+  email      String    @db.VarChar(255)
+  expires_at DateTime  @db.Timestamp(0)
   created_at DateTime? @default(now()) @db.Timestamp(0)
 
   @@index([user_id])
@@ -1990,6 +1990,8 @@ model users {
   two_factor_recovery_codes                                            String?                                @db.Text
   two_factor_confirmed_at                                              DateTime?                              @db.Timestamp(0)
   remember_token                                                       String?                                @db.VarChar(100)
+  public_key                                                           String?                                @db.Text
+  private_key                                                          String?                                @db.Text
   last_active_at                                                       DateTime?                              @db.Timestamp(0)
   last_seen_at                                                         DateTime?                              @db.Timestamp(0)
   interests                                                            String?                                @db.Text
@@ -2115,6 +2117,7 @@ model users {
   vouches_vouches_to_user_idTousers                                    vouches[]                              @relation("vouches_to_user_idTousers")
   wallet_transactions                                                  wallet_transactions[]
   zk_proximity_proofs                                                  zk_proximity_proofs[]
+  user_integrations                                                    user_integrations[]
 
   @@index([decoy_user_id], map: "users_decoy_user_id_foreign")
   @@index([last_active_at], map: "users_last_active_at_index")
@@ -2186,7 +2189,7 @@ model video_calls {
 
 model viral_contents {
   id             String    @id @db.Char(36)
-  share_id  String?  @unique @db.VarChar(36)
+  share_id       String?   @unique @db.VarChar(36)
   user_id        BigInt    @db.UnsignedBigInt
   type           String    @db.VarChar(255)
   content        Json
@@ -2205,7 +2208,6 @@ model trust_scores {
   level      String   @db.VarChar(32)
   factors    Json?
   updated_at DateTime @updatedAt @db.Timestamp(0)
-
 
   @@index([score])
   @@index([level])
@@ -2451,30 +2453,74 @@ enum users_tier {
 }
 
 model federation_follows {
-  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  actor_uri       String    @db.VarChar(255)
-  target_uri      String    @db.VarChar(255)
-  status          String    @default("pending") @db.VarChar(255)
-  created_at      DateTime? @db.Timestamp(0)
-  updated_at      DateTime? @db.Timestamp(0)
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  actor_uri  String    @db.VarChar(255)
+  target_uri String    @db.VarChar(255)
+  status     String    @default("pending") @db.VarChar(255)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @db.Timestamp(0)
 }
 
 model federation_inbox {
-  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  activity_id     String    @unique @db.VarChar(255)
-  actor_uri       String    @db.VarChar(255)
-  type            String    @db.VarChar(255)
-  payload         Json
-  processed_at    DateTime? @db.Timestamp(0)
-  created_at      DateTime? @db.Timestamp(0)
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  activity_id  String    @unique @db.VarChar(255)
+  actor_uri    String    @db.VarChar(255)
+  type         String    @db.VarChar(255)
+  payload      Json
+  processed_at DateTime? @db.Timestamp(0)
+  created_at   DateTime? @db.Timestamp(0)
 }
 
 model federation_outbox {
-  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  activity_id     String    @unique @db.VarChar(255)
-  actor_uri       String    @db.VarChar(255)
-  type            String    @db.VarChar(255)
-  payload         Json
-  delivered_at    DateTime? @db.Timestamp(0)
-  created_at      DateTime? @db.Timestamp(0)
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  activity_id  String    @unique @db.VarChar(255)
+  actor_uri    String    @db.VarChar(255)
+  type         String    @db.VarChar(255)
+  payload      Json
+  delivered_at DateTime? @db.Timestamp(0)
+  created_at   DateTime? @db.Timestamp(0)
+}
+
+model user_integrations {
+  id                BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id           BigInt            @db.UnsignedBigInt
+  provider          String            @db.VarChar(50)
+  provider_user_id  String            @db.VarChar(255)
+  access_token      String            @db.Text
+  refresh_token     String?           @db.Text
+  token_expires_at  DateTime          @db.Timestamp(0)
+  created_at        DateTime          @default(now()) @db.Timestamp(0)
+  updated_at        DateTime          @default(now()) @updatedAt @db.Timestamp(0)
+  user              users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  synced_contacts   synced_contacts[]
+
+  @@unique([user_id, provider])
+}
+
+model synced_contacts {
+  id                  BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  user_integration_id BigInt            @db.UnsignedBigInt
+  first_name          String?           @db.VarChar(255)
+  last_name           String?           @db.VarChar(255)
+  emails              Json?
+  phones              Json?
+  raw_provider_data   Json?
+  synced_at           DateTime          @default(now()) @db.Timestamp(0)
+  user_integration    user_integrations @relation(fields: [user_integration_id], references: [id], onDelete: Cascade)
+}
+
+model autonomous_actions {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  task       String    @db.VarChar(255)
+  status     String    @db.VarChar(50)
+  metadata   Json?
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+
+  @@index([created_at])
+}
+
+model autonomous_settings {
+  key        String    @id @db.VarChar(100)
+  value      String    @db.VarChar(255)
+  updated_at DateTime  @updatedAt @db.Timestamp(0)
 }

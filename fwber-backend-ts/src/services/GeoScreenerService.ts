@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as h3 from 'h3-js';
 import redis from '../lib/redis.js';
+import { AutonomousTaskExecutor } from './AutonomousTaskExecutor.js';
 
 export class GeoScreenerService {
   private enabled: boolean;
@@ -21,31 +22,36 @@ export class GeoScreenerService {
   async indexLocation(userId: number, lat: number, lng: number): Promise<boolean> {
     if (!this.enabled) return false;
 
-    // 1. Mark the cell as active in Redis (Bloom Filter proxy)
-    if (this.bloomEnabled) {
-      try {
-        const h3Index = h3.latLngToCell(lat, lng, 7);
-        const cellKey = `geo:active_cells:res7`;
-        await redis.sadd(cellKey, h3Index);
-        await redis.expire(cellKey, 86400); // 24 hours
-      } catch (error) {
-        console.warn(`[GeoBloom] Failed to update active cells: ${(error as Error).message}`);
+    return AutonomousTaskExecutor.execute(
+      { type: 'Location Indexing', impact: 'low', module: 'Proximity' },
+      async () => {
+        // 1. Mark the cell as active in Redis (Bloom Filter proxy)
+        if (this.bloomEnabled) {
+          try {
+            const h3Index = h3.latLngToCell(lat, lng, 7);
+            const cellKey = `geo:active_cells:res7`;
+            await redis.sadd(cellKey, h3Index);
+            await redis.expire(cellKey, 86400); // 24 hours
+          } catch (error) {
+            console.warn(`[GeoBloom] Failed to update active cells: ${(error as Error).message}`);
+          }
+        }
+
+        // 2. Index in Rust service
+        try {
+          const response = await axios.post(`${this.baseUrl}/index`, {
+            user_id: userId,
+            lat,
+            lng,
+          }, { timeout: this.timeout });
+
+          return response.status === 200;
+        } catch (error) {
+          console.warn(`[GeoScreener] Failed to index location for user ${userId}: ${(error as Error).message}`);
+          return false;
+        }
       }
-    }
-
-    // 2. Index in Rust service
-    try {
-      const response = await axios.post(`${this.baseUrl}/index`, {
-        user_id: userId,
-        lat,
-        lng,
-      }, { timeout: this.timeout });
-
-      return response.status === 200;
-    } catch (error) {
-      console.warn(`[GeoScreener] Failed to index location for user ${userId}: ${(error as Error).message}`);
-      return false;
-    }
+    );
   }
 
   /**
@@ -75,7 +81,14 @@ export class GeoScreenerService {
       });
 
       if (response.status === 200) {
-        return response.data.users || [];
+        const users = response.data.users || [];
+        if (users.length > 50) {
+          await AutonomousTaskExecutor.execute(
+            { type: 'High Density Proximity', impact: 'low', module: 'Proximity' },
+            async () => ({ lat, lng, radiusMeters, user_count: users.length })
+          );
+        }
+        return users;
       }
       return null;
     } catch (error) {

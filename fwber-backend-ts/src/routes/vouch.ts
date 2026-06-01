@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
-import prisma from '../lib/prisma.js';
+import prisma, { serialize } from '../lib/prisma.js';
 
 const router = Router();
 
@@ -22,7 +22,7 @@ router.get('/validate/:code', authenticate, async (req: any, res) => {
 
     res.json({
       valid: true,
-      user_id: Number(user.id),
+      user_id: user.id.toString(),
       name: user.name
     });
   } catch (error) {
@@ -45,7 +45,7 @@ router.post('/submit', authenticate, async (req: any, res) => {
       }
     });
 
-    res.json({ success: true, vouch_id: Number(vouch.id) });
+    res.json({ success: true, vouch_id: vouch.id.toString() });
   } catch (error: any) {
     console.error('[Vouch] Error submitting:', error.message);
     res.status(500).json({ error: 'Failed to submit vouch' });
@@ -85,13 +85,13 @@ router.get('/', authenticate, async (req: any, res) => {
         : v.users_vouches_to_user_idTousers;
       const profile = relatedUser?.user_profiles?.[0];
       return {
-        id: Number(v.id),
+        id: v.id.toString(),
         type: v.type,
         comment: v.comment,
         voucher_name: v.voucher_name || profile?.display_name || relatedUser?.name || 'Anonymous',
         direction,
         user: {
-          id: Number(relatedUser?.id || 0),
+          id: (relatedUser?.id || 0).toString(),
           name: profile?.display_name || relatedUser?.name || 'Unknown',
           avatar_url: profile?.avatar_url || null,
         },
@@ -99,12 +99,12 @@ router.get('/', authenticate, async (req: any, res) => {
       };
     };
 
-    res.json({
+    res.json(serialize({
       received: received.map((v: any) => serializeVouch(v, 'received')),
       given: given.map((v: any) => serializeVouch(v, 'given')),
       total_received: received.length,
       total_given: given.length,
-    });
+    }));
   } catch (error: any) {
     console.error('[Vouch] GET error:', error.message);
     res.json({ received: [], given: [], total_received: 0, total_given: 0 });

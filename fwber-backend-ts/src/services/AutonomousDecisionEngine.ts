@@ -1,0 +1,47 @@
+import { AutonomousService } from './AutonomousService.js';
+import { ProtocolVerificationService } from './ProtocolVerificationService.js';
+
+export type Decision = 'Allow' | 'Deny' | 'Delegate';
+
+export interface ProposedAction {
+  type: string;
+  impact: 'low' | 'medium' | 'high';
+  module: string;
+}
+
+export class AutonomousDecisionEngine {
+  /**
+   * Decide whether to allow an autonomous action based on protocol settings and system health.
+   */
+  static async evaluateAction(action: ProposedAction): Promise<{ decision: Decision; reason: string }> {
+    // 1. Check if Strict Mode is enabled
+    const isStrict = await AutonomousService.isAdjustmentEnabled('strict_mode');
+
+    // 2. Perform a quick health audit
+    const verification = await ProtocolVerificationService.verifyProtocol();
+
+    // Logic:
+    // - If system score is < 50, Deny all high/medium impact actions.
+    // - If strict_mode is ON, Delegate high impact actions.
+    // - If system is "passed" (score > 70), Allow low/medium.
+
+    if (verification.score < 50) {
+      if (action.impact !== 'low') {
+        return { decision: 'Deny', reason: `System integrity too low (${verification.score}/100) for ${action.impact} impact action.` };
+      }
+    }
+
+    if (isStrict) {
+      if (action.impact === 'high') {
+        return { decision: 'Delegate', reason: 'Strict mode enabled. High impact actions require delegation.' };
+      }
+    }
+
+    if (verification.passed) {
+      return { decision: 'Allow', reason: 'System health verified. Action within safety parameters.' };
+    }
+
+    // Default to delegation if uncertain
+    return { decision: 'Delegate', reason: 'Action outside automated allowance thresholds. Requesting human/subagent oversight.' };
+  }
+}
