@@ -840,11 +840,13 @@ model ice_breaker_answers {
   id                                             BigInt                @id @default(autoincrement()) @db.UnsignedBigInt
   user_id                                        BigInt                @db.UnsignedBigInt
   question_id                                    BigInt                @db.UnsignedBigInt
-  match_user_id                                  BigInt                @db.UnsignedBigInt
+  match_user_id                                  BigInt?               @db.UnsignedBigInt
   answer                                         String                @db.Text
+  is_revealed                                    Boolean               @default(false)
+  answered_at                                    DateTime              @default(now()) @db.Timestamp(0)
   created_at                                     DateTime?             @db.Timestamp(0)
   updated_at                                     DateTime?             @db.Timestamp(0)
-  users_ice_breaker_answers_match_user_idTousers users                 @relation("ice_breaker_answers_match_user_idTousers", fields: [match_user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ice_breaker_answers_match_user_id_foreign")
+  users_ice_breaker_answers_match_user_idTousers users?                @relation("ice_breaker_answers_match_user_idTousers", fields: [match_user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ice_breaker_answers_match_user_id_foreign")
   ice_breaker_questions                          ice_breaker_questions @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ice_breaker_answers_question_id_foreign")
   users_ice_breaker_answers_user_idTousers       users                 @relation("ice_breaker_answers_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ice_breaker_answers_user_id_foreign")
 
