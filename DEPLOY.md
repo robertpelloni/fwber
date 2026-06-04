@@ -326,3 +326,8 @@ Earlier DreamHost deployment guidance should now be treated as **legacy referenc
 
 ### Autonomous Monitoring
 To enable real-time monitoring of the autonomous protocol, ensure the `autonomous_actions` and `autonomous_settings` tables are migrated. The dashboard is available at `/admin/monitoring` for users with the `is_moderator` flag.
+
+### OkCupid Matching Engine (v2.1.5+)
+The new matching engine requires additional Prisma models. Ensure you run `npx prisma generate` in `fwber-backend-ts` after deployment.
+- **Required Tables**: `matching_questions`, `matching_options`, `user_matching_answers`.
+- **Seeding**: Run `node dist/lib/seeds/matching-questions.js` (or use the provided seed script via the backend maintenance console) to populate initial value-based questions.
