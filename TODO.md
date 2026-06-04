@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items (ABSOLUTE FINAL STATUS)
 
-> **Version:** 2.0.16
+> **Version:** 2.1.5
 
 # TODO — fwber Immediate Action Items
 
@@ -19,7 +19,7 @@
 - [x] **Intelligent Merge & Sync**: Completed comprehensive repository refresh and branch reconciliation. (v2.0.29)
 - [x] **Autonomous Execution Engine**: Developed `AutonomousTaskExecutor` and `AutonomousHealer` for self-healing loops. (v2.1.3)
 - [x] **Performance Monitoring**: Integrated real-time latency tracking and visualization for autonomous tasks. (v2.1.4)
-- [x] **OkCupid Matching**: Implemented full value-based matching engine with priority weighting and geometric mean compatibility scoring. (v2.1.5)
+- [x] **OkCupid Matching Engine**: Implemented a comprehensive value-based matching system with a geometric-mean compatibility heuristic and dedicated UI. (v2.1.5)
 - [x] **Content Quality**: Seeded FWBER with high-quality, rewritten matching questions. (v2.1.4)
 - [x] **Remote Actor Persistence**: Implement logic to store external federated users in the local DB. (v2.0.14)
 - [x] **Signed Outbound Delivery**: Implement `broadcastUpdate` with real HTTP signatures in `FederationService.ts`. (v2.0.14)

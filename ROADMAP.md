@@ -1,11 +1,20 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.0.20 "Real-Time Tracking"
-> **Last Updated:** 2026-05-23
+> **Current Version:** 2.1.5 "OkCupid Matching Engine"
+> **Last Updated:** 2026-06-04
 
 ---
 
 ## 🗺️ High-Level Trajectory
+
+### The OkCupid Matching Engine (COMPLETED - v2.1.5)
+The matching engine has been upgraded to a value-based system with importance weighting and a geometric-mean compatibility heuristic.
+
+**Key Achievements:**
+- **Geometric-Mean Heuristic**: Implemented the classic formula `(Satisfaction A * Satisfaction B) ^ (1/2)` for high-fidelity signals.
+- **Value-Based Questions**: Integrated multiple-choice questions with user-defined importance levels.
+- **Interactive UI**: Launched a dedicated matching dashboard at `/settings/matching`.
+- **Deep Integration**: Compatibility scores are now visible across user profiles and the discovery feed.
 
 ### The High-Performance Autonomous Engine (COMPLETED - v2.1.4)
 The autonomous system is now fully instrumented for performance and quality, with a self-healing engine that monitors latency and system health in real-time.

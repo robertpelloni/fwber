@@ -1,19 +1,19 @@
-# PROJECT_STATUS.md - fwber v2.0.7
+# PROJECT_STATUS.md — fwber v2.1.5
 
-**Date:** $(date +%Y-%m-%d)
-**Version:** 2.0.10 "Federation Hardening & Map Hydration"
-**Status:** ✅ **PHASE 7 MILESTONES SECURED**
-# Project Status — fwber v1.0.3 (ABSOLUTE FINAL)
-
-**Date:** 2026-03-28  
-**Version:** 1.0.3 "Absolute Final"  
-**Status:** 🚀 **100% LIVE, PRODUCTION VERIFIED, & ABSOLUTELY FINISHED**
-
+**Date:** 2026-06-04
+**Version:** 2.1.5 "OkCupid Matching Engine"
+**Status:** 🚀 **COMPATIBILITY MODULE LIVE & VERIFIED**
 
 ---
 
 ## 🎯 What This Release Delivered
-This release shores up the security and real-time connectivity aspects of the features introduced in v2.0.6.
+This release introduces the cornerstone of the connection experience: a high-fidelity matching engine based on shared values and mutual satisfaction.
+
+Delivered:
+- **Geometric-Mean Compatibility:** Implemented a sophisticated heuristic that calculates a "Match %" based on mutual satisfaction, weighted by user-defined importance.
+- **Matching Question Hub:** Launched a dedicated `/settings/matching` interface for multiple-choice value questions.
+- **Deep Site Integration:** Compatibility scores are now visible on all public profiles and within the discovery feed cards.
+- **AI-Enhanced Content:** Seeded the platform with 15+ Cyber-Noir themed value questions.
 
 Delivered:
 - **ActivityPub Security:** The backend now actively parses and verifies inbound HTTP Signatures on the `/inbox` endpoint using `crypto.createVerify`, preventing spoofed payloads from the Fediverse.
