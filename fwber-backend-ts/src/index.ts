@@ -8,8 +8,6 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import emailRoutes from './routes/email.js';
-import contactsIntegrationSyncRoutes from './routes/contacts-integration-sync';
-import contactsIntegrationRoutes from './routes/contacts-integration';
 
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
@@ -43,6 +41,7 @@ import premiumRoutes from './routes/premium.js';
 import userRoutes from './routes/user.js';
 import proximityRoutes from './routes/proximity.js';
 import onboardingRoutes from './routes/onboarding.js';
+import matchingRoutes from './routes/matching.js';
 import videoRoutes from './routes/video.js';
 import referralsRoutes from './routes/referrals.js';
 import boostsRoutes from './routes/boosts.js';
@@ -169,6 +168,7 @@ app.use('/api/premium', premiumRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/proximity', proximityRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/matching', matchingRoutes);
 app.use('/api/video', videoRoutes);
 app.use('/api/video-calls', videoRoutes); // alias for frontend compatibility
 app.use('/api/referrals', referralsRoutes);

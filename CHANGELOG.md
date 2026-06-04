@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.5] - 2026-05-24
+
+### Added
+- **OkCupid-Style Matching Engine**: Implemented a comprehensive matching system with value-based questions, multiple-choice options, and importance weighting.
+- **Matching Heuristic Service**: Developed a sophisticated compatibility algorithm using geometric mean satisfaction (OkCupid style).
+- **Matching UI**: Created a new dedicated interface in the frontend for users to answer matching questions and view their progress.
+- **Enhanced Seeding**: Added 100+ AI-enhanced matching questions rewritten for the 'Cyber-Noir' aesthetic.
+
 ## [2.1.4] - 2026-05-24
 
 ### Added
