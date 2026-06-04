@@ -1,6 +1,3 @@
-import { Router } from 'express';
-import { authenticate } from '../middleware/auth.js';
-
 import { Router, type Response } from 'express';
 import { authenticate, type AuthRequest } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
@@ -108,8 +105,6 @@ router.get('/', (_req, res) => res.json({
 }));
 
 // GET /api/federation/activity - Unified Activity Center endpoint
-router.get('/activity', async (req: any, res) => {
-
 router.get('/activity', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const inboxItems = await prisma.federation_inbox.findMany({
@@ -118,8 +113,6 @@ router.get('/activity', authenticate, async (req: AuthRequest, res: Response) =>
         });
 
         const activity = inboxItems.map((item: any) => {
-            const payload = item.payload;
-
             const payload = item.payload as any;
             const actorUri = item.actor_uri;
 
@@ -127,11 +120,6 @@ router.get('/activity', authenticate, async (req: AuthRequest, res: Response) =>
                 id: Number(item.id),
                 type: item.type,
                 actor_uri: actorUri,
-                actor_username: actorUri.split('/').pop(),
-                actor_domain: actorUri.includes('http') ? new URL(actorUri).host : 'unknown',
-                content: payload.object?.content || payload.object?.type || '',
-                timestamp: item.created_at.toISOString(),
-
                 actor_username: actorUri?.split('/').pop() || 'unknown',
                 actor_domain: actorUri?.includes('http') ? new URL(actorUri).host : 'unknown',
                 content: payload?.object?.content || payload?.object?.type || '',
@@ -148,8 +136,6 @@ router.get('/activity', authenticate, async (req: AuthRequest, res: Response) =>
 });
 
 // GET /api/federation/posts — get federation posts from inbox
-router.get('/posts', async (_req, res) => {
-
 router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const inboxItems = await prisma.federation_inbox.findMany({
@@ -159,22 +145,15 @@ router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
         });
 
         const posts = inboxItems.map((item: any) => {
-            const payload = item.payload;
-            const object = payload.object || {};
-
             const payload = item.payload as any;
             const object = payload?.object || {};
 
             return {
                 id: Number(item.id),
                 actor_uri: item.actor_uri,
-                actor_username: item.actor_uri.split('/').pop(),
-                actor_domain: new URL(item.actor_uri).host,
-                content: object.content || '',
-                published_at: object.published || item.created_at.toISOString(),
-
                 actor_username: item.actor_uri?.split('/').pop() || 'unknown',
                 actor_domain: item.actor_uri ? new URL(item.actor_uri).host : 'unknown',
+                content: object.content || '',
                 published_at: object.published || item.created_at?.toISOString() || new Date().toISOString(),
                 metadata: {
                     name: object.name || 'Remote Post',
@@ -191,12 +170,8 @@ router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/federation/following - Get external actors user is following
-router.get('/following', async (req: any, res) => {
-    try {
-        const following = await (prisma as any).federation_follows.findMany({
-            where: { actor_uri: `https://api.fwber.me/api/federation/actors/${req.user.id}` }
-
 router.get('/following', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
         const following = await prisma.federation_follows.findMany({
             where: { actor_uri: `https://api.fwber.me/api/federation/actors/${req.user!.id}` }
         });
@@ -216,12 +191,8 @@ router.get('/following', authenticate, async (req: AuthRequest, res: Response) =
 });
 
 // GET /api/federation/followers - Get external actors following user
-router.get('/followers', async (req: any, res) => {
-    try {
-        const followers = await (prisma as any).federation_follows.findMany({
-            where: { target_uri: `https://api.fwber.me/api/federation/actors/${req.user.id}`, status: 'accepted' }
-
 router.get('/followers', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
         const followers = await prisma.federation_follows.findMany({
             where: { target_uri: `https://api.fwber.me/api/federation/actors/${req.user!.id}`, status: 'accepted' }
         });
@@ -240,17 +211,11 @@ router.get('/followers', authenticate, async (req: AuthRequest, res: Response) =
 });
 
 // POST /api/federation/follow - Follow an external actor
-router.post('/follow', async (req: any, res) => {
-
 router.post('/follow', authenticate, async (req: AuthRequest, res: Response) => {
     const { actor_id } = req.body;
     if (!actor_id) return res.status(400).json({ error: 'actor_id is required' });
 
     try {
-        const userUri = `https://api.fwber.me/api/federation/actors/${req.user.id}`;
-
-        await (prisma as any).federation_follows.create({
-
         const userUri = `https://api.fwber.me/api/federation/actors/${req.user!.id}`;
 
         await prisma.federation_follows.create({
@@ -268,8 +233,6 @@ router.post('/follow', authenticate, async (req: AuthRequest, res: Response) => 
 });
 
 // GET /api/federation/search - Search for external actors
-router.get('/search', async (req: any, res) => {
-
 router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
     const { q } = req.query;
     if (!q || typeof q !== 'string') return res.status(400).json({ error: 'Query is required' });

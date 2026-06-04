@@ -157,6 +157,7 @@
 - Replacing multiple separate API calls (followers, following, posts, outbox) with a single `/api/federation/activity` aggregator endpoint significantly reduced Activity Center complexity.
 - This pattern (Unified Activity) allows for easier sorting and badging of diverse ActivityPub interaction types (Follow, Like, Boost, Create) in a merged timeline.
 - The `FederationService` enhancement to handle `Like` and `Announce` (Boost) activities provides the backend foundation for these new timeline items.
+
 ## 2026-05-23 — v2.0.21 Real-time metrics provide critical protocol visibility
 - Grouping autonomous actions by status over a 24-hour window allows for real-time success rate calculations without heavy database scans.
 - Visualizing the execution pipeline as a bar chart significantly improves administrative oversight of AI agent behavior.

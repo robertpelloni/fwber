@@ -1,7 +1,7 @@
 # DEPLOY.md — The fwber Operations Guide
 
-> **Last Updated:** 2026-05-23
-> **Version:** 2.0.16
+> **Last Updated:** 2026-05-31
+> **Version:** 2.1.4
 
 This document is the operational source of truth for deploying the active fwber stack after the restoration phases. The recommended topology is now:
 
@@ -323,5 +323,6 @@ Run this checklist before enabling live billing:
 ## 11. Legacy Note
 
 Earlier DreamHost deployment guidance should now be treated as **legacy reference only**. fwber’s active production recommendation is **Hetzner VPS + Vercel frontend**.
+
 ### Autonomous Monitoring
 To enable real-time monitoring of the autonomous protocol, ensure the `autonomous_actions` and `autonomous_settings` tables are migrated. The dashboard is available at `/admin/monitoring` for users with the `is_moderator` flag.

@@ -12,12 +12,6 @@ function safeProfile(u: any) {
   return { name: p?.display_name || u.name || 'Anonymous', avatar: p?.avatar_url || null };
 }
 
-function safeProfile(u: any) {
-  if (!u) return { name: 'Anonymous', avatar: null };
-  const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
-  return { name: p?.display_name || u.name || 'Anonymous', avatar: p?.avatar_url || null };
-}
-
 // GET /api/proximity/local-pulse
 router.get('/local-pulse', authenticate, async (req: any, res) => {
   try {

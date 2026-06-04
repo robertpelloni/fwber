@@ -3,11 +3,9 @@ import axios from 'axios';
 
 export class ContactSyncService {
     static async syncAllActiveIntegrations() {
-        const integrations = await (prisma as any).userIntegration.findMany({
-
-        const integrations = await prisma.userIntegration.findMany({
+        const integrations = await prisma.user_integrations.findMany({
             where: {
-                tokenExpiresAt: {
+                token_expires_at: {
                     gt: new Date()
                 }
             }
@@ -22,10 +20,8 @@ export class ContactSyncService {
         }
     }
 
-    static async syncContactsForIntegration(integrationId: string) {
-        const integration = await (prisma as any).userIntegration.findUnique({
-
-        const integration = await prisma.userIntegration.findUnique({
+    static async syncContactsForIntegration(integrationId: bigint) {
+        const integration = await prisma.user_integrations.findUnique({
             where: { id: integrationId }
         });
 
@@ -34,11 +30,11 @@ export class ContactSyncService {
         let rawContacts: any[] = [];
 
         if (integration.provider === 'google') {
-            rawContacts = await this.fetchGoogleContacts(integration.accessToken);
+            rawContacts = await this.fetchGoogleContacts(integration.access_token);
         } else if (integration.provider === 'microsoft') {
-            rawContacts = await this.fetchMicrosoftContacts(integration.accessToken);
+            rawContacts = await this.fetchMicrosoftContacts(integration.access_token);
         } else if (integration.provider === 'facebook') {
-            rawContacts = await this.fetchFacebookFriends(integration.accessToken);
+            rawContacts = await this.fetchFacebookFriends(integration.access_token);
         }
 
         await this.storeSyncedContacts(integrationId, integration.provider, rawContacts);
@@ -94,7 +90,7 @@ export class ContactSyncService {
         return response.data.data || [];
     }
 
-    private static async storeSyncedContacts(integrationId: string, provider: string, rawContacts: any[]) {
+    private static async storeSyncedContacts(integrationId: bigint, provider: string, rawContacts: any[]) {
         for (const raw of rawContacts) {
             let firstName = null;
             let lastName = null;
@@ -118,18 +114,14 @@ export class ContactSyncService {
                 lastName = nameParts.slice(1).join(' ') || null;
             }
 
-            await (prisma as any).syncedContact.create({
-
-            await prisma.syncedContact.create({
+            await prisma.synced_contacts.create({
                 data: {
-                    userIntegrationId: integrationId,
-                    firstName,
-                    lastName,
+                    user_integration_id: integrationId,
+                    first_name: firstName,
+                    last_name: lastName,
                     emails: emails as any,
                     phones: phones as any,
-                    rawProviderData: raw
-
-                    rawProviderData: raw as any
+                    raw_provider_data: raw as any
                 }
             });
         }

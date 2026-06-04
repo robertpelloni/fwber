@@ -22,9 +22,6 @@ export default function IntegrationsPage() {
         setConnecting(provider);
         // Direct the user to the backend OAuth redirect route
         // Example: /api/integrations/contacts/auth/google
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
-        window.location.href = `${backendUrl}/integrations/contacts/auth/${provider}`;
-
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
         window.location.href = `${apiUrl}/integrations/contacts/auth/${provider}`;
 

@@ -44,7 +44,9 @@ export class ProtocolVerificationService {
     });
 
     const danglingTasks = Object.keys(taskStatusMap).filter(task => {
-        const timeDiff = now.getTime() - taskStatusMap[task].startTime.getTime();
+        const entry = taskStatusMap[task];
+        if (!entry) return false;
+        const timeDiff = now.getTime() - entry.startTime.getTime();
         return timeDiff > 10 * 60 * 1000; // > 10 mins
     });
 
@@ -64,7 +66,7 @@ export class ProtocolVerificationService {
 
     maintenanceLogs.forEach(log => {
         const meta = log.metadata as any;
-        if (meta && typeof meta.strict_mode === 'boolean') {
+        if (meta && meta.strict_mode !== undefined && typeof meta.strict_mode === 'boolean') {
             if (lastStrictValue !== null && lastStrictValue !== meta.strict_mode) {
                 flappingCount++;
             }

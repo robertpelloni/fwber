@@ -1,6 +1,144 @@
 # Changelog
 
+## [2.1.4] - 2026-05-24
+
+### Added
+- **Autonomous Performance Tracking**: Integrated detailed latency measurement into `AutonomousTaskExecutor` and created `AutonomousPerformanceService` for historical analysis.
+- **High-Quality Ice Breakers**: Implemented a seed script with 50+ OkCupid-style questions rewritten for the fwber aesthetic, covering lifestyle, ethics, and deep connection topics.
+- **Monitoring UI Enhancement**: Updated the Admin Monitoring dashboard with a performance breakdown table and real-time execution trend visualization.
+- **Instrumentation Expansion**: Extended autonomous oversight to `GeoScreenerService`, `MatchMakerService`, `TokenDistributionService`, and `FederationService`.
+
+### Fixed
+- **Testing Reliability**: Resolved 404 errors in `MerchantLoyaltyApi.test.ts` by isolating route tests and correctly configuring moderator permissions in mocks.
+- **Type Safety**: Fixed several TypeScript compiler errors in autonomous and monitoring services to ensure production build stability.
+
+## [2.1.3] - 2026-05-24
+
+### Added
+- **Autonomous Task Executor**: Implemented a unified execution wrapper `AutonomousTaskExecutor` that enforces decision engine rules and logs all phases of task execution.
+- **Service Instrumentation**: Wrapped core `AuthService` methods (`registerUser`, `loginUser`) with the autonomous protocol for real-time monitoring and reliability tracking.
+- **Autonomous Healing**: Developed `AutonomousHealer` to automatically restore system stability (e.g., disabling strict mode) when health metrics normalize.
+
+## [2.1.2] - 2026-05-24
+
+### Added
+- **Autonomous Decision Engine**: Implemented `AutonomousDecisionEngine` to evaluate proposed actions against system health and protocol settings.
+- **Heuristic Safety**: The engine automatically denies medium/high impact actions if protocol consistency is low, or delegates them if strict mode is enabled.
+
+## [2.0.29] - 2026-05-24
+
+### Changed
+- **Repository Synchronization**: Executed an intensive repository refresh, synchronized submodules, and reconciled all active feature branches into `main`.
+- **Submodule Sanitization**: Updated all recursive submodules to latest tracking commits and verified workspace hygiene.
+
+## [2.0.28] - 2026-05-24
+
+### Added
+- **ActivityPub Notifications**: Implemented real-time in-app notifications and socket broadcasts for Follow, Like, and Boost events.
+- **Real-Time Notification UI**: Updated the frontend to handle ActivityPub interactions with themed toasts and direct CTAs to the Activity Center.
+
+## [2.0.27] - 2026-05-24
+
+### Added
+- **Autonomous Self-Correction**: Implemented `MaintenanceService` to monitor `autonomous_actions` failure rates and automatically toggle `strict_mode` based on system health.
+- **Solana Loyalty Bridge**: Integrated `SolanaBridgeService` into venue check-ins to trigger on-chain NFT minting signals based on merchant-defined thresholds.
+- **Instrumentation Expansion**: Full visibility for `AuthService` (Login/Register) and `ContactSyncService` tasks in the autonomous ledger.
+- **Merchant Loyalty UI**: Launched a unified program configuration and signal monitoring dashboard at `/merchant/loyalty`.
+
+### Fixed
+- **Testing Isolation**: Refactored Merchant Loyalty API tests to use isolated database contexts, eliminating interference during parallel execution.
+- **ESM Compatibility**: Resolved Prisma named export issues in Jest ESM environment via explicit mock definitions.
+
+## [2.0.24] - 2026-05-24
+
+### Added
+- **Service Instrumentation**: Integrated `GeoSpoofDetectionService` and `GeoScreenerService` into the autonomous execution protocol for real-time monitoring of security and proximity health.
+- **Activity Center UI**: Finalized the frontend Activity Center (`/settings/federation/activity`) to display unified ActivityPub interactions (Follows, Likes, Boosts).
+- **Integrated Contact Sync**: Finalized the Connected Accounts UI and Next.js API proxy for Google, Microsoft, and Facebook contact synchronization.
+
+### Fixed
+- **API Proxies**: Corrected Next.js internal API routes to map accurately to the primary TypeScript backend ports.
+- **Type Safety**: Enforced strict typing in Federation route handlers to satisfy compiler null-checks.
+
+- **Type Safety**: Enforced strict typing in Federation route handlers to satisfy compiler null-checks.
+
+
+
+### Added
+## [2.0.20] - 2026-05-23
+
+### Added
+- **Real-Time Action Logging**: Integrated `AutonomousService` into `FederationService.ts` to log outbound ActivityPub broadcast tasks. The system now records 'Started' and 'Completed' states for federation events.
+- **Enhanced Monitoring UX**: Added descriptive tooltips to the Autonomous Monitoring dashboard adjustment switches, clarifying the impact of behavioral toggles like 'Strict Mode' and 'Subagent Delegation'.
+
+### Fixed
+- **Service Patterns**: Standardized the use of `AutonomousService` for system-level logging across backend services.
+
+## [2.0.19] - 2026-05-23
+
+### Fixed
+- **Monitoring Logic Verification**: Refactored monitoring route handlers for isolated testability and added a logic-level test suite (`MonitoringLogic.test.ts`) to verify authorization and adjustment persistence without triggering app initialization timeouts.
+- **Submodule Documentation**: Updated the submodule dashboard to reflect the current TypeScript architecture and autonomous protocol hooks.
+
+## [2.0.18] - 2026-05-23
+
+### Added
+- **Autonomous Monitoring Dashboard**: Integrated a real-time monitor for the autonomous execution protocol, allowing moderators to track AI agent actions and fine-tune automated adjustment settings.
+- **Monitoring API**: Added backend endpoints for tracking autonomous protocol status and managing adjustments, backed by new `autonomous_actions` and `autonomous_settings` tables.
+- **UI Integration**: Added "Autonomous Monitor" to the Moderation Dashboard and main Dashboard for privileged users.
+
+### Fixed
+- **Security Hardening**: Secured the contact synchronization OAuth flow by implementing a signed JWT `state` parameter, preventing unauthorized account linking.
+- **System Stability**: Verified full system builds and introduced regression tests for the monitoring infrastructure.
+
+## [2.0.17] - 2026-05-23
+
+### Fixed
+- **Repository Synchronization**: Executed a dual-direction intelligent merge, synchronizing 'main' with active feature branches and resolving conflicts in core documentation and configuration.
+- **Hygiene**: Updated '.gitignore' to exclude '.jules/' and other AI session metadata.
+
 ## [2.0.16] - 2026-05-23
+
+### Added
+- **Unified Activity Center**: Implemented a central ActivityPub activity aggregator endpoint in the backend and rewired the frontend Activity Center to use it.
+- **Enhanced Inbox Processing**: Added support for 'Like' and 'Announce' (Boost) activities in the 'FederationService', including automated detection of interactions with local outbox content.
+- **Activity Types**: Frontend now supports and badges 'Like' and 'Boost' activities alongside 'Follow' and 'Create'.
+
+## [2.0.15] - 2026-05-22
+
+### Added
+- **Federation Automation**: New proximity artifacts are now automatically broadcast to the Fediverse if federation is enabled for the user.
+- **Handshake Completion**: Implemented outbound signed 'Accept' activities to complete the follow handshake with remote servers.
+- **Inbox Processing**: Connected the '/inbox' endpoint to the 'FederationService' processing logic.
+
+## [2.0.14] - 2026-05-22
+
+### Added
+- **Auth Hardening**: Integrated centralized 'AuthService' with dedicated unit tests.
+- **Contact Sync**: Integrated 'ContactSyncService' and OAuth routes for Google, Microsoft, and Facebook contact synchronization.
+- **Integration UI**: Added "Connected Accounts" and "Synced Contacts" pages to the frontend.
+
+### Fixed
+- **Build Stabilization**: Resolved TypeScript and Webpack errors in newly integrated components; added missing 'Tooltip' UI component.
+- **Prisma Schema**: Synchronized 'UserIntegration' and 'SyncedContact' models into the master schema.
+- **Security**: Fixed critical OAuth callback vulnerability by implementing a JWT-signed 'state' parameter to preserve 'userId'.
+
+## [2.0.13] - 2026-05-21
+
+### Added
+- **Performance Analytics**: Hooked up the '/api/analytics/slow-requests' routes to 'fwber-backend-ts' to enable live APM signals and performance monitoring insights.
+
+## [2.0.12] - 2026-05-21
+
+### Added
+- **Referral Polish**: Hooked up the '/api/referrals/summary' endpoint to properly return 'vouch_link', 'referral_link', and calculate 'levels' based on 'token_balance' and real cash values to support the frontend's referral modal.
+
+## [2.0.11] - 2026-05-20
+
+### Added
+- **ActivityPub Models**: Added 'federation_follows', 'federation_inbox', and 'federation_outbox' Prisma models. Added 'public_key' and 'private_key' to 'users'.
+- **WebFinger**: Added '/.well-known/webfinger' route to correctly resolve external actor handles.
+- **ActivityPub Endpoints**: Wired '/api/federation/actors/:id', '/api/federation/users/:id/inbox', and '/api/federation/users/:userId/outbox' endpoints in 'routes/federation.ts'.
 
 All notable changes to this project will be documented in this file.
 

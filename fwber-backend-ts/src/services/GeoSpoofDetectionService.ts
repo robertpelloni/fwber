@@ -105,8 +105,6 @@ export class GeoSpoofDetectionService {
     }
 
     if (suspicionScore >= 25) {
-      return await prisma.geo_spoof_detections.create({
-
       const detection = await prisma.geo_spoof_detections.create({
         data: {
           user_id: userId,
@@ -123,6 +121,7 @@ export class GeoSpoofDetectionService {
           detected_at: new Date()
         }
       });
+
       await AutonomousService.logAction('Geo-Spoof Detected', 'Completed', {
         userId,
         suspicionScore,

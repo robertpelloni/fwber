@@ -11,18 +11,15 @@ const router = Router();
  */
 router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     try {
-        const integrations = await (prisma as any).userIntegration.findMany({
-            where: { userId: BigInt(req.user.id) },
-
-        const integrations = await prisma.userIntegration.findMany({
-            where: { userId: BigInt(req.user!.id) },
-            include: { syncedContacts: true }
+        const integrations = await prisma.user_integrations.findMany({
+            where: { user_id: BigInt(req.user!.id) },
+            include: { synced_contacts: true }
         });
 
         // Flatten all contacts from all providers
         let allContacts: any[] = [];
         integrations.forEach((i: any) => {
-            allContacts = [...allContacts, ...i.syncedContacts];
+            allContacts = [...allContacts, ...i.synced_contacts];
         });
 
         res.json({ contacts: allContacts });
@@ -37,11 +34,8 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
  */
 router.post('/sync', authenticate, async (req: AuthRequest, res: Response) => {
     try {
-        const integrations = await (prisma as any).userIntegration.findMany({
-            where: { userId: BigInt(req.user.id) }
-
-        const integrations = await prisma.userIntegration.findMany({
-            where: { userId: BigInt(req.user!.id) }
+        const integrations = await prisma.user_integrations.findMany({
+            where: { user_id: BigInt(req.user!.id) }
         });
 
         for (const integration of integrations) {

@@ -105,6 +105,7 @@ export class TokenDistributionService {
     });
 
     console.log(`[TokenService] Awarded ${amount} tokens to user ${userId}: ${description}`);
+
     // Log to Autonomous Monitor
     await AutonomousService.logAction('Token Award', 'Completed', { userId, amount, type, description });
   }
@@ -130,6 +131,7 @@ export class TokenDistributionService {
           description
         }
       });
+
       await AutonomousService.logAction('Token Spend', 'Completed', { userId, amount, description });
     });
   }

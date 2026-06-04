@@ -41,9 +41,27 @@ const mockSendPasswordResetEmail = jest.fn();
 const mockCreateVerificationToken = jest.fn();
 
 jest.unstable_mockModule('../src/lib/prisma.js', () => ({
-  default: mockPrisma,
-
   default: mockPrisma, serialize: (obj: any) => obj, sanitizeUser: (obj: any) => obj,
+}));
+
+jest.unstable_mockModule('../src/services/AutonomousDecisionEngine.js', () => ({
+  AutonomousDecisionEngine: {
+    evaluateAction: jest.fn().mockResolvedValue({ decision: 'Allow' })
+  },
+  ProposedAction: {}
+}));
+
+jest.unstable_mockModule('../src/services/AutonomousService.js', () => ({
+  AutonomousService: {
+    logAction: jest.fn().mockResolvedValue(undefined),
+    isAdjustmentEnabled: jest.fn().mockResolvedValue(true)
+  }
+}));
+
+jest.unstable_mockModule('../src/services/ProtocolVerificationService.js', () => ({
+  ProtocolVerificationService: {
+    verifyProtocol: jest.fn().mockResolvedValue({ score: 100, passed: true })
+  }
 }));
 
 jest.unstable_mockModule('../src/lib/email.js', () => ({

@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { jest } from '@jest/globals';
+import express from 'express';
 
 const mockFindUnique = jest.fn();
 const mockUpsert = jest.fn();
@@ -11,19 +12,29 @@ const mockPrisma = {
     findUnique: mockFindUnique,
     upsert: mockUpsert
   },
-  users: {
-    findUnique: jest.fn(),
+  merchant_inventories: {
+    count: jest.fn(),
+    findMany: jest.fn(),
   },
-  $queryRaw: jest.fn().mockResolvedValue([{ 1: 1 }]),
+  merchant_payments: {
+    count: jest.fn(),
+    aggregate: jest.fn(),
+  },
+  promotion_events: {
+    findMany: jest.fn(),
+    count: jest.fn(),
+  },
+  inventory_redemptions: {
+    findFirst: jest.fn(),
+  }
 };
 
 jest.unstable_mockModule('../src/lib/prisma.js', () => ({
   default: mockPrisma,
-  serialize: (obj: any) => JSON.parse(JSON.stringify(obj, (k, v) => typeof v === 'bigint' ? v.toString() : v)),
+  serialize: (obj: any) => obj,
   sanitizeUser: (obj: any) => obj,
 }));
 
-// Mock the middleware to bypass real JWT verification
 jest.unstable_mockModule('../src/middleware/auth.js', () => ({
   authenticate: (req: any, res: any, next: any) => {
     req.user = { id: 1 };
@@ -31,15 +42,15 @@ jest.unstable_mockModule('../src/middleware/auth.js', () => ({
   },
 }));
 
-const { default: app } = await import('../src/index.js');
+const { default: merchantPortalRoutes } = await import('../src/routes/merchant-portal.js');
 
-describe('Merchant Loyalty API', () => {
+const app = express();
+app.use(express.json());
+app.use('/api/merchant-portal', merchantPortalRoutes);
+
+describe('Merchant Loyalty API (Isolated)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  afterAll(async () => {
-    if ((app as any).close) (app as any).close();
   });
 
   it('GET /api/merchant-portal/loyalty/settings should return default if not set', async () => {
@@ -47,8 +58,7 @@ describe('Merchant Loyalty API', () => {
     mockFindUnique.mockResolvedValue(null);
 
     const response = await request(app)
-      .get('/api/merchant-portal/loyalty/settings')
-      .set('Authorization', 'Bearer fake-token');
+      .get('/api/merchant-portal/loyalty/settings');
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -64,8 +74,7 @@ describe('Merchant Loyalty API', () => {
 
     const response = await request(app)
       .post('/api/merchant-portal/loyalty/settings')
-      .send(payload)
-      .set('Authorization', 'Bearer fake-token');
+      .send(payload);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ success: true });
@@ -79,8 +88,7 @@ describe('Merchant Loyalty API', () => {
     mockFindMerchantProfile.mockResolvedValue(null);
 
     const response = await request(app)
-      .get('/api/merchant-portal/loyalty/settings')
-      .set('Authorization', 'Bearer fake-token');
+      .get('/api/merchant-portal/loyalty/settings');
 
     expect(response.status).toBe(403);
     expect(response.body.message).toBe('Not a merchant');

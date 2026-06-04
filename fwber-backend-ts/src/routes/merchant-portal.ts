@@ -328,6 +328,7 @@ router.post('/inventory/redeem', async (req: any, res) => {
 
 // GET /api/merchant-portal/loyalty/settings
 router.get('/loyalty/settings', async (req: any, res) => {
+  console.log('[DEBUG] Hit /loyalty/settings GET');
   try {
     const userId = BigInt(req.user.id);
     const profile = await getMerchantProfile(userId);
@@ -346,6 +347,7 @@ router.get('/loyalty/settings', async (req: any, res) => {
         enabled: true,
         checkin_threshold: 5,
         nft_collection_name: 'Merchant Vibe Gold',
+      });
     }
 
     res.json(JSON.parse(settings.value));
@@ -353,21 +355,33 @@ router.get('/loyalty/settings', async (req: any, res) => {
     console.error('[Merchant] Loyalty settings error:', error.message);
     res.status(500).json({ message: 'Failed to fetch loyalty settings' });
   }
+});
 
 // POST /api/merchant-portal/loyalty/settings
 router.post('/loyalty/settings', async (req: any, res) => {
+  console.log('[DEBUG] Hit /loyalty/settings POST');
+  try {
+    const userId = BigInt(req.user.id);
+    const profile = await getMerchantProfile(userId);
 
+    if (!profile) {
+      return res.status(403).json({ message: 'Not a merchant' });
     }
 
+    const key = `loyalty_settings_merchant_${profile.id}`;
     const value = JSON.stringify(req.body);
 
     await prisma.autonomous_settings.upsert({
+      where: { key },
       update: { value },
       create: { key, value },
+    });
 
     res.json({ success: true });
+  } catch (error: any) {
     console.error('[Merchant] Loyalty settings save error:', error.message);
     res.status(500).json({ message: 'Failed to save loyalty settings' });
   }
+});
 
 export default router;
