@@ -7,16 +7,12 @@ export const contentType = 'image/png';
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api';
   
   let userName = 'Someone';
   let type = 'roast';
   let emoji = '🔥';
   let bgColor = 'from-orange-600 to-red-600';
-export default async function Image({ params }: { params: { id: string } }) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api';
-
   
   try {
     const res = await fetch(`${apiUrl}/api/viral-content/${id}`, { 

@@ -18,14 +18,6 @@ const getBaseUrl = () => {
   // If window is defined, we are definitely in the browser.
   // ALWAYS use relative path to route through the Next.js proxy.
   if (typeof window !== 'undefined') {
-
-    // In the browser, hit the backend API directly at api.fwber.me
-    // (Next.js /api rewrites don't work on Vercel when app/api routes exist)
-    return 'https://api.fwber.me/api';
-  }
-  // On the server (SSR), use env var or direct URL
-  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-  return url.replace(/\/$/, '') + '/api';
     return '/api';
   }
   
@@ -36,7 +28,6 @@ const getBaseUrl = () => {
   // Ensure we don't return just '/api' if NEXT_PUBLIC_API_URL is somehow empty on server
   const normalizedUrl = url.replace(/\/$/, '');
   return normalizedUrl.includes('://') ? `${normalizedUrl}/api` : '/api';
-
 };
 
 const BASE_URL = getBaseUrl();
@@ -194,8 +185,6 @@ async function request<T>(
   const baseUrl = getBaseUrl();
   let url = `${baseUrl}${endpoint}`;
 
-  // Build URL with query parameters
-  let url = `${BASE_URL}${endpoint}`;
   if (params) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
