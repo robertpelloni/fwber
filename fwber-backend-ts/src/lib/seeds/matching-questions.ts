@@ -120,11 +120,14 @@ export async function seedMatchingQuestions() {
   console.log('[Seed] Matching questions seeded.');
 }
 
-if (process.argv[1]?.includes('matching-questions.ts')) {
+if (process.argv[1]?.includes('matching-questions')) {
   seedMatchingQuestions()
-    .then(() => process.exit(0))
+    .then(() => {
+      console.log('[Seed] Seeding completed successfully.');
+      process.exit(0);
+    })
     .catch((err) => {
-      console.error(err);
+      console.error('[Seed] Seeding failed:', err);
       process.exit(1);
     });
 }
