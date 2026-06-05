@@ -57,7 +57,8 @@ router.get('/', async (req: any, res) => {
 
       // Inject value-matching score
       try {
-        const valueScore = await matchingService.calculateCompatibility(userId, u.id);
+        const valueScoreFloat = await matchingService.calculateCompatibility(userId, u.id);
+        const valueScore = Math.round(valueScoreFloat * 100);
         rec.compatibility_score = Math.round((rec.compatibility_score + valueScore) / 2);
         (rec as any).value_match_score = valueScore;
       } catch (err) {
