@@ -331,3 +331,9 @@ To enable real-time monitoring of the autonomous protocol, ensure the `autonomou
 The new matching engine requires additional Prisma models. Ensure you run `npx prisma generate` in `fwber-backend-ts` after deployment.
 - **Required Tables**: `matching_questions`, `matching_options`, `user_matching_answers`.
 - **Seeding**: Run `node dist/lib/seeds/matching-questions.js` (or use the provided seed script via the backend maintenance console) to populate initial value-based questions.
+
+### Staging Validation (v2.1.5-staging)
+The `staging` branch has been prepared with full v2.1.5 capabilities.
+1. Build check: PASS
+2. Unit tests: PASS (tests/MatchingHeuristic.test.ts)
+3. UI verification: COMPLETED

@@ -14,6 +14,7 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 - **Frontend Build**: PASS
 - **Unit Tests**: 100% pass rate for matching logic.
 - **Smoke Test**: E2E matching flow (question -> answer -> score) verified.
+- **Staging Branch**: Created and initialized at `v2.1.5-staging`.
 
 ## Deployment Notes
 - Run `npx prisma generate` in `fwber-backend-ts`.
