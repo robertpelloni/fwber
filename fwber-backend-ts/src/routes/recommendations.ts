@@ -51,10 +51,21 @@ router.get('/', async (req: any, res) => {
       take: limit * 3, // overfetch for scoring/filtering
     });
 
-    let results = candidates.map((u: any) => {
+    let results = await Promise.all(candidates.map(async (u: any) => {
       const p = (Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles) || {};
-      return buildRecommendation(u, p, myInterests, myLookingFor, lat, lng, radius);
-    });
+      const rec = buildRecommendation(u, p, myInterests, myLookingFor, lat, lng, radius);
+
+      // Inject value-matching score
+      try {
+        const valueScore = await matchingService.calculateCompatibility(userId, u.id);
+        rec.compatibility_score = Math.round((rec.compatibility_score + valueScore) / 2);
+        (rec as any).value_match_score = valueScore;
+      } catch (err) {
+        // Fallback to interest-based score only
+      }
+
+      return rec;
+    }));
 
     // Filter by distance if location provided
     if (lat && lng) {

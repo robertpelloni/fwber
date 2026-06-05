@@ -1,12 +1,18 @@
 # Changelog
 
-## [2.1.5] - 2026-05-24
+## [2.1.5] - 2026-06-05
 
 ### Added
 - **OkCupid-Style Matching Engine**: Implemented a comprehensive matching system with value-based questions, multiple-choice options, and importance weighting.
 - **Matching Heuristic Service**: Developed a sophisticated compatibility algorithm using geometric mean satisfaction (OkCupid style).
 - **Matching UI**: Created a new dedicated interface in the frontend for users to answer matching questions and view their progress.
-- **Enhanced Seeding**: Added 100+ AI-enhanced matching questions rewritten for the 'Cyber-Noir' aesthetic.
+- **Deep Integration**: Integrated compatibility badges into Profile and Recommendation cards.
+- **Enhanced Seeding**: Added AI-enhanced matching questions rewritten for the 'Cyber-Noir' aesthetic.
+
+### Fixed
+- **Frontend Build Stability**: Resolved critical "Identifier already declared" errors and duplicate imports in the frontend stack.
+- **Data Integrity**: Standardized BigInt-to-String serialization in the API layer.
+- **Autonomous Monitoring**: Instrumenting the new matching engine for real-time performance oversight.
 
 ## [2.1.4] - 2026-05-24
 
