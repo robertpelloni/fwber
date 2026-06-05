@@ -7,6 +7,14 @@
 
 ## 🗺️ High-Level Trajectory
 
+### Phase 8: Intelligent Match Refinement (PLANNED)
+The next major evolution focuses on high-fidelity personality analysis and deeper signal integration.
+
+**Targets:**
+- **Narrative Compatibility**: AI-generated reports explaining *why* two users are compatible based on their value-matching data.
+- **Signal Merging**: Unification of matching engine scores, weighted interest overlap, and real-time proximity history into a single connection score.
+- **Scale**: Expanding the value-matching dataset to 100+ high-signal questions.
+
 ### The OkCupid Matching Engine (COMPLETED - v2.1.5)
 The matching engine has been upgraded to a value-based system with importance weighting and a geometric-mean compatibility heuristic.
 

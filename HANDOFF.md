@@ -20,7 +20,8 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 - Run `node dist/lib/seeds/matching-questions.js`.
 - All environment variables are correctly configured for staging.
 
-## Next Steps
-- Expand the question set to 100+.
-- Implement "Mandatory" answer gating.
-- Analyze initial matching data for importance weighting adjustments.
+## Next Steps & Iteration
+- **Question Expansion**: Scale the Cyber-Noir value dataset from 15 to 100+ questions using generative AI.
+- **Mandatory Gating**: Refine the heuristic to support "Mandatory" requirements (if a mandatory match fails, total compatibility drops to 0%).
+- **Weighted Interests**: Merge the matching engine scores with interest overlap data (currently separate signals).
+- **Personality Insights**: Use AI to generate a narrative compatibility report based on the shared answers.
