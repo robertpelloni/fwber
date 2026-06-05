@@ -179,3 +179,5 @@
 - Standardized BigInt serialization in `prisma.ts` by converting to Strings to prevent precision loss in the frontend while ensuring compatibility with JSON.
 - Fixed multiple "already declared" identifier regressions in the frontend caused by duplicate API client imports and conflicting variable names in server components.
 - The matching question seeding uses a Cyber-Noir aesthetic to maintain product vibe while collecting high-signal compatibility data.
+- v2.1.5 includes score injection into the `/api/recommendations` discovery feed, using a rounded average of interest and value-based scores.
+- Frontend stabilization (v2.1.5) resolved recursive dependencies and duplicate state imports in the Next.js stack.

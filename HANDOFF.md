@@ -5,9 +5,10 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 
 ## Key Changes
 - **Heuristic**: Geometric-mean compatibility `(SatA * SatB)^(1/2)` verified via unit tests.
+- **Deep Integration**: Scores injected into `/api/recommendations` discovery feed and Profile pages.
 - **Frontend**: Dedicated matching dashboard at `/settings/matching` and score badges on profiles/discovery cards.
 - **Content**: Seeded 15 high-fidelity "Cyber-Noir" value questions.
-- **Fixes**: Resolved multiple frontend build regressions and linting errors.
+- **Fixes**: Resolved multiple frontend build regressions (AvatarGenerationFlow syntax) and linting errors.
 
 ## Final Verification
 - **Backend Build**: PASS (v2.1.5 Production)
