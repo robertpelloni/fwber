@@ -332,8 +332,18 @@ The new matching engine requires additional Prisma models. Ensure you run `npx p
 - **Required Tables**: `matching_questions`, `matching_options`, `user_matching_answers`.
 - **Seeding**: Run `node dist/lib/seeds/matching-questions.js` (or use the provided seed script via the backend maintenance console) to populate initial value-based questions.
 
-### Staging Validation (v2.1.5-staging)
-The `staging` branch has been prepared with full v2.1.5 capabilities.
-1. Build check: PASS
-2. Unit tests: PASS (tests/MatchingHeuristic.test.ts)
-3. UI verification: COMPLETED
+### Staging Operations
+The platform supports a dedicated staging environment for pre-production validation.
+
+**Staging Deployment**:
+1. Push changes to the `staging` branch.
+2. The GitHub Action `Deploy Backend (Hetzner Staging)` will automatically trigger.
+3. To manually deploy from the Hetzner terminal:
+   ```bash
+   /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend-ts.sh staging
+   ```
+
+**Staging Validation**:
+1. Check staging health: `https://api-staging.fwber.me/api/health`
+2. Run automated regression: `cd fwber-backend-ts && npm run test`
+3. Verify matching engine UI at `/settings/matching` on the staging frontend.
