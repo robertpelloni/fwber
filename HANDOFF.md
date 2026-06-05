@@ -19,9 +19,9 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 - **Staging Branch**: Merged into `main`.
 
 ## Deployment Notes
-- Run `npx prisma generate` in `fwber-backend-ts`.
-- Run `node dist/lib/seeds/matching-questions.js`.
-- All environment variables are correctly configured for staging.
+- **Prisma**: Run \`npx prisma generate\` in \`fwber-backend-ts\` post-deployment.
+- **Seeding**: Run \`node dist/lib/seeds/matching-questions.js\` to populate the initial Cyber-Noir dataset.
+- **Automation**: Staging deploys are now automated via \`.github/workflows/deploy-staging.yml\` on push to \`staging\`.
 
 ## Next Steps & Iteration
 - **Question Expansion**: Scale the Cyber-Noir value dataset from 15 to 100+ questions using generative AI.
