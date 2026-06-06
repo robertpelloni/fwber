@@ -6,7 +6,7 @@ export function useMatchCompatibility(matchId: string) {
     queryKey: ['match-compatibility', matchId],
     queryFn: async () => {
       const response = await api.get<{ score: number }>(`/api/matching/compatibility/${matchId}`);
-      return response.data;
+      return (response as any).data;
     },
     enabled: !!matchId,
   });

@@ -268,14 +268,14 @@ export default function RecommendationsPage() {
 
     return (
       <Card key={recommendation.id || `${activeTab}-${index}`} className="h-full border-gray-200 dark:border-gray-700 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
-        {recommendation.compatibility_score && (
+        {(recommendation as any).compatibility_score && (
           <div className="bg-purple-600/10 border-b border-purple-500/20 py-2 px-4 flex items-center justify-between">
             <span className="text-xs font-bold text-purple-400 flex items-center gap-1">
               <Sparkles size={12} />
               AI Compatibility
             </span>
             <Badge variant="outline" className="bg-purple-500/20 border-purple-500/30 text-purple-200">
-              {Math.round(recommendation.compatibility_score)}% Match
+              {Math.round((recommendation as any).compatibility_score)}% Match
             </Badge>
           </div>
         )}

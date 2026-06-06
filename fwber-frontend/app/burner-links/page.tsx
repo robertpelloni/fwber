@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, Link as LinkIcon, Trash2, Shield, Plus, Copy } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 export default function BurnerLinksPage() {
     const [links, setLinks] = useState<any[]>([]);

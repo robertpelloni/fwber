@@ -18,8 +18,8 @@ export function useMatchingQuestions() {
   return useQuery({
     queryKey: ['matching-questions'],
     queryFn: async () => {
-      const response = await api.get<MatchingQuestion[]>('/api/matching/questions');
-      return response.data;
+      const response: any = await api.get<MatchingQuestion[]>('/api/matching/questions');
+      return (response as any).data;
     },
   });
 }
@@ -34,8 +34,8 @@ export function useSubmitMatchingAnswer() {
       importance: number;
       explanation?: string;
     }) => {
-      const response = await api.post('/api/matching/answer', data);
-      return response.data;
+      const response: any = await api.post('/api/matching/answer', data);
+      return (response as any).data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['matching-questions'] });

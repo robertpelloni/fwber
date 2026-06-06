@@ -37,7 +37,6 @@ export default function ResetPasswordPage() {
     try {
       await apiClient.post('/auth/reset-password', {
         token,
-        email,
         password,
         password_confirmation: passwordConfirmation,
       });

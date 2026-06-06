@@ -1,11 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Award, Lock, CheckCircle2, Trophy, Flame, Heart, Eye, MessageCircle, Users, Zap, UserCheck } from 'lucide-react'
+import { Lock, CheckCircle2, Trophy, Flame, Heart, Eye, MessageCircle, Users, Zap, UserCheck } from 'lucide-react'
 import { ApiError, apiClient } from '@/lib/api/client'
 import { useAuth } from '@/lib/auth-context'
 
-import { api } from '@/lib/api/client'
 
 interface Achievement {
   id: number
@@ -46,11 +45,9 @@ export function AchievementsList() {
       return
     }
 
-    apiClient.get<AchievementsResponse>('/achievements')
-    api.get<AchievementsResponse>('/achievements')
+apiClient.get<AchievementsResponse>('/achievements')
       .then(res => {
-        setAchievements(res.achievements)
-        setAchievements(res.data.achievements)
+        setAchievements((res as any)?.data?.achievements || (res as any)?.achievements || [])
         setIsLoading(false)
       })
       .catch(err => {

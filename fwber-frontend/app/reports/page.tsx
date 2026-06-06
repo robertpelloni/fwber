@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, ShieldAlert, FileText, AlertTriangle } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 export default function ReportsPage() {
     const [reports, setReports] = useState<any[]>([]);

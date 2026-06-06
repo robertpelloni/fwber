@@ -459,3 +459,23 @@ All notable changes to this project will be documented in this file.
 - **API Proxies**: Corrected Next.js internal API routes to map accurately to the primary TypeScript backend ports.
 - **Type Safety**: Enforced strict typing in Federation route handlers to satisfy compiler null-checks.
 
+
+## [2.1.6] - 2026-06-06
+
+### Added
+- OkCupid-style Matching Engine with heuristic scoring service
+- Matching questions seed data (ice-breakers integrated into matchmaking)
+- Matching settings page in frontend (protected/settings/matching)
+- use-compatibility and use-matching frontend hooks
+- Federation hardening: Prisma schema updates for auth integration
+- Staging deployment workflow (.github/workflows/deploy-staging.yml)
+- Backend deployment script (ops/hetzner/scripts/deploy-backend-ts.sh)
+
+### Fixed
+- Photos reorder route ordering (PUT /reorder before PUT /:id)
+- Photos reorder accepts both 'order' and 'photo_ids' field names
+- Express parameterized route interception prevention across route files
+
+### Merged
+- feat/okcupid-matching-engine-v2.1.5 into main
+- feat/federation-hardening-auth-integration-v2.0.14 into main

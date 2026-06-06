@@ -120,7 +120,7 @@ export default function AvatarGenerationFlow({
       return await api.get('/avatar/physical-traits');
 
       const token = localStorage.getItem('fwber_token');
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/physical-traits`, {
+      let res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/physical-traits`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -180,31 +180,19 @@ export default function AvatarGenerationFlow({
   const galleryQuery = useQuery({
     queryKey: ['avatar-gallery'],
     queryFn: async (): Promise<AvatarGalleryPhoto[]> => {
-        const res = await api.get<{data: AvatarGalleryPhoto[]}>('/photos');
-        const photos: AvatarGalleryPhoto[] = res.data || [];
-
-        const token = localStorage.getItem('fwber_token');
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/photos`, {
-             headers: { Authorization: `Bearer ${token}` }
-        });
-        const photos: AvatarGalleryPhoto[] = res.data?.data || [];
-        return photos.filter((photo) => photo.metadata?.source === 'ai');
+     const galleryRes = await api.get<{data: AvatarGalleryPhoto[]}>('/photos');
+     const photos: AvatarGalleryPhoto[] = (galleryRes as any)?.data || [];
+     return photos.filter((photo: any) => photo.metadata?.source === 'ai');
     },
     enabled: view === 'gallery'
   });
 
-  useEffect(() => {
-    const fetchProviders = async () => {
-      try {
-        const res = await api.get<{providers: Record<string, ProviderConfig>}>('/avatar/providers');
-        setProviders(res.providers);
-
-      const token = localStorage.getItem('fwber_token');
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/avatar/providers`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setProviders(res.data.providers);
-      } catch (e) {
+useEffect(() => {
+  const fetchProviders = async () => {
+    try {
+    const provRes = await api.get<{providers: Record<string, ProviderConfig>}>('/avatar/providers');
+    setProviders((provRes as any)?.data?.providers || (provRes as any)?.providers || {});
+    } catch (e) {
         console.error('Failed to fetch providers', e);
       }
     };
@@ -234,7 +222,7 @@ export default function AvatarGenerationFlow({
       );
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (data.avatar_url) {
           setGeneratedAvatar(data.avatar_url);
           setGeneratedPhotoId(data.photo_id);
@@ -258,7 +246,7 @@ export default function AvatarGenerationFlow({
         provider: selectedProvider,
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (data.avatar_url) {
           setGeneratedAvatar(data.avatar_url);
           setStep('preview');

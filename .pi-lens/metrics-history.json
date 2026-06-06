@@ -550,7 +550,82 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\components\\dashboard\\AchievementsList.tsx": {
+      "latest": {
+        "commit": "dccc525db",
+        "timestamp": "2026-06-06T13:10:25.512Z",
+        "mi": 31.8,
+        "cognitive": 23,
+        "nesting": 3,
+        "lines": 119,
+        "maxCyclomatic": 14,
+        "entropy": 5.9
+      },
+      "history": [
+        {
+          "commit": "dccc525db",
+          "timestamp": "2026-06-06T13:10:25.512Z",
+          "mi": 31.8,
+          "cognitive": 23,
+          "nesting": 3,
+          "lines": 119,
+          "maxCyclomatic": 14,
+          "entropy": 5.9
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\reset-password\\page.tsx": {
+      "latest": {
+        "commit": "dccc525db",
+        "timestamp": "2026-06-06T13:20:43.079Z",
+        "mi": 29.1,
+        "cognitive": 23,
+        "nesting": 4,
+        "lines": 147,
+        "maxCyclomatic": 15,
+        "entropy": 5.67
+      },
+      "history": [
+        {
+          "commit": "dccc525db",
+          "timestamp": "2026-06-06T13:20:43.079Z",
+          "mi": 29.1,
+          "cognitive": 23,
+          "nesting": 4,
+          "lines": 147,
+          "maxCyclomatic": 15,
+          "entropy": 5.67
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\AvatarGenerationFlow.tsx": {
+      "latest": {
+        "commit": "dccc525db",
+        "timestamp": "2026-06-06T13:26:10.622Z",
+        "mi": 4.8,
+        "cognitive": 265,
+        "nesting": 5,
+        "lines": 951,
+        "maxCyclomatic": 264,
+        "entropy": 6.97
+      },
+      "history": [
+        {
+          "commit": "dccc525db",
+          "timestamp": "2026-06-06T13:26:10.622Z",
+          "mi": 4.8,
+          "cognitive": 265,
+          "nesting": 5,
+          "lines": 951,
+          "maxCyclomatic": 264,
+          "entropy": 6.97
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T22:24:32.287Z"
+  "capturedAt": "2026-06-06T13:26:15.710Z"
 }
