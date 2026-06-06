@@ -160,8 +160,21 @@ php artisan optimize
 ```
 
 ### Re-Deploy Sequence
-Use the in-repo deploy script for the repeatable path:
+Use the in-repo deploy script for the repeatable path. Note that there are separate scripts for the PHP and TypeScript backends.
 
+#### TypeScript Backend (fwber-backend-ts)
+GitHub Actions deployment for the TS backend targets Hetzner via `.github/workflows/deploy-backend.yml` (Main/Production) and `.github/workflows/deploy-staging.yml` (Staging).
+
+To manually deploy the TS backend:
+```bash
+# Deploy main (Production)
+/var/www/fwber/repo/ops/hetzner/scripts/deploy-backend-ts.sh main
+
+# Deploy staging
+/var/www/fwber/repo/ops/hetzner/scripts/deploy-backend-ts.sh staging
+```
+
+#### PHP Backend (fwber-backend)
 GitHub Actions backend deployment should now target Hetzner as well, using `.github/workflows/deploy-backend.yml` plus repository secrets:
 - note: the deploy script now explicitly sources rustup Cargo from `~/.cargo/env` / `~/.cargo/bin` so `fwber-geo` builds correctly in non-login CI SSH sessions as well as manual shells
 - validated: the GitHub `Deploy Backend (Hetzner)` workflow has now completed successfully end-to-end after secrets setup and the rustup-path fix
