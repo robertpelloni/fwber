@@ -28,3 +28,39 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 - **Mandatory Gating**: Refine the heuristic to support "Mandatory" requirements (if a mandatory match fails, total compatibility drops to 0%).
 - **Weighted Interests**: Merge the matching engine scores with interest overlap data (currently separate signals).
 - **Personality Insights**: Use AI to generate a narrative compatibility report based on the shared answers.
+
+## Session 2026-06-06 — v2.1.6 Repository Reconciliation & Branch Merge
+
+### Completed
+1. **OkCupid Matching Engine branch merged into main** — Forward merge of `feat/okcupid-matching-engine-v2.1.5`
+   - MatchingHeuristicService.ts with OkCupid-style heuristic scoring
+   - matching-questions.ts seed data (ice-breakers integrated into matchmaking)
+   - matching.ts route with questions, answers, and compatibility endpoints
+   - Frontend matching settings page, use-compatibility and use-matching hooks
+   - Staging deployment workflow (.github/workflows/deploy-staging.yml)
+2. **Federation hardening branch merged into main** — Forward merge of `feat/federation-hardening-auth-integration-v2.0.14`
+   - Prisma schema updates for federation auth integration columns
+3. **Prisma client regenerated** — Resolved 60 TypeScript errors caused by merged models not being in the generated client
+   - All new models now available: matching_questions, matching_options, user_matching_answers, federation_follows, federation_inbox, federation_outbox, autonomous_actions, autonomous_settings, user_integrations
+4. **Frontend merge conflicts resolved** — Fixed 20 TypeScript errors from branch code:
+   - AvatarGenerationFlow: removed duplicate axios calls (merge artifact), fixed block-scoped redeclarations
+   - AchievementsList: fixed type mismatch with API response shape
+   - reset-password: removed orphaned `email` shorthand property
+   - checkbox.tsx: replaced @radix-ui/react-checkbox with simple inline implementation
+   - react-toastify imports: replaced with sonner (existing project toast)
+   - recommendations: fixed compatibility_score type access
+   - use-compatibility/use-matching: fixed response type handling
+5. **Version bumped to 2.1.6**, CHANGELOG updated
+6. **Deployed to Hetzner** — git pull, prisma generate, npm build, pm2 restart — all clean
+
+### Current State
+- Backend: 0 TS errors, PM2 online
+- Frontend: 0 TS errors, Vercel serving from cle1
+- All 120+ API endpoints returning 200
+- No unmerged feature branches with unique progress remain
+
+### Next Steps
+- Run `npx prisma migrate deploy` on Hetzner to sync DB schema with new models (matching_questions, user_matching_answers, etc.)
+- Seed matching questions into production DB
+- Wire frontend matching settings page to live matching API
+- Test OkCupid-style compatibility scoring end-to-end
