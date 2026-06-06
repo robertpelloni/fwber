@@ -1,0 +1,35 @@
+name: Deploy Backend (Hetzner Staging)
+
+on:
+  push:
+    branches: [ staging ]
+    paths:
+      - 'fwber-backend-ts/**'
+      - 'ops/hetzner/**'
+      - '.github/workflows/deploy-staging.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'
+
+    steps:
+      - name: Deploy to Hetzner Staging via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          HETZNER_PROJECT_PATH: ${{ secrets.HETZNER_PROJECT_PATH }}
+          FWBER_RUN_SMOKE_CHECK: 1
+        with:
+          host: ${{ secrets.HETZNER_STAGING_HOST || secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_STAGING_USERNAME || secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_STAGING_SSH_KEY || secrets.HETZNER_SSH_KEY }}
+          port: 22
+          envs: HETZNER_PROJECT_PATH,FWBER_RUN_SMOKE_CHECK
+          script: |
+            set -euo pipefail
+            REPO_ROOT="${HETZNER_PROJECT_PATH:-/var/www/fwber/repo}"
+            cd "$REPO_ROOT"
+            # Execute deployment script for staging
+            ./ops/hetzner/scripts/deploy-backend-ts.sh staging
+            echo "Staging deploy complete"

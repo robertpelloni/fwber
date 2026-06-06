@@ -90,7 +90,6 @@ function TranslateButton({
 			setTranslatedText(null);
 			return;
 		}
-		// Default to English for now
 		const result = await translate(text, "en");
 		if (result) setTranslatedText(result);
 	};
@@ -135,13 +134,10 @@ function EncryptedMessageContent({
 
 	useEffect(() => {
 		if (!isReady || !content) return;
-
-		// Check if content looks like JSON (our encrypted format)
 		if (!content.trim().startsWith("{")) {
-			setDecryptedText(content); // Assume plain text if not JSON
+			setDecryptedText(content);
 			return;
 		}
-
 		const decryptMsg = async () => {
 			try {
 				const text = await decrypt(senderId, content);
@@ -151,7 +147,6 @@ function EncryptedMessageContent({
 				setError(true);
 			}
 		};
-
 		decryptMsg();
 	}, [content, senderId, isReady, decrypt]);
 
@@ -217,13 +212,9 @@ export default function RealTimeChat({
 
 	const [activeNudge, setActiveNudge] = useState<any>(null);
 
-	// When a new nudge arrives, set it to active and show the banner
 	useEffect(() => {
 		if (currentNudges && currentNudges.length > 0) {
-			// Show the most recent one
 			setActiveNudge(currentNudges[currentNudges.length - 1]);
-
-			// Auto-dismiss after 15 seconds
 			const timer = setTimeout(() => {
 				setActiveNudge(null);
 			}, 15000);
@@ -232,19 +223,12 @@ export default function RealTimeChat({
 	}, [currentNudges]);
 
 	const { loadConversationHistory, connectionStatus } = useWebSocket();
-
   const BACKEND_URL = (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me').replace('/api', '');
 
-	const BACKEND_URL =
-		process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
-		"http://localhost:8000";
-
-	// Update isConnected based on global connection status
 	useEffect(() => {
 		setIsConnected(connectionStatus.connected);
 	}, [connectionStatus.connected]);
 
-	// Load conversation history on mount
 	useEffect(() => {
 		if (recipientId && user?.id) {
 			setLoadingHistory(true);
@@ -254,19 +238,16 @@ export default function RealTimeChat({
 		}
 	}, [recipientId, user?.id, loadConversationHistory]);
 
-	// Find recipient's online status
 	const recipientUser = (onlineUsers as OnlineUser[]).find(
 		(u) => u.user_id === recipientId,
 	);
 	const recipientStatus: PresenceStatus =
 		(recipientUser?.status as PresenceStatus) || "offline";
 
-	// Scroll to bottom when new messages arrive
 	useEffect(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
 
-	// Check if recipient is typing
 	const recipientTyping = (typingIndicators || []).find(
 		(indicator: any) =>
 			indicator.from_user_id === recipientId && indicator.is_typing,
@@ -286,7 +267,6 @@ export default function RealTimeChat({
 			const messageUuid = uuidv4();
 			const messageContent = message.trim();
 
-			// Handle offline queuing for text-only messages
 			if (!navigator.onLine) {
 				if (selectedFile) {
 					showError("Offline", "File uploads require an active connection.");
@@ -318,14 +298,12 @@ export default function RealTimeChat({
 
 			try {
 				if (selectedFile) {
-					// Handle file upload via API
 					const formData = new FormData();
 					formData.append("uuid", messageUuid);
 					formData.append("receiver_id", recipientId);
 					formData.append("content", messageContent);
 					formData.append("media", selectedFile);
 
-					// Auto-detect type
 					if (selectedFile.type.startsWith("image/"))
 						formData.append("message_type", "image");
 					else if (selectedFile.type.startsWith("video/"))
@@ -335,24 +313,16 @@ export default function RealTimeChat({
 					else formData.append("message_type", "file");
 
 					await api.post("/messages", formData);
-					// Message will be received via WebSocket
 				} else {
-					// Handle text message via WebSocket
 					let payload = message.trim();
-
-					// Encrypt if E2E is ready
 					if (isE2EReady) {
 						try {
 							payload = await encrypt(parseInt(recipientId), payload);
-						} catch (error) {
-							// E2E not available - send plain text silently
-						}
+						} catch (error) {}
 					}
-
 					sendMessage(payload);
 				}
 
-				// REST fallback when WebSocket is disconnected
 				if (!isConnected) {
 					try {
 						await api.post("/messages", {
@@ -360,7 +330,7 @@ export default function RealTimeChat({
 							content: messageContent,
 							message_type: "text",
 						});
-					} catch (_) { /* optimistic already queued */ }
+					} catch (_) {}
 				}
 
 				setMessage("");
@@ -393,11 +363,8 @@ export default function RealTimeChat({
 		try {
 			if (!navigator.onLine) throw new Error("Offline");
 			await api.post("/messages", formData);
-			// Message will be received via WebSocket
 		} catch (error) {
 			console.error("Failed to send voice message:", error);
-
-			// Offline fallback
 			if (
 				!navigator.onLine ||
 				(error as any)?.message === "Offline" ||
@@ -414,13 +381,10 @@ export default function RealTimeChat({
 							is_encrypted: isE2EReady,
 							created_at: new Date().toISOString(),
 						});
-
-						// Register background sync
 						if ("serviceWorker" in navigator && "SyncManager" in window) {
 							const registration = await navigator.serviceWorker.ready;
 							await (registration as any).sync.register("chat-message");
 						}
-
 						showSuccess(
 							"Saved Offline",
 							"Voice message will be sent when online",
@@ -439,7 +403,6 @@ export default function RealTimeChat({
 	const handleReaction = async (messageId: string, emoji: string) => {
 		try {
 			await api.post(`/messages/${messageId}/react`, { emoji });
-			// The reaction will be broadcasted back via WebSocket/Pusher
 		} catch (err) {
 			console.error("Failed to react", err);
 		}
@@ -447,7 +410,6 @@ export default function RealTimeChat({
 
 	return (
 		<div className={`flex flex-col h-full bg-gray-800 rounded-lg ${className}`}>
-			{/* Chat Header */}
 			<div className="flex items-center justify-between p-4 border-b border-gray-700">
 				<div
 					className="flex items-center space-x-3 cursor-pointer"
@@ -636,10 +598,8 @@ export default function RealTimeChat({
 				</div>
 			</div>
 
-			{/* Tier Unlock Guide Overlay */}
 			<TierUnlockGuide matchId={recipientId} />
 
-			{/* Wingman Proactive Nudge Banner */}
 			<AnimatePresence>
 				{activeNudge && (
 					<motion.div
@@ -690,7 +650,6 @@ export default function RealTimeChat({
 				)}
 			</AnimatePresence>
 
-			{/* Messages */}
 			<div className="flex-1 overflow-y-auto p-4 space-y-4">
 				{((messages || []) as ChatMessage[]).length === 0 ? (
 					<div className="text-center text-gray-400 py-8">
@@ -807,7 +766,6 @@ export default function RealTimeChat({
 									/>
 								</div>
 
-								{/* Message Reactions */}
 								<div className="flex gap-1 mt-1 opacity-0 hover:opacity-100 transition-opacity">
 									<button
 										onClick={() =>
@@ -847,7 +805,6 @@ export default function RealTimeChat({
 									</button>
 								</div>
 
-								{/* Display Reactions */}
 								{Array.isArray(msg.reactions) && msg.reactions.length > 0 && (
 									<div className="flex gap-1 mt-1 -translate-y-2 translate-x-2">
 										{msg.reactions.map((r: any, i: number) => (
@@ -868,7 +825,6 @@ export default function RealTimeChat({
 				<div ref={messagesEndRef} />
 			</div>
 
-			{/* Message Input */}
 			<div className="p-4 border-t border-gray-700">
 				<div className="mb-2">
 					<WingmanSuggestions
@@ -980,13 +936,8 @@ export default function RealTimeChat({
 	);
 }
 
-/**
- * Chat list component showing all active conversations
- */
 export function ChatList({ className = "" }: { className?: string }) {
 	const { chatMessages, onlineUsers } = useWebSocketChat();
-
-	// Group messages by conversation
 	const conversations = (Array.isArray(chatMessages) ? chatMessages : []).reduce<
 		Record<string, ChatMessage[]>
 	>((acc, msg) => {
@@ -1050,9 +1001,6 @@ export function ChatList({ className = "" }: { className?: string }) {
 	);
 }
 
-/**
- * Online users component
- */
 export function OnlineUsers({ className = "" }: { className?: string }) {
 	const { onlineUsers } = useWebSocketChat();
 

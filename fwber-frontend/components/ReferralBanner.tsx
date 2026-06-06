@@ -27,15 +27,10 @@ export default function ReferralBanner() {
       const checkCode = async () => {
         try {
           const res = await api.get<{valid: boolean, referrer_name: string, referrer_avatar: string|null}>(`/auth/referral/${refCode}`)
-          if (res.valid) {
+          if (res && res.valid) {
              setReferrer({
                name: res.referrer_name,
                avatar: res.referrer_avatar
-
-          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/referral/${refCode}`)
-          if (res.data.valid) {
-               name: res.data.referrer_name,
-               avatar: res.data.referrer_avatar
              })
              setIsVisible(true)
           }

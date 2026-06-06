@@ -2,8 +2,10 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { filePathToUrl } from '../lib/photos.js';
+import { MatchingHeuristicService } from '../services/MatchingHeuristicService.js';
 
 const router = Router();
+const matchingService = new MatchingHeuristicService();
 
 // All recommendation routes require auth
 router.use(authenticate);
@@ -49,10 +51,22 @@ router.get('/', async (req: any, res) => {
       take: limit * 3, // overfetch for scoring/filtering
     });
 
-    let results = candidates.map((u: any) => {
+    let results = await Promise.all(candidates.map(async (u: any) => {
       const p = (Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles) || {};
-      return buildRecommendation(u, p, myInterests, myLookingFor, lat, lng, radius);
-    });
+      const rec = buildRecommendation(u, p, myInterests, myLookingFor, lat, lng, radius);
+
+      // Inject value-matching score
+      try {
+        const valueScoreFloat = await matchingService.calculateCompatibility(userId, u.id);
+        const valueScore = Math.round(valueScoreFloat * 100);
+        rec.compatibility_score = Math.round((rec.compatibility_score + valueScore) / 2);
+        (rec as any).value_match_score = valueScore;
+      } catch (err) {
+        // Fallback to interest-based score only
+      }
+
+      return rec;
+    }));
 
     // Filter by distance if location provided
     if (lat && lng) {
@@ -378,6 +392,12 @@ function buildRecommendation(u: any, p: any, myInterests: string[], myLookingFor
 
   // Score: base 30 + shared interests (12 each, max 48) + distance + verified + looking_for + profile completeness
   let score = 30;
+
+  // In a real async loop we'd fetch these earlier, but for this recommendation builder,
+  // we might want to just incorporate the matching score if it's already calculated or
+  // do a quick check. Since calculateCompatibility is async, we'll keep it as a secondary
+  // adjustment or assume it's part of the 'ai' type results.
+
   score += Math.min(shared.length * 12, 48); // shared interests
   if (distanceMeters > 0 && distanceMeters < 5000) score += 8;
   if (distanceMeters > 0 && distanceMeters < 1000) score += 5;
