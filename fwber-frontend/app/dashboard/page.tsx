@@ -4,43 +4,17 @@ import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { api } from '@/lib/api/client';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
-  Heart,
-  Users,
-  User,
-  MessageSquare,
-  TrendingUp,
-  Clock,
-  Target,
-  Crown,
-  Flame,
-  Store,
-  Gavel,
-  Wallet,
-  Bell,
-  Calendar,
-  Plane,
-  Sparkles,
-  Rocket,
-  Gift,
-  Phone,
-  Lock,
-  Shield,
-  CircleHelp,
-  Share2,
-  Radio,
-  Map,
-  Award,
-  Compass,
-  Wand2,
-  HeartHandshake,
-  Wifi,
-  Cpu
+  Heart, MessageSquare, Users, TrendingUp, Clock,
+  Crown, Sparkles, MapPin, Shield, Compass, Radio,
+  Award, Wallet, Store, Wand2, Calendar, UserPlus,
+  Eye, Star, Rocket, Gift, Lock, Phone, Share2,
+  Settings, Bell, Plane, Search, Gavel, Flame,
+  CheckCircle2, User
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
-import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenceView';
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
@@ -82,20 +56,12 @@ export default function DashboardPage() {
     },
   });
 
-  const { data: leaderboardData } = useQuery({
-    queryKey: ['vouch-leaderboard'],
-    queryFn: async () => {
-      return await api.get('/leaderboard');
-    }
-  });
-
   const dailyStreak = stats?.current_streak || 0;
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
         <AppHeader />
-
         <DailyStreakModal
           isOpen={isStreakModalOpen}
           currentStreak={dailyStreak}
@@ -104,301 +70,260 @@ export default function DashboardPage() {
 
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
-            <div className="mb-8 flex justify-between items-end">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Dashboard</h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Here&apos;s what&apos;s happening with your matches and the surfaces that now belong in the signed-in app.
-                </p>
-              </div>
+
+            {/* ── Greeting ── */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Hey, {(user as any)?.display_name || (user as any)?.name || 'there'} 👋
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">
+                Your matches, messages, and everything else — one glance.
+              </p>
             </div>
 
+            {/* ── Key Metrics Row ── */}
             {statsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse dark:bg-gray-800 dark:border-gray-700">
-                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-4 dark:bg-gray-700"></div>
-                    <div className="h-8 bg-gray-200 rounded w-1/2 dark:bg-gray-700"></div>
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 animate-pulse">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-3" />
+                    <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <StatCard
-                  icon={<Heart className="w-6 h-6" />}
-                  label="Total Matches"
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+                <MetricCard
+                  icon={<Heart className="w-5 h-5" />}
+                  label="Matches"
                   value={stats?.total_matches || 0}
-                  subtext={`${stats?.pending_matches || 0} pending`}
-                  color="purple"
-                  link="/matches"
+                  detail={`${stats?.pending_matches || 0} pending`}
+                  accent="pink"
+                  href="/matches"
                 />
-                <StatCard
-                  icon={<MessageSquare className="w-6 h-6" />}
-                  label="Active Chats"
+                <MetricCard
+                  icon={<MessageSquare className="w-5 h-5" />}
+                  label="Chats"
                   value={stats?.conversations || 0}
-                  subtext={`${stats?.response_rate || 0}% response rate`}
-                  color="blue"
-                  link="/messages"
+                  detail={`${stats?.response_rate || 0}% response`}
+                  accent="blue"
+                  href="/messages"
                 />
-                <StatCard
-                  icon={<Users className="w-6 h-6" />}
-                  label="Profile Views"
+                <MetricCard
+                  icon={<Eye className="w-5 h-5" />}
+                  label="Views"
                   value={stats?.profile_views || 0}
-                  subtext={`${stats?.today_views || 0} today`}
-                  color="green"
-                  link="/profile"
+                  detail={`${stats?.today_views || 0} today`}
+                  accent="green"
+                  href="/profile-views"
                 />
-                <StatCard
-                  icon={<TrendingUp className="w-6 h-6" />}
-                  label="Match Score"
+                <MetricCard
+                  icon={<TrendingUp className="w-5 h-5" />}
+                  label="Compatibility"
                   value={`${stats?.match_score_avg || 0}%`}
-                  subtext="Average compatibility"
-                  color="orange"
-                  link="/matches"
+                  detail="avg score"
+                  accent="purple"
+                  href="/matching"
                 />
-                <StatCard
-                  icon={<Wifi className="w-6 h-6" />}
-                  label="Network"
-                  value={stats?.reverb_healthy ? 'Live' : 'Syncing'}
-                  subtext={stats?.reverb_healthy ? 'Real-time active' : 'Connecting to hub...'}
-                  color={stats?.reverb_healthy ? 'green' : 'yellow'}
-                  link="/support"
+                <MetricCard
+                  icon={<Flame className="w-5 h-5" />}
+                  label="Streak"
+                  value={dailyStreak}
+                  detail={dailyStreak > 0 ? 'days active' : 'Start today!'}
+                  accent="orange"
+                  href="/daily-checkin"
                 />
-                {(user as any)?.is_moderator && (
-                  <StatCard
-                    icon={<Cpu className="w-6 h-6" />}
-                    label="Autonomous Protocol"
-                    value="Active"
-                    subtext="View execution monitor"
-                    color="purple"
-                    link="/admin/monitoring"
-                  />
-                )}
               </div>
             )}
 
+            {/* ── Main Grid: Activity + Sidebar ── */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-              <div className="lg:col-span-2 space-y-6">
-                <ActivityFeed maxItems={8} showRefresh />
 
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-purple-500" />
+              {/* Left: Activity Feed */}
+              <div className="lg:col-span-2 space-y-6">
+                <ActivityFeed maxItems={6} showRefresh />
+
+                {/* Quick Actions */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">
                     Quick Actions
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-                    <ActionButton href="/matching" label="Start Matching" icon="❤️" color="purple" />
-                    <ActionButton href="/connections" label="Recent Activity" icon="🤝" color="blue" />
-                    <ActionButton href="/economy" label="Wallet & Gold" icon="💰" color="orange" />
-                    <ActionButton href="/identity" label="Manage Profile" icon="👤" color="green" />
-                    <ActionButton href="/plans" label="Date Planning" icon="🗓️" color="purple" />
-                    <ActionButton href="/studio" label="AI Wingman" icon="✨" color="gray" />
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Features</h3>
-                  <div className="space-y-6">
-                    <div>
-                      <div className="mb-3 flex items-center gap-2">
-                        <Heart className="h-4 w-4 text-pink-500" />
-                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Core dating loop</h4>
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <FeatureSurfaceCard
-                          href="/matching"
-                          title="Matching & Attraction"
-                          description="Open recommendations, matches, admirers, profile-view intent, and nearby dating signals from one hub."
-                          icon={<Heart className="h-5 w-5" />}
-                          accent="pink"
-                        />
-                        <FeatureSurfaceCard
-                          href="/connections"
-                          title="Connections"
-                          description="Open messages, friends, activity, notifications, and adjacent direct-social flows from one hub."
-                          icon={<HeartHandshake className="h-5 w-5" />}
-                          accent="red"
-                        />
-                        <FeatureSurfaceCard
-                          href="/scenes"
-                          title="Scenes & Discovery"
-                          description="Open recommendations, groups, topics, matches, and broader social-discovery surfaces from one hub."
-                          icon={<Compass className="h-5 w-5" />}
-                          accent="purple"
-                        />
-                        <FeatureSurfaceCard
-                          href="/places"
-                          title="Places & Nearby"
-                          description="Open nearby people, venues, deals, date planning, and location-aware surfaces from one local-discovery hub."
-                          icon={<Map className="h-5 w-5" />}
-                          accent="green"
-                        />
-                        <FeatureSurfaceCard
-                          href="/plans"
-                          title="Plans & Meetups"
-                          description="Open events, date planning, nearby discovery, venues, and deals from one local outing hub."
-                          icon={<Calendar className="h-5 w-5" />}
-                          accent="purple"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="mb-3 flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-500" />
-                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Identity, trust & support</h4>
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <FeatureSurfaceCard
-                          href="/identity"
-                          title="Identity & Profile"
-                          description="Open profile, photos, verification, and identity-focused settings from one hub."
-                          icon={<User className="h-5 w-5" />}
-                          accent="blue"
-                        />
-                        <FeatureSurfaceCard
-                          href="/reputation"
-                          title="Reputation & Trust"
-                          description="Open achievements, verification, profile views, and social-proof surfaces from one trust-focused hub."
-                          icon={<Award className="h-5 w-5" />}
-                          accent="yellow"
-                        />
-                        <FeatureSurfaceCard
-                          href="/operations"
-                          title="Trust & Operations"
-                          description="Open safety, settings, merchant, moderation, and operational control surfaces from one hub."
-                          icon={<Shield className="h-5 w-5" />}
-                          accent="red"
-                        />
-                        <FeatureSurfaceCard
-                          href="/support"
-                          title="Support & Policies"
-                          description="Open help, support contact, privacy, terms, safety resources, and user-protection references from one hub."
-                          icon={<CircleHelp className="h-5 w-5" />}
-                          accent="blue"
-                        />
-                        <FeatureSurfaceCard
-                          href="/settings/travel"
-                          title="Travel Mode"
-                          description="Open the travel-mode controls directly from the dashboard."
-                          icon={<Plane className="h-5 w-5" />}
-                          accent="slate"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="mb-3 flex items-center gap-2">
-                        <Wallet className="h-4 w-4 text-green-500" />
-                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Premium, growth & playful surfaces</h4>
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <FeatureSurfaceCard
-                          href="/economy"
-                          title="Premium & Economy"
-                          description="Open premium, wallet, referrals, boosts, gifts, and unlock-related monetization flows from one hub."
-                          icon={<Wallet className="h-5 w-5" />}
-                          accent="green"
-                        />
-                        <FeatureSurfaceCard
-                          href="/unlocks"
-                          title="Unlock Center"
-                          description="Jump into token-gated perks, share unlocks, and premium reveal surfaces from one recovery hub."
-                          icon={<Lock className="h-5 w-5" />}
-                          accent="yellow"
-                        />
-                        <FeatureSurfaceCard
-                          href="/studio"
-                          title="Studio & AI"
-                          description="Open roast tools, wingman, content generation, bounties, and adjacent viral/creative surfaces from one hub."
-                          icon={<Wand2 className="h-5 w-5" />}
-                          accent="pink"
-                        />
-                        <FeatureSurfaceCard
-                          href="/video"
-                          title="Video Calls"
-                          description="Open call history and start video calls from a top-level page."
-                          icon={<Phone className="h-5 w-5" />}
-                          accent="blue"
-                        />
-                        <FeatureSurfaceCard
-                          href="/share-unlock"
-                          title="Share Unlocks"
-                          description="Open the viral unlock route directly instead of hunting through hidden CTA chains."
-                          icon={<Share2 className="h-5 w-5" />}
-                          accent="purple"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="mb-3 flex items-center gap-2">
-                        <Store className="h-4 w-4 text-orange-500" />
-                        <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">Community, live & local business</h4>
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <FeatureSurfaceCard
-                          href="/spaces"
-                          title="Live Spaces"
-                          description="Open chatrooms, audio rooms, local pulse, boards, burner links, and conference pulse from one top-level hub."
-                          icon={<Radio className="h-5 w-5" />}
-                          accent="purple"
-                        />
-                        <FeatureSurfaceCard
-                          href="/commerce"
-                          title="Merchants & Commerce"
-                          description="Open merchant onboarding, business operations, analytics, promotions, and local broadcast tooling from one hub."
-                          icon={<Store className="h-5 w-5" />}
-                          accent="orange"
-                        />
-                        <FeatureSurfaceCard
-                          href={user?.role === 'merchant' ? '/merchant/dashboard' : '/merchant/register'}
-                          title={user?.role === 'merchant' ? 'Merchant Portal' : 'Become a Merchant'}
-                          description={user?.role === 'merchant'
-                            ? 'Run storefront inventory, redemptions, analytics, and trust status.'
-                            : 'Open a storefront, list redeemable items, and show up in nearby marketplace results.'}
-                          icon={<Store className="h-5 w-5" />}
-                          accent="pink"
-                        />
-                        {(user as { is_moderator?: boolean } | null)?.is_moderator ? (
-                          <FeatureSurfaceCard
-                            href="/moderation"
-                            title="Moderation"
-                            description="Open the moderation dashboard for reports, merchant review, and trust tooling."
-                            icon={<Gavel className="h-5 w-5" />}
-                            accent="slate"
-                          />
-                        ) : null}
-                      </div>
-                    </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                    <QuickAction href="/matching" label="Answer Questions" icon={<Heart className="w-4 h-4" />} />
+                    <QuickAction href="/recommendations" label="Discover" icon={<Compass className="w-4 h-4" />} />
+                    <QuickAction href="/messages" label="Messages" icon={<MessageSquare className="w-4 h-4" />} />
+                    <QuickAction href="/profile/edit" label="Edit Profile" icon={<User className="w-4 h-4" />} accent="green" />
+                    <QuickAction href="/premium" label="Go Premium" icon={<Crown className="w-4 h-4" />} accent="amber" />
+                    <QuickAction href="/studio" label="AI Wingman" icon={<Sparkles className="w-4 h-4" />} accent="purple" />
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
+              {/* Right Sidebar */}
+              <div className="space-y-4">
                 <ProfileCompletenessWidget />
-                <ProximityPresenceCompact nearbyUsers={[]} />
 
-                <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl border border-purple-200 dark:border-purple-800 p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    <span className="text-sm font-medium text-purple-900 dark:text-purple-100">Account Status</span>
+                {/* Streak & Account Card */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">Account</span>
+                    </div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {stats?.days_active || 0} days
+                    </span>
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Member since:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{stats?.days_active || 0} days</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Last active:</span>
+                      <span className="text-gray-500 dark:text-gray-400">Last active</span>
                       <span className="font-medium text-gray-900 dark:text-white">
                         {stats?.last_login ? new Date(stats.last_login).toLocaleDateString() : 'Today'}
                       </span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 dark:text-gray-400">Network</span>
+                      <span className={`font-medium ${stats?.reverb_healthy ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`}>
+                        {stats?.reverb_healthy ? '● Live' : '○ Syncing'}
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Who Liked You CTA */}
+                <Link href="/premium/who-likes-you" prefetch={false} className="block">
+                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-200 dark:border-amber-800 p-5 hover:shadow-md transition">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <span className="text-sm font-semibold text-amber-900 dark:text-amber-100">Who Liked You</span>
+                    </div>
+                    <p className="text-xs text-amber-700 dark:text-amber-300">See who&apos;s already interested in you</p>
+                  </div>
+                </Link>
               </div>
             </div>
+
+            {/* ── Feature Navigation ── */}
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Explore</h3>
+            </div>
+
+            {/* Discover & Connect */}
+            <SectionHeader icon={<Heart className="w-4 h-4" />} title="Discover & Connect" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/matching" title="Matching" subtitle="95 personality questions" icon={<Heart className="w-5 h-5" />} accent="pink" />
+              <FeatureTile href="/recommendations" title="Discover" subtitle="Browse nearby people" icon={<Compass className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/matches" title="Matches" subtitle="Your mutual likes" icon={<Star className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/who-likes-you" title="Admirers" subtitle="Who likes you" icon={<Crown className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/profile-views" title="Profile Views" subtitle="Who checked you out" icon={<Eye className="w-5 h-5" />} accent="green" />
+              <FeatureTile href="/search" title="Search" subtitle="Find anyone" icon={<Search className="w-5 h-5" />} accent="slate" />
+            </div>
+
+            {/* Chat & Social */}
+            <SectionHeader icon={<MessageSquare className="w-4 h-4" />} title="Chat & Social" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/messages" title="Messages" subtitle="Private chats" icon={<MessageSquare className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/friends" title="Friends" subtitle="Your connections" icon={<UserPlus className="w-5 h-5" />} accent="green" />
+              <FeatureTile href="/activity" title="Activity" subtitle="Recent interactions" icon={<Rocket className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/notifications" title="Notifications" subtitle="Alerts & updates" icon={<Bell className="w-5 h-5" />} accent="red" />
+              <FeatureTile href="/groups" title="Groups" subtitle="Interest communities" icon={<Users className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/topics" title="Topics" subtitle="Discussion threads" icon={<MessageSquare className="w-5 h-5" />} accent="slate" />
+            </div>
+
+            {/* Local & Events */}
+            <SectionHeader icon={<MapPin className="w-4 h-4" />} title="Local & Events" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/local-pulse" title="Local Pulse" subtitle="What&apos;s nearby" icon={<MapPin className="w-5 h-5" />} accent="green" />
+              <FeatureTile href="/events" title="Events" subtitle="Meetups & gatherings" icon={<Calendar className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/venues" title="Venues" subtitle="Bars, cafés, spots" icon={<MapPin className="w-5 h-5" />} accent="green" />
+              <FeatureTile href="/deals" title="Deals" subtitle="Local offers" icon={<Store className="w-5 h-5" />} accent="orange" />
+              <FeatureTile href="/date-planner" title="Date Planner" subtitle="Plan your outing" icon={<Calendar className="w-5 h-5" />} accent="pink" />
+              <FeatureTile href="/nearby" title="Nearby" subtitle="People around you" icon={<MapPin className="w-5 h-5" />} accent="green" />
+            </div>
+
+            {/* Live Spaces */}
+            <SectionHeader icon={<Radio className="w-4 h-4" />} title="Live Spaces" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/spaces" title="Chat Rooms" subtitle="Group conversations" icon={<MessageSquare className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/audio-rooms" title="Audio Rooms" subtitle="Live voice chat" icon={<Radio className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/bulletin-boards" title="Bulletins" subtitle="Community posts" icon={<MessageSquare className="w-5 h-5" />} accent="slate" />
+              <FeatureTile href="/conference-pulse" title="Conference" subtitle="Event channels" icon={<Radio className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/burner" title="Burner Links" subtitle="Temporary share" icon={<Lock className="w-5 h-5" />} accent="red" />
+              <FeatureTile href="/proximity-chatrooms" title="Proximity Chat" subtitle="Location-based" icon={<MapPin className="w-5 h-5" />} accent="green" />
+            </div>
+
+            {/* AI Wingman */}
+            <SectionHeader icon={<Sparkles className="w-4 h-4" />} title="AI Wingman" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/studio" title="Studio" subtitle="All AI tools" icon={<Wand2 className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/wingman/roast" title="Roast Me" subtitle="Profile critique" icon={<Sparkles className="w-5 h-5" />} accent="pink" />
+              <FeatureTile href="/wingman/cosmic" title="Cosmic Match" subtitle="AI compatibility" icon={<Star className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/wingman/date-ideas" title="Date Ideas" subtitle="AI suggestions" icon={<Calendar className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/wingman/vibe" title="Vibe Check" subtitle="Read the room" icon={<Sparkles className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/content-generation" title="Content Gen" subtitle="AI writing help" icon={<Wand2 className="w-5 h-5" />} accent="purple" />
+            </div>
+
+            {/* Economy & Premium */}
+            <SectionHeader icon={<Wallet className="w-4 h-4" />} title="Economy & Premium" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/wallet" title="Wallet" subtitle="FWB tokens" icon={<Wallet className="w-5 h-5" />} accent="green" />
+              <FeatureTile href="/premium" title="Premium" subtitle="Upgrade your plan" icon={<Crown className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/boosts" title="Boosts" subtitle="Get more visible" icon={<Rocket className="w-5 h-5" />} accent="orange" />
+              <FeatureTile href="/gifts" title="Gifts" subtitle="Send tokens" icon={<Gift className="w-5 h-5" />} accent="pink" />
+              <FeatureTile href="/referrals" title="Referrals" subtitle="Invite & earn" icon={<Share2 className="w-5 h-5" />} accent="green" />
+              <FeatureTile href="/unlocks" title="Unlocks" subtitle="Premium features" icon={<Lock className="w-5 h-5" />} accent="yellow" />
+            </div>
+
+            {/* Profile & Identity */}
+            <SectionHeader icon={<Users className="w-4 h-4" />} title="Profile & Identity" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/profile" title="My Profile" subtitle="View your page" icon={<Users className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/profile/edit" title="Edit Profile" subtitle="Update your info" icon={<Users className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/photos" title="Photos" subtitle="Manage gallery" icon={<Users className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/identity" title="Identity Hub" subtitle="Verification & more" icon={<Shield className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/reputation" title="Reputation" subtitle="Achievements & trust" icon={<Award className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/vouch" title="Vouch" subtitle="Vouch for friends" icon={<Users className="w-5 h-5" />} accent="green" />
+            </div>
+
+            {/* Safety & Settings */}
+            <SectionHeader icon={<Shield className="w-4 h-4" />} title="Safety & Settings" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/safety" title="Safety" subtitle="Tools & resources" icon={<Shield className="w-5 h-5" />} accent="red" />
+              <FeatureTile href="/settings" title="Settings" subtitle="All preferences" icon={<Settings className="w-5 h-5" />} accent="slate" />
+              <FeatureTile href="/settings/privacy" title="Privacy" subtitle="Location & visibility" icon={<Lock className="w-5 h-5" />} accent="red" />
+              <FeatureTile href="/settings/notifications" title="Notification Prefs" subtitle="Alerts & quiet hours" icon={<Bell className="w-5 h-5" />} accent="slate" />
+              <FeatureTile href="/settings/security" title="Security" subtitle="Password & 2FA" icon={<Shield className="w-5 h-5" />} accent="red" />
+              <FeatureTile href="/settings/travel" title="Travel Mode" subtitle="Change your location" icon={<Plane className="w-5 h-5" />} accent="blue" />
+            </div>
+
+            {/* Commerce & Merchant */}
+            <SectionHeader icon={<Store className="w-4 h-4" />} title="Commerce & Merchant" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/marketplace" title="Marketplace" subtitle="Browse local deals" icon={<Store className="w-5 h-5" />} accent="orange" />
+              <FeatureTile href="/merchant/register" title="Merchant Sign Up" subtitle="List your business" icon={<Store className="w-5 h-5" />} accent="orange" />
+              <FeatureTile href="/merchant/dashboard" title="Merchant Dashboard" subtitle="Manage storefront" icon={<Store className="w-5 h-5" />} accent="orange" />
+              <FeatureTile href="/merchant/analytics" title="Merchant Analytics" subtitle="Sales & insights" icon={<TrendingUp className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/subscription" title="Subscription" subtitle="Manage your plan" icon={<Crown className="w-5 h-5" />} accent="amber" />
+              <FeatureTile href="/leaderboard" title="Leaderboard" subtitle="Token rankings" icon={<Award className="w-5 h-5" />} accent="amber" />
+            </div>
+
+            {/* More */}
+            <SectionHeader icon={<CheckCircle2 className="w-4 h-4" />} title="More" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-8">
+              <FeatureTile href="/video" title="Video Calls" subtitle="Call history" icon={<Phone className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/scrapbook" title="Scrapbook" subtitle="Saved moments" icon={<Star className="w-5 h-5" />} accent="pink" />
+              <FeatureTile href="/ice-breakers" title="Ice Breakers" subtitle="Conversation starters" icon={<MessageSquare className="w-5 h-5" />} accent="blue" />
+              <FeatureTile href="/share-unlock" title="Share Unlocks" subtitle="Viral features" icon={<Share2 className="w-5 h-5" />} accent="purple" />
+              <FeatureTile href="/feedback" title="Feedback" subtitle="Tell us what you think" icon={<MessageSquare className="w-5 h-5" />} accent="slate" />
+              <FeatureTile href="/help" title="Help Center" subtitle="FAQs & guides" icon={<CheckCircle2 className="w-5 h-5" />} accent="slate" />
+              {(user as any)?.is_moderator && (
+                <FeatureTile href="/admin/monitoring" title="Admin Monitor" subtitle="Autonomous system" icon={<Rocket className="w-5 h-5" />} accent="purple" />
+              )}
+              {(user as any)?.is_moderator && (
+                <FeatureTile href="/moderation" title="Moderation" subtitle="Reports & reviews" icon={<Gavel className="w-5 h-5" />} accent="red" />
+              )}
+            </div>
+
           </div>
         </main>
       </div>
@@ -406,89 +331,93 @@ export default function DashboardPage() {
   );
 }
 
-interface StatCardProps {
-  icon: React.ReactNode;
-  label: string;
-  value: number | string;
-  subtext: string;
-  color: 'purple' | 'blue' | 'green' | 'orange' | 'yellow';
-  link: string;
-}
+/* ────────────────────── Sub-Components ────────────────────── */
 
-function StatCard({ icon, label, value, subtext, color, link }: StatCardProps) {
-  const colorClasses = {
-    purple: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+function MetricCard({
+  icon, label, value, detail, accent, href,
+}: {
+  icon: React.ReactNode; label: string; value: number | string;
+  detail: string; accent: string; href: string;
+}) {
+  const accents: Record<string, string> = {
+    pink: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400',
     blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
     green: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+    purple: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
     orange: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
-    yellow: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
+    amber: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+    red: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
   };
 
   return (
-    <Link href={link} prefetch={false} className="block group">
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all hover:border-purple-300 dark:hover:border-purple-700">
-        <div className={`w-12 h-12 rounded-lg ${colorClasses[color]} flex items-center justify-center mb-4`}>
+    <Link href={href} prefetch={false} className="block group">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-all hover:border-purple-300 dark:hover:border-purple-700">
+        <div className={`w-10 h-10 rounded-lg ${accents[accent] || accents.purple} flex items-center justify-center mb-3`}>
           {icon}
         </div>
-        <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{value}</div>
-        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</div>
-        <div className="text-xs text-gray-500 dark:text-gray-400">{subtext}</div>
+        <div className="text-2xl font-bold text-gray-900 dark:text-white leading-none mb-1">{value}</div>
+        <div className="text-xs font-medium text-gray-600 dark:text-gray-400">{label}</div>
+        <div className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">{detail}</div>
       </div>
     </Link>
   );
 }
 
-function ActionButton({ href, label, icon, color }: { href: string; label: string; icon: string; color: string }) {
-  const colorClasses = {
-    purple: 'hover:bg-purple-50 hover:border-purple-300 dark:hover:bg-purple-900/20 dark:hover:border-purple-700',
-    blue: 'hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20 dark:hover:border-blue-700',
-    green: 'hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-900/20 dark:hover:border-green-700',
-    orange: 'hover:bg-orange-50 hover:border-orange-300 dark:hover:bg-orange-900/20 dark:hover:border-orange-700',
-    gray: 'hover:bg-gray-50 hover:border-gray-300 dark:hover:bg-gray-800 dark:hover:border-gray-600',
-  };
+function QuickAction({
+  href, label, icon, accent,
+}: {
+  href: string; label: string; icon: React.ReactNode; accent?: string;
+}) {
+  const bg = accent === 'green' ? 'hover:bg-green-50 dark:hover:bg-green-900/20'
+    : accent === 'amber' ? 'hover:bg-amber-50 dark:hover:bg-amber-900/20'
+    : accent === 'purple' ? 'hover:bg-purple-50 dark:hover:bg-purple-900/20'
+    : 'hover:bg-gray-50 dark:hover:bg-gray-700';
 
   return (
-    <Link
-      href={href}
-      prefetch={false}
-      className={`flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg transition-all ${colorClasses[color as keyof typeof colorClasses]}`}
-    >
-      <span className="text-2xl">{icon}</span>
-      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+    <Link href={href} prefetch={false} className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border border-gray-100 dark:border-gray-700 transition-colors ${bg}`}>
+      <div className="text-gray-600 dark:text-gray-400">{icon}</div>
+      <span className="text-[11px] font-medium text-gray-700 dark:text-gray-300 text-center leading-tight">{label}</span>
     </Link>
   );
 }
 
-function FeatureSurfaceCard({
-  href,
-  title,
-  description,
-  icon,
-  accent,
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <div className="text-gray-400 dark:text-gray-500">{icon}</div>
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{title}</h3>
+    </div>
+  );
+}
+
+function FeatureTile({
+  href, title, subtitle, icon, accent,
 }: {
-  href: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  accent: 'yellow' | 'green' | 'orange' | 'purple' | 'pink' | 'blue' | 'slate' | 'red';
+  href: string; title: string; subtitle: string;
+  icon: React.ReactNode; accent: string;
 }) {
-  const accentClasses = {
-    yellow: 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
-    green: 'border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300',
-    orange: 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
-    purple: 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-300',
-    pink: 'border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-800 dark:bg-pink-900/20 dark:text-pink-300',
-    blue: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
-    slate: 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-200',
-    red: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300',
+  const accents: Record<string, { border: string; bg: string; iconBg: string }> = {
+    pink:   { border: 'border-pink-200 dark:border-pink-800', bg: 'bg-pink-50 dark:bg-pink-900/10', iconBg: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400' },
+    blue:   { border: 'border-blue-200 dark:border-blue-800', bg: 'bg-blue-50 dark:bg-blue-900/10', iconBg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
+    green:  { border: 'border-green-200 dark:border-green-800', bg: 'bg-green-50 dark:bg-green-900/10', iconBg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' },
+    purple: { border: 'border-purple-200 dark:border-purple-800', bg: 'bg-purple-50 dark:bg-purple-900/10', iconBg: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' },
+    orange: { border: 'border-orange-200 dark:border-orange-800', bg: 'bg-orange-50 dark:bg-orange-900/10', iconBg: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' },
+    amber:  { border: 'border-amber-200 dark:border-amber-800', bg: 'bg-amber-50 dark:bg-amber-900/10', iconBg: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' },
+    red:    { border: 'border-red-200 dark:border-red-800', bg: 'bg-red-50 dark:bg-red-900/10', iconBg: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' },
+    yellow: { border: 'border-yellow-200 dark:border-yellow-800', bg: 'bg-yellow-50 dark:bg-yellow-900/10', iconBg: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400' },
+    slate:  { border: 'border-slate-200 dark:border-slate-700', bg: 'bg-slate-50 dark:bg-slate-900/10', iconBg: 'bg-slate-100 dark:bg-slate-900/30 text-slate-600 dark:text-slate-400' },
   };
 
+  const a = accents[accent] || accents.slate;
+
   return (
-    <Link href={href} prefetch={false} className="block">
-      <div className={`h-full rounded-xl border p-4 transition hover:shadow-md ${accentClasses[accent]}`}>
-        <div className="mb-3 inline-flex rounded-lg bg-white dark:bg-gray-800/70 p-2 dark:bg-black/20">{icon}</div>
-        <h4 className="text-sm font-semibold">{title}</h4>
-        <p className="mt-2 text-sm leading-6 text-current/80">{description}</p>
+    <Link href={href} prefetch={false} className="block group">
+      <div className={`h-full rounded-xl border p-4 transition-all hover:shadow-md ${a.border} ${a.bg}`}>
+        <div className={`inline-flex rounded-lg p-2 mb-3 ${a.iconBg}`}>
+          {icon}
+        </div>
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{title}</h4>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{subtitle}</p>
       </div>
     </Link>
   );
