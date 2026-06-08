@@ -1,6 +1,6 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.1.5 "OkCupid Matching Engine"
+> **Current Version:** 2.1.7 "Repository Reconciliation"
 > **Last Updated:** 2026-06-05
 
 ---

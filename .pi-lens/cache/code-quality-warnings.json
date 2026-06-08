@@ -1,15 +1,38 @@
 {
-  "generatedAt": "2026-06-06T13:50:46.358Z",
+  "generatedAt": "2026-06-08T16:12:40.751Z",
   "scope": "turn_delta",
-  "sessionId": "lens-mq2cejlu-12b70199",
-  "turnIndex": 81,
-  "projectSeqStart": 7,
-  "projectSeqEnd": 7,
+  "sessionId": "lens-mq5dp7tp-7190290e",
+  "turnIndex": 15,
+  "projectSeqStart": 9,
+  "projectSeqEnd": 10,
   "deltaOnly": true,
-  "files": [],
+  "files": [
+    {
+      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\ROADMAP.md",
+      "displayPath": "ROADMAP.md",
+      "fileSeq": 1,
+      "warnings": [
+        {
+          "id": "cq:264289c836",
+          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\ROADMAP.md",
+          "displayPath": "ROADMAP.md",
+          "severity": "warning",
+          "tool": "pi-lens",
+          "message": "Pi-lens analysis unavailable. Tools for markdown not installed.",
+          "category": "other",
+          "origin": "dispatch"
+        }
+      ]
+    }
+  ],
   "summary": {
-    "warnings": 0,
-    "files": 0,
-    "topRules": []
+    "warnings": 1,
+    "files": 1,
+    "topRules": [
+      {
+        "rule": "pi-lens",
+        "count": 1
+      }
+    ]
   }
 }

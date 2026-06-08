@@ -64,3 +64,26 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 - Seed matching questions into production DB
 - Wire frontend matching settings page to live matching API
 - Test OkCupid-style compatibility scoring end-to-end
+
+## Session 2026-06-08 — v2.1.7 Repository Reconciliation & Cleanup
+
+### Completed
+1. **Upstream Sync** — Fetched all remotes. Upstream has 0 new commits. No merge needed.
+2. **Branch Reconciliation** — Both feature branches (okcupid-matching-engine, federation-hardening) verified as fully merged (0 unique commits remaining). No forward or reverse merge required.
+3. **Workspace Cleanup** — Removed stale patch scripts (patch_federation.sh, patch_outbox.sh, test_schema.sh) and one-off Python debugging helpers (fix_mock_user*.py, resolve_conflicts*.py, etc.)
+4. **start.bat Updated** — Rewrote dev launcher to support monorepo structure: backend on :4000, frontend on :3000 in separate cmd windows.
+5. **Version bumped to 2.1.7** — VERSION, VERSION.md, CHANGELOG.md, TODO.md, ROADMAP.md all synchronized.
+6. **Documentation Sync** — TODO.md updated with v2.1.6-v2.1.7 completed items and new upcoming tasks (federation actors/detail fix, email DNS, AI keys, Stripe live keys).
+
+### Current State
+- Backend: 0 TS errors, PM2 online, 46/47 API endpoints returning 200
+- Frontend: 0 TS errors
+- DB: All 6 new tables created and operational, 10 matching questions seeded
+- No unmerged feature branches with unique progress
+- Working tree clean
+
+### Known Issues
+- `/api/federation/actors/detail` returns 500 (non-critical, route missing from current codebase)
+- Email delivery requires DNS configuration (Resend MX/SPF/DKIM/DMARC)
+- AI Wingman features falling back to static content (no API keys configured)
+- Stripe in test mode only

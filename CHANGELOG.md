@@ -479,3 +479,18 @@ All notable changes to this project will be documented in this file.
 ### Merged
 - feat/okcupid-matching-engine-v2.1.5 into main
 - feat/federation-hardening-auth-integration-v2.0.14 into main
+
+## [2.1.7] - 2026-06-08
+
+### Changed
+- Updated start.bat to support monorepo structure (backend on :4000, frontend on :3000)
+- Cleaned up stale patch scripts (patch_federation.sh, patch_outbox.sh, test_schema.sh)
+- Removed one-off Python helper scripts from previous debugging sessions
+
+### Verified
+- Both feature branches fully merged (zero unique commits remaining)
+- No upstream changes to sync
+- Backend: 0 TS errors, 46/47 API endpoints OK
+- Frontend: 0 TS errors
+- PM2 online and stable on Hetzner
+- Matching engine live with 10 seeded questions

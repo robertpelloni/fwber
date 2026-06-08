@@ -1,8 +1,8 @@
 {
   "version": 1,
   "projectRoot": "C:/Users/hyper/workspace/fwber",
-  "generatedAt": "2026-05-30T16:12:26.999Z",
-  "seq": 0,
+  "generatedAt": "2026-06-08T15:44:30.566Z",
+  "seq": 7,
   "files": {},
   "symbols": {},
   "reverseDeps": {},
@@ -89,7 +89,7 @@
     ],
     [
       "calculateDistance",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\utils\\geolocation.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\matchingAlgorithm.ts"
     ],
     [
       "calculateMatchScore",
@@ -525,7 +525,7 @@
     ],
     [
       "GET",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\app\\api\\bulletin-boards\\route.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\app\\api\\referrals\\route.ts"
     ],
     [
       "getActiveBoost",
@@ -649,7 +649,7 @@
     ],
     [
       "getFeatureFlags",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-feature-flags.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\config.ts"
     ],
     [
       "getFederatedPosts",
@@ -793,7 +793,7 @@
     ],
     [
       "getMerchantProfile",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\merchant.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\routes\\merchant-portal.ts"
     ],
     [
       "getMessage",
@@ -1428,6 +1428,14 @@
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\profile.ts"
     ],
     [
+      "seedIceBreakers",
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\ice-breakers.ts"
+    ],
+    [
+      "seedMatchingQuestions",
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts"
+    ],
+    [
       "sendEmail",
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\email.ts"
     ],
@@ -1441,7 +1449,7 @@
     ],
     [
       "sendMessage",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\chatrooms.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\messages.ts"
     ],
     [
       "sendNotificationEmail",
@@ -1461,7 +1469,7 @@
     ],
     [
       "serialize",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\routes\\profile.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\routes\\proximity-chatrooms.ts"
     ],
     [
       "serializeEntry",
@@ -1721,11 +1729,15 @@
     ],
     [
       "useBackendFeatureFlags",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-config.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-feature-flags.ts"
     ],
     [
       "useBoostAnalytics",
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-admin-analytics.ts"
+    ],
+    [
+      "useBoostHistory",
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-boosts.ts"
     ],
     [
       "useBulletinBoard",
@@ -2016,6 +2028,14 @@
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-recommendations.ts"
     ],
     [
+      "useMatchCompatibility",
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-compatibility.ts"
+    ],
+    [
+      "useMatchingQuestions",
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-matching.ts"
+    ],
+    [
       "useMatchInsights",
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-match-insights.ts"
     ],
@@ -2292,6 +2312,10 @@
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-ice-breakers.ts"
     ],
     [
+      "useSubmitMatchingAnswer",
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-matching.ts"
+    ],
+    [
       "useSystemHealth",
       "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-config.ts"
     ],
@@ -2442,7 +2466,7 @@
     "scanRoot": "C:\\Users\\hyper\\workspace\\fwber",
     "projectRoot": "C:\\Users\\hyper\\workspace\\fwber",
     "canWarmCaches": true,
-    "sourceFileCount": 742
+    "sourceFileCount": 751
   },
   "languageProfile": {
     "present": {
@@ -2486,14 +2510,29 @@
       "jsts": true
     },
     "counts": {
-      "python": 26,
-      "jsts": 709,
+      "python": 27,
+      "jsts": 724,
       "rust": 2
     },
     "detectedKinds": [
       "jsts",
       "python",
       "rust"
+    ]
+  },
+  "conventions": {
+    "frameworks": [],
+    "testRunners": [],
+    "buildTools": [],
+    "agentDocs": [
+      {
+        "filePath": "AGENTS.md",
+        "lineCount": 34
+      },
+      {
+        "filePath": "CLAUDE.md",
+        "lineCount": 25
+      }
     ]
   }
 }
