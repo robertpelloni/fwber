@@ -625,7 +625,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts": {
+      "latest": {
+        "commit": "81ac9f838",
+        "timestamp": "2026-06-08T18:35:43.890Z",
+        "mi": 34.1,
+        "cognitive": 15,
+        "nesting": 4,
+        "lines": 121,
+        "maxCyclomatic": 3,
+        "entropy": 5.73
+      },
+      "history": [
+        {
+          "commit": "81ac9f838",
+          "timestamp": "2026-06-08T18:35:43.890Z",
+          "mi": 34.1,
+          "cognitive": 15,
+          "nesting": 4,
+          "lines": 121,
+          "maxCyclomatic": 3,
+          "entropy": 5.73
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-06T13:26:15.710Z"
+  "capturedAt": "2026-06-08T18:35:49.035Z"
 }
