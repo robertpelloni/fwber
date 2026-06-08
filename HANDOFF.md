@@ -87,3 +87,26 @@ Successfully implemented and verified the OkCupid-style matching engine. The sys
 - Email delivery requires DNS configuration (Resend MX/SPF/DKIM/DMARC)
 - AI Wingman features falling back to static content (no API keys configured)
 - Stripe in test mode only
+
+## Session 2026-06-08 — v2.1.8 Matching Question Expansion
+
+### Completed
+1. **Upstream Sync** — Fetched all remotes. 0 new upstream commits. No merge needed.
+2. **Branch Reconciliation** — Both feature branches (okcupid-matching-engine, federation-hardening) still have 0 unique commits. No merge actions required.
+3. **Matching Questions Expanded** — Rewrote seed file from 15 Cyber-Noir themed questions to 95 natural-language questions across 7 categories (lifestyle, romance, personality, ethics, interests, dealbreakers, intimacy, communication) with 334 options. Replaced old DB data and reseeded production.
+4. **Version bumped to 2.1.8** — VERSION, VERSION.md, CHANGELOG.md, TODO.md, ROADMAP.md all synchronized.
+5. **Deployed to Hetzner** — git pull, build, reseed, PM2 restart. API returning 95 questions.
+
+### Current State
+- Backend: 0 TS errors, PM2 online
+- Frontend: 0 TS errors
+- API: 46/47 endpoints OK (only /api/federation/actors/detail returns 500 — route missing)
+- Matching: 95 questions + 334 options live in production DB
+- No unmerged feature branches with unique progress
+- Working tree clean
+
+### Known Issues
+- `/api/federation/actors/detail` returns 500 (non-critical, route missing)
+- Email delivery requires Resend DNS configuration
+- AI Wingman features fall back to static content (no API keys)
+- Stripe in test mode only

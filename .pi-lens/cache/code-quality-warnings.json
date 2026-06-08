@@ -1,126 +1,15 @@
 {
-  "generatedAt": "2026-06-08T18:54:08.711Z",
+  "generatedAt": "2026-06-08T19:57:09.262Z",
   "scope": "turn_delta",
   "sessionId": "lens-mq5dp7tp-7190290e",
-  "turnIndex": 35,
-  "projectSeqStart": 10,
-  "projectSeqEnd": 11,
+  "turnIndex": 54,
+  "projectSeqStart": 13,
+  "projectSeqEnd": 14,
   "deltaOnly": true,
-  "files": [
-    {
-      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-      "displayPath": "fwber-backend-ts/src/lib/seeds/matching-questions.ts",
-      "fileSeq": 1,
-      "warnings": [
-        {
-          "id": "cq:8c57f97515",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 7,
-          "column": 1,
-          "severity": "warning",
-          "tool": "duplicate-string-literal",
-          "rule": "duplicate-string-literal",
-          "message": "String literal \"lifestyle\" repeated 20 times — extract to a named constant",
-          "category": "duplication",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:bcfe635b07",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 31,
-          "column": 1,
-          "severity": "warning",
-          "tool": "duplicate-string-literal",
-          "rule": "duplicate-string-literal",
-          "message": "String literal \"romance\" repeated 17 times — extract to a named constant",
-          "category": "duplication",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:1704a10577",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 52,
-          "column": 1,
-          "severity": "warning",
-          "tool": "duplicate-string-literal",
-          "rule": "duplicate-string-literal",
-          "message": "String literal \"ethics\" repeated 13 times — extract to a named constant",
-          "category": "duplication",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:3fa948c107",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 69,
-          "column": 1,
-          "severity": "warning",
-          "tool": "duplicate-string-literal",
-          "rule": "duplicate-string-literal",
-          "message": "String literal \"personality\" repeated 15 times — extract to a named constant",
-          "category": "duplication",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:ea7a839a82",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 120,
-          "column": 1,
-          "severity": "warning",
-          "tool": "duplicate-string-literal",
-          "rule": "duplicate-string-literal",
-          "message": "String literal \"interests\" repeated 10 times — extract to a named constant",
-          "category": "duplication",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:8a4850a965",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 156,
-          "severity": "warning",
-          "tool": "type-safety",
-          "rule": "no-any-type",
-          "message": "Avoid 'any' type — use 'unknown' or define a proper interface",
-          "category": "type-safety",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:2b2d6dc593",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts",
-          "displayPath": "src/lib/seeds/matching-questions.ts",
-          "line": 156,
-          "column": 7,
-          "severity": "warning",
-          "tool": "missing-error-propagation",
-          "rule": "missing-error-propagation",
-          "message": "Catch block in async 'seedMatchingQuestions' logs the error but doesn't rethrow — callers receive undefined and assume success",
-          "category": "other",
-          "origin": "dispatch"
-        }
-      ]
-    }
-  ],
+  "files": [],
   "summary": {
-    "warnings": 7,
-    "files": 1,
-    "topRules": [
-      {
-        "rule": "duplicate-string-literal",
-        "count": 5
-      },
-      {
-        "rule": "missing-error-propagation",
-        "count": 1
-      },
-      {
-        "rule": "no-any-type",
-        "count": 1
-      }
-    ]
+    "warnings": 0,
+    "files": 0,
+    "topRules": []
   }
 }

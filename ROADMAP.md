@@ -1,19 +1,19 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.1.7 "Repository Reconciliation"
+> **Current Version:** 2.1.8 "Matching Question Expansion"
 > **Last Updated:** 2026-06-05
 
 ---
 
 ## 🗺️ High-Level Trajectory
 
-### Phase 8: Intelligent Match Refinement (PLANNED)
+### Phase 8: Intelligent Match Refinement (IN PROGRESS)
 The next major evolution focuses on high-fidelity personality analysis and deeper signal integration.
 
 **Targets:**
 - **Narrative Compatibility**: AI-generated reports explaining *why* two users are compatible based on their value-matching data.
 - **Signal Merging**: Unification of matching engine scores, weighted interest overlap, and real-time proximity history into a single connection score.
-- **Scale**: Expanding the value-matching dataset to 100+ high-signal questions.
+- ~~**Scale**: Expanding the value-matching dataset to 100+ high-signal questions.~~ (DONE - v2.1.8: 95 questions across 7 categories)
 
 ### The OkCupid Matching Engine (COMPLETED - v2.1.5)
 The matching engine has been upgraded to a value-based system with importance weighting and a geometric-mean compatibility heuristic.
@@ -23,6 +23,12 @@ The matching engine has been upgraded to a value-based system with importance we
 - **Value-Based Questions**: Integrated multiple-choice questions with user-defined importance levels.
 - **Interactive UI**: Launched a dedicated matching dashboard at `/settings/matching`.
 - **Deep Integration**: Compatibility scores are now visible across user profiles and the discovery feed.
+
+### Matching Question Expansion (COMPLETED - v2.1.8)
+
+Expanded the matching question dataset from 15 Cyber-Noir themed questions to 95 natural-language questions across 7 categories with 334 multiple-choice options.
+
+**Categories:** Lifestyle (20), Romance (17), Personality (15), Ethics (13), Interests (10), Dealbreakers (8), Intimacy (6), Communication (6).
 
 ### The High-Performance Autonomous Engine (COMPLETED - v2.1.4)
 The autonomous system is now fully instrumented for performance and quality, with a self-healing engine that monitors latency and system health in real-time.

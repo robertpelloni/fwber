@@ -494,3 +494,18 @@ All notable changes to this project will be documented in this file.
 - Frontend: 0 TS errors
 - PM2 online and stable on Hetzner
 - Matching engine live with 10 seeded questions
+
+## [2.1.8] - 2026-06-08
+
+### Added
+- Expanded matching questions from 15 to 95 across 7 categories (lifestyle, romance, personality, ethics, interests, dealbreakers, intimacy, communication) with 334 multiple-choice options
+- All questions rewritten in natural English (replaced Cyber-Noir themed questions)
+
+### Changed
+- Matching question seed file rewritten with broad, realistic personality/compatibility coverage
+
+### Verified
+- No upstream changes to sync
+- Both feature branches fully merged (0 unique commits remaining)
+- 95 questions + 334 options live in production DB
+- API: 46/47 endpoints OK
