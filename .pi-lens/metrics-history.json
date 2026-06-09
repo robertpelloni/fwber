@@ -650,7 +650,57 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\app\\dashboard\\page.tsx": {
+      "latest": {
+        "commit": "1f75b3389",
+        "timestamp": "2026-06-08T23:18:29.403Z",
+        "mi": 13.5,
+        "cognitive": 38,
+        "nesting": 4,
+        "lines": 470,
+        "maxCyclomatic": 37,
+        "entropy": 5.45
+      },
+      "history": [
+        {
+          "commit": "1f75b3389",
+          "timestamp": "2026-06-08T23:18:29.403Z",
+          "mi": 13.5,
+          "cognitive": 38,
+          "nesting": 4,
+          "lines": 470,
+          "maxCyclomatic": 37,
+          "entropy": 5.45
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\AppHeader.tsx": {
+      "latest": {
+        "commit": "1f75b3389",
+        "timestamp": "2026-06-08T23:24:24.161Z",
+        "mi": 14,
+        "cognitive": 55,
+        "nesting": 4,
+        "lines": 461,
+        "maxCyclomatic": 44,
+        "entropy": 5.93
+      },
+      "history": [
+        {
+          "commit": "1f75b3389",
+          "timestamp": "2026-06-08T23:24:24.161Z",
+          "mi": 14,
+          "cognitive": 55,
+          "nesting": 4,
+          "lines": 461,
+          "maxCyclomatic": 44,
+          "entropy": 5.93
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-08T18:35:49.035Z"
+  "capturedAt": "2026-06-08T23:24:29.205Z"
 }
