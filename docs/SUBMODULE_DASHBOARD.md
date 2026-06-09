@@ -1,51 +1,38 @@
-# FWBER Submodule & Repository Dashboard
+# FWBER Monorepo Logical Package Dashboard
 
-> **Generated on:** 2026-05-23
-> **Current Global Version:** 2.0.21
+> **Last Updated:** 2026-06-05
+> **Current Global Version:** 2.1.5
 
-This dashboard lists the active logical packages inside the `fwber` monorepo after the TypeScript migration and repository unification.
-
-> **Generated on:** 2026-05-23
-> **Current Global Version:** 2.0.21
-
-This dashboard lists the active logical packages inside the `fwber` monorepo after the TypeScript migration and repository unification.
+This dashboard lists the active logical packages inside the unified `fwber` monorepo.
 
 ## 🗂️ Project Directory Structure
 
 ```text
 fwber/
-├── docs/                      # Product, deployment, AI workflow, testing, and architecture documentation
-├── fwber-backend-ts/          # Node.js/Express API for auth, onboarding, matching, messaging, safety, federation
-├── fwber-frontend/            # Next.js app-router web client for discovery, chat, profile, federation monitor
-├── fwber-geo/                 # Rust geospatial microservice for nearby-user lookup and geo screening
-├── fwber-wasm/                # Rust/WASM crypto helpers used by the web client where available
-├── mobile/                    # Expo / React Native shell wrapping the web experience
-├── ARCHIVE_v1_8_php_legacy/   # Retired PHP systems preserved for reference
-└── .github/workflows/         # CI/CD automation
+├── docs/                      # Comprehensive system and process documentation
+├── fwber-backend-ts/          # Primary Node.js/Express API (Auth, Matching, Messaging, Federation)
+├── fwber-frontend/            # Next.js 15 Web Client (Discovery, Pulse, Activity Center)
+├── mobile/                    # React Native / Expo Mobile App (NFC & Push Bridge)
+├── ops/                       # Infrastructure automation and deployment scripts
+└── .github/workflows/         # CI/CD pipelines
 ```
 
 ## 📦 Active Logical Packages
 
 ### 1. `fwber-backend-ts`
-- **Version:** inherits global `2.0.21`
-- **Role:** Primary API and real-time engine (Socket.io).
-- **Owns:** auth, onboarding, federation, monitoring, matching, messaging.
-- \*\*Key stack:\*\* Node.js 22, Express, Prisma, TypeScript.
+- **Role:** Central API and WebSocket hub.
+- **Key Features:** Matching Engine v2.1.5, ActivityPub Federation, Autonomous Protocol.
+- **Stack:** Node.js 22, Express, Prisma, Socket.io.
 
 ### 2. `fwber-frontend`
-- **Version:** inherits global `2.0.21`
-- **Role:** Main user-facing product surface.
-- **Owns:** app shell, discovery, activity center, autonomous monitor.
-- \*\*Key stack:\*\* Next.js 15, React 19, Tailwind CSS.
+- **Role:** Unified user interface.
+- **Key Features:** Value-Matching Dashboard, Real-time Discovery, Activity Feed.
+- **Stack:** Next.js 15, React 19, TanStack Query, Tailwind.
 
-### 3. `fwber-geo`
-- **Role:** High-speed geospatial indexing (H3).
+### 3. `mobile`
+- **Role:** Native hardware bridge.
+- **Key Features:** NFC Tap-to-Exchange, Native Push Notifications, Background Location.
+- **Stack:** React Native, Expo, WebView.
 
-## 🔄 Autonomous Execution Protocol (ACTIVE)
-The monorepo now features an integrated autonomous execution protocol with real-time monitoring:
-- **Backend API**: `/api/monitoring/autonomous`
-- **Admin UI**: `/admin/monitoring`
-- **Metrics**: Real-time success rate, task volume, and integrity tracking.
-- **Tracking**: Persistent action logging in `autonomous_actions`.
-- **Adjustments**: Persistent behavioral toggles in `autonomous_settings`.
-
+---
+**Note**: Legacy submodules (`fwber-geo`, `fwber-wasm`) and the PHP archive (`ARCHIVE_v1_8_php_legacy`) have been consolidated into the primary TypeScript stack or removed as redundant to simplify the deployment pipeline.
