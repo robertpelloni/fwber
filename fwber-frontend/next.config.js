@@ -41,7 +41,6 @@ const withPWA = (config) => config; // Passthrough until PWA is fixed
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
-const { withSentryConfig } = require('@sentry/nextjs');
 
 
 /** @type {import('next').NextConfig} */

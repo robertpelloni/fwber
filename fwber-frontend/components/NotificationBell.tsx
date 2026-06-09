@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { Bell, X, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api/client';
-
 import { PresenceIndicator } from '@/components/realtime/PresenceComponents';
-import { api } from '@/lib/api/client';
 
 interface Notification {
   id: string;
@@ -50,15 +48,12 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     }
   }, [authLoading, isAuthenticated, token]);
 
-  // Fetch notifications
   const fetchNotifications = useCallback(async () => {
     if (authLoading || !isAuthenticated || !token) return;
 
     setIsLoading(true);
     try {
       const data = await api.get<{ notifications?: Notification[]; unread_count?: number }>('/notifications');
-
-      const data = await api.get<{notifications: Notification[], unread_count: number}>('/notifications');
       setNotifications(data.notifications || []);
       setUnreadCount(data.unread_count || 0);
     } catch (error) {
@@ -68,7 +63,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     }
   }, [authLoading, isAuthenticated, token]);
 
-  // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     if (!token) return;
 
@@ -83,7 +77,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     }
   };
 
-  // Mark all as read
   const markAllAsRead = async () => {
     if (!token) return;
 
@@ -96,22 +89,17 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
     }
   };
 
-  // Poll the lightweight unread-count endpoint while closed and only refresh the
-  // full notifications payload when the drawer is open.
   useEffect(() => {
     if (authLoading || !isAuthenticated || !token) {
       return;
     }
 
     const refresh = isOpen ? fetchNotifications : fetchUnreadCount;
-
     refresh();
     const interval = setInterval(refresh, 30000);
-
     return () => clearInterval(interval);
   }, [authLoading, fetchNotifications, fetchUnreadCount, isAuthenticated, isOpen, token]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -128,24 +116,15 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'message':
-        return <MessageSquare className="h-4 w-4 text-blue-500" />;
-      case 'match':
-        return <Heart className="h-4 w-4 text-pink-500" />;
-      case 'like':
-        return <Heart className="h-4 w-4 text-red-500" />;
-      case 'friend_request':
-        return <UserPlus className="h-4 w-4 text-green-500" />;
-      case 'view':
-        return <Eye className="h-4 w-4 text-purple-500" />;
-      case 'gift':
-        return <Gift className="h-4 w-4 text-pink-400" />;
-      case 'event':
-        return <Calendar className="h-4 w-4 text-blue-400" />;
-      case 'system':
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
-      default:
-        return <Bell className="h-4 w-4 text-gray-500" />;
+      case 'message': return <MessageSquare className="h-4 w-4 text-blue-500" />;
+      case 'match': return <Heart className="h-4 w-4 text-pink-500" />;
+      case 'like': return <Heart className="h-4 w-4 text-red-500" />;
+      case 'friend_request': return <UserPlus className="h-4 w-4 text-green-500" />;
+      case 'view': return <Eye className="h-4 w-4 text-purple-500" />;
+      case 'gift': return <Gift className="h-4 w-4 text-pink-400" />;
+      case 'event': return <Calendar className="h-4 w-4 text-blue-400" />;
+      case 'system': return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      default: return <Bell className="h-4 w-4 text-gray-500" />;
     }
   };
 
@@ -187,7 +166,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
 
   return (
     <div className={`notification-bell relative ${className}`}>
-      {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-full hover:bg-gray-100 dark:bg-gray-800 transition-colors"
@@ -201,10 +179,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
         )}
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50 dark:bg-gray-900">
             <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
             <div className="flex items-center gap-2">
@@ -227,7 +203,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
             </div>
           </div>
 
-          {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -248,10 +223,8 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                       if (!notification.read) markAsRead(notification.id);
                       setIsOpen(false);
                     }}
-                    className={`flex items-start gap-3 p-4 hover:bg-gray-50 dark:bg-gray-900 transition-colors ${!notification.read ? 'bg-blue-50' : ''
-                      }`}
+                    className={`flex items-start gap-3 p-4 hover:bg-gray-50 dark:bg-gray-900 transition-colors ${!notification.read ? 'bg-blue-50' : ''}`}
                   >
-                    {/* Icon */}
                     <div className="flex-shrink-0 mt-0.5">
                       {notification.data?.user_id ? (
                         <div className="relative">
@@ -272,7 +245,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                       )}
                     </div>
 
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {notification.title}
@@ -285,7 +257,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
                       </p>
                     </div>
 
-                    {/* Unread indicator */}
                     {!notification.read && (
                       <div className="flex-shrink-0">
                         <div className="w-2 h-2 bg-blue-500 rounded-full" />
@@ -297,7 +268,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
             )}
           </div>
 
-          {/* Footer */}
           {notifications.length > 0 && (
             <div className="border-t border-gray-100 px-4 py-3 bg-gray-50 dark:bg-gray-900">
               <Link
@@ -315,9 +285,6 @@ export function NotificationBell({ className = '' }: NotificationBellProps) {
   );
 }
 
-/**
- * Compact notification indicator for mobile/small spaces
- */
 export function NotificationDot({ className = '' }: { className?: string }) {
   const { token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -328,8 +295,6 @@ export function NotificationDot({ className = '' }: { className?: string }) {
     const fetchCount = async () => {
       try {
         const data = await api.get<{ unread_count?: number }>('/notifications/count');
-
-        const data = await api.get<{unread_count: number}>('/notifications/count');
         setUnreadCount(data.unread_count || 0);
       } catch (error) {
         console.error('Failed to fetch notification count:', error);

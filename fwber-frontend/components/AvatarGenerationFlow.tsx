@@ -252,21 +252,11 @@ export default function AvatarGenerationFlow({
   const generateFromPhotoMutation = useMutation({
     mutationFn: async (photoId: number) => {
       return await api.post('/avatar/generate-from-photo', { 
-
-      const token = localStorage.getItem('fwber_token');
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/avatar/generate-from-photo`,
-        { 
-          photo_id: photoId,
-          style,
-          sexy_boost: sexyBoost,
-          provider: selectedProvider,
-        });
-
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return response.data;
+        photo_id: photoId,
+        style,
+        sexy_boost: sexyBoost,
+        provider: selectedProvider,
+      });
     },
     onSuccess: (data) => {
       if (data.avatar_url) {
@@ -287,17 +277,6 @@ export default function AvatarGenerationFlow({
 
       if (generatedPhotoId) {
         await api.put(`/photos/${generatedPhotoId}`, { is_primary: true });
-
-      const token = localStorage.getItem('fwber_token');
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/profile`,
-        { avatar_url: generatedAvatar },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-          `${process.env.NEXT_PUBLIC_API_URL}/photos/${generatedPhotoId}`,
-          { is_primary: true },
-        );
       }
     },
     onSuccess: () => {
@@ -720,8 +699,6 @@ export default function AvatarGenerationFlow({
                       >
                         <Image
                           src={`${(process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me').replace('/api', '')}/storage/${photo.file_path || photo.filename}`}
-
-                          src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}/storage/${photo.file_path || photo.filename}`}
                           alt="Your photo"
                           fill
                           className="object-cover"

@@ -172,3 +172,12 @@
 - Successfully bridged backend services (Security, Proximity, Federation) with high-fidelity frontend dashboard and activity surfaces.
 - Unified Next.js API proxy routes to simplify frontend data fetching.
 - Autonomous Monitoring now tracks Geo-Spoofing detections and High-Density proximity events.
+
+## 2026-06-04 — v2.1.5 OkCupid-style matching engine implementation
+- Implemented a geometric-mean compatibility heuristic: `Score = (Satisfaction A * Satisfaction B) ^ (1/2)`. This ensures that compatibility is mutual and balanced.
+- Added importance weighting for matching questions (Irrelevant=0, A little=1, Somewhat=10, Very=50, Mandatory=250), allowing users to prioritize what matters to them.
+- Standardized BigInt serialization in `prisma.ts` by converting to Strings to prevent precision loss in the frontend while ensuring compatibility with JSON.
+- Fixed multiple "already declared" identifier regressions in the frontend caused by duplicate API client imports and conflicting variable names in server components.
+- The matching question seeding uses a Cyber-Noir aesthetic to maintain product vibe while collecting high-signal compatibility data.
+- v2.1.5 includes score injection into the `/api/recommendations` discovery feed, using a rounded average of interest and value-based scores.
+- Frontend stabilization (v2.1.5) resolved recursive dependencies and duplicate state imports in the Next.js stack.

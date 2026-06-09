@@ -160,8 +160,21 @@ php artisan optimize
 ```
 
 ### Re-Deploy Sequence
-Use the in-repo deploy script for the repeatable path:
+Use the in-repo deploy script for the repeatable path. Note that there are separate scripts for the PHP and TypeScript backends.
 
+#### TypeScript Backend (fwber-backend-ts)
+GitHub Actions deployment for the TS backend targets Hetzner via `.github/workflows/deploy-backend.yml` (Main/Production) and `.github/workflows/deploy-staging.yml` (Staging).
+
+To manually deploy the TS backend:
+```bash
+# Deploy main (Production)
+/var/www/fwber/repo/ops/hetzner/scripts/deploy-backend-ts.sh main
+
+# Deploy staging
+/var/www/fwber/repo/ops/hetzner/scripts/deploy-backend-ts.sh staging
+```
+
+#### PHP Backend (fwber-backend)
 GitHub Actions backend deployment should now target Hetzner as well, using `.github/workflows/deploy-backend.yml` plus repository secrets:
 - note: the deploy script now explicitly sources rustup Cargo from `~/.cargo/env` / `~/.cargo/bin` so `fwber-geo` builds correctly in non-login CI SSH sessions as well as manual shells
 - validated: the GitHub `Deploy Backend (Hetzner)` workflow has now completed successfully end-to-end after secrets setup and the rustup-path fix
@@ -326,3 +339,24 @@ Earlier DreamHost deployment guidance should now be treated as **legacy referenc
 
 ### Autonomous Monitoring
 To enable real-time monitoring of the autonomous protocol, ensure the `autonomous_actions` and `autonomous_settings` tables are migrated. The dashboard is available at `/admin/monitoring` for users with the `is_moderator` flag.
+
+### OkCupid Matching Engine (v2.1.5+)
+The new matching engine requires additional Prisma models. Ensure you run `npx prisma generate` in `fwber-backend-ts` after deployment.
+- **Required Tables**: `matching_questions`, `matching_options`, `user_matching_answers`.
+- **Seeding**: Run `node dist/lib/seeds/matching-questions.js` (or use the provided seed script via the backend maintenance console) to populate initial value-based questions.
+
+### Staging Operations
+The platform supports a dedicated staging environment for pre-production validation.
+
+**Staging Deployment**:
+1. Push changes to the `staging` branch.
+2. The GitHub Action `Deploy Backend (Hetzner Staging)` will automatically trigger.
+3. To manually deploy from the Hetzner terminal:
+   ```bash
+   /var/www/fwber/repo/ops/hetzner/scripts/deploy-backend-ts.sh staging
+   ```
+
+**Staging Validation**:
+1. Check staging health: `https://api-staging.fwber.me/api/health`
+2. Run automated regression: `cd fwber-backend-ts && npm run test`
+3. Verify matching engine UI at `/settings/matching` on the staging frontend.

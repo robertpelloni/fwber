@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   Heart, 
   MessageSquare, 
@@ -16,10 +15,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import UserAvatar from './UserAvatar';
-
 import { api } from '@/lib/api/client';
 import { PresenceIndicator, usePresenceContext } from './realtime/PresenceComponents';
-import { api } from '@/lib/api/client';
 
 interface ActivityItem {
   id: string;
@@ -67,9 +64,7 @@ export function ActivityFeed({
 
     try {
       const data = await api.get<ActivityItem[]>(`/dashboard/activity?limit=${maxItems}`);
-      setActivities(Array.isArray(data) ? data : data ? (data as any).data || [] : []);
-
-      setActivities(data || []);
+      setActivities(Array.isArray(data) ? data : (data as any)?.data || []);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch activities:', err);

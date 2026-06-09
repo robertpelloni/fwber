@@ -15,8 +15,9 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
-import { BookHeart, Compass, Gift, HeartHandshake, ShieldCheck } from 'lucide-react';
+import { BookHeart, Compass, Gift, HeartHandshake, ShieldCheck, Sparkles } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
+import { useMatchCompatibility } from '@/lib/hooks/use-compatibility';
 import { useToast } from '@/components/ToastProvider';
 
 export default function PublicProfilePage() {
@@ -35,6 +36,7 @@ export default function PublicProfilePage() {
   const [actionPerformed, setActionPerformed] = useState(false);
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
   const { showSuccess, showError } = useToast();
+  const { data: compatibility } = useMatchCompatibility(id || '');
 
   const loadProfile = useCallback(async () => {
     if (!token || !id || isNaN(numericId)) {
@@ -162,11 +164,19 @@ export default function PublicProfilePage() {
 						<div className="absolute bottom-0 left-0 right-0 p-8 text-white">
 							<div className="flex justify-between items-end">
 								<div>
-									<h1 className="text-3xl font-bold flex items-center gap-2">
-										{p.display_name || 'Anonymous'}, {p.age || '??'}
-										<PresenceIndicator userId={String(profile.id)} />
-									</h1>
-									<p className="text-gray-200 mt-1">
+									<div className="flex items-center gap-3 mb-1">
+										<h1 className="text-3xl font-bold flex items-center gap-2">
+											{p.display_name || 'Anonymous'}, {p.age || '??'}
+											<PresenceIndicator userId={String(profile.id)} />
+										</h1>
+										{compatibility && (
+											<div className="flex items-center gap-1 bg-purple-500/30 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-purple-200 border border-purple-400/30">
+												<Sparkles size={12} className="text-purple-300" />
+												{compatibility.score}% Match
+											</div>
+										)}
+									</div>
+									<p className="text-gray-200">
 										{p.location?.city || 'Unknown'}, {p.location?.state || 'Location'}
 									</p>
 								</div>

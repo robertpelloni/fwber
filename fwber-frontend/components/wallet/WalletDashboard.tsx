@@ -1,13 +1,11 @@
 'use client';
 import { useConnection, useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
 import { PublicKey, Transaction } from '@solana/web3.js';
-import { getAssociatedTokenAddress, createTransferInstruction, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
+import { getAssociatedTokenAddress, createTransferInstruction } from '@solana/spl-token';
 import dynamic from 'next/dynamic';
 import { useWallet as useInternalWallet } from '@/lib/hooks/useWallet';
 import { useState } from 'react';
 import { api } from '@/lib/api/client';
-
-import { apiClient } from '@/lib/api/client';
 import { Loader2, ArrowDownCircle, ArrowUpCircle, Send, Key, Copy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import PaymentRequests from './PaymentRequests';
@@ -38,8 +36,6 @@ export default function WalletDashboard() {
         setLoading(true);
         try {
             await api.post('/wallet/withdraw', {
-
-            await apiClient.post('/wallet/withdraw', {
                 amount: parseFloat(withdrawAmount),
                 destination_address: publicKey.toBase58()
             });
@@ -48,8 +44,6 @@ export default function WalletDashboard() {
             alert('Withdrawal successful! Check your wallet.');
         } catch (e: any) {
             alert('Withdrawal failed: ' + (e.error || e.message));
-
-            alert('Withdrawal failed: ' + (e.response?.data?.error || e.message));
         } finally {
             setLoading(false);
         }
@@ -75,8 +69,6 @@ export default function WalletDashboard() {
             if (confirmation.value.err) throw new Error('Transaction failed on-chain');
 
             await api.post('/wallet/deposit', {
-
-            await apiClient.post('/wallet/deposit', {
                 amount: parseFloat(depositAmount),
                 signature: signature
             });
@@ -97,9 +89,6 @@ export default function WalletDashboard() {
         try {
             const res = await api.post<{ merchant_secret: string }>('/merchant/keys');
             setMerchantKeys(res);
-
-            const res = await apiClient.post('/merchant/keys');
-            setMerchantKeys(res.data as { merchant_secret: string });
         } catch (e: any) {
             alert('Failed to generate keys');
         }
@@ -112,7 +101,6 @@ export default function WalletDashboard() {
                 <div className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Devnet</div>
             </div>
 
-            {/* Tabs */}
             <div className="flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 dark:bg-gray-700/50 rounded-lg overflow-x-auto">
                 {(['wallet', 'requests', 'merchant', 'bridge'] as const).map(tab => (
                     <button
@@ -145,7 +133,6 @@ export default function WalletDashboard() {
 
             {activeTab === 'wallet' && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Internal Balance */}
                     <div className="p-4 border border-purple-200 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
                         <div className="flex justify-between items-start">
                             <div>
@@ -174,7 +161,6 @@ export default function WalletDashboard() {
                         </div>
                     </div>
 
-                    {/* External Wallet Connection */}
                     <div className="flex justify-between items-center">
                         <h3 className="font-medium">External Wallet (Solana)</h3>
                         <WalletMultiButton className="!bg-purple-600 hover:!bg-purple-700" />
@@ -182,7 +168,6 @@ export default function WalletDashboard() {
 
                     {publicKey ? (
                         <div className="grid md:grid-cols-2 gap-4">
-                            {/* Withdraw */}
                             <div className="p-4 border rounded-xl space-y-4 dark:border-gray-700 bg-white dark:bg-gray-800">
                                 <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-medium">
                                     <ArrowUpCircle className="w-5 h-5" /> Withdraw
@@ -207,7 +192,6 @@ export default function WalletDashboard() {
                                 <p className="text-xs text-gray-500">To: {publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}</p>
                             </div>
 
-                            {/* Deposit */}
                             <div className="p-4 border rounded-xl space-y-4 dark:border-gray-700 bg-white dark:bg-gray-800">
                                 <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
                                     <ArrowDownCircle className="w-5 h-5" /> Deposit
@@ -240,7 +224,6 @@ export default function WalletDashboard() {
                         </div>
                     )}
 
-                    {/* Referral */}
                     {internalWallet?.referral_code && (
                         <div className="p-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl">
                             <p className="text-sm opacity-90">Refer a friend & earn 50 FWB</p>
@@ -248,7 +231,6 @@ export default function WalletDashboard() {
                         </div>
                     )}
 
-                    {/* Transaction History */}
                     <div className="space-y-4">
                         <h3 className="font-medium">Transaction History</h3>
                         <div className="space-y-2">

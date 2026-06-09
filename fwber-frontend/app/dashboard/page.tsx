@@ -3,9 +3,8 @@
 import { useAuth } from '@/lib/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { api } from '@/lib/api/client';
-
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Heart,
   Users,
@@ -37,6 +36,7 @@ import {
   Wand2,
   HeartHandshake,
   Wifi,
+  Cpu
 } from 'lucide-react';
 import Link from 'next/link';
 import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget';
@@ -44,7 +44,6 @@ import { ProximityPresenceCompact } from '@/components/realtime/ProximityPresenc
 import AppHeader from '@/components/AppHeader';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal';
-import { api } from '@/lib/api/client';
 
 interface DashboardStats {
   total_matches: number;
@@ -57,6 +56,9 @@ interface DashboardStats {
   response_rate: number;
   days_active: number;
   last_login: string;
+  current_streak: number;
+  streak_just_updated: boolean;
+  reverb_healthy?: boolean;
 }
 
 export default function DashboardPage() {
@@ -68,7 +70,7 @@ export default function DashboardPage() {
     enabled: isAuthenticated && !!token,
     queryFn: async () => {
       try {
-        const data = await api.get<DashboardStats & { current_streak: number; streak_just_updated: boolean; reverb_healthy?: boolean }>('/dashboard/stats');
+        const data = await api.get<DashboardStats>('/dashboard/stats');
         if (data?.streak_just_updated) {
           setIsStreakModalOpen(true);
         }
@@ -76,7 +78,7 @@ export default function DashboardPage() {
       } catch (error) {
         console.error('Dashboard stats fetch failed:', error);
         return null;
-      return await api.get<DashboardStats & { streak_just_updated: boolean }>('/dashboard/stats');
+      }
     },
   });
 
@@ -84,23 +86,7 @@ export default function DashboardPage() {
     queryKey: ['vouch-leaderboard'],
     queryFn: async () => {
       return await api.get('/leaderboard');
-
-  // Effect to check if we should show the streak modal
-  useEffect(() => {
-    // Priority: Explicit backend flag (most reliable for real-time update)
-    // Fallback: LocalStorage check (prevents spam on page reload)
-    if (stats?.streak_just_updated) {
-      setShowStreakModal(true);
-    } else if (stats?.current_streak && stats.current_streak > 0) {
-      const today = new Date().toDateString();
-      const lastShown = localStorage.getItem('fwber_streak_shown_date');
-
-      // If we haven't shown it today, and user has a streak, show it
-      if (lastShown !== today) {
-        localStorage.setItem('fwber_streak_shown_date', today);
-
-      }
-    },
+    }
   });
 
   const dailyStreak = stats?.current_streak || 0;
@@ -494,7 +480,7 @@ function FeatureSurfaceCard({
     pink: 'border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-800 dark:bg-pink-900/20 dark:text-pink-300',
     blue: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
     slate: 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-200',
-  red: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300',
+    red: 'border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300',
   };
 
   return (

@@ -1,7 +1,7 @@
 # VISION.md — The Ultimate fwber Architecture & Philosophy
 
-> **Last Updated:** 2026-05-23
-> **Version:** 2.0.16 (ActivityPub Hardened)
+> **Last Updated:** 2026-06-05
+> **Version:** 2.1.5 (OkCupid Matching Engine)
 > **Goal:** To serve as the definitive North Star for all human and AI agents working on the fwber project.
 
 ---
@@ -49,7 +49,7 @@ fwber is a bleeding-edge, high-performance platform capable of handling extreme 
 - **Safety**: Safe Walk Tracking, Panic Buttons, Hardware Tokens (BLE), AR "Ghost" Navigation.
 
 ### The Next Frontier (Phase 5+)
-- **Value-Aligned Matching**: AI-powered "Compatibility Audit" assessing shared life goals and ethical frameworks beyond physical compatibility.
+- **Value-Aligned Matching (CORE COMPLETE - v2.1.5)**: AI-powered "OkCupid-style" matching engine assessing shared life goals and ethical frameworks via a geometric-mean compatibility heuristic and weighted importance.
 - **The AI Wingman Evolution**: A proactive agent that watches conversation flow and suggests real-time nudges ("You've been chatting for 3 days — suggest this nearby jazz event!").
 - **Dynamic Emotional Avatars**: Avatars that shift their visual "aura" based on the user's recent sentiment and activity.
 - **Neighborhood Social Layer**: Expanding the Local Pulse to serve as a hyper-local neighborhood forum ("Nextdoor meets modern dating").

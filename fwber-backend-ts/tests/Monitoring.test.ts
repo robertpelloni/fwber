@@ -14,6 +14,8 @@ const mockJwt = {
 
 jest.unstable_mockModule('../src/lib/prisma.js', () => ({
   default: mockPrisma,
+  serialize: (obj: any) => obj,
+  sanitizeUser: (obj: any) => obj,
 }));
 
 jest.unstable_mockModule('jsonwebtoken', () => ({
