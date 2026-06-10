@@ -653,14 +653,14 @@
     },
     "fwber-frontend\\app\\dashboard\\page.tsx": {
       "latest": {
-        "commit": "1f75b3389",
-        "timestamp": "2026-06-08T23:18:29.403Z",
-        "mi": 13.5,
-        "cognitive": 38,
+        "commit": "35f957535",
+        "timestamp": "2026-06-10T22:54:58.931Z",
+        "mi": 6.6,
+        "cognitive": 41,
         "nesting": 4,
-        "lines": 470,
+        "lines": 907,
         "maxCyclomatic": 37,
-        "entropy": 5.45
+        "entropy": 6.67
       },
       "history": [
         {
@@ -672,9 +672,19 @@
           "lines": 470,
           "maxCyclomatic": 37,
           "entropy": 5.45
+        },
+        {
+          "commit": "35f957535",
+          "timestamp": "2026-06-10T22:54:58.931Z",
+          "mi": 6.6,
+          "cognitive": 41,
+          "nesting": 4,
+          "lines": 907,
+          "maxCyclomatic": 37,
+          "entropy": 6.67
         }
       ],
-      "trend": "stable"
+      "trend": "regressing"
     },
     "fwber-frontend\\components\\AppHeader.tsx": {
       "latest": {
@@ -700,7 +710,57 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\app\\matching\\page.tsx": {
+      "latest": {
+        "commit": "35f957535",
+        "timestamp": "2026-06-10T22:51:09.799Z",
+        "mi": 33.7,
+        "cognitive": 0,
+        "nesting": 2,
+        "lines": 110,
+        "maxCyclomatic": 1,
+        "entropy": 4.97
+      },
+      "history": [
+        {
+          "commit": "35f957535",
+          "timestamp": "2026-06-10T22:51:09.799Z",
+          "mi": 33.7,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 110,
+          "maxCyclomatic": 1,
+          "entropy": 4.97
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\services\\NarrativeService.ts": {
+      "latest": {
+        "commit": "a48599e19",
+        "timestamp": "2026-06-10T23:11:49.906Z",
+        "mi": 45.8,
+        "cognitive": 33,
+        "nesting": 6,
+        "lines": 72,
+        "maxCyclomatic": 15,
+        "entropy": 6.38
+      },
+      "history": [
+        {
+          "commit": "a48599e19",
+          "timestamp": "2026-06-10T23:11:49.906Z",
+          "mi": 45.8,
+          "cognitive": 33,
+          "nesting": 6,
+          "lines": 72,
+          "maxCyclomatic": 15,
+          "entropy": 6.38
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-08T23:24:29.205Z"
+  "capturedAt": "2026-06-10T23:11:55.127Z"
 }

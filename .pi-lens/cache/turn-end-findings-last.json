@@ -1,6 +1,6 @@
 {
-  "signature": "fwber-frontend/app/dashboard/page.tsx::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 10 across 1 file(s).\nTop rules: duplicate-string-literal×6, no-any-type×3, high-complexity×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
-  "sessionId": "lens-mq5dp7tp-7190290e",
-  "projectSeqStart": 17,
-  "projectSeqEnd": 18
+  "signature": "fwber-backend-ts/src/services/NarrativeService.ts::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 2 across 1 file(s).\nTop rules: missing-error-propagation×1, no-any-type×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "sessionId": "lens-mq8lu96d-83b12966",
+  "projectSeqStart": 24,
+  "projectSeqEnd": 25
 }

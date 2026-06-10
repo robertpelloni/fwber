@@ -24,3 +24,33 @@ Successfully implemented Phase 8: Intelligent Match Refinement. This release tra
 - **Phase 9: Social Velocity & Federation**: Focus on interop testing with external Fediverse nodes (Mastodon/Pleroma).
 - **Email DNS**: Configure Resend records for production delivery.
 - **Stripe Live**: Transition to live keys for payments.
+
+## Session 2026-06-10 — v2.1.9 Forward Merge & TS Fixes
+
+### Completed
+1. **Upstream Sync** — Fetched all remotes. 0 new upstream commits. No merge needed.
+2. **Branch Reconciliation** — Forward-merged `v2.1.9-intelligent-match-refinement` branch into main (2 commits, clean merge):
+   - NarrativeService.ts — AI-powered compatibility narrative reports
+   - use-match-narrative.ts — Frontend hook for narrative data
+   - New matching route `/narrative/:matchId`
+   - Enhanced MatchingHeuristicService with proximity integration
+   - Updated MatchInsights and profile pages
+   - Federation route hardening (actors/:id validation)
+   - 108 total matching questions (expanded from 95)
+3. **TS Fixes** — Fixed 3 TypeScript errors in NarrativeService.ts:
+   - Prisma relation types: added `(ua as any).matching_questions?.text` guards
+   - OpenAI response: added optional chaining on `response.choices?.[0]?.message?.content`
+4. **Branch Reconciliation** — Federation branch: 0 unique commits (fully merged). OkCupid branch: 3 stale finalization commits (ignored — already incorporated into main).
+5. **Version bumped to 2.1.9** — VERSION, VERSION.md, CHANGELOG, TODO, ROADMAP, HANDOFF all synced by v2.1.9 branch merge.
+
+### Current State
+- Backend: 0 TS errors
+- Frontend: 0 TS errors
+- No unmerged feature branches with unique progress
+- Working tree clean
+
+### Known Issues
+- `/api/federation/actors/detail` may still return 500 (needs testing after deploy)
+- Email delivery requires Resend DNS configuration
+- AI Wingman features fall back to static content (no API keys)
+- Stripe in test mode only

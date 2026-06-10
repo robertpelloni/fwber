@@ -44,9 +44,9 @@ export class NarrativeService {
       for (const ua of userAnswers) {
         const ta = targetAnswers.find(a => a.question_id === ua.question_id);
         if (ta) {
-          const questionText = ua.matching_questions.text;
-          const userOption = ua.matching_options.text;
-          const targetOption = ta.matching_options.text;
+          const questionText = (ua as any).matching_questions?.text || 'Unknown question';
+          const userOption = (ua as any).matching_options?.text || 'Unknown';
+          const targetOption = (ta as any).matching_options?.text || 'Unknown';
 
           if (ua.chosen_option_id === ta.chosen_option_id) {
             commonalities.push(`Both answered "${userOption}" to "${questionText}"`);
@@ -76,13 +76,13 @@ export class NarrativeService {
         return `Atmospheric Analysis: You share ${commonalities.length} key values including ${commonalities[0]?.split('"')[1] || 'core ethics'}. However, you differ on ${differences.length} points. In this neon-lit void, you might just find a signal in the noise.`;
       }
 
-      const response = await this.openai.chat.completions.create({
+      const response = await this.openai!.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [{ role: "system", content: "You are a Cyber-Noir compatibility analyst." }, { role: "user", content: prompt }],
         max_tokens: 250,
       });
 
-      return response.choices[0].message.content || "The AI is silent. The void remains.";
+      return response.choices?.[0]?.message?.content || "The AI is silent. The void remains.";
     } catch (error: any) {
       console.error('[NarrativeService] Error:', error.message);
       return "The connection is flickering. Narrative unavailable.";

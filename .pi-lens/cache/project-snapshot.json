@@ -1,8 +1,8 @@
 {
   "version": 1,
   "projectRoot": "C:/Users/hyper/workspace/fwber",
-  "generatedAt": "2026-06-08T15:44:30.566Z",
-  "seq": 7,
+  "generatedAt": "2026-06-10T21:54:55.116Z",
+  "seq": 19,
   "files": {},
   "symbols": {},
   "reverseDeps": {},
@@ -525,7 +525,7 @@
     ],
     [
       "GET",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\app\\api\\referrals\\route.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\app\\api\\burner-links\\route.ts"
     ],
     [
       "getActiveBoost",
@@ -649,7 +649,7 @@
     ],
     [
       "getFeatureFlags",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\config.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-feature-flags.ts"
     ],
     [
       "getFederatedPosts",
@@ -1449,7 +1449,7 @@
     ],
     [
       "sendMessage",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\messages.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\api\\chatrooms.ts"
     ],
     [
       "sendNotificationEmail",
@@ -1469,7 +1469,7 @@
     ],
     [
       "serialize",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\routes\\proximity-chatrooms.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\routes\\leaderboard.ts"
     ],
     [
       "serializeEntry",
@@ -1729,7 +1729,7 @@
     ],
     [
       "useBackendFeatureFlags",
-      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-feature-flags.ts"
+      "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\lib\\hooks\\use-config.ts"
     ],
     [
       "useBoostAnalytics",
@@ -2466,7 +2466,7 @@
     "scanRoot": "C:\\Users\\hyper\\workspace\\fwber",
     "projectRoot": "C:\\Users\\hyper\\workspace\\fwber",
     "canWarmCaches": true,
-    "sourceFileCount": 751
+    "sourceFileCount": 734
   },
   "languageProfile": {
     "present": {
@@ -2510,8 +2510,8 @@
       "jsts": true
     },
     "counts": {
-      "python": 27,
-      "jsts": 724,
+      "python": 12,
+      "jsts": 716,
       "rust": 2
     },
     "detectedKinds": [
