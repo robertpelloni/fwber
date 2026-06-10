@@ -177,7 +177,7 @@ export default function DashboardPage() {
                   </h3>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
                     <QuickAction
-                      href="/matching"
+                      href="/settings/matching"
                       label="Answer Questions"
                       icon={<Heart className="h-4 w-4" />}
                     />
@@ -280,7 +280,7 @@ export default function DashboardPage() {
             <SectionHeader icon={<Heart className="h-4 w-4" />} title="Discover & Connect" />
             <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
               <FeatureTile
-                href="/matching"
+                href="/settings/matching"
                 title="Matching"
                 subtitle="95 personality questions"
                 icon={<Heart className="h-5 w-5" />}

@@ -7,6 +7,13 @@ import { BarChart3, Compass, Eye, Heart, Sparkles, Users, Smartphone } from 'luc
 
 const matchingSurfaces = [
   {
+    href: '/settings/matching',
+    title: 'Answer Questions',
+    description: '95 personality questions across 7 categories. Answer them to build your compatibility profile.',
+    icon: Sparkles,
+    accent: 'from-purple-500 to-violet-500',
+  },
+  {
     href: '/recommendations',
     title: 'Recommendations',
     description: 'Open the richer recommendation stack with AI, nearby, collaborative, and feed-driven match suggestions.',
