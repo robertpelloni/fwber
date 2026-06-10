@@ -8,9 +8,16 @@ const federationService = new FederationService();
 
 // GET /api/federation/actors/:id — get actor detail (No auth required for federation)
 router.get('/actors/:id', async (req, res) => {
+  const { id } = req.params;
+
+  // Handle 'detail' or other non-numeric IDs gracefully
+  if (isNaN(Number(id))) {
+    return res.status(404).json({ error: 'Actor not found' });
+  }
+
   try {
     const user = await prisma.users.findUnique({
-      where: { id: BigInt(req.params.id) },
+      where: { id: BigInt(id) },
     });
 
     if (!user) {

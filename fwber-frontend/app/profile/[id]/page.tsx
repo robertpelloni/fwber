@@ -19,6 +19,7 @@ import { BookHeart, Compass, Gift, HeartHandshake, ShieldCheck, Sparkles } from 
 import { VouchBadge } from '@/components/profile/VouchBadge';
 import { useMatchCompatibility } from '@/lib/hooks/use-compatibility';
 import { useToast } from '@/components/ToastProvider';
+import { MatchInsights } from '@/components/matches/MatchInsights';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -397,6 +398,11 @@ export default function PublicProfilePage() {
                 currentTier={RelationshipTier.DISCOVERY}
                 onTokenUnlock={handleTokenUnlock}
               />
+            </div>
+
+            {/* Match Insights & Narrative (v2.1.9) */}
+            <div className="mb-8">
+              <MatchInsights matchId={id || ''} />
             </div>
 
             {/* Actions */}
