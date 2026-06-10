@@ -1,7 +1,8 @@
 import React from 'react';
 import { useMatchInsights } from '@/lib/hooks/use-match-insights';
+import { useMatchNarrative } from '@/lib/hooks/use-match-narrative';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Activity, Heart, Brain, MessageCircle, Zap } from 'lucide-react';
+import { Loader2, Activity, Heart, Brain, MessageCircle, Zap, Quote } from 'lucide-react';
 
 interface MatchInsightsProps {
   matchId: string;
@@ -26,6 +27,7 @@ function ScoreBar({ label, score, color = "bg-blue-500" }: { label: string; scor
 
 export function MatchInsights({ matchId }: MatchInsightsProps) {
   const { data, isLoading, error } = useMatchInsights(matchId);
+  const { data: narrative, isLoading: narrativeLoading } = useMatchNarrative(matchId);
 
   if (isLoading) {
     return (
@@ -105,6 +107,24 @@ export function MatchInsights({ matchId }: MatchInsightsProps) {
               <p className="font-semibold text-sm">{data.details.lifestyle}%</p>
             </div>
           </div>
+        </div>
+
+        {/* Narrative Compatibility Report (v2.1.9) */}
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2 flex items-center gap-1">
+            <Quote className="h-3 w-3" />
+            The Signal Breakdown
+          </h4>
+          {narrativeLoading ? (
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Analyzing digital soul-print...</span>
+            </div>
+          ) : (
+            <p className="text-sm italic text-gray-600 dark:text-gray-400 leading-relaxed font-serif">
+              "{narrative || "The system is silent. Not enough data for a narrative report."}"
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

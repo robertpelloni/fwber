@@ -1,6 +1,19 @@
 # Changelog
 
-## [2.1.5] - 2026-06-05
+## [2.1.9] - 2026-06-08
+
+### Added
+- **Narrative Compatibility Reports**: Launched AI-powered personality analysis that explains *why* two users are compatible based on shared values and differences.
+- **Narrative Service**: Created `NarrativeService.ts` to generate atmospheric Cyber-Noir compatibility reports using OpenAI.
+- **Proximity-Enhanced Matching**: Updated `MatchingHeuristicService.ts` to factor in real-time physical proximity into the compatibility score (80% values / 20% proximity).
+- **Expanded Matching Questions**: Scaled the value-matching dataset to 108 high-signal questions, adding new Cyber-Noir and Tech Ethics categories.
+- **Frontend Insights**: Integrated the new narrative reports directly into the public profile pages and MatchInsights component.
+
+### Fixed
+- **Federation Actor Detail**: Resolved a 500 error on `/api/federation/actors/:id` when non-numeric IDs (like "detail") were passed.
+- **API Robustness**: Added validation to federation routes to handle edge cases in actor lookups.
+
+## [2.1.8] - 2026-06-08
 
 ### Added
 - **OkCupid-Style Matching Engine**: Implemented a comprehensive matching system with value-based questions, multiple-choice options, and importance weighting.

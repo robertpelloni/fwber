@@ -1,19 +1,20 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.1.8 "Matching Question Expansion"
-> **Last Updated:** 2026-06-05
+> **Current Version:** 2.1.9 "Intelligent Match Refinement"
+> **Last Updated:** 2026-06-08
 
 ---
 
 ## 🗺️ High-Level Trajectory
 
-### Phase 8: Intelligent Match Refinement (IN PROGRESS)
+### Phase 8: Intelligent Match Refinement (COMPLETED - v2.1.9)
 The next major evolution focuses on high-fidelity personality analysis and deeper signal integration.
 
-**Targets:**
-- **Narrative Compatibility**: AI-generated reports explaining *why* two users are compatible based on their value-matching data.
-- **Signal Merging**: Unification of matching engine scores, weighted interest overlap, and real-time proximity history into a single connection score.
-- ~~**Scale**: Expanding the value-matching dataset to 100+ high-signal questions.~~ (DONE - v2.1.8: 95 questions across 7 categories)
+**Key Achievements:**
+- **Narrative Compatibility**: Launched AI-powered reports explaining the "why" behind compatibility scores.
+- **Signal Merging**: Unified value-matching scores with real-time proximity history (80/20 weight).
+- **Scale**: Expanded the value-matching dataset to 108 high-signal questions, including new Cyber-Noir ethics.
+- **Deep UI Integration**: Wired narrative reports into the profile discovery flow.
 
 ### The OkCupid Matching Engine (COMPLETED - v2.1.5)
 The matching engine has been upgraded to a value-based system with importance weighting and a geometric-mean compatibility heuristic.
