@@ -1,57 +1,15 @@
 {
-  "generatedAt": "2026-06-10T23:13:41.983Z",
+  "generatedAt": "2026-06-11T02:23:55.900Z",
   "scope": "turn_delta",
-  "sessionId": "lens-mq8lu96d-83b12966",
-  "turnIndex": 41,
-  "projectSeqStart": 24,
-  "projectSeqEnd": 25,
+  "sessionId": "lens-mq8sfb4i-413c75dd",
+  "turnIndex": 18,
+  "projectSeqStart": 30,
+  "projectSeqEnd": 30,
   "deltaOnly": true,
-  "files": [
-    {
-      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\services\\NarrativeService.ts",
-      "displayPath": "fwber-backend-ts/src/services/NarrativeService.ts",
-      "fileSeq": 2,
-      "warnings": [
-        {
-          "id": "cq:bda94a4646",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\services\\NarrativeService.ts",
-          "displayPath": "src/services/NarrativeService.ts",
-          "line": 86,
-          "severity": "warning",
-          "tool": "type-safety",
-          "rule": "no-any-type",
-          "message": "Avoid 'any' type — use 'unknown' or define a proper interface",
-          "category": "type-safety",
-          "origin": "dispatch"
-        },
-        {
-          "id": "cq:c9257bd24e",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\services\\NarrativeService.ts",
-          "displayPath": "src/services/NarrativeService.ts",
-          "line": 86,
-          "column": 7,
-          "severity": "warning",
-          "tool": "missing-error-propagation",
-          "rule": "missing-error-propagation",
-          "message": "Catch block in async 'generateNarrative' logs the error but doesn't rethrow — callers receive undefined and assume success",
-          "category": "other",
-          "origin": "dispatch"
-        }
-      ]
-    }
-  ],
+  "files": [],
   "summary": {
-    "warnings": 2,
-    "files": 1,
-    "topRules": [
-      {
-        "rule": "missing-error-propagation",
-        "count": 1
-      },
-      {
-        "rule": "no-any-type",
-        "count": 1
-      }
-    ]
+    "warnings": 0,
+    "files": 0,
+    "topRules": []
   }
 }

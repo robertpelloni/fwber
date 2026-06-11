@@ -18,25 +18,25 @@ export function useMatchingQuestions() {
   return useQuery({
     queryKey: ['matching-questions'],
     queryFn: async () => {
-      return await api.get<MatchingQuestion[]>('/matching/questions');
+      return await api.get<MatchingQuestion[]>('/matching/questions')
     },
-  });
+  })
 }
 
 export function useSubmitMatchingAnswer() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: {
-      question_id: string;
-      chosen_option_id: string;
-      accepted_option_ids: string[];
-      importance: number;
-      explanation?: string;
+      question_id: string
+      chosen_option_id: string
+      accepted_option_ids: string[]
+      importance: number
+      explanation?: string
     }) => {
-      return await api.post('/matching/answer', data);
+      return await api.post('/matching/answer', data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['matching-questions'] });
+      queryClient.invalidateQueries({ queryKey: ['matching-questions'] })
     },
-  });
+  })
 }
