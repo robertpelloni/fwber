@@ -78,7 +78,10 @@ router.post('/answer', async (req: any, res) => {
 });
 
 import { MatchingHeuristicService } from '../services/MatchingHeuristicService.js';
+import { NarrativeService } from '../services/NarrativeService.js';
+
 const matchingService = new MatchingHeuristicService();
+const narrativeService = new NarrativeService();
 
 router.get('/compatibility/:matchId', async (req: any, res) => {
   try {
@@ -86,6 +89,17 @@ router.get('/compatibility/:matchId', async (req: any, res) => {
     const matchId = BigInt(req.params.matchId);
     const score = await matchingService.calculateCompatibility(userId, matchId);
     res.json({ score: Math.round(score * 100) });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/narrative/:matchId', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const matchId = BigInt(req.params.matchId);
+    const report = await narrativeService.generateNarrative(userId, matchId);
+    res.json({ report });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

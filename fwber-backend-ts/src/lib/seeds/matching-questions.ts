@@ -893,6 +893,106 @@ const matchingQuestions = [
 			"It would bother me",
 		],
 	},
+
+	// ============================================================
+	// CYBER-NOIR & TECH ETHICS (Expanded v2.1.9)
+	// ============================================================
+	{
+		text: "How do you feel about AI-generated companionship?",
+		category: "ethics",
+		options: [
+			"It's the future — no difference from human connection",
+			"A useful tool but not a replacement for a soul",
+			"Disturbing and unnatural",
+			"I'm already in love with an AI",
+		],
+	},
+	{
+		text: "Do you prefer neon-lit urban environments or quiet, dark retreats?",
+		category: "lifestyle",
+		options: [
+			"The buzz of the neon city",
+			"A quiet, shadowy retreat",
+			"A mix of urban grit and private solace",
+		],
+	},
+	{
+		text: "Is privacy a right or a luxury in the digital age?",
+		category: "ethics",
+		options: [
+			"An absolute right worth fighting for",
+			"A luxury we've mostly already lost",
+			"Unnecessary if you have nothing to hide",
+		],
+	},
+	{
+		text: "How do you handle a partner who has a digital alter-ego?",
+		category: "personality",
+		options: [
+			"I love the mystery",
+			"As long as I know the 'real' them",
+			"I find it deceptive",
+			"I have one too",
+		],
+	},
+	{
+		text: "What's your stance on bio-hacking and body modification?",
+		category: "lifestyle",
+		options: [
+			"Fully support — the body is a temple to be upgraded",
+			"A few mods are fine",
+			"Natural is better",
+			"It scares me",
+		],
+	},
+	{
+		text: "If you could upload your consciousness to the cloud, would you?",
+		category: "ethics",
+		options: [
+			"In a heartbeat — digital immortality is the goal",
+			"Only if my physical body was failing",
+			"Never — it's not truly 'me'",
+			"Maybe, if the server was secure",
+		],
+	},
+	{
+		text: "How important is it that your partner appreciates retro-tech (vinyl, analog, old code)?",
+		category: "interests",
+		options: [
+			"Very — the old ways are better",
+			"It's a cool hobby",
+			"Not important — I prefer the cutting edge",
+		],
+	},
+	{
+		text: "Could you trust someone you've only ever met in virtual space?",
+		category: "romance",
+		options: [
+			"Yes, the mind is what matters",
+			"Only after a long time and verification",
+			"No, I need to look into their eyes in person",
+		],
+	},
+	{
+		text: "Do you believe in the 'soul' or are we just complex biological algorithms?",
+		category: "ethics",
+		options: [
+			"There is a soul that tech can't replicate",
+			"We are just biological machines",
+			"The 'soul' is just another name for the algorithm",
+			"I don't know and it keeps me up at night",
+		],
+	},
+	{
+		text: "How do you feel about corporate influence on daily life?",
+		category: "ethics",
+		options: [
+			"I'm a loyal consumer / employee",
+			"It's a necessary evil",
+			"I'm part of the underground resistance",
+			"I try to live off the grid as much as possible",
+		],
+	},
 ];
 
 export async function seedMatchingQuestions() {
