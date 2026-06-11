@@ -141,16 +141,19 @@ function RegisterForm() {
   return (
     <div className="max-w-md w-full space-y-8">
       <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Create your <span className="text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 animate-gradient-chaos">FWBer</span> account
+        <h2 className="mt-6 text-center text-2xl font-bold text-gray-900 dark:text-white">
+          Join fwber
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          Or{' '}
+          Free to join. Your privacy is built in from day one.
+        </p>
+        <p className="mt-1 text-center text-xs text-gray-500 dark:text-gray-500">
+          Already have an account?{' '}
           <Link
             href="/login"
-            className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+            className="font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300"
           >
-            sign in to your existing account
+            Sign in
           </Link>
         </p>
       </div>
@@ -220,7 +223,7 @@ function RegisterForm() {
 
           <div>
             <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Profile Photo (Optional)
+              Profile Photo <span className="text-gray-400 dark:text-gray-500 font-normal">(optional — you can stay anonymous)</span>
             </label>
             <input
               id="avatar"
@@ -265,7 +268,7 @@ function RegisterForm() {
               onChange={handleChange}
             />
             <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-              Both you and your referrer earn <span className="font-semibold text-amber-600 dark:text-amber-400">50 bonus tokens</span>! After signing up, find your own code in Settings to invite friends.
+              Invite a friend and you&apos;ll both earn bonus tokens. Find your referral link in Settings after signing up.
             </p>
           </div>
           
