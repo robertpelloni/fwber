@@ -1,6 +1,6 @@
 {
-  "signature": "fwber-frontend/lib/hooks/use-matching.ts::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 4 across 1 file(s).\nTop rules: no-any-type×4\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "signature": "fwber-frontend/components/landing/LandingVariantB.tsx::Unresolved from this turn — fwber-frontend/components/landing/LandingVariantB.tsx:\n🔴 STOP — 10 issue(s) must be fixed:\n  L11: 'Menu' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.\n  L11: 'X' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.\n  L11: 'FileText' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.\n  L11: 'Building2' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.\n  L11: 'GitMerge' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.\n  L11: 'Shirt' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if int\n... (truncated)",
   "sessionId": "lens-mq8sfb4i-413c75dd",
-  "projectSeqStart": 26,
-  "projectSeqEnd": 27
+  "projectSeqStart": 44,
+  "projectSeqEnd": 45
 }

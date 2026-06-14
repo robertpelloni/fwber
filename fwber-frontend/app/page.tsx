@@ -28,9 +28,13 @@ export default function HomePage() {
     const v = getOrAssignVariant()
 
     if (v === 'A') {
-      import('@/components/landing/LandingVariantA').then(mod => setVariantComponent(() => mod.default))
+      import('@/components/landing/LandingVariantA').then((mod) =>
+        setVariantComponent(() => mod.default)
+      )
     } else {
-      import('@/components/landing/LandingVariantB').then(mod => setVariantComponent(() => mod.default))
+      import('@/components/landing/LandingVariantB').then((mod) =>
+        setVariantComponent(() => mod.default)
+      )
     }
   }, [])
 

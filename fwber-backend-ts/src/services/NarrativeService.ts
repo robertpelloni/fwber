@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma.js";
-import OpenAI from "openai";
+import prisma from '../lib/prisma.js';
+import OpenAI from 'openai';
 
 /**
  * NarrativeService
@@ -7,102 +7,85 @@ import OpenAI from "openai";
  * Generates AI-powered compatibility reports based on shared and differing matching answers.
  */
 export class NarrativeService {
-	private openai: OpenAI | null = null;
+  private openai: OpenAI | null = null;
 
-	constructor() {
-		if (
-			process.env.OPENAI_API_KEY &&
-			process.env.OPENAI_API_KEY !== "mock-key"
-		) {
-			this.openai = new OpenAI({
-				apiKey: process.env.OPENAI_API_KEY,
-			});
-		}
-	}
+  constructor() {
+    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'mock-key') {
+      this.openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    }
+  }
 
-	/**
-	 * Generates a narrative report for the compatibility between two users.
-	 */
-	async generateNarrative(userId: bigint, targetId: bigint): Promise<string> {
-		try {
-			// 1. Fetch answers for both users
-			const userAnswers = await prisma.user_matching_answers.findMany({
-				where: { user_id: userId },
-				include: { matching_questions: true, matching_options: true },
-			});
+  /**
+   * Generates a narrative report for the compatibility between two users.
+   */
+  async generateNarrative(userId: bigint, targetId: bigint): Promise<string> {
+    try {
+      // 1. Fetch answers for both users
+      const userAnswers = await prisma.user_matching_answers.findMany({
+        where: { user_id: userId },
+        include: { matching_questions: true, matching_options: true }
+      });
 
-			const targetAnswers = await prisma.user_matching_answers.findMany({
-				where: { user_id: targetId },
-				include: { matching_questions: true, matching_options: true },
-			});
+      const targetAnswers = await prisma.user_matching_answers.findMany({
+        where: { user_id: targetId },
+        include: { matching_questions: true, matching_options: true }
+      });
 
-			if (userAnswers.length === 0 || targetAnswers.length === 0) {
-				return "Not enough data to generate a narrative report. Answer more matching questions!";
-			}
+      if (userAnswers.length === 0 || targetAnswers.length === 0) {
+        return "Not enough data to generate a narrative report. Answer more matching questions!";
+      }
 
-			// 2. Identify commonalities and differences
-			const commonalities: string[] = [];
-			const differences: string[] = [];
+      // 2. Identify commonalities and differences
+      const commonalities: string[] = [];
+      const differences: string[] = [];
 
-			for (const ua of userAnswers) {
-				const ta = targetAnswers.find((a) => a.question_id === ua.question_id);
-				if (ta) {
-					const questionText =
-						(ua as any).matching_questions?.text || "Unknown question";
-					const userOption = (ua as any).matching_options?.text || "Unknown";
-					const targetOption = (ta as any).matching_options?.text || "Unknown";
+      for (const ua of userAnswers) {
+        const ta = targetAnswers.find(a => a.question_id === ua.question_id);
+        if (ta) {
+          const questionText = ua.matching_questions.text;
+          const userOption = ua.matching_options.text;
+          const targetOption = ta.matching_options.text;
 
-					if (ua.chosen_option_id === ta.chosen_option_id) {
-						commonalities.push(
-							`Both answered "${userOption}" to "${questionText}"`,
-						);
-					} else {
-						differences.push(
-							`User answered "${userOption}" while Target answered "${targetOption}" to "${questionText}"`,
-						);
-					}
-				}
-			}
+          if (ua.chosen_option_id === ta.chosen_option_id) {
+            commonalities.push(`Both answered "${userOption}" to "${questionText}"`);
+          } else {
+            differences.push(`User answered "${userOption}" while Target answered "${targetOption}" to "${questionText}"`);
+          }
+        }
+      }
 
-			// 3. Construct prompt for AI
-			const prompt = `
+      // 3. Construct prompt for AI
+      const prompt = `
         You are an expert compatibility analyst in a "Cyber-Noir" world.
         Analyze the following matching data for two users and write a concise, atmospheric compatibility report (max 150 words).
         Focus on their shared values and notable differences. Use a mysterious, slightly cynical, yet insightful tone.
 
         Commonalities:
-        ${commonalities.slice(0, 5).join("\n")}
+        ${commonalities.slice(0, 5).join('\n')}
 
         Differences:
-        ${differences.slice(0, 5).join("\n")}
+        ${differences.slice(0, 5).join('\n')}
 
         Final Analysis:
       `;
 
-			if (!this.openai) {
-				// Fallback if no OpenAI key
-				return `Atmospheric Analysis: You share ${commonalities.length} key values including ${commonalities[0]?.split('"')[1] || "core ethics"}. However, you differ on ${differences.length} points. In this neon-lit void, you might just find a signal in the noise.`;
-			}
+      if (!this.openai) {
+        // Fallback if no OpenAI key
+        return `Atmospheric Analysis: You share ${commonalities.length} key values including ${commonalities[0]?.split('"')[1] || 'core ethics'}. However, you differ on ${differences.length} points. In this neon-lit void, you might just find a signal in the noise.`;
+      }
 
-			const response = await this.openai!.chat.completions.create({
-				model: "gpt-3.5-turbo",
-				messages: [
-					{
-						role: "system",
-						content: "You are a Cyber-Noir compatibility analyst.",
-					},
-					{ role: "user", content: prompt },
-				],
-				max_tokens: 250,
-			});
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "system", content: "You are a Cyber-Noir compatibility analyst." }, { role: "user", content: prompt }],
+        max_tokens: 250,
+      });
 
-			return (
-				response.choices?.[0]?.message?.content ||
-				"The AI is silent. The void remains."
-			);
-		} catch (error: any) {
-			console.error("[NarrativeService] Error:", error.message);
-			return "The connection is flickering. Narrative unavailable.";
-		}
-	}
+      return response.choices[0].message.content || "The AI is silent. The void remains.";
+    } catch (error: any) {
+      console.error('[NarrativeService] Error:', error.message);
+      return "The connection is flickering. Narrative unavailable.";
+    }
+  }
 }

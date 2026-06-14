@@ -13,7 +13,9 @@ export function trackEvent(event: string, data: Record<string, string>) {
     const events = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]')
     events.push({ event, ...data, timestamp: new Date().toISOString() })
     localStorage.setItem(EVENTS_KEY, JSON.stringify(events.slice(-100)))
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 }
 
 export function trackCTAClick(ctaName: string) {

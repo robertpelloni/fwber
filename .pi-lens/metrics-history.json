@@ -663,8 +663,8 @@
     },
     "fwber-frontend\\app\\dashboard\\page.tsx": {
       "latest": {
-        "commit": "35f957535",
-        "timestamp": "2026-06-10T22:54:58.931Z",
+        "commit": "01f06ed9a",
+        "timestamp": "2026-06-11T17:15:26.534Z",
         "mi": 6.6,
         "cognitive": 41,
         "nesting": 4,
@@ -686,6 +686,16 @@
         {
           "commit": "35f957535",
           "timestamp": "2026-06-10T22:54:58.931Z",
+          "mi": 6.6,
+          "cognitive": 41,
+          "nesting": 4,
+          "lines": 907,
+          "maxCyclomatic": 37,
+          "entropy": 6.67
+        },
+        {
+          "commit": "01f06ed9a",
+          "timestamp": "2026-06-11T17:15:26.534Z",
           "mi": 6.6,
           "cognitive": 41,
           "nesting": 4,
@@ -820,7 +830,107 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\app\\page.tsx": {
+      "latest": {
+        "commit": "01f06ed9a",
+        "timestamp": "2026-06-11T17:06:49.717Z",
+        "mi": 18.1,
+        "cognitive": 8,
+        "nesting": 4,
+        "lines": 387,
+        "maxCyclomatic": 5,
+        "entropy": 6.77
+      },
+      "history": [
+        {
+          "commit": "01f06ed9a",
+          "timestamp": "2026-06-11T17:06:49.717Z",
+          "mi": 18.1,
+          "cognitive": 8,
+          "nesting": 4,
+          "lines": 387,
+          "maxCyclomatic": 5,
+          "entropy": 6.77
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\register\\page.tsx": {
+      "latest": {
+        "commit": "01f06ed9a",
+        "timestamp": "2026-06-11T17:13:33.798Z",
+        "mi": 20.3,
+        "cognitive": 77,
+        "nesting": 6,
+        "lines": 314,
+        "maxCyclomatic": 38,
+        "entropy": 6.26
+      },
+      "history": [
+        {
+          "commit": "01f06ed9a",
+          "timestamp": "2026-06-11T17:13:33.798Z",
+          "mi": 20.3,
+          "cognitive": 77,
+          "nesting": 6,
+          "lines": 314,
+          "maxCyclomatic": 38,
+          "entropy": 6.26
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\landing\\LandingVariantA.tsx": {
+      "latest": {
+        "commit": "df66c9516",
+        "timestamp": "2026-06-11T21:18:43.903Z",
+        "mi": 16.8,
+        "cognitive": 9,
+        "nesting": 4,
+        "lines": 447,
+        "maxCyclomatic": 5,
+        "entropy": 6.81
+      },
+      "history": [
+        {
+          "commit": "df66c9516",
+          "timestamp": "2026-06-11T21:18:43.903Z",
+          "mi": 16.8,
+          "cognitive": 9,
+          "nesting": 4,
+          "lines": 447,
+          "maxCyclomatic": 5,
+          "entropy": 6.81
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\landing\\LandingVariantB.tsx": {
+      "latest": {
+        "commit": "df66c9516",
+        "timestamp": "2026-06-11T21:29:22.208Z",
+        "mi": 18.1,
+        "cognitive": 8,
+        "nesting": 4,
+        "lines": 387,
+        "maxCyclomatic": 5,
+        "entropy": 6.77
+      },
+      "history": [
+        {
+          "commit": "df66c9516",
+          "timestamp": "2026-06-11T21:29:22.208Z",
+          "mi": 18.1,
+          "cognitive": 8,
+          "nesting": 4,
+          "lines": 387,
+          "maxCyclomatic": 5,
+          "entropy": 6.77
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-11T01:47:20.210Z"
+  "capturedAt": "2026-06-11T21:29:27.348Z"
 }
