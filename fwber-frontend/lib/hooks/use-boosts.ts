@@ -26,14 +26,13 @@ export function useActiveBoost() {
         const response = await api.get<ActiveBoostResponse>('/boosts/active');
         return response.data;
       } catch (error: any) {
-        if (error.response?.status === 404) {
+        if (error.status === 404) {
           return null;
         }
         throw error;
       }
     },
     refetchInterval: (query) => {
-      // If we have an active boost, poll every minute to check expiration
       return query.state.data ? 60000 : false;
     },
   });
@@ -44,7 +43,9 @@ export function useBoostHistory() {
   return useQuery({
     queryKey: ['boost-history'],
     enabled: isAuthenticated && !!token,
-    queryFn: () => api.get<Boost[]>('/boosts/history'),
+    queryFn: async () => {
+      return await api.get<Boost[]>('/boosts/history');
+    },
   });
 }
 

@@ -1,6 +1,4 @@
 {
-	"CHANGELOG.md": true,
-	"CONTRIBUTING.md": true,
 	"DEPLOY.md": true,
 	"DNS_SETUP.md": true,
 	"EMAIL_SETUP.md": true,
@@ -8,15 +6,14 @@
 	"GPT.md": true,
 	"HANDOFF.md": true,
 	"IDEAS.md": true,
+	"LEADERBOARD_IS_NOT_MISSING.md": true,
 	"MEMORY.md": true,
 	"PROJECT_MEMORY.md": true,
 	"PROJECT_MEMORY_SUMMARY.md": true,
 	"PROJECT_STATUS.md": true,
-	"README.md": true,
-	"ROADMAP.md": true,
-	"SECURITY.md": true,
 	"SETUP_GUIDE.md": true,
 	"SUBMODULE_INVENTORY.md": true,
 	"TODO.md": true,
+	"VERSION.md": true,
 	"VISION.md": true
 }

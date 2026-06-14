@@ -1,55 +1,55 @@
-'use client'
+'use client';
 
-import { useMemo } from 'react'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import AppHeader from '@/components/AppHeader'
-import { ReferralModal } from '@/components/viral/ReferralModal'
-import { useAuth } from '@/lib/auth-context'
-import { api } from '@/lib/api/client'
-import { useQuery } from '@tanstack/react-query'
-import { Copy, DollarSign, Coins, Users, Shield } from 'lucide-react'
+import { useMemo } from 'react';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import AppHeader from '@/components/AppHeader';
+import { ReferralModal } from '@/components/viral/ReferralModal';
+import { useAuth } from '@/lib/auth-context';
+import { api } from '@/lib/api/client';
+import { useQuery } from '@tanstack/react-query';
+import { Copy, DollarSign, Coins, Users, Shield } from 'lucide-react';
 
 interface ReferralLevelSummary {
-  level: number
-  count: number
-  cash_usd: number
-  token_amount: number
+  level: number;
+  count: number;
+  cash_usd: number;
+  token_amount: number;
 }
 
 interface ReferralSummary {
-  referral_code: string
-  referral_link: string
-  vouch_link: string
-  golden_tickets_remaining: number
-  referrals_count: number
-  vouches_count: number
-  token_balance: number
-  pending_cash_usd: number
-  earned_token_rewards: number
-  levels: ReferralLevelSummary[]
+  referral_code: string;
+  referral_link: string;
+  vouch_link: string;
+  golden_tickets_remaining: number;
+  referrals_count: number;
+  vouches_count: number;
+  token_balance: number;
+  pending_cash_usd: number;
+  earned_token_rewards: number;
+  levels: ReferralLevelSummary[];
 }
 
 export default function ReferralsPage() {
-  const { user } = useAuth()
-  const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me')
+  const { user } = useAuth();
+  const origin = typeof window !== 'undefined' ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL || 'https://fwber.me');
 
   const { data: summary, isLoading } = useQuery({
     queryKey: ['referrals-page-summary'],
     enabled: !!user,
     queryFn: () => api.get<ReferralSummary>('/referrals/summary'),
-  })
+  });
 
   const referralLink = useMemo(() => {
-    if (summary?.referral_link) return summary.referral_link
-    if (summary?.referral_code) return `${origin}/register?ref=${summary.referral_code}`
-    if (user?.referral_code) return `${origin}/register?ref=${user.referral_code}`
-    return ''
-  }, [summary, user, origin])
+    if (summary?.referral_link) return summary.referral_link;
+    if (summary?.referral_code) return `${origin}/register?ref=${summary.referral_code}`;
+    if (user?.referral_code) return `${origin}/register?ref=${user.referral_code}`;
+    return '';
+  }, [summary, user, origin]);
 
   const copy = async (value: string) => {
-    if (!value) return
-    await navigator.clipboard.writeText(value)
-  }
+    if (!value) return;
+    await navigator.clipboard.writeText(value);
+  };
 
   return (
     <ProtectedRoute>
@@ -57,7 +57,6 @@ export default function ReferralsPage() {
         <AppHeader title="Referrals" />
         <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
           <section className="rounded-2xl border-2 border-yellow-400/80 bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 p-6 shadow-[0_0_40px_rgba(234,179,8,0.25)] relative overflow-hidden dark:from-gray-900 dark:via-yellow-950/30 dark:to-gray-900 dark:border-yellow-500/50">
-            {/* Floating gold coins */}
             <div className="absolute top-3 right-4 text-4xl animate-bounce" style={{animationDuration:'2s'}}>🪙</div>
             <div className="absolute bottom-3 left-5 text-3xl animate-bounce" style={{animationDuration:'2.5s', animationDelay:'0.5s'}}>💰</div>
             <div className="absolute top-1/2 right-20 text-2xl animate-bounce" style={{animationDuration:'3s', animationDelay:'1s'}}>🪙</div>
@@ -78,8 +77,8 @@ export default function ReferralsPage() {
           </section>
 
           <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard icon={<Users className="h-5 w-5" />} label="Referrals" value={summary?.referrals_count ?? user?.referrals_count ?? 0} color="blue" />
-            <MetricCard icon={<Shield className="h-5 w-5" />} label="Vouches" value={summary?.vouches_count ?? user?.vouches_count ?? 0} color="purple" />
+            <MetricCard icon={<Users className="h-5 w-5" />} label="Referrals" value={summary?.referrals_count ?? (user as any)?.referrals_count ?? 0} color="blue" />
+            <MetricCard icon={<Shield className="h-5 w-5" />} label="Vouches" value={summary?.vouches_count ?? (user as any)?.vouches_count ?? 0} color="purple" />
             <MetricCard icon={<Coins className="h-5 w-5" />} label="🪙 Token Rewards" value={summary?.earned_token_rewards ?? 0} color="yellow" />
             <MetricCard icon={<DollarSign className="h-5 w-5" />} label="💵 Pending Cash" value={`$${Number(summary?.pending_cash_usd ?? 0).toFixed(2)}`} color="green" />
           </section>
@@ -108,7 +107,7 @@ export default function ReferralsPage() {
         </main>
       </div>
     </ProtectedRoute>
-  )
+  );
 }
 
 function MetricCard({ icon, label, value, color = 'emerald' }: { icon: React.ReactNode; label: string; value: React.ReactNode; color?: string }) {
@@ -118,13 +117,13 @@ function MetricCard({ icon, label, value, color = 'emerald' }: { icon: React.Rea
     purple:  { bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-600 dark:text-purple-300', border: 'border-purple-200 dark:border-purple-800' },
     yellow:  { bg: 'bg-yellow-50 dark:bg-yellow-900/20', text: 'text-yellow-600 dark:text-yellow-300', border: 'border-yellow-300 dark:border-yellow-700' },
     green:   { bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-600 dark:text-green-300', border: 'border-green-300 dark:border-green-700' },
-  }
-  const c = colorMap[color] || colorMap.emerald
+  };
+  const c = colorMap[color] || colorMap.emerald;
   return (
     <div className={`rounded-2xl border ${c.border} bg-white p-5 shadow-sm dark:bg-gray-900`}>
       <div className={`mb-3 inline-flex rounded-xl ${c.bg} p-3 ${c.text}`}>{icon}</div>
       <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
       <div className="mt-1 text-2xl font-black text-gray-900 dark:text-white">{value}</div>
     </div>
-  )
+  );
 }

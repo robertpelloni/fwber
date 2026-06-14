@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import emailRoutes from './routes/email.js';
+
 import authRoutes from './routes/auth.js';
 import analyticsRoutes from './routes/analytics.js';
 import dashboardRoutes from './routes/dashboard.js';
@@ -40,6 +41,7 @@ import premiumRoutes from './routes/premium.js';
 import userRoutes from './routes/user.js';
 import proximityRoutes from './routes/proximity.js';
 import onboardingRoutes from './routes/onboarding.js';
+import matchingRoutes from './routes/matching.js';
 import videoRoutes from './routes/video.js';
 import referralsRoutes from './routes/referrals.js';
 import boostsRoutes from './routes/boosts.js';
@@ -127,6 +129,9 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/integrations/contacts/data', contactsIntegrationSyncRoutes);
+app.use('/api/integrations/contacts', contactsIntegrationRoutes);
+
 app.use('/api/email', emailRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -163,6 +168,7 @@ app.use('/api/premium', premiumRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/proximity', proximityRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/matching', matchingRoutes);
 app.use('/api/video', videoRoutes);
 app.use('/api/video-calls', videoRoutes); // alias for frontend compatibility
 app.use('/api/referrals', referralsRoutes);

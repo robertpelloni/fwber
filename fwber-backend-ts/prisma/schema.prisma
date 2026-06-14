@@ -2120,6 +2120,7 @@ model users {
   wallet_transactions                                                  wallet_transactions[]
   zk_proximity_proofs                                                  zk_proximity_proofs[]
   user_integrations                                                    user_integrations[]
+  user_matching_answers                                                user_matching_answers[]
 
   @@index([decoy_user_id], map: "users_decoy_user_id_foreign")
   @@index([last_active_at], map: "users_last_active_at_index")
@@ -2525,4 +2526,44 @@ model autonomous_settings {
   key        String    @id @db.VarChar(100)
   value      String    @db.VarChar(255)
   updated_at DateTime  @updatedAt @db.Timestamp(0)
+}
+
+model matching_questions {
+  id                  BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  text                String                 @db.Text
+  category            String                 @db.VarChar(255)
+  priority            Int                    @default(0)
+  is_active           Boolean                @default(true)
+  created_at          DateTime?              @db.Timestamp(0)
+  updated_at          DateTime?              @db.Timestamp(0)
+  matching_options    matching_options[]
+  user_matching_answers user_matching_answers[]
+}
+
+model matching_options {
+  id                  BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  question_id         BigInt                 @db.UnsignedBigInt
+  text                String                 @db.Text
+  created_at          DateTime?              @db.Timestamp(0)
+  updated_at          DateTime?              @db.Timestamp(0)
+  matching_questions  matching_questions     @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  user_matching_answers user_matching_answers[] @relation("chosen_option")
+}
+
+model user_matching_answers {
+  id                  BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id             BigInt                 @db.UnsignedBigInt
+  question_id         BigInt                 @db.UnsignedBigInt
+  chosen_option_id    BigInt                 @db.UnsignedBigInt
+  accepted_option_ids Json?
+  importance          Int                    @default(1)
+  explanation         String?                @db.Text
+  created_at          DateTime?              @db.Timestamp(0)
+  updated_at          DateTime?              @db.Timestamp(0)
+
+  users               users                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  matching_questions  matching_questions     @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  chosen_option       matching_options       @relation("chosen_option", fields: [chosen_option_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, question_id])
 }

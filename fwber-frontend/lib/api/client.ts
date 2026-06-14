@@ -15,14 +15,19 @@ import type {
 
 // Ensure BASE_URL hits the backend API directly
 const getBaseUrl = () => {
+  // If window is defined, we are definitely in the browser.
+  // ALWAYS use relative path to route through the Next.js proxy.
   if (typeof window !== 'undefined') {
-    // In the browser, hit the backend API directly at api.fwber.me
-    // (Next.js /api rewrites don't work on Vercel when app/api routes exist)
-    return 'https://api.fwber.me/api';
+    return '/api';
   }
-  // On the server (SSR), use env var or direct URL
-  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-  return url.replace(/\/$/, '') + '/api';
+  
+  // On the server (SSR), use the absolute URL.
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  const url = envUrl || 'https://api.fwber.me';
+  
+  // Ensure we don't return just '/api' if NEXT_PUBLIC_API_URL is somehow empty on server
+  const normalizedUrl = url.replace(/\/$/, '');
+  return normalizedUrl.includes('://') ? `${normalizedUrl}/api` : '/api';
 };
 
 const BASE_URL = getBaseUrl();
@@ -176,8 +181,10 @@ async function request<T>(
     ...fetchOptions
   } = options;
 
-  // Build URL with query parameters
-  let url = `${BASE_URL}${endpoint}`;
+  // Build URL with query parameters - Dynamically get base URL
+  const baseUrl = getBaseUrl();
+  let url = `${baseUrl}${endpoint}`;
+
   if (params) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -395,9 +402,9 @@ export function getFieldValidationErrors(error: unknown, field: string): string[
   return [];
 }
 
-// ============================================================================
+// ======
 // Typed API Client Wrappers
-// ============================================================================
+// ======
 
 /**
  * Typed wrapper around apiClient.get that unwraps the data property
@@ -478,9 +485,9 @@ export async function getApiResponse<T>(
   }
 }
 
-// ============================================================================
+// ======
 // Utility Functions for Common API Patterns
-// ============================================================================
+// ======
 
 /**
  * Build query string from params object

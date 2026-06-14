@@ -1,28 +1,35 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.0.20
-> **Last Updated:** 2026-05-23
+> **Version:** 2.1.9
+> **Last Updated:** 2026-06-08
 
 ---
 
-## 🔴 Critical: Federation Hardening & UI
-- [x] **Autonomous Monitoring**: Integrated a real-time monitor and adjustment protocol for the autonomous execution engine. (v2.0.18)
-- [x] **Monitoring Validation**: Refactored handlers for testability and implemented logic-level verification. (v2.0.19)
-- [x] **Real-Time Logging**: Integrated `AutonomousService` into federation broadcast flows for real-time task tracking. (v2.0.20)
-- [x] **Solana Loyalty Bridge**: Instrumented venue check-ins to trigger NFT minting signals via SolanaBridgeService. (v2.0.27)
-- [x] **Autonomous Self-Correction**: Implemented MaintenanceService heartbeat for failure monitoring and strict_mode toggling. (v2.0.27)
-- [x] **ActivityPub Notifications**: Implemented real-time in-app notifications and socket broadcasts for Follow, Like, and Boost events. (v2.0.28)
-- [x] **Intelligent Merge & Sync**: Completed comprehensive repository refresh and branch reconciliation. (v2.0.29)
-- [x] **Autonomous Execution Engine**: Developed `AutonomousTaskExecutor` and `AutonomousHealer` for self-healing loops. (v2.1.3)
-- [x] **Performance Monitoring**: Integrated real-time latency tracking and visualization for autonomous tasks. (v2.1.4)
-- [x] **Content Quality**: Seeded FWBER with high-quality, rewritten matching questions. (v2.1.4)
-- [x] **Remote Actor Persistence**: Implement logic to store external federated users in the local DB. (v2.0.14)
-- [x] **Signed Outbound Delivery**: Implement `broadcastUpdate` with real HTTP signatures in `FederationService.ts`. (v2.0.14)
-- [x] **UI Polish**: Add "Remote" badges and interactive follow states to the /federation hub. (v2.0.14)
-- [x] **Handshake Completion**: Implemented signed 'Accept' activities back to remote servers. (v2.0.15)
-- [x] **Outbox Automation**: Wired proximity artifact creation to ActivityPub broadcasting. (v2.0.15)
-- [x] **Activity Center Logic**: Implement real data fetching for the Activity Center from `federation_inbox`. (v2.0.16)
-- [x] **Interaction Support**: Added `Like` and `Announce` (Boost) processing to the inbox. (v2.0.16)
-- [x] **Fediverse Interop Testing**: (Partially Verified via Logic Tests) Prepared infrastructure for end-to-end ActivityPub exchange.: Spin up a local Mastodon/Pleroma dev instance and attempt to search for a local `fwber` user handle to test the `webfinger` and `actor` endpoints end-to-end.
+## 🟢 Recently Completed: Phase 8 - Intelligent Match Refinement (v2.1.9)
+- [x] **Narrative Compatibility**: AI subagent explains match reasons based on question data.
+- [x] **Proximity Unification**: Merged real-time proximity history with matching scores (80/20).
+- [x] **Expansion**: Scaled value questions to 100+ (108 total) including Cyber-Noir ethics.
+- [x] **UI Wiring**: Integrated narrative reports into MatchInsights and Profile pages.
+- [x] **Bug Fix**: Resolved 500 error on federation actor detail endpoint.
 
-[... Legacy entries ...]
+## 🟢 Recently Completed: OkCupid Matching Engine (v2.1.5)
+- [x] **Geometric-Mean Heuristic**: Implemented mutual-satisfaction matching logic.
+- [x] **Value-Based Questions**: Launched `/settings/matching` and seeded Cyber-Noir questions.
+- [x] **Discovery Integration**: Injected compatibility scores into the recommendation feed.
+- [x] **Site Stability**: Verified full regression suite and resolved frontend build regressions.
+
+## 🟢 Completed: v2.1.6-v2.1.7 Repository Reconciliation
+- [x] **Branch Merge**: Forward-merged feat/okcupid-matching-engine and feat/federation-hardening into main.
+- [x] **Prisma Regeneration**: Resolved 60 TS errors from new models not in generated client.
+- [x] **Frontend Fixup**: Resolved 20 TS errors from merge artifacts (duplicate axios, missing imports, type mismatches).
+- [x] **Production DB Sync**: Created 6 new tables (autonomous_actions, autonomous_settings, matching_questions, matching_options, user_matching_answers, user_integrations).
+- [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
+- [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
+
+## 🔴 Upcoming: Phase 9 - Social Velocity & Federation
+- [ ] **ActivityPub Federation**: Complete end-to-end interop testing with local Mastodon/Pleroma nodes.
+- [ ] **Email Infrastructure**: Configure Resend DNS records (MX, SPF, DKIM, DMARC) for email delivery.
+- [ ] **AI Provider Keys**: Configure OpenRouter/OpenAI API keys for Wingman AI features.
+- [ ] **Stripe Live Keys**: Switch from test to live Stripe keys for production payments.
+
+[... Historical TODOs moved to ARCHIVE ...]

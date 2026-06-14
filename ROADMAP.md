@@ -1,11 +1,35 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.0.20 "Real-Time Tracking"
-> **Last Updated:** 2026-05-23
+> **Current Version:** 2.1.9 "Intelligent Match Refinement"
+> **Last Updated:** 2026-06-08
 
 ---
 
 ## 🗺️ High-Level Trajectory
+
+### Phase 8: Intelligent Match Refinement (COMPLETED - v2.1.9)
+The next major evolution focuses on high-fidelity personality analysis and deeper signal integration.
+
+**Key Achievements:**
+- **Narrative Compatibility**: Launched AI-powered reports explaining the "why" behind compatibility scores.
+- **Signal Merging**: Unified value-matching scores with real-time proximity history (80/20 weight).
+- **Scale**: Expanded the value-matching dataset to 108 high-signal questions, including new Cyber-Noir ethics.
+- **Deep UI Integration**: Wired narrative reports into the profile discovery flow.
+
+### The OkCupid Matching Engine (COMPLETED - v2.1.5)
+The matching engine has been upgraded to a value-based system with importance weighting and a geometric-mean compatibility heuristic.
+
+**Key Achievements:**
+- **Geometric-Mean Heuristic**: Implemented the classic formula `(Satisfaction A * Satisfaction B) ^ (1/2)` for high-fidelity signals.
+- **Value-Based Questions**: Integrated multiple-choice questions with user-defined importance levels.
+- **Interactive UI**: Launched a dedicated matching dashboard at `/settings/matching`.
+- **Deep Integration**: Compatibility scores are now visible across user profiles and the discovery feed.
+
+### Matching Question Expansion (COMPLETED - v2.1.8)
+
+Expanded the matching question dataset from 15 Cyber-Noir themed questions to 95 natural-language questions across 7 categories with 334 multiple-choice options.
+
+**Categories:** Lifestyle (20), Romance (17), Personality (15), Ethics (13), Interests (10), Dealbreakers (8), Intimacy (6), Communication (6).
 
 ### The High-Performance Autonomous Engine (COMPLETED - v2.1.4)
 The autonomous system is now fully instrumented for performance and quality, with a self-healing engine that monitors latency and system health in real-time.

@@ -3,22 +3,18 @@
 import React, { useEffect, useState } from 'react'
 import { apiClient } from '@/lib/api/client'
 import Link from 'next/link'
-import { Shield, Flame, PartyPopper, CheckCircle2, User, ArrowRight, Loader2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { Shield, Flame, PartyPopper, CheckCircle2, User, Loader2 } from 'lucide-react'
 
 interface VouchClientProps {
   code: string
 }
 
 export function VouchClient({ code }: VouchClientProps) {
-  const router = useRouter()
-
   const [referrer, setReferrer] = useState<{name: string, avatar: string | null} | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [vouched, setVouched] = useState<string | null>(null)
   
-  // New Form State
   const [relationshipType, setRelationshipType] = useState('')
   const [comment, setComment] = useState('')
   const [voucherName, setVoucherName] = useState('')
@@ -30,10 +26,10 @@ export function VouchClient({ code }: VouchClientProps) {
       const checkCode = async () => {
         try {
           const res: any = await apiClient.get(`/auth/referral/${code}`)
-          if (res.data.valid) {
+          if (res && res.valid) {
              setReferrer({
-               name: res.data.referrer_name,
-               avatar: res.data.referrer_avatar
+               name: res.referrer_name,
+               avatar: res.referrer_avatar
              })
           } else {
              setError(true)
@@ -66,7 +62,7 @@ export function VouchClient({ code }: VouchClientProps) {
       setVouched(selectedType)
     } catch (e: any) {
       console.error(e)
-      setVouched(selectedType) // Show success even on duplicate error for UX
+      setVouched(selectedType)
     }
   }
 
@@ -91,12 +87,9 @@ export function VouchClient({ code }: VouchClientProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-
-        {/* Header / Profile */}
         <div className="bg-gray-50 dark:bg-gray-900 p-8 text-center border-b border-gray-100">
           <div className="w-24 h-24 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4 relative">
             {referrer.avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img src={referrer.avatar} alt={referrer.name} className="w-full h-full rounded-full object-cover" />
             ) : (
                 <User className="w-12 h-12 text-purple-400" />
@@ -109,7 +102,6 @@ export function VouchClient({ code }: VouchClientProps) {
           <p className="text-gray-500 mt-2">Help them verify their reputation on fwber.</p>
         </div>
 
-        {/* Action Area */}
         <div className="p-8">
           {!vouched ? (
             <>
@@ -161,7 +153,7 @@ export function VouchClient({ code }: VouchClientProps) {
                   </div>
                 </>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                <form onSubmit={handleSubmit} className="space-y-4">
                    <button 
                      type="button" 
                      onClick={() => setStep('type')}
@@ -218,7 +210,7 @@ export function VouchClient({ code }: VouchClientProps) {
               )}
             </>
           ) : (
-            <div className="text-center animate-in fade-in zoom-in duration-300">
+            <div className="text-center">
                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                  <CheckCircle2 className="w-8 h-8" />
                </div>

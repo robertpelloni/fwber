@@ -1,27 +1,27 @@
-'use client'
+'use client';
 
-import { useMemo, useState } from 'react'
-import Link from 'next/link'
-import AppHeader from '@/components/AppHeader'
-import ProtectedRoute from '@/components/ProtectedRoute'
-import { TopicCard } from '@/components/TopicCard'
-import { useTopics } from '@/lib/hooks/use-topics'
-import { Compass, Search } from 'lucide-react'
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import AppHeader from '@/components/AppHeader';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { TopicCard } from '@/components/TopicCard';
+import { useTopics } from '@/lib/hooks/use-topics';
+import { Compass, Search } from 'lucide-react';
 
 export default function TopicsPage() {
-  const [search, setSearch] = useState('')
-  const [featuredOnly, setFeaturedOnly] = useState(false)
-  const [followedOnly, setFollowedOnly] = useState(false)
+  const [search, setSearch] = useState('');
+  const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [followedOnly, setFollowedOnly] = useState(false);
   const { data: topics = [], isLoading } = useTopics({
     search: search.trim() || undefined,
     featured: featuredOnly || undefined,
     followed: followedOnly || undefined,
-  })
+  });
 
   const categories = useMemo(
     () => Array.from(new Set((Array.isArray(topics) ? topics : []).map((topic) => topic.category).filter(Boolean))).sort(),
     [topics]
-  )
+  );
 
   return (
     <ProtectedRoute>
@@ -38,12 +38,12 @@ export default function TopicsPage() {
                     </div>
                     <div>
                       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Structured topic hubs</h1>
-                      <p className="mt-2 text-sm text-gray-600">
-                        Browse the scenes forming across interests, Local Pulse posts, public groups, and visible field notes.
-                      </p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                  <p className="mt-2 text-sm text-gray-600">
+                    Browse the scenes forming across interests, Local Pulse posts, public groups, and visible field notes.
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-xs text-gray-500 mt-4">
                     {categories.map((category) => (
                       <span key={category} className="rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 font-medium uppercase tracking-wide">
                         {category}
@@ -99,9 +99,7 @@ export default function TopicsPage() {
             ) : topics.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-16 text-center">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">No topics matched that filter.</h2>
-                <p className="mt-2 text-sm text-gray-600">
-                  Try a broader scene name or clear one of the pills above.
-                </p>
+                <p className="mt-1 text-sm text-gray-500">Try a broader scene name or clear one of the pills above.</p>
               </div>
             ) : (
               <section className="grid gap-6 xl:grid-cols-2">
@@ -114,5 +112,5 @@ export default function TopicsPage() {
         </main>
       </div>
     </ProtectedRoute>
-  )
+  );
 }

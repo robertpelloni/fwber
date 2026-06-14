@@ -328,12 +328,12 @@
     },
     "fwber-frontend\\lib\\api\\client.ts": {
       "latest": {
-        "commit": "62c71f648",
-        "timestamp": "2026-04-29T19:58:40.655Z",
-        "mi": 24.9,
-        "cognitive": 146,
+        "commit": "8f265a168",
+        "timestamp": "2026-06-11T01:45:46.732Z",
+        "mi": 24.8,
+        "cognitive": 148,
         "nesting": 7,
-        "lines": 452,
+        "lines": 455,
         "maxCyclomatic": 68,
         "entropy": 6.84
       },
@@ -345,6 +345,16 @@
           "cognitive": 146,
           "nesting": 7,
           "lines": 452,
+          "maxCyclomatic": 68,
+          "entropy": 6.84
+        },
+        {
+          "commit": "8f265a168",
+          "timestamp": "2026-06-11T01:45:46.732Z",
+          "mi": 24.8,
+          "cognitive": 148,
+          "nesting": 7,
+          "lines": 455,
           "maxCyclomatic": 68,
           "entropy": 6.84
         }
@@ -550,7 +560,377 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\components\\dashboard\\AchievementsList.tsx": {
+      "latest": {
+        "commit": "dccc525db",
+        "timestamp": "2026-06-06T13:10:25.512Z",
+        "mi": 31.8,
+        "cognitive": 23,
+        "nesting": 3,
+        "lines": 119,
+        "maxCyclomatic": 14,
+        "entropy": 5.9
+      },
+      "history": [
+        {
+          "commit": "dccc525db",
+          "timestamp": "2026-06-06T13:10:25.512Z",
+          "mi": 31.8,
+          "cognitive": 23,
+          "nesting": 3,
+          "lines": 119,
+          "maxCyclomatic": 14,
+          "entropy": 5.9
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\reset-password\\page.tsx": {
+      "latest": {
+        "commit": "dccc525db",
+        "timestamp": "2026-06-06T13:20:43.079Z",
+        "mi": 29.1,
+        "cognitive": 23,
+        "nesting": 4,
+        "lines": 147,
+        "maxCyclomatic": 15,
+        "entropy": 5.67
+      },
+      "history": [
+        {
+          "commit": "dccc525db",
+          "timestamp": "2026-06-06T13:20:43.079Z",
+          "mi": 29.1,
+          "cognitive": 23,
+          "nesting": 4,
+          "lines": 147,
+          "maxCyclomatic": 15,
+          "entropy": 5.67
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\AvatarGenerationFlow.tsx": {
+      "latest": {
+        "commit": "dccc525db",
+        "timestamp": "2026-06-06T13:26:10.622Z",
+        "mi": 4.8,
+        "cognitive": 265,
+        "nesting": 5,
+        "lines": 951,
+        "maxCyclomatic": 264,
+        "entropy": 6.97
+      },
+      "history": [
+        {
+          "commit": "dccc525db",
+          "timestamp": "2026-06-06T13:26:10.622Z",
+          "mi": 4.8,
+          "cognitive": 265,
+          "nesting": 5,
+          "lines": 951,
+          "maxCyclomatic": 264,
+          "entropy": 6.97
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\lib\\seeds\\matching-questions.ts": {
+      "latest": {
+        "commit": "81ac9f838",
+        "timestamp": "2026-06-08T18:35:43.890Z",
+        "mi": 34.1,
+        "cognitive": 15,
+        "nesting": 4,
+        "lines": 121,
+        "maxCyclomatic": 3,
+        "entropy": 5.73
+      },
+      "history": [
+        {
+          "commit": "81ac9f838",
+          "timestamp": "2026-06-08T18:35:43.890Z",
+          "mi": 34.1,
+          "cognitive": 15,
+          "nesting": 4,
+          "lines": 121,
+          "maxCyclomatic": 3,
+          "entropy": 5.73
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\dashboard\\page.tsx": {
+      "latest": {
+        "commit": "01f06ed9a",
+        "timestamp": "2026-06-11T17:15:26.534Z",
+        "mi": 6.6,
+        "cognitive": 41,
+        "nesting": 4,
+        "lines": 907,
+        "maxCyclomatic": 37,
+        "entropy": 6.67
+      },
+      "history": [
+        {
+          "commit": "1f75b3389",
+          "timestamp": "2026-06-08T23:18:29.403Z",
+          "mi": 13.5,
+          "cognitive": 38,
+          "nesting": 4,
+          "lines": 470,
+          "maxCyclomatic": 37,
+          "entropy": 5.45
+        },
+        {
+          "commit": "35f957535",
+          "timestamp": "2026-06-10T22:54:58.931Z",
+          "mi": 6.6,
+          "cognitive": 41,
+          "nesting": 4,
+          "lines": 907,
+          "maxCyclomatic": 37,
+          "entropy": 6.67
+        },
+        {
+          "commit": "01f06ed9a",
+          "timestamp": "2026-06-11T17:15:26.534Z",
+          "mi": 6.6,
+          "cognitive": 41,
+          "nesting": 4,
+          "lines": 907,
+          "maxCyclomatic": 37,
+          "entropy": 6.67
+        }
+      ],
+      "trend": "regressing"
+    },
+    "fwber-frontend\\components\\AppHeader.tsx": {
+      "latest": {
+        "commit": "1f75b3389",
+        "timestamp": "2026-06-08T23:24:24.161Z",
+        "mi": 14,
+        "cognitive": 55,
+        "nesting": 4,
+        "lines": 461,
+        "maxCyclomatic": 44,
+        "entropy": 5.93
+      },
+      "history": [
+        {
+          "commit": "1f75b3389",
+          "timestamp": "2026-06-08T23:24:24.161Z",
+          "mi": 14,
+          "cognitive": 55,
+          "nesting": 4,
+          "lines": 461,
+          "maxCyclomatic": 44,
+          "entropy": 5.93
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\matching\\page.tsx": {
+      "latest": {
+        "commit": "35f957535",
+        "timestamp": "2026-06-10T22:51:09.799Z",
+        "mi": 33.7,
+        "cognitive": 0,
+        "nesting": 2,
+        "lines": 110,
+        "maxCyclomatic": 1,
+        "entropy": 4.97
+      },
+      "history": [
+        {
+          "commit": "35f957535",
+          "timestamp": "2026-06-10T22:51:09.799Z",
+          "mi": 33.7,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 110,
+          "maxCyclomatic": 1,
+          "entropy": 4.97
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\services\\NarrativeService.ts": {
+      "latest": {
+        "commit": "a48599e19",
+        "timestamp": "2026-06-10T23:11:49.906Z",
+        "mi": 45.8,
+        "cognitive": 33,
+        "nesting": 6,
+        "lines": 72,
+        "maxCyclomatic": 15,
+        "entropy": 6.38
+      },
+      "history": [
+        {
+          "commit": "a48599e19",
+          "timestamp": "2026-06-10T23:11:49.906Z",
+          "mi": 45.8,
+          "cognitive": 33,
+          "nesting": 6,
+          "lines": 72,
+          "maxCyclomatic": 15,
+          "entropy": 6.38
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\lib\\hooks\\use-matching.ts": {
+      "latest": {
+        "commit": "8f265a168",
+        "timestamp": "2026-06-11T01:01:00.811Z",
+        "mi": 47.4,
+        "cognitive": 0,
+        "nesting": 2,
+        "lines": 41,
+        "maxCyclomatic": 1,
+        "entropy": 5.09
+      },
+      "history": [
+        {
+          "commit": "8f265a168",
+          "timestamp": "2026-06-11T01:01:00.811Z",
+          "mi": 47.4,
+          "cognitive": 0,
+          "nesting": 2,
+          "lines": 41,
+          "maxCyclomatic": 1,
+          "entropy": 5.09
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\(protected)\\settings\\matching\\page.tsx": {
+      "latest": {
+        "commit": "8f265a168",
+        "timestamp": "2026-06-11T01:47:15.019Z",
+        "mi": 27.6,
+        "cognitive": 19,
+        "nesting": 4,
+        "lines": 150,
+        "maxCyclomatic": 17,
+        "entropy": 6.3
+      },
+      "history": [
+        {
+          "commit": "8f265a168",
+          "timestamp": "2026-06-11T01:47:15.019Z",
+          "mi": 27.6,
+          "cognitive": 19,
+          "nesting": 4,
+          "lines": 150,
+          "maxCyclomatic": 17,
+          "entropy": 6.3
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\page.tsx": {
+      "latest": {
+        "commit": "01f06ed9a",
+        "timestamp": "2026-06-11T17:06:49.717Z",
+        "mi": 18.1,
+        "cognitive": 8,
+        "nesting": 4,
+        "lines": 387,
+        "maxCyclomatic": 5,
+        "entropy": 6.77
+      },
+      "history": [
+        {
+          "commit": "01f06ed9a",
+          "timestamp": "2026-06-11T17:06:49.717Z",
+          "mi": 18.1,
+          "cognitive": 8,
+          "nesting": 4,
+          "lines": 387,
+          "maxCyclomatic": 5,
+          "entropy": 6.77
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\register\\page.tsx": {
+      "latest": {
+        "commit": "01f06ed9a",
+        "timestamp": "2026-06-11T17:13:33.798Z",
+        "mi": 20.3,
+        "cognitive": 77,
+        "nesting": 6,
+        "lines": 314,
+        "maxCyclomatic": 38,
+        "entropy": 6.26
+      },
+      "history": [
+        {
+          "commit": "01f06ed9a",
+          "timestamp": "2026-06-11T17:13:33.798Z",
+          "mi": 20.3,
+          "cognitive": 77,
+          "nesting": 6,
+          "lines": 314,
+          "maxCyclomatic": 38,
+          "entropy": 6.26
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\landing\\LandingVariantA.tsx": {
+      "latest": {
+        "commit": "df66c9516",
+        "timestamp": "2026-06-11T21:18:43.903Z",
+        "mi": 16.8,
+        "cognitive": 9,
+        "nesting": 4,
+        "lines": 447,
+        "maxCyclomatic": 5,
+        "entropy": 6.81
+      },
+      "history": [
+        {
+          "commit": "df66c9516",
+          "timestamp": "2026-06-11T21:18:43.903Z",
+          "mi": 16.8,
+          "cognitive": 9,
+          "nesting": 4,
+          "lines": 447,
+          "maxCyclomatic": 5,
+          "entropy": 6.81
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\components\\landing\\LandingVariantB.tsx": {
+      "latest": {
+        "commit": "df66c9516",
+        "timestamp": "2026-06-11T21:29:22.208Z",
+        "mi": 18.1,
+        "cognitive": 8,
+        "nesting": 4,
+        "lines": 387,
+        "maxCyclomatic": 5,
+        "entropy": 6.77
+      },
+      "history": [
+        {
+          "commit": "df66c9516",
+          "timestamp": "2026-06-11T21:29:22.208Z",
+          "mi": 18.1,
+          "cognitive": 8,
+          "nesting": 4,
+          "lines": 387,
+          "maxCyclomatic": 5,
+          "entropy": 6.77
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-04-29T22:24:32.287Z"
+  "capturedAt": "2026-06-11T21:29:27.348Z"
 }

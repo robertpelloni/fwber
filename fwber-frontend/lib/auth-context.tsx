@@ -441,10 +441,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [state.isAuthenticated, state.token, state.user, state.isLoading])
 
-  // Ensure browser requests use the Next.js proxy to avoid cross-origin session drift.
-  const API_BASE_URL = typeof window !== 'undefined'
-    ? BROWSER_API_BASE_URL
-    : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api')
+  // API base URL - Ensure relative /api in browser for proxying
+  const API_BASE_URL = typeof window !== 'undefined' 
+    ? '/api' 
+    : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api');
+
 
   // Login function
   const login = useCallback(async (email: string, password: string) => {

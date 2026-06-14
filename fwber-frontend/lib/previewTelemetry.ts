@@ -138,11 +138,8 @@ const postBatch = async (events: PendingTelemetryEvent[]) => {
       headers['Authorization'] = `Bearer ${token}`
     }
 
-    let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
-    if (!baseUrl.endsWith('/api')) {
-      baseUrl += '/api'
-    }
-    const url = `${baseUrl}${ENDPOINT}`
+    const apiBaseUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api');
+    const url = `${apiBaseUrl}${ENDPOINT}`
 
     const response = await fetch(url, {
       method: 'POST',
@@ -151,7 +148,6 @@ const postBatch = async (events: PendingTelemetryEvent[]) => {
     })
 
     if (!response.ok) {
-      // Stop retrying on 404 — endpoint not implemented yet
       if (response.status === 404) return
       throw new Error(`Telemetry upload failed: ${response.status}`)
     }

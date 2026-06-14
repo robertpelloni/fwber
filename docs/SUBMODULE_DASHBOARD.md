@@ -5,6 +5,11 @@
 
 This dashboard lists the active logical packages inside the `fwber` monorepo after the TypeScript migration and repository unification.
 
+> **Generated on:** 2026-05-23
+> **Current Global Version:** 2.0.21
+
+This dashboard lists the active logical packages inside the `fwber` monorepo after the TypeScript migration and repository unification.
+
 ## 🗂️ Project Directory Structure
 
 ```text

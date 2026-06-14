@@ -42,6 +42,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // outputFileTracingRoot only works in monorepo; Vercel builds fwber-frontend/ as root
@@ -127,6 +128,9 @@ const nextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://js.stripe.com; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://api.fwber.me https://*.amazonaws.com https://*.cloudfront.net https://oaidalleapiprodscus.blob.core.windows.net https://*.googleapis.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://api.fwber.me wss://ws.fwber.me wss://ws.fwber.me/socket.io/ https://*.sentry.io https://www.fwber.me https://api.stripe.com https://nominatim.openstreetmap.org; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; frame-ancestors 'self' https://fwber.me https://www.fwber.me; media-src 'self' blob:;" },
           { key: 'X-Content-Type-Options', value: '' }, // Neutralize legacy block
+
+          { key: 'Content-Security-Policy', value: "frame-ancestors *" },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-XSS-Protection', value: '1; mode=block' },
           { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(self)' }
@@ -197,3 +201,5 @@ if (isProd && withSentryConfig !== ((c) => c)) {
 }
 
 module.exports = finalConfig;
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+

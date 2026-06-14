@@ -15,10 +15,9 @@ export default function VenueDashboard() {
       return
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const apiUrl = typeof window !== 'undefined' ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'https://api.fwber.me/api');
     
-    // Fetch venue profile
-    fetch(`${apiUrl}/api/venue/me`, {
+    fetch(`${apiUrl}/venue/me`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json',
@@ -46,7 +45,7 @@ export default function VenueDashboard() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold text-purple-400">fwber Partner</h1>
           <div className="flex items-center gap-4">
-            <span className="font-medium">{venue.name}</span>
+            <span className="font-medium">{venue?.name}</span>
             <button 
               onClick={() => {
                 localStorage.removeItem('venue_token')
@@ -88,11 +87,11 @@ export default function VenueDashboard() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <p><span className="text-gray-400 block text-xs uppercase">Address</span> {venue.address}</p>
-                <p><span className="text-gray-400 block text-xs uppercase">Type</span> <span className="capitalize">{venue.business_type}</span></p>
+                <p><span className="text-gray-400 block text-xs uppercase">Address</span> {venue?.address}</p>
+                <p><span className="text-gray-400 block text-xs uppercase">Type</span> <span className="capitalize">{venue?.business_type}</span></p>
               </div>
               <div className="space-y-2">
-                <p><span className="text-gray-400 block text-xs uppercase">Capacity</span> {venue.capacity || 'Not set'}</p>
+                <p><span className="text-gray-400 block text-xs uppercase">Capacity</span> {venue?.capacity || 'Not set'}</p>
                 <p><span className="text-gray-400 block text-xs uppercase">Status</span> <span className="text-green-400">Active</span></p>
               </div>
             </div>
