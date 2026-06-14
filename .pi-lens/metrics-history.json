@@ -758,8 +758,8 @@
     },
     "fwber-backend-ts\\src\\services\\NarrativeService.ts": {
       "latest": {
-        "commit": "a48599e19",
-        "timestamp": "2026-06-10T23:11:49.906Z",
+        "commit": "cfe6e1263",
+        "timestamp": "2026-06-14T19:08:02.140Z",
         "mi": 45.8,
         "cognitive": 33,
         "nesting": 6,
@@ -771,6 +771,16 @@
         {
           "commit": "a48599e19",
           "timestamp": "2026-06-10T23:11:49.906Z",
+          "mi": 45.8,
+          "cognitive": 33,
+          "nesting": 6,
+          "lines": 72,
+          "maxCyclomatic": 15,
+          "entropy": 6.38
+        },
+        {
+          "commit": "cfe6e1263",
+          "timestamp": "2026-06-14T19:08:02.140Z",
           "mi": 45.8,
           "cognitive": 33,
           "nesting": 6,
@@ -932,5 +942,5 @@
       "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-11T21:29:27.348Z"
+  "capturedAt": "2026-06-14T19:08:07.154Z"
 }
