@@ -1,41 +1,15 @@
 {
-  "generatedAt": "2026-06-14T19:10:50.467Z",
+  "generatedAt": "2026-06-14T19:36:36.818Z",
   "scope": "turn_delta",
   "sessionId": "lens-mqe297nf-d4316de7",
-  "turnIndex": 37,
-  "projectSeqStart": 51,
-  "projectSeqEnd": 52,
+  "turnIndex": 50,
+  "projectSeqStart": 56,
+  "projectSeqEnd": 56,
   "deltaOnly": true,
-  "files": [
-    {
-      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\services\\NarrativeService.ts",
-      "displayPath": "fwber-backend-ts/src/services/NarrativeService.ts",
-      "fileSeq": 4,
-      "warnings": [
-        {
-          "id": "cq:0ed21e6759",
-          "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\services\\NarrativeService.ts",
-          "displayPath": "src/services/NarrativeService.ts",
-          "line": 45,
-          "column": 39,
-          "severity": "warning",
-          "tool": "function-in-loop",
-          "rule": "function-in-loop",
-          "message": "Arrow function inside a loop — creates a new function object on every iteration",
-          "category": "other",
-          "origin": "dispatch"
-        }
-      ]
-    }
-  ],
+  "files": [],
   "summary": {
-    "warnings": 1,
-    "files": 1,
-    "topRules": [
-      {
-        "rule": "function-in-loop",
-        "count": 1
-      }
-    ]
+    "warnings": 0,
+    "files": 0,
+    "topRules": []
   }
 }

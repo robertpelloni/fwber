@@ -1,6 +1,6 @@
 {
-  "signature": "fwber-backend-ts/src/services/NarrativeService.ts::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 1 across 1 file(s).\nTop rules: function-in-loop×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "signature": "fwber-backend-ts/src/services/NarrativeService.ts::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 2 across 1 file(s).\nTop rules: function-in-loop×1, missing-error-propagation×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
   "sessionId": "lens-mqe297nf-d4316de7",
-  "projectSeqStart": 51,
-  "projectSeqEnd": 52
+  "projectSeqStart": 53,
+  "projectSeqEnd": 54
 }
