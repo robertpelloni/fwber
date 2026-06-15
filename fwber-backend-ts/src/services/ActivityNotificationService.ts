@@ -72,4 +72,17 @@ export class ActivityNotificationService {
         preview: content.substring(0, 100)
     });
   }
+
+  /**
+   * Specifically handle ActivityPub "Reply" notifications.
+   */
+  static async notifyReply(targetUserId: bigint, actorName: string, actorDomain: string, content: string) {
+    const title = 'New Reply';
+    const body = `${actorName}@${actorDomain} replied to your post.`;
+    await this.notify(targetUserId, title, body, {
+        type: 'reply',
+        actor: `${actorName}@${actorDomain}`,
+        preview: content.substring(0, 100)
+    });
+  }
 }

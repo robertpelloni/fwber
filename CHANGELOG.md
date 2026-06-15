@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.6] - 2026-06-10
+
+### Added
+- **Inbound Reply Processing**: Automated handling of incoming federated replies, linking them to local proximity artifacts.
+- **Enhanced Notifications**: Real-time notifications for federated replies.
+- **Infrastructure Docs**: Comprehensive guide for Resend/DNS production email setup.
+
 ## [2.2.5] - 2026-06-10
 
 ### Added

@@ -1,11 +1,11 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.2.0
+> **Version:** 2.2.5
 > **Last Updated:** 2026-06-10
 
 ---
 
-## 🟢 Recently Completed: Phase 9 - Social Velocity & Federation (v2.2.0)
+## 🟢 Recently Completed: Phase 9 - Social Velocity & Federation (v2.2.5)
 - [x] **WebFinger Discovery**: Implement real handle-to-URI resolution in `FederationService`.
 - [x] **ActivityPub Inbound**: Implement `handleCreate` to ingest remote posts.
 - [x] **Federated Search**: Update Search UI/API to perform live remote lookups.
@@ -17,6 +17,8 @@
 - [x] **Following Feed**: Personalized feed filtered by outbound follow relationships.
 - [x] **Outbox Persistence**: Track all delivered outbound activities.
 - [x] **Federated Profiles**: Broadcast ActivityPub Update on profile changes.
+- [x] **Inbound Reply Loop**: Auto-store remote replies as local artifact comments.
+- [x] **Infrastructure Roadmap**: Finalize production Email setup guide.
 
 ## 🟢 Recently Completed: Phase 8 - Intelligent Match Refinement (v2.1.9)
 - [x] **Narrative Compatibility**: AI subagent explains match reasons based on question data.

@@ -157,13 +157,60 @@ export class FederationService {
 
         if (content.includes(mentionTag)) {
             try {
-                const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }, timeout: 5000 });
-                const actorName = actorRes.data.preferredUsername || 'Someone';
-                const actorDomain = new URL(actorUri).hostname;
+                if (await validateFederationUrl(actorUri)) {
+                    const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }, timeout: 5000 });
+                    const actorName = actorRes.data.preferredUsername || 'Someone';
+                    const actorDomain = new URL(actorUri).hostname;
 
-                await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content);
+                    await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content);
+                }
             } catch (err) {
                 await ActivityNotificationService.notifyMention(targetUserId, 'Someone', 'remote', content);
+            }
+        }
+
+        // Handle Reply to local artifact
+        if (object.inReplyTo) {
+            const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+            const artifactPrefix = `https://${apiDomain}/api/proximity/artifacts/`;
+            if (object.inReplyTo.startsWith(artifactPrefix)) {
+                const artifactId = object.inReplyTo.split('/').pop() || '';
+                if (!artifactId) return;
+
+                try {
+                    // 1. Resolve remote user
+                    let remoteUser = await prisma.users.findUnique({ where: { actor_uri: actorUri } });
+                    if (!remoteUser && await validateFederationUrl(actorUri)) {
+                        const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }, timeout: 5000 });
+                        remoteUser = await prisma.users.create({
+                            data: {
+                                name: actorRes.data.preferredUsername || 'remote_user',
+                                email: `remote-${Date.now()}@federated`,
+                                password: 'REMOTE_ACCOUNT_NO_LOGIN',
+                                actor_uri: actorUri,
+                                is_remote: true
+                            }
+                        });
+                    }
+
+                    // 2. Store comment
+                    await prisma.proximity_artifact_comments.create({
+                        data: {
+                            proximity_artifact_id: BigInt(artifactId),
+                            user_id: remoteUser.id,
+                            content: content
+                        }
+                    });
+
+                    // 3. Notify artifact owner
+                    const artifact = await prisma.proximity_artifacts.findUnique({ where: { id: BigInt(artifactId) } });
+                    if (artifact && artifact.user_id) {
+                        const actorDomain = new URL(actorUri).hostname;
+                        await ActivityNotificationService.notifyReply(artifact.user_id, remoteUser.name, actorDomain, content);
+                    }
+                } catch (err: any) {
+                    console.error('[Federation] Failed to process inbound reply:', err.message);
+                }
             }
         }
     }
