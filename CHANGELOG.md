@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.1] - 2026-06-10
+
+### Added
+- **Federated Interactions**: Enabled Like and Boost actions for remote posts in the Global Feed.
+- **Outbound Activity Service**: Implemented `sendActivityToActor` in `FederationService.ts` for direct remote inbox delivery.
+
 ## [2.2.0] - 2026-06-10
 
 ### Added

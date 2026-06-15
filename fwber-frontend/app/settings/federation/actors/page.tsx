@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 import {
   ArrowLeft,
   ExternalLink,
@@ -339,7 +340,7 @@ function FederationActorExplorerContent() {
                         </div>
                         <div
                           className="mt-4 prose max-w-none text-sm text-gray-700 dark:prose-invert dark:text-gray-300"
-                          dangerouslySetInnerHTML={{ __html: post.content }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
                         />
                         <div className="mt-4 flex flex-wrap gap-3">
                           {post.url ? (

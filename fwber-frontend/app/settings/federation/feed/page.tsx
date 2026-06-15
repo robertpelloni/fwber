@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/lib/auth-context'
+import { useToast } from '@/components/ui/use-toast'
+import { api } from '@/lib/api/client'
 import AppHeader from '@/components/AppHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Loader2, Globe, Users, MessageSquare, Repeat, Heart, ArrowLeft, Radio } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 import {
   buildFederationActorExplorerHref,
   formatFederationHandle,
@@ -18,30 +21,42 @@ import {
   type FederatedPost,
 } from '@/lib/api/activitypub'
 
-function ReadOnlyFederationAction({
+function FederationAction({
   icon: Icon,
   label,
+  onClick,
+  disabled,
+  active,
+  activeColor = 'text-blue-500',
 }: {
   icon: typeof MessageSquare
   label: string
+  onClick?: () => void
+  disabled?: boolean
+  active?: boolean
+  activeColor?: string
 }) {
   return (
     <button
       type="button"
-      disabled
-      title="Federated replies, boosts, and likes are not wired up yet."
-      className="flex items-center gap-1.5 cursor-not-allowed opacity-60"
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex items-center gap-1.5 transition-colors hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed ${
+        active ? activeColor : ''
+      }`}
     >
-      <Icon className="w-4 h-4" />
-      <span className="text-xs">{label}</span>
+      <Icon className={`w-4 h-4 ${active ? 'fill-current' : ''}`} />
+      <span className="text-xs font-medium">{label}</span>
     </button>
   )
 }
 
 export default function GlobalFeedPage() {
   const { token } = useAuth()
+  const { toast } = useToast()
   const [posts, setPosts] = useState<FederatedPost[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [interacting, setInteracting] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -159,9 +174,50 @@ export default function GlobalFeedPage() {
                         dangerouslySetInnerHTML={{ __html: post.content }}
                       />
                       <div className="flex items-center gap-6 mt-6 pt-4 border-t dark:border-gray-700 text-gray-500">
-                        <ReadOnlyFederationAction icon={MessageSquare} label="Replies coming soon" />
-                        <ReadOnlyFederationAction icon={Repeat} label="Boosts coming soon" />
-                        <ReadOnlyFederationAction icon={Heart} label="Likes coming soon" />
+                        <FederationAction
+                          icon={MessageSquare}
+                          label="Reply"
+                          disabled
+                        />
+                        <FederationAction
+                          icon={Repeat}
+                          label="Boost"
+                          disabled={interacting[post.id]}
+                          onClick={async () => {
+                            try {
+                                setInteracting(prev => ({ ...prev, [post.id]: true }))
+                                const objectUri = post.payload?.object?.id || post.id;
+                                await api.post(`/federation/posts/${encodeURIComponent(objectUri)}/boost`, {
+                                    actor_uri: post.actor_uri
+                                }, { headers: { Authorization: `Bearer ${token}` } })
+                                toast({ title: "Boost sent", description: "This post has been shared to your followers." })
+                            } catch (err: any) {
+                                toast({ variant: "destructive", title: "Boost failed", description: err.message })
+                            } finally {
+                                setInteracting(prev => ({ ...prev, [post.id]: false }))
+                            }
+                          }}
+                        />
+                        <FederationAction
+                          icon={Heart}
+                          label="Like"
+                          activeColor="text-rose-500"
+                          disabled={interacting[post.id]}
+                          onClick={async () => {
+                            try {
+                                setInteracting(prev => ({ ...prev, [post.id]: true }))
+                                const objectUri = post.payload?.object?.id || post.id;
+                                await api.post(`/federation/posts/${encodeURIComponent(objectUri)}/like`, {
+                                    actor_uri: post.actor_uri
+                                }, { headers: { Authorization: `Bearer ${token}` } })
+                                toast({ title: "Post liked", description: "A like has been sent to the remote server." })
+                            } catch (err: any) {
+                                toast({ variant: "destructive", title: "Like failed", description: err.message })
+                            } finally {
+                                setInteracting(prev => ({ ...prev, [post.id]: false }))
+                            }
+                          }}
+                        />
                       </div>
                     </CardContent>
                   </Card>

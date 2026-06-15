@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 import {
   ArrowLeft,
   Globe,
@@ -280,7 +281,7 @@ export default function FederationActivityPage() {
                           </div>
                           <div
                             className="mt-3 text-sm text-gray-700 dark:text-gray-300 dark:text-gray-200 prose dark:prose-invert max-w-none"
-                            dangerouslySetInnerHTML={{ __html: item.content }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.content) }}
                           />
                           <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
                             {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}

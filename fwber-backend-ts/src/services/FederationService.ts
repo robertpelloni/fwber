@@ -1,6 +1,7 @@
 import prisma from '../lib/prisma.js';
 import axios from 'axios';
 import crypto from 'crypto';
+import { validateFederationUrl } from '../lib/ssrf.js';
 import { AutonomousService } from './AutonomousService.js';
 import { ActivityNotificationService } from './ActivityNotificationService.js';
 
@@ -20,8 +21,8 @@ export class FederationService {
     const webfingerUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`;
     console.log(`[Federation] Resolving WebFinger: ${webfingerUrl}`);
 
-    if (['localhost', '127.0.0.1'].includes(domain) || domain.startsWith('10.') || domain.startsWith('192.168.')) {
-      console.warn(`[Federation] Blocked SSRF attempt during WebFinger: ${domain}`);
+    if (!(await validateFederationUrl(webfingerUrl))) {
+      console.warn(`[Federation] Blocked SSRF attempt during WebFinger: ${webfingerUrl}`);
       return null;
     }
 
@@ -66,9 +67,8 @@ export class FederationService {
       if (!parts.keyId || !parts.signature || !parts.headers) return false;
 
       // 1. Fetch remote actor public key
-      const url = new URL(parts.keyId);
-      if (['localhost', '127.0.0.1'].includes(url.hostname) || url.hostname.startsWith('10.') || url.hostname.startsWith('192.168.')) {
-        console.warn(`[Federation] Blocked SSRF attempt: ${parts.keyId}`);
+      if (!(await validateFederationUrl(parts.keyId))) {
+        console.warn(`[Federation] Blocked SSRF attempt during signature verification: ${parts.keyId}`);
         return false;
       }
       const remoteActor = await axios.get(parts.keyId, { headers: { Accept: 'application/activity+json' }});
@@ -379,7 +379,33 @@ export class FederationService {
             'Signature': signatureHeader,
             'Content-Type': 'application/activity+json',
             'Accept': 'application/activity+json'
-        }
+        },
+        timeout: 5000
     });
+  }
+
+  /**
+   * Sends an activity directly to a remote actor's inbox.
+   */
+  async sendActivityToActor(actorUri: string, activity: any, privateKey: string, localActorUri: string) {
+    try {
+        if (!(await validateFederationUrl(actorUri))) {
+            console.warn(`[Federation] Blocked SSRF attempt during activity send: ${actorUri}`);
+            return false;
+        }
+
+        const actorRes = await axios.get(actorUri, {
+            headers: { Accept: 'application/activity+json' },
+            timeout: 5000
+        });
+        const inbox = actorRes.data.inbox;
+        if (inbox) {
+            await this.sendSignedRequest(inbox, activity, privateKey, localActorUri);
+            return true;
+        }
+    } catch (err: any) {
+        console.error(`[Federation] Failed to send activity to ${actorUri}:`, err.message);
+    }
+    return false;
   }
 }

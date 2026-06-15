@@ -2,6 +2,7 @@ import { Router, type Response } from 'express';
 import { authenticate, type AuthRequest } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import axios from 'axios';
+import { validateFederationUrl } from '../lib/ssrf.js';
 import { FederationService } from '../services/FederationService.js';
 
 const router = Router();
@@ -269,8 +270,7 @@ router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
         try {
             const actorUri = await federationService.resolveWebFinger(q);
             if (actorUri) {
-                const url = new URL(actorUri);
-                if (['localhost', '127.0.0.1'].includes(url.hostname) || url.hostname.startsWith('10.') || url.hostname.startsWith('192.168.')) {
+                if (!(await validateFederationUrl(actorUri))) {
                     console.warn(`[Federation] Blocked SSRF attempt during search detail fetch: ${actorUri}`);
                     return res.status(400).json({ error: 'Invalid actor URI' });
                 }
@@ -325,6 +325,82 @@ router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
         }));
 
         res.json({ actors });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/federation/posts/:id/like - Like a federated post
+router.post('/posts/:id/like', authenticate, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { actor_uri } = req.body; // The URI of the remote post author
+
+    if (!actor_uri) return res.status(400).json({ error: 'actor_uri is required' });
+
+    try {
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true }
+        });
+
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const likeActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/like-${Date.now()}`,
+            type: 'Like',
+            actor: localActorUri,
+            object: id // The ID of the post (usually a URI)
+        };
+
+        const success = await federationService.sendActivityToActor(actor_uri, likeActivity, user.private_key, localActorUri);
+
+        if (success) {
+            res.json({ success: true, message: 'Like sent to remote server' });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver Like to remote server' });
+        }
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/federation/posts/:id/boost - Boost (Announce) a federated post
+router.post('/posts/:id/boost', authenticate, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { actor_uri } = req.body;
+
+    if (!actor_uri) return res.status(400).json({ error: 'actor_uri is required' });
+
+    try {
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true }
+        });
+
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const announceActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/announce-${Date.now()}`,
+            type: 'Announce',
+            actor: localActorUri,
+            object: id
+        };
+
+        const success = await federationService.sendActivityToActor(actor_uri, announceActivity, user.private_key, localActorUri);
+
+        if (success) {
+            res.json({ success: true, message: 'Boost sent to remote server' });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver Boost to remote server' });
+        }
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

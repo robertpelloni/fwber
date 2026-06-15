@@ -1,12 +1,13 @@
 # MEMORY.md — fwber Internal Architectural Observations
 
-## Current Version: 2.2.0 "Social Velocity & Federation"
+## Current Version: 2.2.1 "Federated Interactions"
 **Last Updated:** 2026-06-10
 
-### Architectural Shift: Production Federation (v2.2.0)
-The ActivityPub layer is now production-ready for external discovery.
+### Architectural Shift: Production Federation (v2.2.1)
+The ActivityPub layer is now production-ready for external discovery and real-time interaction.
 - **WebFinger**: Handles resolution of `@user@domain` handles to internal actor URIs.
-- **SSRF Protection**: Strict validation of outbound domains during federation lookups to prevent internal network probing.
+- **Security Hardening**: DNS-level SSRF protection (`ssrf.ts`) for all outbound federation requests and XSS sanitization (`sanitize.ts`) for remote content.
+- **Federated Interactions**: Support for outbound `Like` and `Announce` (Boost) activities, correctly targeting remote object URIs.
 - **Activity Stream Ingestion**: `FederationService` now processes inbound `Create` activities for future global feed integration.
 
 ### Architectural Shift: Narrative Compatibility (v2.1.9)
