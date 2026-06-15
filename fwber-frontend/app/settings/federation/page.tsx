@@ -34,6 +34,7 @@ import {
     CheckCircle2,
     ExternalLink,
     Eye,
+    Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -319,9 +320,10 @@ export default function FederationSettingsPage() {
                                         value={handle}
                                         onChange={(e) => setHandle(e.target.value)}
                                         className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
+                                        disabled={isSearching}
                                     />
-                                    <Button type="submit" disabled={isSearching} className="bg-blue-600 hover:bg-blue-700 text-white">
-                                        {isSearching ? '...' : 'Search'}
+                                    <Button type="submit" disabled={isSearching || !handle} className="bg-blue-600 hover:bg-blue-700 text-white">
+                                        {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
                                     </Button>
                                 </form>
 

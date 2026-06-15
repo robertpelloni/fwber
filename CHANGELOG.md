@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.0] - 2026-06-10
+
+### Added
+- **WebFinger Discovery**: Implemented real-time remote actor resolution via WebFinger in `FederationService.ts`.
+- **Improved ActivityPub Inbound**: Added `handleCreate` to process and store remote posts from external Fediverse nodes.
+- **Enhanced Activity Center**: Unified display for Likes, Boosts, and Remote Posts in the frontend.
+- **Remote Search**: Updated federation search to perform live lookups against external ActivityPub servers.
+
 ## [2.1.9] - 2026-06-08
 
 ### Added

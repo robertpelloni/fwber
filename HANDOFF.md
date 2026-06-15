@@ -1,3 +1,31 @@
+# Session Handoff - v2.2.0 (Social Velocity & Federation)
+
+## Overview
+Initiated Phase 9: Social Velocity & Federation. This release completes the core ActivityPub interoperability layer by implementing real-time WebFinger discovery and enhancing the inbound activity processing engine.
+
+## Key Changes
+- **WebFinger Discovery**: Implemented `resolveWebFinger` in `FederationService.ts` to resolve remote handles (e.g. @user@mastodon.social) to actor URIs. Added SSRF protection for all outbound federation requests.
+- **Improved ActivityPub Inbound**: Added `handleCreate` to `FederationService.ts` to process incoming remote activities. Enhanced `broadcastUpdate` to support variable activity types (Like, Boost, Create).
+- **Federated Search**: Updated the search API in `federation.ts` to perform live remote lookups via WebFinger, with fallback to local user search.
+- **Search UI Refinement**: Added loading states and better input validation to the Federation Search interface.
+- **Activity Center UI**: Enhanced the unified activity feed with semantic color-coding for different interaction types (Post, Like, Boost, Follower).
+
+## Documentation Sync
+- **VERSION**: Updated to 2.2.0
+- **CHANGELOG.md**: Documented WebFinger discovery, enhanced ActivityPub inbound, and UI improvements.
+- **PROJECT_STATUS.md**: Marked Phase 9 as UNDERWAY.
+- **ROADMAP.md**: Added Phase 9 goals and progress.
+- **TODO.md**: Updated with recently completed federation items.
+
+## Deployment Notes
+- **Security**: SSRF protection is active for all federated lookups.
+- **Environment**: Backend dev server should be run with `npx tsc && node dist/index.js` to ensure module resolution.
+
+## Next Steps
+- **End-to-End Interop**: Perform live federation handshakes with external nodes (Mastodon/Pleroma).
+- **Email Delivery**: Finalize production Resend DNS configuration.
+- **Payments**: Configure live Stripe keys and verify webhook handling.
+
 # Session Handoff - v2.1.9 (Intelligent Match Refinement)
 
 ## Overview

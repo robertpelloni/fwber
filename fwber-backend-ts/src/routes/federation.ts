@@ -1,6 +1,7 @@
 import { Router, type Response } from 'express';
 import { authenticate, type AuthRequest } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import axios from 'axios';
 import { FederationService } from '../services/FederationService.js';
 
 const router = Router();
@@ -24,21 +25,23 @@ router.get('/actors/:id', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+
     res.json({
       '@context': [
         'https://www.w3.org/ns/activitystreams',
         'https://w3id.org/security/v1'
       ],
-      id: `https://api.fwber.me/api/federation/actors/${user.id}`,
+      id: `https://${apiDomain}/api/federation/actors/${user.id}`,
       type: 'Person',
       preferredUsername: user.name,
       name: 'Fediverse Display Name',
       summary: 'A test user for the fediverse',
-      inbox: `https://api.fwber.me/api/federation/users/${user.id}/inbox`,
-      outbox: `https://api.fwber.me/api/federation/users/${user.id}/outbox`,
+      inbox: `https://${apiDomain}/api/federation/users/${user.id}/inbox`,
+      outbox: `https://${apiDomain}/api/federation/users/${user.id}/outbox`,
       publicKey: {
-        id: `https://api.fwber.me/api/federation/actors/${user.id}#main-key`,
-        owner: `https://api.fwber.me/api/federation/actors/${user.id}`,
+        id: `https://${apiDomain}/api/federation/actors/${user.id}#main-key`,
+        owner: `https://${apiDomain}/api/federation/actors/${user.id}`,
         publicKeyPem: user.public_key || 'mock-public-key',
       }
     });
@@ -83,15 +86,16 @@ router.post('/users/:id/inbox', async (req, res) => {
 // GET /api/federation/users/:userId/outbox — get user outbox
 router.get('/users/:userId/outbox', async (req, res) => {
   try {
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
     const outboxItems = await prisma.federation_outbox.findMany({
-      where: { actor_uri: `https://api.fwber.me/api/federation/actors/${req.params.userId}` },
+      where: { actor_uri: `https://${apiDomain}/api/federation/actors/${req.params.userId}` },
       orderBy: { created_at: 'desc' },
       take: 20
     });
 
     res.json({
       '@context': 'https://www.w3.org/ns/activitystreams',
-      id: `https://api.fwber.me/api/federation/users/${req.params.userId}/outbox`,
+      id: `https://${apiDomain}/api/federation/users/${req.params.userId}/outbox`,
       type: 'OrderedCollection',
       totalItems: outboxItems.length,
       orderedItems: outboxItems.map(item => item.payload)
@@ -122,14 +126,25 @@ router.get('/activity', authenticate, async (req: AuthRequest, res: Response) =>
         const activity = inboxItems.map((item: any) => {
             const payload = item.payload as any;
             const actorUri = item.actor_uri;
+            const object = payload?.object || {};
+
+            // More robust content extraction for remote activities
+            let content = '';
+            if (typeof object === 'string') {
+                content = object;
+            } else if (object.content) {
+                content = object.content;
+            } else if (object.type) {
+                content = `Activity regarding ${object.type}`;
+            }
 
             return {
                 id: Number(item.id),
                 type: item.type,
                 actor_uri: actorUri,
-                actor_username: actorUri?.split('/').pop() || 'unknown',
+                actor_username: (typeof payload.actor === 'object' ? payload.actor.preferredUsername : null) || actorUri?.split('/').pop() || 'unknown',
                 actor_domain: actorUri?.includes('http') ? new URL(actorUri).host : 'unknown',
-                content: payload?.object?.content || payload?.object?.type || '',
+                content: content,
                 timestamp: item.created_at?.toISOString() || new Date().toISOString(),
                 payload: payload
             };
@@ -179,8 +194,9 @@ router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
 // GET /api/federation/following - Get external actors user is following
 router.get('/following', authenticate, async (req: AuthRequest, res: Response) => {
     try {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
         const following = await prisma.federation_follows.findMany({
-            where: { actor_uri: `https://api.fwber.me/api/federation/actors/${req.user!.id}` }
+            where: { actor_uri: `https://${apiDomain}/api/federation/actors/${req.user!.id}` }
         });
 
         const mapped = following.map((f: any) => ({
@@ -200,8 +216,9 @@ router.get('/following', authenticate, async (req: AuthRequest, res: Response) =
 // GET /api/federation/followers - Get external actors following user
 router.get('/followers', authenticate, async (req: AuthRequest, res: Response) => {
     try {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
         const followers = await prisma.federation_follows.findMany({
-            where: { target_uri: `https://api.fwber.me/api/federation/actors/${req.user!.id}`, status: 'accepted' }
+            where: { target_uri: `https://${apiDomain}/api/federation/actors/${req.user!.id}`, status: 'accepted' }
         });
 
         const mapped = followers.map((f: any) => ({
@@ -223,7 +240,8 @@ router.post('/follow', authenticate, async (req: AuthRequest, res: Response) => 
     if (!actor_id) return res.status(400).json({ error: 'actor_id is required' });
 
     try {
-        const userUri = `https://api.fwber.me/api/federation/actors/${req.user!.id}`;
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const userUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
 
         await prisma.federation_follows.create({
             data: {
@@ -244,19 +262,72 @@ router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
     const { q } = req.query;
     if (!q || typeof q !== 'string') return res.status(400).json({ error: 'Query is required' });
 
-    // Mock search for now
-    res.json({
-        actors: [
-            {
-                id: `https://mastodon.social/users/${q.split('@')[1] || 'user'}`,
-                preferredUsername: q.split('@')[1] || 'user',
-                server: q.split('@')[2] || 'mastodon.social',
-                name: `External ${q.split('@')[1] || 'User'}`,
-                summary: 'An actor from the fediverse',
-                icon: { url: 'https://placehold.co/400x400?text=Actor' }
+    console.log(`[Federation] Searching for actor: ${q}`);
+
+    // If query looks like a handle, try WebFinger
+    if (q.includes('@')) {
+        try {
+            const actorUri = await federationService.resolveWebFinger(q);
+            if (actorUri) {
+                const url = new URL(actorUri);
+                if (['localhost', '127.0.0.1'].includes(url.hostname) || url.hostname.startsWith('10.') || url.hostname.startsWith('192.168.')) {
+                    console.warn(`[Federation] Blocked SSRF attempt during search detail fetch: ${actorUri}`);
+                    return res.status(400).json({ error: 'Invalid actor URI' });
+                }
+
+                // Fetch actor details
+                const actorRes = await axios.get(actorUri, {
+                    headers: { Accept: 'application/activity+json' },
+                    timeout: 5000
+                });
+
+                const actor = actorRes.data;
+                const domain = new URL(actorUri).hostname;
+
+                return res.json({
+                    actors: [
+                        {
+                            id: actor.id,
+                            preferredUsername: actor.preferredUsername || actor.name,
+                            server: domain,
+                            name: actor.name || actor.preferredUsername,
+                            summary: actor.summary || '',
+                            icon: actor.icon ? { url: actor.icon.url || actor.icon } : { url: `https://ui-avatars.com/api/?name=${actor.preferredUsername || 'A'}&background=random` }
+                        }
+                    ]
+                });
             }
-        ]
-    });
+        } catch (err: any) {
+            console.error(`[Federation] Failed to fetch actor details after WebFinger:`, err.message);
+        }
+    }
+
+    // Fallback to local user search if WebFinger fails or query is not a handle
+    try {
+        const localUsers = await prisma.users.findMany({
+            where: {
+                OR: [
+                    { name: { contains: q } },
+                    { email: { contains: q } }
+                ]
+            },
+            take: 5
+        });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const actors = localUsers.map(u => ({
+            id: `https://${apiDomain}/api/federation/actors/${u.id}`,
+            preferredUsername: u.name,
+            server: apiDomain,
+            name: u.name,
+            summary: 'Local fwber user',
+            icon: { url: `https://ui-avatars.com/api/?name=${u.name}&background=random` }
+        }));
+
+        res.json({ actors });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 export default router;

@@ -6,6 +6,48 @@ import { ActivityNotificationService } from './ActivityNotificationService.js';
 
 export class FederationService {
   /**
+   * Resolves a remote WebFinger handle (e.g. @user@domain.com) to an ActivityPub actor URI.
+   */
+  async resolveWebFinger(handle: string): Promise<string | null> {
+    const cleanHandle = handle.startsWith('@') ? handle.substring(1) : handle;
+    const [username, domain] = cleanHandle.split('@');
+
+    if (!username || !domain) {
+      console.error(`[Federation] Invalid handle for WebFinger: ${handle}`);
+      return null;
+    }
+
+    const webfingerUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`;
+    console.log(`[Federation] Resolving WebFinger: ${webfingerUrl}`);
+
+    if (['localhost', '127.0.0.1'].includes(domain) || domain.startsWith('10.') || domain.startsWith('192.168.')) {
+      console.warn(`[Federation] Blocked SSRF attempt during WebFinger: ${domain}`);
+      return null;
+    }
+
+    try {
+      const res = await axios.get(webfingerUrl, {
+        headers: { Accept: 'application/jrd+json, application/json' },
+        timeout: 5000
+      });
+
+      const links = res.data.links || [];
+      const selfLink = links.find((l: any) => l.rel === 'self' && (l.type === 'application/activity+json' || l.type === 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'));
+
+      if (selfLink && selfLink.href) {
+        console.log(`[Federation] Resolved ${handle} to ${selfLink.href}`);
+        return selfLink.href;
+      }
+
+      console.warn(`[Federation] No ActivityPub self-link found for ${handle}`);
+      return null;
+    } catch (err: any) {
+      console.error(`[Federation] WebFinger resolution failed for ${handle}:`, err.message);
+      return null;
+    }
+  }
+
+  /**
    * Verifies the HTTP Signature on an incoming ActivityPub request.
    */
   async verifyHttpSignature(req: any): Promise<boolean> {
@@ -91,8 +133,30 @@ export class FederationService {
     }
   }
 
+  /**
+   * Processes incoming Create activities (remote posts).
+   * Note: In a production environment, this would often be filtered by following status.
+   */
   private async handleCreate(activity: any, targetUserId: bigint) {
-    console.log(`[Federation] Received Create activity for user ${targetUserId}`);
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const object = activity.object;
+
+    if (!object || !object.id) {
+        console.warn(`[Federation] Received malformed Create activity from ${actorUri}`);
+        return;
+    }
+
+    console.log(`[Federation] Received Create activity from ${actorUri} for user ${targetUserId}`);
+
+    // Note: Persistent storage of the activity itself happens in the route handler.
+    // This service method is for logic-level processing (e.g. notifications on mentions).
+    if (object.type === 'Note') {
+        const content = object.content || '';
+        if (content.includes(`@${targetUserId}`)) {
+            // Placeholder for mention notification logic
+            console.log(`[Federation] User ${targetUserId} was mentioned by ${actorUri}`);
+        }
+    }
   }
 
   private async handleLike(activity: any, targetUserId: bigint) {
@@ -151,7 +215,8 @@ export class FederationService {
 
   private async handleFollow(activity: any, targetUserId: bigint) {
     const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
-    const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const targetUri = `https://${apiDomain}/api/federation/actors/${targetUserId}`;
 
     console.log(`[Federation] ${actorUri} wants to follow local user ${targetUserId}`);
 
@@ -205,7 +270,7 @@ export class FederationService {
       if (user?.private_key) {
           const acceptActivity = {
               '@context': 'https://www.w3.org/ns/activitystreams',
-              id: `https://api.fwber.me/api/federation/activities/accept-${Date.now()}`,
+              id: `https://${apiDomain}/api/federation/activities/accept-${Date.now()}`,
               type: 'Accept',
               actor: targetUri,
               object: activity
@@ -226,7 +291,8 @@ export class FederationService {
 
   private async handleUndoFollow(activity: any, targetUserId: bigint) {
     const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
-    const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const targetUri = `https://${apiDomain}/api/federation/actors/${targetUserId}`;
     try {
         await prisma.federation_follows.deleteMany({
             where: { actor_uri: actorUri, target_uri: targetUri }
@@ -236,7 +302,8 @@ export class FederationService {
 
   private async handleAccept(activity: any, targetUserId: bigint) {
     const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
-    const targetUri = `https://api.fwber.me/api/federation/actors/${targetUserId}`;
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const targetUri = `https://${apiDomain}/api/federation/actors/${targetUserId}`;
     try {
         await prisma.federation_follows.updateMany({
             where: { actor_uri: targetUri, target_uri: actorUri },
@@ -245,7 +312,7 @@ export class FederationService {
     } catch (err) {}
   }
 
-  async broadcastUpdate(userId: bigint, objectPayload: any) {
+  async broadcastUpdate(userId: bigint, objectPayload: any, activityType: string = 'Create') {
     const user = await prisma.users.findUnique({
       where: { id: userId },
       select: { private_key: true, name: true }
@@ -253,7 +320,8 @@ export class FederationService {
 
     if (!user || !user.private_key) return;
 
-    const actorUri = `https://api.fwber.me/api/federation/actors/${userId}`;
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const actorUri = `https://${apiDomain}/api/federation/actors/${userId}`;
     const followers = await prisma.federation_follows.findMany({
         where: { target_uri: actorUri, status: 'accepted' }
     });
@@ -262,13 +330,13 @@ export class FederationService {
 
     const activity = {
         '@context': 'https://www.w3.org/ns/activitystreams',
-        id: `https://api.fwber.me/api/federation/activities/${Date.now()}`,
-        type: 'Create',
+        id: `https://${apiDomain}/api/federation/activities/${activityType.toLowerCase()}-${Date.now()}`,
+        type: activityType,
         actor: actorUri,
         object: objectPayload
     };
 
-    const taskLabel = `ActivityPub Broadcast (User ${userId})`;
+    const taskLabel = `ActivityPub ${activityType} Broadcast (User ${userId})`;
     await AutonomousService.logAction(taskLabel, 'Started', { follower_count: followers.length, object_type: objectPayload.type });
 
     let successCount = 0;

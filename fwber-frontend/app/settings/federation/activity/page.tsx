@@ -264,7 +264,14 @@ export default function FederationActivityPage() {
                                 {item.subtitle}
                               </Link>
                             </div>
-                            <Badge variant="outline" className="shrink-0">
+                            <Badge
+                                variant={item.kind === 'post' ? 'default' : 'outline'}
+                                className={`shrink-0 ${
+                                    item.kind === 'like' ? 'bg-rose-50 text-rose-600 border-rose-200' :
+                                    item.kind === 'announce' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                    item.kind === 'follower' ? 'bg-blue-50 text-blue-600 border-blue-200' : ''
+                                }`}
+                            >
                               {item.kind === 'post' ? 'Post' :
                                item.kind === 'outbox' ? 'Outbox' :
                                item.kind === 'follower' ? 'Follower' :
