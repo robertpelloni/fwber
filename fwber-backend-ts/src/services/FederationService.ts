@@ -112,8 +112,9 @@ export class FederationService {
         await this.handleFollow(activity, targetUserId);
         break;
       case 'Undo':
-        if (activity.object && activity.object.type === 'Follow') {
-          await this.handleUndoFollow(activity, targetUserId);
+        if (activity.object) {
+          if (activity.object.type === 'Follow') await this.handleUndoFollow(activity, targetUserId);
+          else if (activity.object.type === 'Like' || activity.object.type === 'Announce') await this.handleUndoInteraction(activity, targetUserId);
         }
         break;
       case 'Accept':
@@ -121,6 +122,12 @@ export class FederationService {
         break;
       case 'Create':
         await this.handleCreate(activity, targetUserId);
+        break;
+      case 'Update':
+        await this.handleUpdate(activity, targetUserId);
+        break;
+      case 'Delete':
+        await this.handleDelete(activity, targetUserId);
         break;
       case 'Like':
         await this.handleLike(activity, targetUserId);
@@ -355,6 +362,67 @@ export class FederationService {
             where: { actor_uri: actorUri, target_uri: targetUri }
         });
     } catch (err) {}
+  }
+
+  /**
+   * Processes incoming Update activities (remote profile changes).
+   */
+  private async handleUpdate(activity: any, targetUserId: bigint) {
+    const actorUri = typeof activity.actor === 'string' ? activity.actor : activity.actor.id;
+    const object = activity.object;
+
+    if (!object || object.type !== 'Person') return;
+
+    try {
+        await prisma.users.updateMany({
+            where: { actor_uri: actorUri },
+            data: {
+                name: object.preferredUsername || object.name || undefined,
+                public_key: object.publicKey?.publicKeyPem || undefined
+            }
+        });
+        console.log(`[Federation] Updated cached details for remote actor: ${actorUri}`);
+    } catch (err: any) {
+        console.error('[Federation] Failed to update remote actor details:', err.message);
+    }
+  }
+
+  /**
+   * Processes incoming Delete activities.
+   */
+  private async handleDelete(activity: any, targetUserId: bigint) {
+    const objectUri = typeof activity.object === 'string' ? activity.object : activity.object.id;
+    if (!objectUri) return;
+
+    try {
+        await prisma.federation_inbox.deleteMany({
+            where: {
+                OR: [
+                    { activity_id: objectUri },
+                    { payload: { path: ['object', 'id'], equals: objectUri } }
+                ]
+            }
+        });
+        console.log(`[Federation] Deleted remote activity/object from inbox: ${objectUri}`);
+    } catch (err: any) {
+        console.error('[Federation] Failed to process inbound delete:', err.message);
+    }
+  }
+
+  /**
+   * Handles Undo for interactions (Like/Announce).
+   */
+  private async handleUndoInteraction(activity: any, targetUserId: bigint) {
+    const object = activity.object;
+    const activityId = typeof object === 'string' ? object : object.id;
+    if (!activityId) return;
+
+    try {
+        await prisma.federation_inbox.deleteMany({
+            where: { activity_id: activityId }
+        });
+        console.log(`[Federation] Processed Undo for activity: ${activityId}`);
+    } catch (err: any) {}
   }
 
   private async handleAccept(activity: any, targetUserId: bigint) {

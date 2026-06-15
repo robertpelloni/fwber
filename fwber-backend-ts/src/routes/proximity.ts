@@ -87,8 +87,28 @@ router.post('/artifacts/:id/flag', authenticate, async (req: any, res) => {
 
 // DELETE /api/proximity/artifacts/:id
 router.delete('/artifacts/:id', authenticate, async (req: any, res) => {
-  await prisma.proximity_artifacts.deleteMany({ where: { id: BigInt(req.params.id), user_id: BigInt(req.user.id) } }).catch(() => {});
-  res.json({ message: 'Deleted' });
+  const userId = BigInt(req.user.id);
+  const artifactId = BigInt(req.params.id);
+
+  try {
+      const artifact = await prisma.proximity_artifacts.findUnique({ where: { id: artifactId } });
+      if (artifact && artifact.user_id === userId) {
+          await prisma.proximity_artifacts.delete({ where: { id: artifactId } });
+
+          // Federation: Broadcast Delete if enabled
+          const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+          if (profile?.is_federated) {
+              const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+              federationService.broadcastUpdate(userId, {
+                  id: `https://${apiDomain}/api/proximity/artifacts/${artifactId}`,
+                  type: 'Tombstone'
+              }, 'Delete').catch(err => console.error('[proximity] Federation delete failed:', err.message));
+          }
+      }
+      res.json({ message: 'Deleted' });
+  } catch (err: any) {
+      res.status(500).json({ error: err.message });
+  }
 });
 
 // POST /api/proximity/artifacts/:id/comments

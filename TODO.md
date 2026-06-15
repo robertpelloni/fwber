@@ -19,6 +19,7 @@
 - [x] **Federated Profiles**: Broadcast ActivityPub Update on profile changes.
 - [x] **Inbound Reply Loop**: Auto-store remote replies as local artifact comments.
 - [x] **Infrastructure Roadmap**: Finalize production Email setup guide.
+- [x] **Activity Lifecycle**: Implement Delete/Undo/Update handlers for full sync.
 
 ## 🟢 Recently Completed: Phase 8 - Intelligent Match Refinement (v2.1.9)
 - [x] **Narrative Compatibility**: AI subagent explains match reasons based on question data.

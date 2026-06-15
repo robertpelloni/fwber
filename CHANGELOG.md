@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.7] - 2026-06-10
+
+### Added
+- **Activity Lifecycle Management**: Implemented handlers for ActivityPub `Delete` and `Update` activities, ensuring local caches of remote content remain synchronized.
+- **Outbound Deletions**: Deleting proximity artifacts now broadcasts an ActivityPub `Delete` activity to the fediverse.
+- **Improved Undo Support**: Expanded `Undo` handling to correctly process retracted Likes and Boosts from remote servers.
+
 ## [2.2.6] - 2026-06-10
 
 ### Added
