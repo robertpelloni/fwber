@@ -179,9 +179,21 @@ router.post('/admin/peers/:id/toggle-block', async (req: AuthRequest, res: Respo
 });
 
 // GET /api/federation/activity - Unified Activity Center endpoint
-router.get('/activity', async (req: AuthRequest, res: Response) => {
+router.get('/activity', authenticate, async (req: AuthRequest, res: Response) => {
     try {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
         const inboxItems = await prisma.federation_inbox.findMany({
+            where: {
+                OR: [
+                    { payload: { path: ['to'], array_contains: localActorUri } },
+                    { payload: { path: ['cc'], array_contains: localActorUri } },
+                    { payload: { path: ['object', 'attributedTo'], equals: localActorUri } },
+                    { payload: { path: ['object', 'inReplyTo'], equals: localActorUri } },
+                    { payload: { path: ['to'], array_contains: 'https://www.w3.org/ns/activitystreams#Public' } }
+                ]
+            },
             orderBy: { created_at: 'desc' },
             take: 50
         });
@@ -221,7 +233,7 @@ router.get('/activity', async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/federation/feed/following — get posts only from actors the user follows
-router.get('/feed/following', async (req: AuthRequest, res: Response) => {
+router.get('/feed/following', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
         const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
@@ -269,10 +281,20 @@ router.get('/feed/following', async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/federation/posts — get federation posts from inbox
-router.get('/posts', async (req: AuthRequest, res: Response) => {
+router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
     try {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
         const inboxItems = await prisma.federation_inbox.findMany({
-            where: { type: 'Create' },
+            where: {
+                type: 'Create',
+                OR: [
+                    { payload: { path: ['to'], array_contains: 'https://www.w3.org/ns/activitystreams#Public' } },
+                    { payload: { path: ['to'], array_contains: localActorUri } },
+                    { payload: { path: ['cc'], array_contains: localActorUri } }
+                ]
+            },
             orderBy: { created_at: 'desc' },
             take: 50
         });
@@ -303,7 +325,7 @@ router.get('/posts', async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/federation/following - Get external actors user is following
-router.get('/following', async (req: AuthRequest, res: Response) => {
+router.get('/following', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
         const following = await prisma.federation_follows.findMany({
@@ -325,7 +347,7 @@ router.get('/following', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/posts/:id/unlike - Unlike a federated post (Undo Like)
-router.post('/posts/:id/unlike', async (req: AuthRequest, res: Response) => {
+router.post('/posts/:id/unlike', authenticate, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { actor_uri } = req.body;
 
@@ -367,7 +389,7 @@ router.post('/posts/:id/unlike', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/unfollow - Unfollow an external actor
-router.post('/unfollow', async (req: AuthRequest, res: Response) => {
+router.post('/unfollow', authenticate, async (req: AuthRequest, res: Response) => {
     const { actor_id } = req.body;
     if (!actor_id) return res.status(400).json({ error: 'actor_id is required' });
 
@@ -410,7 +432,7 @@ router.post('/unfollow', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/posts/:id/unboost - Unboost a federated post (Undo Announce)
-router.post('/posts/:id/unboost', async (req: AuthRequest, res: Response) => {
+router.post('/posts/:id/unboost', authenticate, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { actor_uri } = req.body;
 
@@ -452,7 +474,7 @@ router.post('/posts/:id/unboost', async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/federation/followers - Get external actors following user
-router.get('/followers', async (req: AuthRequest, res: Response) => {
+router.get('/followers', authenticate, async (req: AuthRequest, res: Response) => {
     try {
         const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
         const followers = await prisma.federation_follows.findMany({
@@ -473,7 +495,7 @@ router.get('/followers', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/follow - Follow an external actor
-router.post('/follow', async (req: AuthRequest, res: Response) => {
+router.post('/follow', authenticate, async (req: AuthRequest, res: Response) => {
     const { actor_id } = req.body;
     if (!actor_id) return res.status(400).json({ error: 'actor_id is required' });
 
@@ -522,7 +544,7 @@ router.post('/follow', async (req: AuthRequest, res: Response) => {
 });
 
 // GET /api/federation/search - Search for external actors
-router.get('/search', async (req: AuthRequest, res: Response) => {
+router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
     const { q } = req.query;
     if (!q || typeof q !== 'string') return res.status(400).json({ error: 'Query is required' });
 
@@ -597,7 +619,7 @@ router.get('/search', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/posts/:id/like - Like a federated post
-router.post('/posts/:id/like', async (req: AuthRequest, res: Response) => {
+router.post('/posts/:id/like', authenticate, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { actor_uri } = req.body; // The URI of the remote post author
 
@@ -635,7 +657,7 @@ router.post('/posts/:id/like', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/posts/:id/reply - Reply to a federated post
-router.post('/posts/:id/reply', async (req: AuthRequest, res: Response) => {
+router.post('/posts/:id/reply', authenticate, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { content, actor_uri } = req.body;
 
@@ -683,7 +705,7 @@ router.post('/posts/:id/reply', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/federation/posts/:id/boost - Boost (Announce) a federated post
-router.post('/posts/:id/boost', async (req: AuthRequest, res: Response) => {
+router.post('/posts/:id/boost', authenticate, async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { actor_uri } = req.body;
 

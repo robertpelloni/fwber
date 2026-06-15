@@ -4,6 +4,7 @@ import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { checkAndUnlockAchievements } from '../lib/achievements.js';
 import { filePathToUrl } from '../lib/photos.js';
+import { WingmanService } from '../services/WingmanService.js';
 
 const router = Router();
 const upload = multer({ dest: 'uploads/messages/' });
@@ -328,6 +329,11 @@ router.post('/', upload.single('media'), async (req: any, res) => {
   }
 
     checkAndUnlockAchievements(userId).catch(() => {});
+
+    // Proactive AI Wingman Nudge
+    WingmanService.analyzeAndNudge(userId, BigInt(receiver_id)).catch((err) => {
+      console.warn('[Messages] Wingman nudge error:', err.message);
+    });
 
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {

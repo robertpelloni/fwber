@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate, type AuthRequest } from '../middleware/auth.js';
 import * as ai from '../lib/wingman-ai.js';
 import prisma from '../lib/prisma.js';
 import OpenAI from 'openai';
+import { WingmanService } from '../services/WingmanService.js';
 
 const openai = new OpenAI({ 
   apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY,
@@ -298,19 +299,17 @@ router.get('/ice-breaker', async (req: any, res) => {
 
 // ─── Ice Breakers (match-specific) ───────────────────────────────────────────
 
-router.get('/ice-breakers/:matchId', async (req: any, res) => {
-  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
+router.get('/ice-breakers/:matchId', async (req: AuthRequest, res) => {
   try {
-    const suggestion = await openai.chat.completions.create({
-      model: model,
-      messages: [{ role: 'user', content: 'Generate three clever, unique dating ice breaker messages. Be specific and creative — avoid clichés. Format as a JSON array of strings: ["suggestion1", "suggestion2", "suggestion3"]' }],
-      temperature: 0.95,
-      max_tokens: 300,
-    });
-    const text = suggestion.choices[0]?.message?.content?.trim() || '';
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-    const suggestions = JSON.parse(cleaned);
-    res.json({ suggestions: Array.isArray(suggestions) ? suggestions : [suggestions] });
+    const matchId = BigInt(req.params.matchId);
+    const match = await prisma.matches.findUnique({ where: { id: matchId } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+
+    const userId = BigInt(req.user.id);
+    const partnerId = match.user1_id === userId ? match.user2_id : match.user1_id;
+
+    const suggestions = await WingmanService.getSuggestions(userId, partnerId, 'ice-breaker');
+    res.json({ suggestions });
   } catch (err: any) {
     res.json({ suggestions: ['What\'s the most spontaneous thing you\'ve done this week?', 'If you could have dinner with any historical figure, who would it be?', 'What\'s your favorite local spot?'] });
   }
@@ -318,19 +317,17 @@ router.get('/ice-breakers/:matchId', async (req: any, res) => {
 
 // ─── Reply Suggestions ──────────────────────────────────────────────────────
 
-router.get('/replies/:matchId', async (req: any, res) => {
-  const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
+router.get('/replies/:matchId', async (req: AuthRequest, res) => {
   try {
-    const suggestion = await openai.chat.completions.create({
-      model: model,
-      messages: [{ role: 'user', content: 'Generate three clever, flirty dating reply suggestions. Be witty and engaging. Format as a JSON array of strings: ["reply1", "reply2", "reply3"]' }],
-      temperature: 0.95,
-      max_tokens: 300,
-    });
-    const text = suggestion.choices[0]?.message?.content?.trim() || '';
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```/g, '').trim();
-    const suggestions = JSON.parse(cleaned);
-    res.json({ suggestions: Array.isArray(suggestions) ? suggestions : [suggestions] });
+    const matchId = BigInt(req.params.matchId);
+    const match = await prisma.matches.findUnique({ where: { id: matchId } });
+    if (!match) return res.status(404).json({ error: 'Match not found' });
+
+    const userId = BigInt(req.user.id);
+    const partnerId = match.user1_id === userId ? match.user2_id : match.user1_id;
+
+    const suggestions = await WingmanService.getSuggestions(userId, partnerId, 'reply');
+    res.json({ suggestions });
   } catch (err: any) {
     res.json({ suggestions: ['That\'s awesome! What made you choose that?', 'Tell me more about that!', 'I love your vibe!'] });
   }

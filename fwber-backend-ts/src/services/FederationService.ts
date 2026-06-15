@@ -199,10 +199,11 @@ export class FederationService {
                             httpAgent: agent,
                             timeout: 5000
                         });
+                        const actorHash = crypto.createHash('md5').update(actorUri).digest('hex').substring(0, 8);
                         remoteUser = await prisma.users.create({
                             data: {
                                 name: actorRes.data.preferredUsername || 'remote_user',
-                                email: `remote-${Date.now()}@federated`,
+                                email: `remote-${actorHash}@federated`,
                                 password: 'REMOTE_ACCOUNT_NO_LOGIN',
                                 actor_uri: actorUri,
                                 is_remote: true
@@ -322,10 +323,11 @@ export class FederationService {
                     httpsAgent: agent,
                     httpAgent: agent
                 });
+                const actorHash = crypto.createHash('md5').update(actorUri).digest('hex').substring(0, 8);
                 remoteUser = await prisma.users.create({
                     data: {
                         name: actorRes.data.preferredUsername || 'remote_user',
-                        email: `remote-${Date.now()}@federated`,
+                        email: `remote-${actorHash}@federated`,
                         password: 'REMOTE_ACCOUNT_NO_LOGIN',
                         actor_uri: actorUri,
                         is_remote: true,
@@ -333,10 +335,11 @@ export class FederationService {
                     }
                 });
             } catch (err) {
+                const actorHash = crypto.createHash('md5').update(actorUri).digest('hex').substring(0, 8);
                 remoteUser = await prisma.users.create({
                     data: {
                         name: 'remote_user',
-                        email: `remote-${Date.now()}@federated`,
+                        email: `remote-${actorHash}@federated`,
                         password: 'REMOTE_ACCOUNT_NO_LOGIN',
                         actor_uri: actorUri,
                         is_remote: true

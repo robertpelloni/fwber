@@ -22,12 +22,9 @@ Completed the core implementation and hardening of Phase 9: Social Velocity & Fe
 - **TODO.md**: Marked all core federation items as completed.
 
 ## Deployment Notes
-- **Environment**: Ensure `API_DOMAIN` and `FRONTEND_URL` are correctly set for canonical URI construction.
-- **Secrets**: `RESEND_API_KEY` is required for production email delivery; fallback to SMTP/Console is active.
-
-## Deployment Notes
 - **Security**: SSRF and XSS protection layers are active.
-- **Environment**: Ensure `API_DOMAIN` is set to the public API host (e.g. `api.fwber.me`) for correct URI construction.
+- **Environment**: Ensure `API_DOMAIN` (e.g., `api.fwber.me`) and `FRONTEND_URL` are correctly set for canonical URI construction.
+- **Secrets**: `RESEND_API_KEY` and `OPENAI_API_KEY` are required for production email and AI features.
 
 ## Next Steps
 - **Email Delivery**: Production Resend DNS configuration.
