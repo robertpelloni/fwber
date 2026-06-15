@@ -495,10 +495,13 @@ router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
 
     console.log(`[Federation] Searching for actor: ${q}`);
 
-    // If query looks like a handle, try WebFinger
-    if (q.includes('@')) {
+    // Check if query is a direct ActivityPub URI
+    let actorUri: string | null = null;
+    if (q.startsWith('http://') || q.startsWith('https://')) {
+        actorUri = q;
+    } else if (q.includes('@')) {
         try {
-            const actorUri = await federationService.resolveWebFinger(q);
+            actorUri = await federationService.resolveWebFinger(q);
             if (actorUri) {
                 if (!(await validateFederationUrl(actorUri))) {
                     console.warn(`[Federation] Blocked SSRF attempt during search detail fetch: ${actorUri}`);
@@ -555,6 +558,39 @@ router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
         }));
 
         res.json({ actors });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Admin: GET /api/federation/admin/peers — list discovered peers
+router.get('/admin/peers', async (req: AuthRequest, res: Response) => {
+    if (!req.user?.is_moderator) return res.status(403).json({ error: 'Forbidden' });
+
+    try {
+        const peers = await prisma.federated_servers.findMany({
+            orderBy: { discovered_at: 'desc' }
+        });
+        res.json({ peers });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Admin: POST /api/federation/admin/peers/:id/toggle-block — toggle peer block
+router.post('/admin/peers/:id/toggle-block', async (req: AuthRequest, res: Response) => {
+    if (!req.user?.is_moderator) return res.status(403).json({ error: 'Forbidden' });
+
+    try {
+        const peer = await prisma.federated_servers.findUnique({ where: { id: BigInt(req.params.id) } });
+        if (!peer) return res.status(404).json({ error: 'Peer not found' });
+
+        const updated = await prisma.federated_servers.update({
+            where: { id: peer.id },
+            data: { is_blocked: !peer.is_blocked }
+        });
+
+        res.json({ success: true, is_blocked: updated.is_blocked });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

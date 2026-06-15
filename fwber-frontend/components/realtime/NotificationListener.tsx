@@ -65,6 +65,22 @@ const NOTIFICATION_HANDLERS: Record<string, {
       onClick: () => router.push('/settings/federation/activity'),
     }),
   },
+  reply: {
+    getTitle: (n) => n.title || 'New Reply',
+    getMessage: (n) => n.body || 'Someone replied to your post.',
+    getAction: (_, router) => ({
+      label: 'View Activity',
+      onClick: () => router.push('/settings/federation/activity'),
+    }),
+  },
+  mention: {
+    getTitle: (n) => n.title || 'You were mentioned',
+    getMessage: (n) => n.body || 'Someone mentioned you in a post.',
+    getAction: (_, router) => ({
+      label: 'View Activity',
+      onClick: () => router.push('/settings/federation/activity'),
+    }),
+  },
   like: {
     getTitle: (n) => n.title || 'New Interaction',
     getMessage: (n) => n.body || 'Someone liked your post.',

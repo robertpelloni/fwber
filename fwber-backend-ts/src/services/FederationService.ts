@@ -37,6 +37,7 @@ export class FederationService {
 
       if (selfLink && selfLink.href) {
         console.log(`[Federation] Resolved ${handle} to ${selfLink.href}`);
+        this.trackPeer(domain).catch(() => {});
         return selfLink.href;
       }
 
@@ -530,6 +531,9 @@ export class FederationService {
    */
   async sendActivityToActor(actorUri: string, activity: any, privateKey: string, localActorUri: string) {
     try {
+        const domain = new URL(actorUri).hostname;
+        this.trackPeer(domain).catch(() => {});
+
         if (!(await validateFederationUrl(actorUri))) {
             console.warn(`[Federation] Blocked SSRF attempt during activity send: ${actorUri}`);
             return false;
@@ -561,6 +565,27 @@ export class FederationService {
         console.error(`[Federation] Failed to send activity to ${actorUri}:`, err.message);
     }
     return false;
+  }
+
+  /**
+   * Tracks a newly discovered or interacted-with federation peer.
+   */
+  async trackPeer(domain: string) {
+    if (['localhost', '127.0.0.1'].includes(domain) || domain.startsWith('10.') || domain.startsWith('192.168.')) return;
+
+    try {
+        await prisma.federated_servers.upsert({
+            where: { domain },
+            update: { updated_at: new Date() },
+            create: {
+                domain,
+                software: 'unknown',
+                discovered_at: new Date()
+            }
+        });
+    } catch (err: any) {
+        // Silent fail for peer tracking
+    }
   }
 
   /**

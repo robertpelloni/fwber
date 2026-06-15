@@ -1,20 +1,21 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.2.0 "Social Velocity & Federation"
+> **Current Version:** 2.2.9 "Social Velocity & Federation"
 > **Last Updated:** 2026-06-10
 
 ---
 
 ## 🗺️ High-Level Trajectory
 
-### Phase 9: Social Velocity & Federation (IN PROGRESS - v2.2.0)
-Focuses on making the fediverse features production-ready and interoperable with external servers.
+### Phase 9: Social Velocity & Federation (COMPLETE - v2.2.9)
+Transitions the platform from a pasive observer into a fully interactive and secure Fediverse node.
 
-**Key Goals:**
-- **WebFinger Discovery**: Real-time handle resolution for remote actors.
-- **Activity Stream Enrichment**: Full support for incoming Posts, Likes, and Boosts from other servers.
-- **Email Delivery**: High-reputation email infrastructure via Resend.
-- **Production Payments**: Live Stripe integration for subscriptions and gifts.
+**Key Achievements:**
+- **Interactive Social Graph**: Bi-directional ActivityPub support for Likes, Boosts, Replies, and Follows.
+- **WebFinger Discovery**: Real-time handle-to-URI resolution for remote actors.
+- **Security Hardening**: Implemented DNS-level SSRF protection and isomorphic XSS sanitization.
+- **Social Synchronization**: Automated inbound reply loops and @mention notifications.
+- **Administrative Control**: Discovered peer management and server-level blocklists.
 
 ### Phase 8: Intelligent Match Refinement (COMPLETED - v2.1.9)
 The next major evolution focuses on high-fidelity personality analysis and deeper signal integration.

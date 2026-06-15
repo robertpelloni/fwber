@@ -1,26 +1,29 @@
-# Session Handoff - v2.2.3 (Social Velocity & Federation)
+# Session Handoff - v2.2.9 (Social Velocity & Federation)
 
 ## Overview
-Completed the foundational interactive layer of Phase 9: Social Velocity & Federation. This release transitions the platform from a read-only fediverse observer to a full participant capable of secure, bi-directional interaction (Follows, Likes, Boosts, Replies) with external servers.
+Completed the core implementation and hardening of Phase 9: Social Velocity & Federation. This release establishes fwber as a full, interactive, and secure participant in the decentralized Fediverse, featuring bi-directional social graph synchronization and advanced security layers.
 
 ## Key Changes
-- **WebFinger & Discovery**: Implemented real-time resolution of `@user@domain` handles to ActivityPub actor URIs. Federated search now performs live remote lookups.
-- **Security Hardening**:
-    - **SSRF Protection**: Added `lib/ssrf.ts` using DNS resolution to block outbound requests to private/loopback IP ranges.
-    - **XSS Sanitization**: Integrated `DOMPurify` to sanitize all remote federated content before rendering.
-- **ActivityPub Interactions**:
-    - **Follow/Unfollow**: Full signed handshake for following and unfollowing remote actors.
-    - **Likes & Boosts**: Enabled outbound Like and Announce (Boost) activities targeting remote object URIs.
-    - **Federated Replies**: Support for sending signed replies (Create Note with inReplyTo) to remote posts.
-- **Rich Profiles**: The local actor endpoint now exposes real user profile data (display names, bios, avatars) to the Fediverse.
-- **UI/UX Refinement**: Wired all interactions (Like, Boost, Reply, Follow, Unfollow) into the Global Feed and Actor Explorer with interactive feedback and sanitized previews.
+- **ActivityPub Interactive Layer**: Full support for signed outbound activities including Follow, Undo (Unfollow/Unlike/Unboost), Like, Announce (Boost), Create (Notes/Replies), and Update (Profile).
+- **Security & Hardening**:
+    - **SSRF Protection**: Implemented `lib/ssrf.ts` with DNS-level resolution to block all outbound federation requests to private/loopback/reserved IP ranges.
+    - **XSS Sanitization**: Integrated `isomorphic-dompurify` in the frontend to consistently sanitize untrusted federated content during both SSR and client-side rendering.
+- **Conversational Social Graph**:
+    - **Inbound Replies**: Automated processing of ActivityPub replies, resolving remote actors and storing replies as local comments on proximity artifacts.
+    - **Mentions**: Real-time detection of `@name` mentions in remote posts triggering WebSocket notifications.
+- **Peer Management**: Implemented automatic server discovery (`trackPeer`) and an Admin API for moderators to view and block malicious federation peers.
+- **UI/UX Excellence**: Completely wired the Global Feed, Activity Center, and Actor Explorer with interactive social triggers, feed filtering (Global vs. Following), and rich metadata display.
 
 ## Documentation Sync
-- **VERSION**: Updated to 2.2.3
-- **CHANGELOG.md**: Documented all Phase 9 additions including WebFinger, security, and interactions.
-- **PROJECT_STATUS.md**: Marked Phase 9 progress as significant.
-- **ROADMAP.md**: Synchronized goals with v2.2.3 state.
-- **TODO.md**: Marked core federation interactive items as completed.
+- **VERSION**: Updated to 2.2.9
+- **CHANGELOG.md**: Documented the full progression from discovery to interactive lifecycle management.
+- **PROJECT_STATUS.md**: Marked Phase 9 as significant and stable.
+- **ROADMAP.md**: Synchronized goals with the completed v2.2.9 state.
+- **TODO.md**: Marked all core federation items as completed.
+
+## Deployment Notes
+- **Environment**: Ensure `API_DOMAIN` and `FRONTEND_URL` are correctly set for canonical URI construction.
+- **Secrets**: `RESEND_API_KEY` is required for production email delivery; fallback to SMTP/Console is active.
 
 ## Deployment Notes
 - **Security**: SSRF and XSS protection layers are active.

@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.9] - 2026-06-10
+
+### Added
+- **Peer Discovery**: Automatic tracking of remote federation servers during interactions.
+- **Admin Peer Management**: New API for moderators to view and manage (block/unblock) discovered federation peers.
+- **Direct URI Search**: Support for searching ActivityPub actors by direct HTTP/HTTPS URIs.
+
 ## [2.2.8] - 2026-06-10
 
 ### Added
