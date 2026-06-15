@@ -1,7 +1,7 @@
 import prisma from '../lib/prisma.js';
 import axios from 'axios';
 import crypto from 'crypto';
-import { validateFederationUrl } from '../lib/ssrf.js';
+import { validateFederationUrl, getHardenedFederationAgent } from '../lib/ssrf.js';
 import { AutonomousService } from './AutonomousService.js';
 import { ActivityNotificationService } from './ActivityNotificationService.js';
 
@@ -21,14 +21,12 @@ export class FederationService {
     const webfingerUrl = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`;
     console.log(`[Federation] Resolving WebFinger: ${webfingerUrl}`);
 
-    if (!(await validateFederationUrl(webfingerUrl))) {
-      console.warn(`[Federation] Blocked SSRF attempt during WebFinger: ${webfingerUrl}`);
-      return null;
-    }
-
     try {
+      const agent = await getHardenedFederationAgent(webfingerUrl);
       const res = await axios.get(webfingerUrl, {
         headers: { Accept: 'application/jrd+json, application/json' },
+        httpsAgent: agent,
+        httpAgent: agent,
         timeout: 5000
       });
 
@@ -68,11 +66,12 @@ export class FederationService {
       if (!parts.keyId || !parts.signature || !parts.headers) return false;
 
       // 1. Fetch remote actor public key
-      if (!(await validateFederationUrl(parts.keyId))) {
-        console.warn(`[Federation] Blocked SSRF attempt during signature verification: ${parts.keyId}`);
-        return false;
-      }
-      const remoteActor = await axios.get(parts.keyId, { headers: { Accept: 'application/activity+json' }});
+      const agent = await getHardenedFederationAgent(parts.keyId);
+      const remoteActor = await axios.get(parts.keyId, {
+        headers: { Accept: 'application/activity+json' },
+        httpsAgent: agent,
+        httpAgent: agent
+      });
       const publicKeyPem = remoteActor.data.publicKey.publicKeyPem;
 
       // 2. Reconstruct signature string
@@ -165,13 +164,17 @@ export class FederationService {
 
         if (content.includes(mentionTag)) {
             try {
-                if (await validateFederationUrl(actorUri)) {
-                    const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }, timeout: 5000 });
-                    const actorName = actorRes.data.preferredUsername || 'Someone';
-                    const actorDomain = new URL(actorUri).hostname;
+                const agent = await getHardenedFederationAgent(actorUri);
+                const actorRes = await axios.get(actorUri, {
+                    headers: { Accept: 'application/activity+json' },
+                    httpsAgent: agent,
+                    httpAgent: agent,
+                    timeout: 5000
+                });
+                const actorName = actorRes.data.preferredUsername || 'Someone';
+                const actorDomain = new URL(actorUri).hostname;
 
-                    await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content);
-                }
+                await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content);
             } catch (err) {
                 await ActivityNotificationService.notifyMention(targetUserId, 'Someone', 'remote', content);
             }
@@ -188,8 +191,14 @@ export class FederationService {
                 try {
                     // 1. Resolve remote user
                     let remoteUser = await prisma.users.findUnique({ where: { actor_uri: actorUri } });
-                    if (!remoteUser && await validateFederationUrl(actorUri)) {
-                        const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }, timeout: 5000 });
+                    if (!remoteUser) {
+                        const agent = await getHardenedFederationAgent(actorUri);
+                        const actorRes = await axios.get(actorUri, {
+                            headers: { Accept: 'application/activity+json' },
+                            httpsAgent: agent,
+                            httpAgent: agent,
+                            timeout: 5000
+                        });
                         remoteUser = await prisma.users.create({
                             data: {
                                 name: actorRes.data.preferredUsername || 'remote_user',
@@ -237,7 +246,12 @@ export class FederationService {
 
         if (outboxItem) {
             try {
-              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const agent = await getHardenedFederationAgent(actorUri);
+              const actorRes = await axios.get(actorUri, {
+                headers: { Accept: 'application/activity+json' },
+                httpsAgent: agent,
+                httpAgent: agent
+              });
               const actorName = actorRes.data.preferredUsername || 'Someone';
               const actorDomain = new URL(actorUri).hostname;
               const meta = outboxItem.payload as any;
@@ -264,7 +278,12 @@ export class FederationService {
 
         if (outboxItem) {
             try {
-              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const agent = await getHardenedFederationAgent(actorUri);
+              const actorRes = await axios.get(actorUri, {
+                headers: { Accept: 'application/activity+json' },
+                httpsAgent: agent,
+                httpAgent: agent
+              });
               const actorName = actorRes.data.preferredUsername || 'Someone';
               const actorDomain = new URL(actorUri).hostname;
               const meta = outboxItem.payload as any;
@@ -297,7 +316,12 @@ export class FederationService {
 
         if (!remoteUser) {
             try {
-                const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+                const agent = await getHardenedFederationAgent(actorUri);
+                const actorRes = await axios.get(actorUri, {
+                    headers: { Accept: 'application/activity+json' },
+                    httpsAgent: agent,
+                    httpAgent: agent
+                });
                 remoteUser = await prisma.users.create({
                     data: {
                         name: actorRes.data.preferredUsername || 'remote_user',
@@ -342,7 +366,12 @@ export class FederationService {
           };
 
           try {
-              const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }});
+              const agent = await getHardenedFederationAgent(actorUri);
+              const actorRes = await axios.get(actorUri, {
+                headers: { Accept: 'application/activity+json' },
+                httpsAgent: agent,
+                httpAgent: agent
+              });
               const inbox = actorRes.data.inbox;
               if (inbox) {
                   await this.sendSignedRequest(inbox, acceptActivity, user.private_key, targetUri);
@@ -468,11 +497,16 @@ export class FederationService {
     let successCount = 0;
     for (const follower of followers) {
         try {
-            const actorRes = await axios.get(follower.actor_uri, { headers: { Accept: 'application/activity+json' }});
+            const agent = await getHardenedFederationAgent(follower.actor_uri);
+            const actorRes = await axios.get(follower.actor_uri, {
+                headers: { Accept: 'application/activity+json' },
+                httpsAgent: agent,
+                httpAgent: agent
+            });
             const inbox = actorRes.data.inbox;
 
             if (inbox) {
-                await this.sendSignedRequest(inbox, activity, user.private_key, actorUri);
+                await this.sendSignedRequest(inbox, activity, user.private_key, actorUri, agent);
                 successCount++;
             }
         } catch (err: any) {}
@@ -500,7 +534,7 @@ export class FederationService {
     }
   }
 
-  private async sendSignedRequest(inboxUrl: string, activity: any, privateKey: string, actorUri: string) {
+  private async sendSignedRequest(inboxUrl: string, activity: any, privateKey: string, actorUri: string, agent: any) {
     const url = new URL(inboxUrl);
     const date = new Date().toUTCString();
     const digest = crypto.createHash('sha256').update(JSON.stringify(activity)).digest('base64');
@@ -522,6 +556,8 @@ export class FederationService {
             'Content-Type': 'application/activity+json',
             'Accept': 'application/activity+json'
         },
+        httpsAgent: agent,
+        httpAgent: agent,
         timeout: 5000
     });
   }
@@ -534,18 +570,17 @@ export class FederationService {
         const domain = new URL(actorUri).hostname;
         this.trackPeer(domain).catch(() => {});
 
-        if (!(await validateFederationUrl(actorUri))) {
-            console.warn(`[Federation] Blocked SSRF attempt during activity send: ${actorUri}`);
-            return false;
-        }
-
+        const agent = await getHardenedFederationAgent(actorUri);
         const actorRes = await axios.get(actorUri, {
             headers: { Accept: 'application/activity+json' },
+            httpsAgent: agent,
+            httpAgent: agent,
             timeout: 5000
         });
         const inbox = actorRes.data.inbox;
-        if (inbox && await validateFederationUrl(inbox)) {
-            await this.sendSignedRequest(inbox, activity, privateKey, localActorUri);
+        if (inbox) {
+            const inboxAgent = await getHardenedFederationAgent(inbox);
+            await this.sendSignedRequest(inbox, activity, privateKey, localActorUri, inboxAgent);
 
             // Persist interaction to outbox
             await prisma.federation_outbox.create({
