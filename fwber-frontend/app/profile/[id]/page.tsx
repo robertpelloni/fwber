@@ -15,7 +15,7 @@ import { EvolvingAvatar } from '@/components/ui/EvolvingAvatar';
 import { RelationshipTier } from '@/lib/relationshipTiers';
 import { photoAPI } from '@/lib/api/photos';
 import GiftShopModal from '@/components/gifts/GiftShopModal';
-import { BookHeart, Compass, Gift, HeartHandshake, ShieldCheck, Sparkles } from 'lucide-react';
+import { BookHeart, Compass, Gift, HeartHandshake, ShieldCheck, Sparkles, Globe, Copy } from 'lucide-react';
 import { VouchBadge } from '@/components/profile/VouchBadge';
 import { useMatchCompatibility } from '@/lib/hooks/use-compatibility';
 import { useToast } from '@/components/ToastProvider';
@@ -251,7 +251,26 @@ export default function PublicProfilePage() {
 						</div>
 
             <div className="prose dark:prose-invert mb-8">
-              <h3 className="text-lg font-semibold mb-2">About</h3>
+              <div className="flex items-center justify-between gap-4 mb-2">
+                <h3 className="text-lg font-semibold mb-0">About</h3>
+                {p.is_federated && (
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+                        <Globe className="w-3 h-3 text-blue-500" />
+                        <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tighter">
+                            @{profile.name || 'user'}@api.fwber.me
+                        </span>
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(`@${profile.name}@api.fwber.me`);
+                                showSuccess('Handle Copied', 'Federated handle copied to clipboard');
+                            }}
+                            className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded transition-colors"
+                        >
+                            <Copy className="w-3 h-3 text-blue-400" />
+                        </button>
+                    </div>
+                )}
+              </div>
               <p>{p.bio || 'No bio yet.'}</p>
             </div>
 

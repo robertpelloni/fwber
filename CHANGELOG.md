@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.8] - 2026-06-10
+
+### Added
+- **Outbound Undo Interactions**: Implemented support for retracting social actions (Unlike/Unboost) via ActivityPub `Undo` activities.
+- **Social Profile Badges**: Public profiles now prominently display the user's federated handle (e.g. @user@api.fwber.me) if federation is enabled.
+- **ActivityPub Compliance**: Updated the user outbox endpoint to follow standard `OrderedCollection` pagination for better interoperability with external servers.
+
 ## [2.2.7] - 2026-06-10
 
 ### Added

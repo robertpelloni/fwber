@@ -91,21 +91,43 @@ router.post('/users/:id/inbox', async (req, res) => {
   }
 });
 
-// GET /api/federation/users/:userId/outbox — get user outbox
+// GET /api/federation/users/:userId/outbox — get user outbox (Standard OrderedCollection)
 router.get('/users/:userId/outbox', async (req, res) => {
   try {
     const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const { userId } = req.params;
+    const page = req.query.page === 'true';
+
+    const actorUri = `https://${apiDomain}/api/federation/actors/${userId}`;
+    const outboxUri = `https://${apiDomain}/api/federation/users/${userId}/outbox`;
+
+    const totalItems = await prisma.federation_outbox.count({
+        where: { actor_uri: actorUri }
+    });
+
+    if (!page) {
+        return res.json({
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: outboxUri,
+            type: 'OrderedCollection',
+            totalItems: totalItems,
+            first: `${outboxUri}?page=true`,
+            last: `${outboxUri}?page=true`
+        });
+    }
+
     const outboxItems = await prisma.federation_outbox.findMany({
-      where: { actor_uri: `https://${apiDomain}/api/federation/actors/${req.params.userId}` },
+      where: { actor_uri: actorUri },
       orderBy: { created_at: 'desc' },
       take: 20
     });
 
     res.json({
       '@context': 'https://www.w3.org/ns/activitystreams',
-      id: `https://${apiDomain}/api/federation/users/${req.params.userId}/outbox`,
-      type: 'OrderedCollection',
-      totalItems: outboxItems.length,
+      id: `${outboxUri}?page=true`,
+      type: 'OrderedCollectionPage',
+      partOf: outboxUri,
+      totalItems: totalItems,
       orderedItems: outboxItems.map(item => item.payload)
     });
   } catch (error) {
@@ -269,6 +291,48 @@ router.get('/following', authenticate, async (req: AuthRequest, res: Response) =
     }
 });
 
+// POST /api/federation/posts/:id/unlike - Unlike a federated post (Undo Like)
+router.post('/posts/:id/unlike', authenticate, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { actor_uri } = req.body;
+
+    if (!actor_uri) return res.status(400).json({ error: 'actor_uri is required' });
+
+    try {
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true }
+        });
+
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const undoLikeActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/undo-like-${Date.now()}`,
+            type: 'Undo',
+            actor: localActorUri,
+            object: {
+                type: 'Like',
+                actor: localActorUri,
+                object: id
+            }
+        };
+
+        const success = await federationService.sendActivityToActor(actor_uri, undoLikeActivity, user.private_key, localActorUri);
+
+        if (success) {
+            res.json({ success: true, message: 'Unlike sent to remote server' });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver unlike to remote server' });
+        }
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // POST /api/federation/unfollow - Unfollow an external actor
 router.post('/unfollow', authenticate, async (req: AuthRequest, res: Response) => {
     const { actor_id } = req.body;
@@ -306,6 +370,48 @@ router.post('/unfollow', authenticate, async (req: AuthRequest, res: Response) =
             res.json({ success: true, message: 'Unfollow request sent' });
         } else {
             res.status(502).json({ error: 'Failed to deliver unfollow request to remote server' });
+        }
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/federation/posts/:id/unboost - Unboost a federated post (Undo Announce)
+router.post('/posts/:id/unboost', authenticate, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { actor_uri } = req.body;
+
+    if (!actor_uri) return res.status(400).json({ error: 'actor_uri is required' });
+
+    try {
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true }
+        });
+
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const undoAnnounceActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/undo-announce-${Date.now()}`,
+            type: 'Undo',
+            actor: localActorUri,
+            object: {
+                type: 'Announce',
+                actor: localActorUri,
+                object: id
+            }
+        };
+
+        const success = await federationService.sendActivityToActor(actor_uri, undoAnnounceActivity, user.private_key, localActorUri);
+
+        if (success) {
+            res.json({ success: true, message: 'Unboost sent to remote server' });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver unboost to remote server' });
         }
     } catch (err: any) {
         res.status(500).json({ error: err.message });
