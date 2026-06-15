@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.5] - 2026-06-10
+
+### Added
+- **Outbox Persistence**: All outbound ActivityPub activities are now persisted to the `federation_outbox` table.
+- **Federated Profile Updates**: Updating your fwber profile now broadcasts an ActivityPub `Update` activity to all followers.
+- **Mention Notifications**: Federated mentions now trigger real-time UI badges and semantic entries in the Activity Center.
+
 ## [2.2.4] - 2026-06-10
 
 ### Added

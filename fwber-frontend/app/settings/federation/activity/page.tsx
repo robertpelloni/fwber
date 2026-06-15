@@ -49,7 +49,7 @@ interface PostsResponse {
 type ActivityItem =
   | {
       id: string
-      kind: 'post' | 'follower' | 'outbox' | 'like' | 'announce'
+      kind: 'post' | 'follower' | 'outbox' | 'like' | 'announce' | 'mention'
       title: string
       subtitle: string
       timestamp: string
@@ -119,13 +119,17 @@ export default function FederationActivityPage() {
       else if (item.type === 'Like') kind = 'like'
       else if (item.type === 'Announce') kind = 'announce'
 
+      // Check for mention tag in payload/metadata
+      if (item.payload?.type === 'mention' || item.type === 'mention') kind = 'mention'
+
       return {
         id: `unified-${item.id}`,
         kind,
         title: item.type === 'Follow'
             ? `${formatFederationHandle(item.actor_username, item.actor_domain, item.actor_uri)} followed you`
             : (item.type === 'Like' ? `${item.actor_username} liked your post` :
-               (item.type === 'Announce' ? `${item.actor_username} boosted your post` : `${item.type} activity`)),
+               (item.type === 'Announce' ? `${item.actor_username} boosted your post` :
+                (kind === 'mention' ? `${item.actor_username} mentioned you` : `${item.type} activity`))),
         subtitle: formatFederationHandle(item.actor_username, item.actor_domain, item.actor_uri),
         timestamp: item.timestamp,
         content: item.content || `Activity type: ${item.type}`,
@@ -270,13 +274,15 @@ export default function FederationActivityPage() {
                                 className={`shrink-0 ${
                                     item.kind === 'like' ? 'bg-rose-50 text-rose-600 border-rose-200' :
                                     item.kind === 'announce' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                    item.kind === 'mention' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                                     item.kind === 'follower' ? 'bg-blue-50 text-blue-600 border-blue-200' : ''
                                 }`}
                             >
                               {item.kind === 'post' ? 'Post' :
                                item.kind === 'outbox' ? 'Outbox' :
                                item.kind === 'follower' ? 'Follower' :
-                               item.kind === 'like' ? 'Like' : 'Boost'}
+                               item.kind === 'like' ? 'Like' :
+                               item.kind === 'mention' ? 'Mention' : 'Boost'}
                             </Badge>
                           </div>
                           <div

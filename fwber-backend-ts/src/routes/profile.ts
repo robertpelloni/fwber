@@ -4,9 +4,11 @@ import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import { filePathToUrl } from "../lib/photos.js";
 import { authenticate } from "../middleware/auth.js";
+import { FederationService } from "../services/FederationService.js";
 import { checkAndUnlockAchievements } from '../lib/achievements.js';
 
 const router = Router();
+const federationService = new FederationService();
 
 // ─── Zodiac calculation ─────────────────────────────────────────────────────
 function getZodiacSign(month: number, day: number): string {
@@ -317,6 +319,15 @@ router.post("/", authenticate, async (req: any, res) => {
 				where: { id: existing.id },
 				data,
 			});
+
+            if (updated.is_federated) {
+                const user = await prisma.users.findUnique({ where: { id: userId } });
+                federationService.broadcastProfileUpdate(userId, {
+                    ...updated,
+                    preferredUsername: user?.name
+                }).catch(() => {});
+            }
+
 			res.json(serialize(updated));
 		} else {
 			const created = await prisma.user_profiles.create({
@@ -717,6 +728,15 @@ router.put("/", authenticate, async (req: any, res) => {
 				where: { id: existing.id },
 				data,
 			});
+
+            if (updated.is_federated) {
+                const user = await prisma.users.findUnique({ where: { id: userId } });
+                federationService.broadcastProfileUpdate(userId, {
+                    ...updated,
+                    preferredUsername: user?.name
+                }).catch(() => {});
+            }
+
 			res.json(serialize(updated));
 		} else {
 			const created = await prisma.user_profiles.create({

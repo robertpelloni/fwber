@@ -15,6 +15,8 @@
 - [x] **Outbound Follow/Unfollow**: Complete the ActivityPub follow/unfollow handshake.
 - [x] **Federated Mentions**: Notify users on remote @mentions.
 - [x] **Following Feed**: Personalized feed filtered by outbound follow relationships.
+- [x] **Outbox Persistence**: Track all delivered outbound activities.
+- [x] **Federated Profiles**: Broadcast ActivityPub Update on profile changes.
 
 ## 🟢 Recently Completed: Phase 8 - Intelligent Match Refinement (v2.1.9)
 - [x] **Narrative Compatibility**: AI subagent explains match reasons based on question data.

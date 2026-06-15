@@ -366,6 +366,22 @@ export class FederationService {
         success_count: successCount,
         total_count: followers.length
     });
+
+    // Persist to local outbox
+    try {
+        await prisma.federation_outbox.create({
+            data: {
+                activity_id: activity.id,
+                actor_uri: actorUri,
+                type: activityType,
+                payload: activity as any,
+                delivered_at: new Date(),
+                created_at: new Date()
+            }
+        });
+    } catch (err: any) {
+        console.error('[Federation] Failed to persist activity to outbox:', err.message);
+    }
   }
 
   private async sendSignedRequest(inboxUrl: string, activity: any, privateKey: string, actorUri: string) {
@@ -409,13 +425,49 @@ export class FederationService {
             timeout: 5000
         });
         const inbox = actorRes.data.inbox;
-        if (inbox) {
+        if (inbox && await validateFederationUrl(inbox)) {
             await this.sendSignedRequest(inbox, activity, privateKey, localActorUri);
+
+            // Persist interaction to outbox
+            await prisma.federation_outbox.create({
+                data: {
+                    activity_id: activity.id,
+                    actor_uri: localActorUri,
+                    type: activity.type,
+                    payload: activity as any,
+                    delivered_at: new Date(),
+                    created_at: new Date()
+                }
+            }).catch(() => {});
+
             return true;
         }
     } catch (err: any) {
         console.error(`[Federation] Failed to send activity to ${actorUri}:`, err.message);
     }
     return false;
+  }
+
+  /**
+   * Broadcasts a profile update to all followers.
+   */
+  async broadcastProfileUpdate(userId: bigint, profileData: any) {
+    const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const actorUri = `https://${apiDomain}/api/federation/actors/${userId}`;
+
+    const updateActivity = {
+        id: actorUri,
+        type: 'Person',
+        preferredUsername: profileData.preferredUsername,
+        name: profileData.display_name,
+        summary: profileData.bio,
+        icon: profileData.avatar_url ? {
+            type: 'Image',
+            mediaType: 'image/jpeg',
+            url: profileData.avatar_url
+        } : null
+    };
+
+    await this.broadcastUpdate(userId, updateActivity, 'Update');
   }
 }
