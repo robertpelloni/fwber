@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/lib/auth-context'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 import {
   getFederationOutbox,
   type FederationOutboxActivity,
@@ -161,7 +162,7 @@ export default function FederationOutboxPage() {
                   <CardContent className="space-y-4">
                     <div
                       className="prose max-w-none text-sm text-gray-700 dark:text-gray-300 dark:prose-invert dark:text-gray-200"
-                      dangerouslySetInnerHTML={{ __html: activity.object.content }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(activity.object.content) }}
                     />
                     <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                       <span>Actor: {activity.actor}</span>

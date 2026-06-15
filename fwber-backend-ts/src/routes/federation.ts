@@ -165,6 +165,54 @@ router.get('/activity', authenticate, async (req: AuthRequest, res: Response) =>
     }
 });
 
+// GET /api/federation/feed/following — get posts only from actors the user follows
+router.get('/feed/following', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const following = await prisma.federation_follows.findMany({
+            where: { actor_uri: localActorUri, status: 'accepted' },
+            select: { target_uri: true }
+        });
+
+        const followedUris = following.map(f => f.target_uri);
+
+        if (followedUris.length === 0) {
+            return res.json({ posts: [], total: 0 });
+        }
+
+        const inboxItems = await prisma.federation_inbox.findMany({
+            where: {
+                type: 'Create',
+                actor_uri: { in: followedUris }
+            },
+            orderBy: { created_at: 'desc' },
+            take: 50
+        });
+
+        const posts = inboxItems.map((item: any) => {
+            const payload = item.payload as any;
+            const object = payload?.object || {};
+
+            return {
+                id: Number(item.id),
+                actor_uri: item.actor_uri,
+                actor_username: item.actor_uri?.split('/').pop() || 'unknown',
+                actor_domain: item.actor_uri ? new URL(item.actor_uri).host : 'unknown',
+                content: object.content || '',
+                published_at: object.published || item.created_at?.toISOString() || new Date().toISOString(),
+                payload: payload
+            };
+        });
+
+        res.json({ posts, total: posts.length });
+    } catch (err: any) {
+        console.error('[Federation] Error fetching following feed:', err.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 // GET /api/federation/posts — get federation posts from inbox
 router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
     try {
@@ -221,6 +269,49 @@ router.get('/following', authenticate, async (req: AuthRequest, res: Response) =
     }
 });
 
+// POST /api/federation/unfollow - Unfollow an external actor
+router.post('/unfollow', authenticate, async (req: AuthRequest, res: Response) => {
+    const { actor_id } = req.body;
+    if (!actor_id) return res.status(400).json({ error: 'actor_id is required' });
+
+    try {
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true }
+        });
+
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const undoActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/undo-${Date.now()}`,
+            type: 'Undo',
+            actor: localActorUri,
+            object: {
+                type: 'Follow',
+                actor: localActorUri,
+                object: actor_id
+            }
+        };
+
+        const success = await federationService.sendActivityToActor(actor_id, undoActivity, user.private_key, localActorUri);
+
+        if (success) {
+            await prisma.federation_follows.deleteMany({
+                where: { actor_uri: localActorUri, target_uri: actor_id }
+            });
+            res.json({ success: true, message: 'Unfollow request sent' });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver unfollow request to remote server' });
+        }
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // GET /api/federation/followers - Get external actors following user
 router.get('/followers', authenticate, async (req: AuthRequest, res: Response) => {
     try {
@@ -248,18 +339,44 @@ router.post('/follow', authenticate, async (req: AuthRequest, res: Response) => 
     if (!actor_id) return res.status(400).json({ error: 'actor_id is required' });
 
     try {
-        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
-        const userUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
-
-        await prisma.federation_follows.create({
-            data: {
-                actor_uri: userUri,
-                target_uri: actor_id,
-                status: 'pending'
-            }
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true }
         });
 
-        res.json({ success: true, message: 'Follow request initiated' });
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const followActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/follow-${Date.now()}`,
+            type: 'Follow',
+            actor: localActorUri,
+            object: actor_id
+        };
+
+        const success = await federationService.sendActivityToActor(actor_id, followActivity, user.private_key, localActorUri);
+
+        if (success) {
+            await prisma.federation_follows.upsert({
+                where: {
+                    id: (await prisma.federation_follows.findFirst({
+                        where: { actor_uri: localActorUri, target_uri: actor_id }
+                    }))?.id || -1n
+                },
+                update: { status: 'pending' },
+                create: {
+                    actor_uri: localActorUri,
+                    target_uri: actor_id,
+                    status: 'pending'
+                }
+            });
+            res.json({ success: true, message: 'Follow request sent' });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver follow request to remote server' });
+        }
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }

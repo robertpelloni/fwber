@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.2.4] - 2026-06-10
+
+### Added
+- **Federated Mentions**: Automatic detection of @mentions in remote activities with real-time in-app notifications.
+- **Following Feed**: Users can now filter the Global Feed to see posts only from actors they explicitly follow.
+- **Outbox Sanitization**: Applied XSS protection to the public outbox view.
+
+## [2.2.3] - 2026-06-10
+
+### Added
+- **Outbound Follow Flow**: Completed the ActivityPub follow handshake by sending signed Follow activities to remote servers.
+- **Federated Unfollow**: Implemented support for unfollowing remote actors via ActivityPub Undo activities.
+- **Unfollow UI**: Integrated unfollow buttons in the federation settings and actor explorer.
+
 ## [2.2.2] - 2026-06-10
 
 ### Added

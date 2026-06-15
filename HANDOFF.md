@@ -1,30 +1,35 @@
-# Session Handoff - v2.2.0 (Social Velocity & Federation)
+# Session Handoff - v2.2.3 (Social Velocity & Federation)
 
 ## Overview
-Initiated Phase 9: Social Velocity & Federation. This release completes the core ActivityPub interoperability layer by implementing real-time WebFinger discovery and enhancing the inbound activity processing engine.
+Completed the foundational interactive layer of Phase 9: Social Velocity & Federation. This release transitions the platform from a read-only fediverse observer to a full participant capable of secure, bi-directional interaction (Follows, Likes, Boosts, Replies) with external servers.
 
 ## Key Changes
-- **WebFinger Discovery**: Implemented `resolveWebFinger` in `FederationService.ts` to resolve remote handles (e.g. @user@mastodon.social) to actor URIs. Added SSRF protection for all outbound federation requests.
-- **Improved ActivityPub Inbound**: Added `handleCreate` to `FederationService.ts` to process incoming remote activities. Enhanced `broadcastUpdate` to support variable activity types (Like, Boost, Create).
-- **Federated Search**: Updated the search API in `federation.ts` to perform live remote lookups via WebFinger, with fallback to local user search.
-- **Search UI Refinement**: Added loading states and better input validation to the Federation Search interface.
-- **Activity Center UI**: Enhanced the unified activity feed with semantic color-coding for different interaction types (Post, Like, Boost, Follower).
+- **WebFinger & Discovery**: Implemented real-time resolution of `@user@domain` handles to ActivityPub actor URIs. Federated search now performs live remote lookups.
+- **Security Hardening**:
+    - **SSRF Protection**: Added `lib/ssrf.ts` using DNS resolution to block outbound requests to private/loopback IP ranges.
+    - **XSS Sanitization**: Integrated `DOMPurify` to sanitize all remote federated content before rendering.
+- **ActivityPub Interactions**:
+    - **Follow/Unfollow**: Full signed handshake for following and unfollowing remote actors.
+    - **Likes & Boosts**: Enabled outbound Like and Announce (Boost) activities targeting remote object URIs.
+    - **Federated Replies**: Support for sending signed replies (Create Note with inReplyTo) to remote posts.
+- **Rich Profiles**: The local actor endpoint now exposes real user profile data (display names, bios, avatars) to the Fediverse.
+- **UI/UX Refinement**: Wired all interactions (Like, Boost, Reply, Follow, Unfollow) into the Global Feed and Actor Explorer with interactive feedback and sanitized previews.
 
 ## Documentation Sync
-- **VERSION**: Updated to 2.2.0
-- **CHANGELOG.md**: Documented WebFinger discovery, enhanced ActivityPub inbound, and UI improvements.
-- **PROJECT_STATUS.md**: Marked Phase 9 as UNDERWAY.
-- **ROADMAP.md**: Added Phase 9 goals and progress.
-- **TODO.md**: Updated with recently completed federation items.
+- **VERSION**: Updated to 2.2.3
+- **CHANGELOG.md**: Documented all Phase 9 additions including WebFinger, security, and interactions.
+- **PROJECT_STATUS.md**: Marked Phase 9 progress as significant.
+- **ROADMAP.md**: Synchronized goals with v2.2.3 state.
+- **TODO.md**: Marked core federation interactive items as completed.
 
 ## Deployment Notes
-- **Security**: SSRF protection is active for all federated lookups.
-- **Environment**: Backend dev server should be run with `npx tsc && node dist/index.js` to ensure module resolution.
+- **Security**: SSRF and XSS protection layers are active.
+- **Environment**: Ensure `API_DOMAIN` is set to the public API host (e.g. `api.fwber.me`) for correct URI construction.
 
 ## Next Steps
-- **End-to-End Interop**: Perform live federation handshakes with external nodes (Mastodon/Pleroma).
-- **Email Delivery**: Finalize production Resend DNS configuration.
-- **Payments**: Configure live Stripe keys and verify webhook handling.
+- **Email Delivery**: Production Resend DNS configuration.
+- **Payments**: Stripe live key configuration.
+- **End-to-End Interop**: Live verification with production Mastodon/Pleroma nodes.
 
 # Session Handoff - v2.1.9 (Intelligent Match Refinement)
 

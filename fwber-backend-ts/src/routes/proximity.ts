@@ -56,8 +56,9 @@ router.post('/artifacts', authenticate, async (req: any, res) => {
     // Federation: Broadcast if enabled
     const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
     if (profile?.is_federated) {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
         federationService.broadcastUpdate(userId, {
-            id: `https://api.fwber.me/api/proximity/artifacts/${a.id}`,
+            id: `https://${apiDomain}/api/proximity/artifacts/${a.id}`,
             type: 'Note',
             content: content,
             published: a.created_at?.toISOString()

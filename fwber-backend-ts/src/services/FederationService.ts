@@ -152,9 +152,19 @@ export class FederationService {
     // This service method is for logic-level processing (e.g. notifications on mentions).
     if (object.type === 'Note') {
         const content = object.content || '';
-        if (content.includes(`@${targetUserId}`)) {
-            // Placeholder for mention notification logic
-            console.log(`[Federation] User ${targetUserId} was mentioned by ${actorUri}`);
+        const user = await prisma.users.findUnique({ where: { id: targetUserId } });
+        const mentionTag = `@${user?.name}`;
+
+        if (content.includes(mentionTag)) {
+            try {
+                const actorRes = await axios.get(actorUri, { headers: { Accept: 'application/activity+json' }, timeout: 5000 });
+                const actorName = actorRes.data.preferredUsername || 'Someone';
+                const actorDomain = new URL(actorUri).hostname;
+
+                await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content);
+            } catch (err) {
+                await ActivityNotificationService.notifyMention(targetUserId, 'Someone', 'remote', content);
+            }
         }
     }
   }

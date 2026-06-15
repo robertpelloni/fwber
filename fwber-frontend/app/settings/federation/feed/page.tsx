@@ -69,6 +69,7 @@ export default function GlobalFeedPage() {
   const [replyPost, setReplyPost] = useState<FederatedPost | null>(null)
   const [replyContent, setReplyContent] = useState('')
   const [isReplying, setIsReplying] = useState(false)
+  const [feedMode, setFeedMode] = useState<'global' | 'following'>('global')
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -78,8 +79,12 @@ export default function GlobalFeedPage() {
       }
 
       try {
-        const response = await getFederatedPosts()
-        setPosts(response)
+        setIsLoading(true)
+        const endpoint = feedMode === 'following' ? '/federation/feed/following' : '/federation/posts'
+        const response = await api.get<{ posts: FederatedPost[] }>(endpoint, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        setPosts(Array.isArray(response.posts) ? response.posts : [])
       } catch (error) {
         console.error('Failed to fetch federated posts:', error)
         setPosts([])
@@ -89,7 +94,7 @@ export default function GlobalFeedPage() {
     }
 
     fetchPosts()
-  }, [token])
+  }, [token, feedMode])
 
   return (
     <ProtectedRoute>
@@ -112,7 +117,21 @@ export default function GlobalFeedPage() {
               </Badge>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg mr-4">
+                  <button
+                    onClick={() => setFeedMode('global')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${feedMode === 'global' ? 'bg-white dark:bg-zinc-700 shadow-sm text-blue-600' : 'text-zinc-500 hover:text-zinc-700'}`}
+                  >
+                      Global
+                  </button>
+                  <button
+                    onClick={() => setFeedMode('following')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${feedMode === 'following' ? 'bg-white dark:bg-zinc-700 shadow-sm text-blue-600' : 'text-zinc-500 hover:text-zinc-700'}`}
+                  >
+                      Following
+                  </button>
+              </div>
               <Button asChild variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
                 <Link href="/settings/federation">
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -136,10 +155,19 @@ export default function GlobalFeedPage() {
             <Card className="bg-white dark:bg-gray-800 border-dashed border-2">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <Users className="w-12 h-12 text-gray-300 mb-4" />
-                <CardTitle className="text-xl">Your feed is empty</CardTitle>
+                <CardTitle className="text-xl">
+                    {feedMode === 'following' ? 'No posts from people you follow' : 'Your feed is empty'}
+                </CardTitle>
                 <p className="text-gray-500 mt-2">
-                  Follow users from other servers to see their posts collected here.
+                  {feedMode === 'following'
+                    ? 'Start following federated actors to see their latest updates here.'
+                    : 'Follow users from other servers to see their posts collected here.'}
                 </p>
+                {feedMode === 'following' && (
+                    <Button variant="outline" className="mt-6" onClick={() => setFeedMode('global')}>
+                        Switch to Global Feed
+                    </Button>
+                )}
               </CardContent>
             </Card>
           ) : (

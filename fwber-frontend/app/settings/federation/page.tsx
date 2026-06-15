@@ -23,6 +23,7 @@ import {
     Globe,
     Search,
     UserPlus,
+    UserMinus,
     Shield,
     Info,
     ArrowLeft,
@@ -144,6 +145,26 @@ export default function FederationSettingsPage() {
                 variant: "destructive",
                 title: "Follow Failed",
                 description: "Could not send follow request to the remote server.",
+            });
+        }
+    };
+
+    const handleUnfollow = async (actorId: string) => {
+        if (!token) return;
+        try {
+            await api.post('/federation/unfollow', { actor_id: actorId }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            toast({
+                title: "Unfollowed",
+                description: "You have unfollowed this federated actor.",
+            });
+            fetchConnections();
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Unfollow Failed",
+                description: "Could not send unfollow request to the remote server.",
             });
         }
     };
@@ -365,16 +386,29 @@ export default function FederationSettingsPage() {
                                                                 Explore
                                                             </Link>
                                                         </Button>
-                                                        <Button 
-                                                            size="sm" 
-                                                            variant={isFollowing ? "secondary" : "outline"}
-                                                            className={isFollowing ? "" : "border-blue-200 text-blue-600 hover:bg-blue-50"}
-                                                            onClick={() => handleFollow(actor.id)}
-                                                            disabled={isFollowing || !isFederated}
-                                                        >
-                                                            {isFollowing ? <CheckCircle2 className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-                                                            {isFollowing ? 'Following' : 'Follow'}
-                                                        </Button>
+                                                        {isFollowing ? (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                className="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                                                                onClick={() => handleUnfollow(actor.id)}
+                                                                disabled={!isFederated}
+                                                            >
+                                                                <UserMinus className="w-4 h-4 mr-2" />
+                                                                Unfollow
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                                onClick={() => handleFollow(actor.id)}
+                                                                disabled={!isFederated}
+                                                            >
+                                                                <UserPlus className="w-4 h-4 mr-2" />
+                                                                Follow
+                                                            </Button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             );
@@ -409,7 +443,17 @@ export default function FederationSettingsPage() {
                                                 <p className="text-[10px] text-zinc-400 uppercase tracking-widest font-bold">Status: {f.status}</p>
                                             </div>
                                         </div>
-                                        <Badge variant="secondary">{f.status || 'pending'}</Badge>
+                                        <div className="flex items-center gap-2">
+                                            <Badge variant="secondary">{f.status || 'pending'}</Badge>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="h-8 w-8 p-0 text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                                                onClick={() => handleUnfollow(f.actor_uri)}
+                                            >
+                                                <UserMinus className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))
                             )}
