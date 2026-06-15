@@ -10,7 +10,7 @@ const federationService = new FederationService();
 
 // GET /api/federation/actors/:id — get actor detail (No auth required for federation)
 router.get('/actors/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = req.params.id;
 
   // Handle 'detail' or other non-numeric IDs gracefully
   if (isNaN(Number(id))) {
@@ -163,8 +163,11 @@ router.get('/admin/peers', async (req: AuthRequest, res: Response) => {
 router.post('/admin/peers/:id/toggle-block', async (req: AuthRequest, res: Response) => {
     if (!req.user?.is_moderator) return res.status(403).json({ error: 'Forbidden' });
 
+    const idStr = req.params.id;
+    if (!idStr) return res.status(400).json({ error: 'ID is required' });
+
     try {
-        const peer = await prisma.federated_servers.findUnique({ where: { id: BigInt(req.params.id) } });
+        const peer = await prisma.federated_servers.findUnique({ where: { id: BigInt(idStr as string) } });
         if (!peer) return res.status(404).json({ error: 'Peer not found' });
 
         const updated = await prisma.federated_servers.update({
@@ -187,10 +190,10 @@ router.get('/activity', authenticate, async (req: AuthRequest, res: Response) =>
         const inboxItems = await prisma.federation_inbox.findMany({
             where: {
                 OR: [
-                    { payload: { path: ['to'], array_contains: localActorUri } },
-                    { payload: { path: ['cc'], array_contains: localActorUri } },
-                    { payload: { path: ['object', 'attributedTo'], equals: localActorUri } },
-                    { payload: { path: ['object', 'inReplyTo'], equals: localActorUri } },
+                    { payload: { path: ['to'], array_contains: localActorUri as any } },
+                    { payload: { path: ['cc'], array_contains: localActorUri as any } },
+                    { payload: { path: ['object', 'attributedTo'], equals: localActorUri as any } },
+                    { payload: { path: ['object', 'inReplyTo'], equals: localActorUri as any } },
                     { payload: { path: ['to'], array_contains: 'https://www.w3.org/ns/activitystreams#Public' } }
                 ]
             },
@@ -291,8 +294,8 @@ router.get('/posts', authenticate, async (req: AuthRequest, res: Response) => {
                 type: 'Create',
                 OR: [
                     { payload: { path: ['to'], array_contains: 'https://www.w3.org/ns/activitystreams#Public' } },
-                    { payload: { path: ['to'], array_contains: localActorUri } },
-                    { payload: { path: ['cc'], array_contains: localActorUri } }
+                    { payload: { path: ['to'], array_contains: localActorUri as any } },
+                    { payload: { path: ['cc'], array_contains: localActorUri as any } }
                 ]
             },
             orderBy: { created_at: 'desc' },

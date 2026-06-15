@@ -174,9 +174,9 @@ export class FederationService {
                 const actorName = actorRes.data.preferredUsername || 'Someone';
                 const actorDomain = new URL(actorUri).hostname;
 
-                await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content);
+                await ActivityNotificationService.notifyMention(targetUserId, actorName, actorDomain, content as string);
             } catch (err) {
-                await ActivityNotificationService.notifyMention(targetUserId, 'Someone', 'remote', content);
+                await ActivityNotificationService.notifyMention(targetUserId, 'Someone', 'remote', content as string);
             }
         }
 
@@ -377,7 +377,8 @@ export class FederationService {
               });
               const inbox = actorRes.data.inbox;
               if (inbox) {
-                  await this.sendSignedRequest(inbox, acceptActivity, user.private_key, targetUri);
+                  const inboxAgent = await getHardenedFederationAgent(inbox);
+                  await this.sendSignedRequest(inbox, acceptActivity, user.private_key, targetUri, inboxAgent);
               }
           } catch (err: any) {}
       }
@@ -509,7 +510,8 @@ export class FederationService {
             const inbox = actorRes.data.inbox;
 
             if (inbox) {
-                await this.sendSignedRequest(inbox, activity, user.private_key, actorUri, agent);
+                const inboxAgent = await getHardenedFederationAgent(inbox);
+                await this.sendSignedRequest(inbox, activity, user.private_key, actorUri, inboxAgent);
                 successCount++;
             }
         } catch (err: any) {}

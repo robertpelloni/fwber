@@ -85,7 +85,7 @@ export async function getHardenedFederationAgent(urlStr: string) {
     // Use a custom agent that overrides lookup to return the pinned IP
     return new Agent({
         lookup: (host, opts, cb) => {
-            if (host === hostname) {
+            if (host === hostname && targetIp) {
                 // Pin the resolved IP
                 (cb as any)(null, targetIp, targetIp.includes(':') ? 6 : 4);
             } else {
@@ -108,8 +108,8 @@ function isPrivateIp(addr: ipaddr.IPv4 | ipaddr.IPv6): boolean {
 
     // Explicitly block 172.16.0.0/12 which some libraries might categorize differently
     if (addr.kind() === 'ipv4') {
-        const octets = addr.toByteArray();
-        if (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) {
+        const octets = (addr as any).toByteArray();
+        if (octets && octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) {
             return true;
         }
     }

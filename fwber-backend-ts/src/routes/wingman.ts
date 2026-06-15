@@ -301,7 +301,9 @@ router.get('/ice-breaker', async (req: any, res) => {
 
 router.get('/ice-breakers/:matchId', async (req: AuthRequest, res) => {
   try {
-    const matchId = BigInt(req.params.matchId);
+    const matchIdStr = req.params.matchId;
+    if (!matchIdStr) return res.status(400).json({ error: 'matchId is required' });
+    const matchId = BigInt(matchIdStr as string);
     const match = await prisma.matches.findUnique({ where: { id: matchId } });
     if (!match) return res.status(404).json({ error: 'Match not found' });
 
@@ -319,7 +321,9 @@ router.get('/ice-breakers/:matchId', async (req: AuthRequest, res) => {
 
 router.get('/replies/:matchId', async (req: AuthRequest, res) => {
   try {
-    const matchId = BigInt(req.params.matchId);
+    const matchIdStr = req.params.matchId;
+    if (!matchIdStr) return res.status(400).json({ error: 'matchId is required' });
+    const matchId = BigInt(matchIdStr as string);
     const match = await prisma.matches.findUnique({ where: { id: matchId } });
     if (!match) return res.status(404).json({ error: 'Match not found' });
 
