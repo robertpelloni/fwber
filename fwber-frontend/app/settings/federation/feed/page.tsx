@@ -10,6 +10,15 @@ import AppHeader from '@/components/AppHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog'
 import { Loader2, Globe, Users, MessageSquare, Repeat, Heart, ArrowLeft, Radio } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
@@ -57,6 +66,9 @@ export default function GlobalFeedPage() {
   const [posts, setPosts] = useState<FederatedPost[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [interacting, setInteracting] = useState<Record<string, boolean>>({})
+  const [replyPost, setReplyPost] = useState<FederatedPost | null>(null)
+  const [replyContent, setReplyContent] = useState('')
+  const [isReplying, setIsReplying] = useState(false)
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -171,13 +183,13 @@ export default function GlobalFeedPage() {
                     <CardContent>
                       <div
                         className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-100 dark:text-gray-200"
-                        dangerouslySetInnerHTML={{ __html: post.content }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
                       />
                       <div className="flex items-center gap-6 mt-6 pt-4 border-t dark:border-gray-700 text-gray-500">
                         <FederationAction
                           icon={MessageSquare}
                           label="Reply"
-                          disabled
+                          onClick={() => setReplyPost(post)}
                         />
                         <FederationAction
                           icon={Repeat}
@@ -226,6 +238,58 @@ export default function GlobalFeedPage() {
             </div>
           )}
         </main>
+
+        <Dialog open={Boolean(replyPost)} onOpenChange={(open) => { if (!open) setReplyPost(null); setReplyContent(''); }}>
+            <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>Reply to {replyPost?.metadata?.name || replyPost?.actor_username}</DialogTitle>
+                    <DialogDescription>
+                        Your reply will be signed and sent to the author&apos;s server.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    {replyPost && (
+                        <div className="rounded-lg bg-zinc-50 dark:bg-zinc-900 p-3 text-xs text-zinc-500 line-clamp-3 overflow-hidden">
+                             <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(replyPost.content) }} />
+                        </div>
+                    )}
+                    <Textarea
+                        placeholder="Write your reply..."
+                        value={replyContent}
+                        onChange={(e) => setReplyContent(e.target.value)}
+                        rows={4}
+                    />
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setReplyPost(null)}>Cancel</Button>
+                    <Button
+                        disabled={!replyContent.trim() || isReplying}
+                        onClick={async () => {
+                            if (!replyPost) return
+                            try {
+                                setIsReplying(true)
+                                const objectUri = replyPost.payload?.object?.id || replyPost.id
+                                await api.post(`/federation/posts/${encodeURIComponent(objectUri)}/reply`, {
+                                    content: replyContent,
+                                    actor_uri: replyPost.actor_uri
+                                }, { headers: { Authorization: `Bearer ${token}` } })
+
+                                toast({ title: "Reply sent", description: "Your federated reply has been delivered." })
+                                setReplyPost(null)
+                                setReplyContent('')
+                            } catch (err: any) {
+                                toast({ variant: "destructive", title: "Reply failed", description: err.message })
+                            } finally {
+                                setIsReplying(false)
+                            }
+                        }}
+                    >
+                        {isReplying ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <MessageSquare className="w-4 h-4 mr-2" />}
+                        Post Reply
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
       </div>
     </ProtectedRoute>
   )

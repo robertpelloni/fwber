@@ -20,6 +20,7 @@ router.get('/actors/:id', async (req, res) => {
   try {
     const user = await prisma.users.findUnique({
       where: { id: BigInt(id) },
+      include: { user_profiles: true }
     });
 
     if (!user) {
@@ -27,6 +28,7 @@ router.get('/actors/:id', async (req, res) => {
     }
 
     const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+    const profile = user.user_profiles?.[0];
 
     res.json({
       '@context': [
@@ -36,8 +38,13 @@ router.get('/actors/:id', async (req, res) => {
       id: `https://${apiDomain}/api/federation/actors/${user.id}`,
       type: 'Person',
       preferredUsername: user.name,
-      name: 'Fediverse Display Name',
-      summary: 'A test user for the fediverse',
+      name: profile?.display_name || user.name,
+      summary: profile?.bio || 'A user on the fwber network.',
+      icon: profile?.avatar_url ? {
+          type: 'Image',
+          mediaType: 'image/jpeg',
+          url: profile.avatar_url
+      } : null,
       inbox: `https://${apiDomain}/api/federation/users/${user.id}/inbox`,
       outbox: `https://${apiDomain}/api/federation/users/${user.id}/outbox`,
       publicKey: {
@@ -362,6 +369,54 @@ router.post('/posts/:id/like', authenticate, async (req: AuthRequest, res: Respo
             res.json({ success: true, message: 'Like sent to remote server' });
         } else {
             res.status(502).json({ error: 'Failed to deliver Like to remote server' });
+        }
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// POST /api/federation/posts/:id/reply - Reply to a federated post
+router.post('/posts/:id/reply', authenticate, async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { content, actor_uri } = req.body;
+
+    if (!content) return res.status(400).json({ error: 'content is required' });
+    if (!actor_uri) return res.status(400).json({ error: 'actor_uri is required' });
+
+    try {
+        const user = await prisma.users.findUnique({
+            where: { id: req.user!.id },
+            select: { private_key: true, name: true }
+        });
+
+        if (!user?.private_key) return res.status(400).json({ error: 'User has no signing keys' });
+
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        const localActorUri = `https://${apiDomain}/api/federation/actors/${req.user!.id}`;
+
+        const noteId = `https://${apiDomain}/api/federation/notes/reply-${Date.now()}`;
+        const replyActivity = {
+            '@context': 'https://www.w3.org/ns/activitystreams',
+            id: `https://${apiDomain}/api/federation/activities/reply-${Date.now()}`,
+            type: 'Create',
+            actor: localActorUri,
+            object: {
+                id: noteId,
+                type: 'Note',
+                inReplyTo: id,
+                content: content,
+                attributedTo: localActorUri,
+                to: ['https://www.w3.org/ns/activitystreams#Public'],
+                cc: [actor_uri]
+            }
+        };
+
+        const success = await federationService.sendActivityToActor(actor_uri, replyActivity, user.private_key, localActorUri);
+
+        if (success) {
+            res.json({ success: true, message: 'Reply sent to remote server', activity: replyActivity });
+        } else {
+            res.status(502).json({ error: 'Failed to deliver reply to remote server' });
         }
     } catch (err: any) {
         res.status(500).json({ error: err.message });

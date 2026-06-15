@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.2] - 2026-06-10
+
+### Added
+- **Federated Replies**: Support for sending signed replies to remote ActivityPub posts.
+- **Enhanced Actor Profiles**: The federation actor endpoint now exposes real profile data, including display names, bios, and avatars.
+
 ## [2.2.1] - 2026-06-10
 
 ### Added

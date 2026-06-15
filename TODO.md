@@ -10,7 +10,8 @@
 - [x] **ActivityPub Inbound**: Implement `handleCreate` to ingest remote posts.
 - [x] **Federated Search**: Update Search UI/API to perform live remote lookups.
 - [x] **Activity Center**: Polish unified feed for Likes, Boosts, and Posts.
-- [x] **Federated Interactions**: Wire Like/Boost buttons to ActivityPub outbound triggers.
+- [x] **Federated Interactions**: Wire Like/Boost/Reply buttons to ActivityPub outbound triggers.
+- [x] **Enhanced Actor Profiles**: Expose real profile data via the ActivityPub actor endpoint.
 
 ## 🟢 Recently Completed: Phase 8 - Intelligent Match Refinement (v2.1.9)
 - [x] **Narrative Compatibility**: AI subagent explains match reasons based on question data.
