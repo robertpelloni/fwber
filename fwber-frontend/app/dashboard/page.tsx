@@ -44,6 +44,7 @@ import ProfileCompletenessWidget from '@/components/ProfileCompletenessWidget'
 import AppHeader from '@/components/AppHeader'
 import { ActivityFeed } from '@/components/ActivityFeed'
 import { DailyStreakModal } from '@/components/gamification/DailyStreakModal'
+import QuestBoard from '@/components/quests/QuestBoard'
 
 interface DashboardStats {
   total_matches: number
@@ -166,8 +167,10 @@ export default function DashboardPage() {
 
             {/* ── Main Grid: Activity + Sidebar ── */}
             <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* Left: Activity Feed */}
-              <div className="space-y-6 lg:col-span-2">
+              {/* Left: Quests + Activity Feed */}
+              <div className="space-y-8 lg:col-span-2">
+                <QuestBoard />
+
                 <ActivityFeed maxItems={6} showRefresh />
 
                 {/* Quick Actions */}

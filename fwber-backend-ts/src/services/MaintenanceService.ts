@@ -58,7 +58,10 @@ export class MaintenanceService {
       // 4. Process Automated Vibe Nudges
       await this.processVibeNudges();
 
-      // 5. Log the maintenance task
+      // 5. Process Community Quests
+      await this.processCommunityQuests();
+
+      // 6. Log the maintenance task
       await AutonomousService.logAction('System Maintenance', 'Completed', {
         failureRate,
         actionCount: actions.length
@@ -138,6 +141,47 @@ export class MaintenanceService {
       }
     } catch (err: any) {
       console.error('[MaintenanceService] Vibe nudging failed:', err.message);
+    }
+  }
+
+  /**
+   * Autonomously generates quests based on neighborhood activity/vibe.
+   */
+  private static async processCommunityQuests() {
+    try {
+      const lat = 42.33;
+      const lng = -83.05;
+
+      const analysis = await SentimentAnalysisService.analyzeNeighborhoodSentiment(lat, lng);
+
+      // If vibe is Energetic or Vibrant, create a social quest
+      if (['energetic', 'vibrant'].includes(analysis.vibe.toLowerCase())) {
+          const questTitle = `High-Energy Social Surge: ${analysis.vibe}`;
+
+          // Check if quest already exists
+          const existing = await prisma.quests.findFirst({
+            where: { title: questTitle, is_active: true }
+          });
+
+          if (!existing) {
+              await prisma.quests.create({
+                data: {
+                  title: questTitle,
+                  description: `The neighborhood is feeling ${analysis.vibe}! High-five 3 new people in the area to boost the collective mood.`,
+                  type: 'vibe_action',
+                  target_vibe: analysis.vibe,
+                  target_location_lat: lat,
+                  target_location_lng: lng,
+                  token_reward: 100,
+                  expires_at: new Date(Date.now() + 4 * 60 * 60 * 1000) // 4 hours
+                }
+              });
+
+              await AutonomousService.logAction('Quest Generation', 'Completed', { title: questTitle, vibe: analysis.vibe });
+          }
+      }
+    } catch (err: any) {
+      console.error('[MaintenanceService] Quest generation failed:', err.message);
     }
   }
 

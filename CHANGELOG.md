@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.5] - 2026-06-16
+
+### Added
+- **Community Quests**: Implemented autonomous location-based challenge generation triggered by high neighborhood energy vibes (e.g. 'Energetic', 'Vibrant').
+- **Quest Discovery UI**: New dashboard component for discovering, joining, and tracking progress of community quests.
+- **Quest Progress API**: Backend infrastructure for quest lifecycle management and reward distribution.
+
+### Changed
+- **Maintenance Heartbeat**: Added `processCommunityQuests` to the periodic system maintenance cycle.
+- **Prisma Schema**: Introduced `quests` and `user_quests` models to support gamified location interactions.
+
 ## [2.3.4] - 2026-06-16
 
 ### Added
