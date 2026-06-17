@@ -46,7 +46,10 @@ export interface ProximityArtifact {
 
 export interface MatchCandidate {
   user_id: number;
-  age: number;
+  name?: string;
+  avatar?: string | null;
+  emotion?: string;
+  age: number | null;
   gender: string;
   distance_miles: number;
   compatibility_indicators: string[];

@@ -347,15 +347,23 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
-        <div>
-          <div className="flex items-center space-x-2 mb-1">
-            <span className="text-lg font-semibold">{candidate.age}</span>
-            <span className="text-gray-500">•</span>
-            <span className="text-sm text-gray-600 capitalize">{candidate.gender}</span>
-          </div>
-          <div className="flex items-center space-x-1 text-sm text-gray-500">
-            <MapPin className="h-3 w-3" />
-            <span>{candidate.distance_miles.toFixed(1)} miles away</span>
+        <div className="flex items-center gap-3">
+          <EvolvingAvatar
+            src={candidate.avatar || "/placeholder-avatar.png"}
+            alt={candidate.name || "Candidate"}
+            size="md"
+            emotion={(candidate.emotion as any) || "neutral"}
+          />
+          <div>
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="text-lg font-semibold">{candidate.age}</span>
+              <span className="text-gray-500">•</span>
+              <span className="text-sm text-gray-600 capitalize">{candidate.gender}</span>
+            </div>
+            <div className="flex items-center space-x-1 text-sm text-gray-500">
+              <MapPin className="h-3 w-3" />
+              <span>{candidate.distance_miles.toFixed(1)} miles away</span>
+            </div>
           </div>
         </div>
         <div className="flex gap-2">

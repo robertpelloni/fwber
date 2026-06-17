@@ -2,9 +2,12 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { SentimentAnalysisService } from '../services/SentimentAnalysisService.js';
+import { TokenDistributionService } from '../services/TokenDistributionService.js';
+import { ActivityNotificationService } from '../services/ActivityNotificationService.js';
 
 const router = Router();
 router.use(authenticate);
+const tokenService = new TokenDistributionService();
 
 // GET /api/merchant/pulse/vibe — get neighborhood vibe based on recent artifacts
 router.get('/pulse/vibe', async (req: any, res) => {
@@ -38,20 +41,86 @@ router.get('/pulse/vibe', async (req: any, res) => {
     else if (questions > 1) { heuristicVibe = 'curious'; score = 0.55; }
 
     // AI-driven neighborhood sentiment
-    const aiVibe = await SentimentAnalysisService.analyzeNeighborhoodSentiment(lat, lng);
+    const aiAnalysis = await SentimentAnalysisService.analyzeNeighborhoodSentiment(lat, lng);
 
     res.json({
-      vibe: aiVibe !== 'Neutral' ? aiVibe : heuristicVibe,
-      score,
-      confidence: Math.min(total / 10, 1),
-      message: `${total} recent signals nearby. AI vibe: ${aiVibe}`,
-      artifact_count: total,
+      business_name: 'Merchant', // Placeholder
+      location: { lat, lng, radius: 5000 },
+      analysis: {
+        vibe: aiAnalysis.vibe !== 'Neutral' ? aiAnalysis.vibe : heuristicVibe,
+        sentiment: aiAnalysis.sentiment || 0.5,
+        trending_keywords: aiAnalysis.keywords || [],
+        activity_score: total,
+        summary: aiAnalysis.summary || `Heuristic detection: ${heuristicVibe}`,
+        post_count: total,
+        last_updated: new Date().toISOString()
+      },
       heuristic_vibe: heuristicVibe,
-      ai_vibe: aiVibe,
-      breakdown: { shouts, questions, events, recommendations: recs }
+      ai_raw: aiAnalysis
     });
   } catch (err: any) {
     res.json({ vibe: 'neutral', score: 0.5, confidence: 0, message: 'Vibe analysis not yet available' });
+  }
+});
+
+// POST /api/merchant/pulse/broadcast — Broadcast a notification to nearby users based on vibe
+router.post('/pulse/broadcast', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+    const { content, vibe_target, discount_code, lat, lng } = req.body;
+    const broadcastCost = 50;
+
+    // 1. Check & Spend Tokens
+    try {
+      await tokenService.spendTokens(userId, broadcastCost, 'Vibe Pulse Broadcast');
+    } catch (e: any) {
+      return res.status(403).json({ error: e.message });
+    }
+
+    // 2. Vibe Check (if targeted)
+    const currentLat = lat || 42.33;
+    const currentLng = lng || -83.05;
+    const aiAnalysis = await SentimentAnalysisService.analyzeNeighborhoodSentiment(currentLat, currentLng);
+
+    if (vibe_target && vibe_target !== 'any' && aiAnalysis.vibe.toLowerCase() !== vibe_target.toLowerCase()) {
+      return res.json({
+        status: 'skipped',
+        message: `Vibe mismatch. Target: ${vibe_target}, Current: ${aiAnalysis.vibe}`,
+        current_vibe: aiAnalysis.vibe,
+        token_cost: broadcastCost
+      });
+    }
+
+    // 3. Identify nearby users (within ~1 mile / 1.6km)
+    const nearbyUsers = await prisma.user_locations.findMany({
+      where: {
+        latitude: { gte: currentLat - 0.015, lte: currentLat + 0.015 },
+        longitude: { gte: currentLng - 0.015, lte: currentLng + 0.015 },
+        updated_at: { gte: new Date(Date.now() - 60 * 60 * 1000) } // Active in last hour
+      },
+      select: { user_id: true }
+    });
+
+    // 4. Send Notifications
+    const notificationPromises = nearbyUsers.map(u =>
+      ActivityNotificationService.notify(
+        u.user_id,
+        'Local Flash Deal',
+        content,
+        { type: 'merchant_broadcast', discount_code, vibe: aiAnalysis.vibe }
+      )
+    );
+    await Promise.all(notificationPromises);
+
+    res.json({
+      status: 'success',
+      recipient_count: nearbyUsers.length,
+      current_vibe: aiAnalysis.vibe,
+      token_cost: broadcastCost
+    });
+  } catch (err: any) {
+    console.error('[Merchant] Broadcast error:', err.message);
+    res.status(500).json({ error: 'Failed to transmit broadcast' });
   }
 });
 

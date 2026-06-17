@@ -73,18 +73,29 @@ export class SentimentAnalysisService {
         take: 20
       });
 
-      if (artifacts.length === 0) return 'Neutral';
+      if (artifacts.length === 0) return { vibe: 'Neutral', sentiment: 0.5, keywords: [], summary: 'No recent activity' };
 
       const content = artifacts.map(a => a.content).join('\n');
       const systemPrompt = `
         Analyze the collective mood of this neighborhood based on these local posts.
-        Respond with a single vibe word (e.g. Energetic, Chill, Gloomy, Tense, Vibrant).
+        Return a JSON object with:
+        - vibe: a single vibe word (Energetic, Chill, Gloomy, Tense, Vibrant)
+        - sentiment: a float from 0.0 (negative) to 1.0 (positive)
+        - keywords: an array of 3 trending keywords/topics
+        - summary: a short 1-sentence description of the neighborhood mood
       `;
 
-      const vibe = await generateText(systemPrompt, content, 0.6);
-      return (vibe || 'Neutral').split('\n')[0]?.trim() || 'Neutral';
+      const aiResponse = await generateText(systemPrompt, content, 0.6);
+      try {
+        const jsonMatch = aiResponse.match(/{[\s\S]*}/);
+        if (jsonMatch) {
+            return JSON.parse(jsonMatch[0]);
+        }
+      } catch (e) {}
+
+      return { vibe: (aiResponse || 'Neutral').split('\n')[0]?.trim() || 'Neutral', sentiment: 0.5, keywords: [], summary: 'Mood analyzed via baseline' };
     } catch (err: any) {
-      return 'Neutral';
+      return { vibe: 'Neutral', sentiment: 0.5, keywords: [], summary: 'Analysis service unavailable' };
     }
   }
 }

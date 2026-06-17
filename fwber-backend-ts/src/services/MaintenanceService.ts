@@ -1,5 +1,6 @@
 import prisma from '../lib/prisma.js';
 import { AutonomousService } from './AutonomousService.js';
+import { SentimentAnalysisService } from './SentimentAnalysisService.js';
 
 export class MaintenanceService {
   /**
@@ -49,7 +50,10 @@ export class MaintenanceService {
         }
       }
 
-      // 3. Log the maintenance task
+      // 3. Refresh sentiment for active users
+      await this.refreshActiveUserSentiment();
+
+      // 4. Log the maintenance task
       await AutonomousService.logAction('System Maintenance', 'Completed', {
         failureRate,
         actionCount: actions.length
@@ -58,6 +62,41 @@ export class MaintenanceService {
     } catch (err: any) {
       console.error('[MaintenanceService] Maintenance failed:', err.message);
       await AutonomousService.logAction('System Maintenance', 'Failed', { error: err.message });
+    }
+  }
+
+  /**
+   * Identifies active users who need a sentiment refresh and triggers analysis.
+   */
+  private static async refreshActiveUserSentiment() {
+    try {
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000);
+
+      // Find users seen in the last 24h whose emotion hasn't been updated in 4h
+      const usersToRefresh = await prisma.users.findMany({
+        where: {
+          last_seen_at: { gte: oneDayAgo },
+          user_profiles: {
+            some: {
+              OR: [
+                { emotion_updated_at: { lt: fourHoursAgo } },
+                { emotion_updated_at: null }
+              ]
+            }
+          }
+        },
+        select: { id: true },
+        take: 5 // Limit batch size to prevent hitting AI rate limits
+      });
+
+      console.log(`[MaintenanceService] Refreshing sentiment for ${usersToRefresh.length} users.`);
+
+      for (const user of usersToRefresh) {
+        await SentimentAnalysisService.analyzeUserSentiment(user.id);
+      }
+    } catch (err: any) {
+      console.error('[MaintenanceService] Sentiment refresh failed:', err.message);
     }
   }
 }

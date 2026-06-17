@@ -45,9 +45,13 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.1)
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.2)
 - [ ] **Vibe Dashboard**: Frontend UI for merchants to see real-time AI vibe analysis.
 - [ ] **Automated Nudges**: AI-triggered push notifications for high-affinity vibe matches.
+
+## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.2)
+- [x] **Aura Discovery**: Displayed user emotions in conversation list and proximity cards.
+- [x] **Auto-Refresh**: Background sentiment updates for active users via heartbeat.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.1)
 - [x] **Threaded Comments**: Backend & Frontend support for nested replies in Local Pulse.

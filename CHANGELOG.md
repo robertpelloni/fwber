@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.2] - 2026-06-16
+
+### Added
+- **Aura Discovery**: Surface user emotional states ("Auras") across the social graph, including the conversation list and nearby match candidates.
+- **Autonomous Sentiment Refresh**: Integrated a background task into the system heartbeat that periodically refreshes the emotional state of active users.
+- **Live Match Indicators**: Enhanced proximity candidate cards with real-time emotional status.
+
+### Changed
+- **Messaging API**: Updated `conversations` endpoint to return `current_emotion` for match partners.
+- **Proximity API**: Updated `local-pulse` to return nearby match candidates with their live emotional states.
+
 ## [2.3.1] - 2026-06-16
 
 ### Added

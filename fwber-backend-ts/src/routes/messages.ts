@@ -97,10 +97,10 @@ router.get('/conversations', async (req: any, res) => {
       },
       include: {
         users_matches_user1_idTousers: {
-          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true }, take: 1 } },
         },
         users_matches_user2_idTousers: {
-          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true }, take: 1 } },
         },
       },
       take: 50,
@@ -153,7 +153,7 @@ router.get('/conversations', async (req: any, res) => {
           profile: {
             display_name: profile?.display_name || otherUser?.name || 'Unknown',
             age: null,
-            current_emotion: null,
+            current_emotion: (profile?.current_emotion || 'neutral').toLowerCase(),
             photos: profile?.avatar_url ? [{ "id": 0, "url": profile.avatar_url, "is_private": false, "is_primary": true }] : [],
           },
         },

@@ -8,15 +8,22 @@ const router = Router();
 const federationService = new FederationService();
 
 function safeProfile(u: any) {
-  if (!u) return { name: 'Anonymous', avatar: null };
+  if (!u) return { name: 'Anonymous', avatar: null, emotion: 'neutral' };
   const p = Array.isArray(u.user_profiles) ? u.user_profiles[0] : u.user_profiles;
-  return { name: p?.display_name || u.name || 'Anonymous', avatar: p?.avatar_url || null };
+  return {
+    name: p?.display_name || u.name || 'Anonymous',
+    avatar: p?.avatar_url || null,
+    emotion: (p?.current_emotion || 'neutral').toLowerCase()
+  };
 }
 
 // GET /api/proximity/local-pulse
 router.get('/local-pulse', authenticate, async (req: any, res) => {
   try {
+    const userId = BigInt(req.user.id);
     const radius = Number(req.query.radius) || 5000;
+    const lat = Number(req.query.lat) || 42.33;
+    const lng = Number(req.query.lng) || -83.05;
     const topicSlug = req.query.topic_slug as string;
 
     const where: any = {
@@ -31,20 +38,68 @@ router.get('/local-pulse', authenticate, async (req: any, res) => {
       };
     }
 
-    const artifacts = await prisma.proximity_artifacts.findMany({
-      where,
-      orderBy: { created_at: 'desc' as const }, take: 30,
-      include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true } } } } }
+    const [artifacts, nearbyLocations] = await Promise.all([
+      prisma.proximity_artifacts.findMany({
+        where,
+        orderBy: { created_at: 'desc' as const }, take: 30,
+        include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true } } } } }
+      }),
+      prisma.user_locations.findMany({
+        where: {
+          user_id: { not: userId },
+          latitude: { gte: lat - 0.05, lte: lat + 0.05 },
+          longitude: { gte: lng - 0.05, lte: lng + 0.05 },
+          updated_at: { gte: new Date(Date.now() - 60 * 60 * 1000) } // Active in last hour
+        },
+        include: {
+          users: {
+            include: {
+              user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true, date_of_birth: true, gender: true } }
+            }
+          }
+        },
+        take: 10
+      })
+    ]);
+
+    const candidates = nearbyLocations.map(loc => {
+      const u = loc.users;
+      const p = u.user_profiles?.[0];
+      const age = p?.date_of_birth ? new Date().getFullYear() - new Date(p.date_of_birth).getFullYear() : null;
+
+      return {
+        user_id: Number(u.id),
+        name: p?.display_name || u.name,
+        avatar: p?.avatar_url,
+        emotion: (p?.current_emotion || 'neutral').toLowerCase(),
+        age,
+        gender: p?.gender,
+        distance_miles: 0.5, // Simplified
+        compatibility_indicators: ['active_locally'],
+        last_seen: loc.updated_at?.toISOString()
+      };
     });
+
     res.json({
       artifacts: artifacts.map((a: any) => {
         const p = safeProfile(a.users);
-        return { id: Number(a.id), type: a.type, content: a.content, lat: Number(a.location_lat), lng: Number(a.location_lng), radius_m: Number(a.visibility_radius_m), author_name: p.name, author_avatar: p.avatar, created_at: a.created_at?.toISOString(), expires_at: a.expires_at?.toISOString() };
+        return { id: Number(a.id), type: a.type, content: a.content, lat: Number(a.location_lat), lng: Number(a.location_lng), radius_m: Number(a.visibility_radius_m), author_name: p.name, author_avatar: p.avatar, author_emotion: p.emotion, created_at: a.created_at?.toISOString(), expires_at: a.expires_at?.toISOString() };
       }),
-      candidates: [], profiles: [], venues: [], total: artifacts.length, radius,
-      meta: { artifacts_count: artifacts.length, candidates_count: 0, venues_count: 0, radius, ranking_strategy: 'freshness' }
+      candidates,
+      total: artifacts.length,
+      radius,
+      meta: {
+        artifacts_count: artifacts.length,
+        candidates_count: candidates.length,
+        venues_count: 0,
+        radius,
+        ranking_strategy: 'freshness'
+      }
     });
-  } catch (err: any) { console.error('[proximity] error:', err.message); res.json({ artifacts: [], candidates: [], profiles: [], venues: [], total: 0, radius: 1000, meta: {} }); }
+  } catch (err: any) {
+    console.error('[proximity] error:', err.message);
+    res.json({ artifacts: [], candidates: [], total: 0, radius: 1000, meta: {} });
+  }
 });
 
 // GET /api/proximity/feed
@@ -53,9 +108,9 @@ router.get('/feed', authenticate, async (_req: any, res) => {
     const artifacts = await prisma.proximity_artifacts.findMany({
       where: { moderation_status: 'clean', expires_at: { gt: new Date() } },
       orderBy: { created_at: 'desc' as const }, take: 30,
-      include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true } } } } }
+      include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true } } } } }
     });
-    res.json({ artifacts: artifacts.map((a: any) => { const p = safeProfile(a.users); return { id: Number(a.id), type: a.type, content: a.content, author_name: p.name, author_avatar: p.avatar, created_at: a.created_at?.toISOString() }; }) });
+    res.json({ artifacts: artifacts.map((a: any) => { const p = safeProfile(a.users); return { id: Number(a.id), type: a.type, content: a.content, author_name: p.name, author_avatar: p.avatar, author_emotion: p.emotion, created_at: a.created_at?.toISOString() }; }) });
   } catch { res.json({ artifacts: [] }); }
 });
 
@@ -109,10 +164,10 @@ router.post('/artifacts', authenticate, async (req: any, res) => {
 // GET /api/proximity/artifacts/:id
 router.get('/artifacts/:id', authenticate, async (req: any, res) => {
   try {
-    const a = await prisma.proximity_artifacts.findUnique({ where: { id: BigInt(req.params.id) }, include: { users: { select: { name: true, user_profiles: { select: { display_name: true, avatar_url: true } } } } } });
+    const a = await prisma.proximity_artifacts.findUnique({ where: { id: BigInt(req.params.id) }, include: { users: { select: { name: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true } } } } } });
     if (!a) return res.json({ artifact: null });
     const p = safeProfile(a.users);
-    res.json({ artifact: { id: Number(a.id), type: a.type, content: a.content, author_name: p.name, author_avatar: p.avatar, created_at: a.created_at?.toISOString() } });
+    res.json({ artifact: { id: Number(a.id), type: a.type, content: a.content, author_name: p.name, author_avatar: p.avatar, author_emotion: p.emotion, created_at: a.created_at?.toISOString() } });
   } catch { res.json({ artifact: null }); }
 });
 

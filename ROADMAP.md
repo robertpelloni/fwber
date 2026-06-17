@@ -7,12 +7,12 @@
 
 ## 🗺️ High-Level Trajectory
 
-### Phase 10: Dynamic Identity & Proximity Forum (IN PROGRESS - v2.3.1)
+### Phase 10: Dynamic Identity & Proximity Forum (IN PROGRESS - v2.3.2)
 The next evolution focuses on making user identity alive and evolving the local pulse into a functional community layer.
 
 **Key Goals:**
 - **Dynamic Emotional Identity**: AI Avatars that reflect the user's recent sentiment and activity ("Emotional Auras").
-- **Threaded Community Engagement**: Nested conversations in the local pulse to support deep neighborhood interaction.
+- **Aura Discovery**: Surfacing live emotional states across the social graph (Messages, Nearby, Pulse).
 - **AI-Driven Local Economy**: Merchants broadcasting vibe-matched promotions based on real-time neighborhood sentiment analysis.
 
 ### Phase 9: Social Velocity & Federation (COMPLETE - v2.2.9)

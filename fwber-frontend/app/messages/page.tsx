@@ -280,12 +280,12 @@ export default function MessagesPage() {
 										>
 											<div className="flex items-center space-x-3">
 												<div className="relative">
-													<div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-														{(conversation.other_user?.profile
-															?.display_name?.[0] || 
-														  conversation.other_user?.email?.[0] ||
-														  "?").toUpperCase()}
-													</div>
+													<EvolvingAvatar
+														src={conversation.other_user?.profile?.photos?.[0]?.url || "/placeholder-avatar.png"}
+														alt={conversation.other_user?.profile?.display_name || "User"}
+														size="md"
+														emotion={(conversation.other_user?.profile?.current_emotion as any) || "neutral"}
+													/>
 													<div className="absolute -bottom-0.5 -right-0.5">
 														<PresenceIndicator
 															userId={String(conversation.other_user?.id)}
