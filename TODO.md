@@ -45,12 +45,14 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.0)
-- [ ] **Sentiment Engine**: Service to analyze user emotion from posts/messages.
-- [ ] **Emotional Avatars**: Inject `current_emotion` into AI avatar generation prompts.
-- [ ] **Aura UI**: Display current user emotion/aura in profiles and chat.
-- [ ] **Pulse Topics**: Categorize proximity artifacts (News, Help, Meetups).
-- [ ] **Vibe Broadcasting**: Merchant promotions based on neighborhood sentiment.
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.1)
+- [ ] **Vibe Dashboard**: Frontend UI for merchants to see real-time AI vibe analysis.
+- [ ] **Automated Nudges**: AI-triggered push notifications for high-affinity vibe matches.
+
+## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.1)
+- [x] **Threaded Comments**: Backend & Frontend support for nested replies in Local Pulse.
+- [x] **AI Merchant Vibe**: Integrated SentimentAnalysisService into merchant APIs.
+- [x] **Promotion Affinity**: Logic to match offers with neighborhood sentiment.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.0)
 - [x] **Sentiment Engine**: Service to analyze user emotion from posts/messages.

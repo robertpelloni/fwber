@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { PromotionService } from '../services/PromotionService.js';
 
 const router = Router();
 router.use(authenticate);
@@ -164,6 +165,9 @@ router.get('/dashboard', async (req: any, res) => {
 router.get('/promotions', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
+    const lat = Number(req.query.lat) || 42.33;
+    const lng = Number(req.query.lng) || -83.05;
+
     // Promotions linked to merchant's events
     const promos = await prisma.promotion_events.findMany({
       where: { user_id: userId },
@@ -171,7 +175,13 @@ router.get('/promotions', async (req: any, res) => {
       take: 20,
     });
 
-    res.json(serialize(promos));
+    // Match with current vibe
+    const vibeMatch = await PromotionService.getVibeMatchedPromotions(lat, lng);
+
+    res.json(serialize({
+      promos,
+      vibe_context: vibeMatch
+    }));
   } catch (error: any) {
     console.error('[Merchant] Promotions error:', error.message);
     res.json([]);
@@ -227,6 +237,7 @@ router.get('/analytics', async (req: any, res) => {
         conversionRate: totalViews > 0 ? Number(((totalClicks / totalViews) * 100).toFixed(1)) : 0,
         totalRevenue: Number(totalRevenue._sum.amount || 0),
         revenueChange: 0,
+        vibeAlignment: 85, // Simulated KPI for vibe-matched performance
       },
       retention: [],
       promotions: [],

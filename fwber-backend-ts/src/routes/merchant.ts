@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { SentimentAnalysisService } from '../services/SentimentAnalysisService.js';
 
 const router = Router();
 router.use(authenticate);
@@ -29,18 +30,24 @@ router.get('/pulse/vibe', async (req: any, res) => {
     const events = recent.filter((a: any) => a.type === 'event').length;
     const recs = recent.filter((a: any) => a.type === 'recommendation').length;
 
-    let vibe = 'neutral';
+    let heuristicVibe = 'neutral';
     let score = 0.5;
-    if (events > 2) { vibe = 'hype'; score = 0.9; }
-    else if (shouts > 3) { vibe = 'social'; score = 0.75; }
-    else if (recs > 2) { vibe = 'chill'; score = 0.6; }
-    else if (questions > 1) { vibe = 'curious'; score = 0.55; }
+    if (events > 2) { heuristicVibe = 'hype'; score = 0.9; }
+    else if (shouts > 3) { heuristicVibe = 'social'; score = 0.75; }
+    else if (recs > 2) { heuristicVibe = 'chill'; score = 0.6; }
+    else if (questions > 1) { heuristicVibe = 'curious'; score = 0.55; }
+
+    // AI-driven neighborhood sentiment
+    const aiVibe = await SentimentAnalysisService.analyzeNeighborhoodSentiment(lat, lng);
 
     res.json({
-      vibe, score,
+      vibe: aiVibe !== 'Neutral' ? aiVibe : heuristicVibe,
+      score,
       confidence: Math.min(total / 10, 1),
-      message: `${total} recent signals nearby`,
+      message: `${total} recent signals nearby. AI vibe: ${aiVibe}`,
       artifact_count: total,
+      heuristic_vibe: heuristicVibe,
+      ai_vibe: aiVibe,
       breakdown: { shouts, questions, events, recommendations: recs }
     });
   } catch (err: any) {

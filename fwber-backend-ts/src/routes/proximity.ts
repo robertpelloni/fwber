@@ -151,16 +151,38 @@ router.delete('/artifacts/:id', authenticate, async (req: any, res) => {
 // POST /api/proximity/artifacts/:id/comments
 router.post('/artifacts/:id/comments', authenticate, async (req: any, res) => {
   try {
-    const c = await prisma.proximity_artifact_comments.create({ data: { proximity_artifact_id: BigInt(req.params.id), user_id: BigInt(req.user.id), content: req.body.content || '' } });
-    res.json({ message: 'Comment added', comment: { id: Number(c.id) } });
-  } catch { res.json({ message: 'Comment added', comment: null }); }
+    const { content, parent_id } = req.body;
+    const c = await prisma.proximity_artifact_comments.create({
+      data: {
+        proximity_artifact_id: BigInt(req.params.id),
+        user_id: BigInt(req.user.id),
+        content: content || '',
+        parent_id: parent_id ? BigInt(parent_id) : null
+      }
+    });
+    res.json({ message: 'Comment added', comment: { id: Number(c.id), parent_id: c.parent_id ? Number(c.parent_id) : null } });
+  } catch (err: any) {
+    console.error('[proximity] comment error:', err.message);
+    res.json({ message: 'Failed to add comment', comment: null });
+  }
 });
 
 // GET /api/proximity/artifacts/:id/comments
 router.get('/artifacts/:id/comments', authenticate, async (req: any, res) => {
   try {
-    const comments = await prisma.proximity_artifact_comments.findMany({ where: { proximity_artifact_id: BigInt(req.params.id) }, orderBy: { created_at: 'asc' as const }, take: 50 });
-    res.json({ data: comments.map((c: any) => ({ id: Number(c.id), content: c.content, created_at: c.created_at?.toISOString() })) });
+    const comments = await prisma.proximity_artifact_comments.findMany({
+      where: { proximity_artifact_id: BigInt(req.params.id) },
+      orderBy: { created_at: 'asc' as const },
+      take: 50
+    });
+    res.json({
+      data: comments.map((c: any) => ({
+        id: Number(c.id),
+        content: c.content,
+        parent_id: c.parent_id ? Number(c.parent_id) : null,
+        created_at: c.created_at?.toISOString()
+      }))
+    });
   } catch { res.json({ data: [] }); }
 });
 

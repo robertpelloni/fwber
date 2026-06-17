@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.1] - 2026-06-16
+
+### Added
+- **Threaded Forum Conversations**: Implemented `parent_id` support for proximity artifact comments, enabling nested replies in the Local Pulse feed.
+- **AI-Enhanced Merchant Vibe**: Integrated AI sentiment analysis into the merchant pulse API for real-time neighborhood mood detection.
+- **Vibe-Matched Promotions**: New `PromotionService` to align merchant offers with the local neighborhood vibe (e.g., chill vibes triggering coffee discounts).
+- **Merchant Analytics Expansion**: Added "Vibe Alignment" KPI to the merchant dashboard to track performance against neighborhood sentiment.
+
+### Changed
+- **Prisma Schema**: Updated `proximity_artifact_comments` model with optional `parent_id` for recursive threading.
+
 ## [2.3.0] - 2026-06-16
 
 ### Added

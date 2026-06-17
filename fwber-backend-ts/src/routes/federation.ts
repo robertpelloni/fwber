@@ -2,7 +2,7 @@ import { Router, type Response } from 'express';
 import { authenticate, type AuthRequest } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import axios from 'axios';
-import { validateFederationUrl } from '../lib/ssrf.js';
+import { validateFederationUrl, getHardenedFederationAgent } from '../lib/ssrf.js';
 import { FederationService } from '../services/FederationService.js';
 
 const router = Router();
@@ -566,10 +566,13 @@ router.get('/search', authenticate, async (req: AuthRequest, res: Response) => {
                     return res.status(400).json({ error: 'Invalid actor URI' });
                 }
 
-                // Fetch actor details
+                // Fetch actor details with pinned IP to prevent DNS rebinding
+                const hardenedAgent = await getHardenedFederationAgent(actorUri);
                 const actorRes = await axios.get(actorUri, {
                     headers: { Accept: 'application/activity+json' },
-                    timeout: 5000
+                    timeout: 5000,
+                    httpAgent: hardenedAgent,
+                    httpsAgent: hardenedAgent
                 });
 
                 const actor = actorRes.data;
