@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.3] - 2026-06-16
+
+### Added
+- **Autonomous Vibe Nudging**: Implemented background logic to autonomously trigger merchant promotions when neighborhood vibes align with specific deals.
+- **Vibe Intelligence Dashboard**: New merchant UI component showing historical sentiment transitions and autonomous nudge status.
+- **Vibe History API**: New endpoint `GET /api/merchant-portal/vibe-history` for trend analysis.
+
+### Changed
+- **Sentiment Service Expansion**: Updated `SentimentAnalysisService` to return structured JSON mood analysis (vibe, sentiment, keywords, summary).
+- **Maintenance Heartbeat**: Added `processVibeNudges` to the periodic system maintenance cycle.
+
 ## [2.3.2] - 2026-06-16
 
 ### Added

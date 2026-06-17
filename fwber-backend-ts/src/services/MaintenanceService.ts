@@ -1,6 +1,8 @@
 import prisma from '../lib/prisma.js';
 import { AutonomousService } from './AutonomousService.js';
 import { SentimentAnalysisService } from './SentimentAnalysisService.js';
+import { PromotionService } from './PromotionService.js';
+import { ActivityNotificationService } from './ActivityNotificationService.js';
 
 export class MaintenanceService {
   /**
@@ -53,7 +55,10 @@ export class MaintenanceService {
       // 3. Refresh sentiment for active users
       await this.refreshActiveUserSentiment();
 
-      // 4. Log the maintenance task
+      // 4. Process Automated Vibe Nudges
+      await this.processVibeNudges();
+
+      // 5. Log the maintenance task
       await AutonomousService.logAction('System Maintenance', 'Completed', {
         failureRate,
         actionCount: actions.length
@@ -62,6 +67,77 @@ export class MaintenanceService {
     } catch (err: any) {
       console.error('[MaintenanceService] Maintenance failed:', err.message);
       await AutonomousService.logAction('System Maintenance', 'Failed', { error: err.message });
+    }
+  }
+
+  /**
+   * Autonomously triggers merchant promotions when neighborhood vibes align.
+   */
+  private static async processVibeNudges() {
+    try {
+      // 1. Get all verified merchants with active promotions
+      const merchants = await prisma.merchant_profiles.findMany({
+        where: { verification_status: 'verified' },
+        include: { users: { select: { token_balance: true } } }
+      });
+
+      for (const merchant of merchants) {
+        // Skip if balance is too low for a nudge (e.g. 50 FWB)
+        if (Number(merchant.users.token_balance) < 50) continue;
+
+        // 2. Detect live vibe near merchant (if location exists)
+        if (!merchant.address) continue;
+        // In a real app we'd geocode or use lat/lng from profile.
+        // For now, assume a central hub location for the hub-city.
+        const lat = 42.33;
+        const lng = -83.05;
+
+        const analysis = await PromotionService.getVibeMatchedPromotions(lat, lng);
+
+        // 3. Check for high affinity matches
+        const highAffinity = analysis.matched_promotions.filter(p => p.vibe_affinity > 0.8);
+
+        if (highAffinity.length > 0) {
+          // Find nearby users who haven't been nudged in 12h
+          const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+          const nearby = await prisma.user_locations.findMany({
+            where: {
+              latitude: { gte: lat - 0.015, lte: lat + 0.015 },
+              longitude: { gte: lng - 0.015, lte: lng + 0.015 },
+              updated_at: { gte: new Date(Date.now() - 60 * 60 * 1000) } // Active recently
+            },
+            take: 20
+          });
+
+          for (const loc of nearby) {
+            // Check last nudge
+            const recentNudge = await prisma.notifications.findFirst({
+              where: {
+                user_id: loc.user_id,
+                type: 'merchant_broadcast',
+                created_at: { gte: twelveHoursAgo }
+              }
+            });
+
+            if (!recentNudge) {
+              await ActivityNotificationService.notify(
+                loc.user_id,
+                'Vibe Match Detected',
+                `The neighborhood is feeling ${analysis.current_vibe}. ${merchant.business_name} has a deal for you!`,
+                { type: 'merchant_broadcast', vibe: analysis.current_vibe, merchant_id: merchant.id.toString() }
+              );
+
+              await AutonomousService.logAction('Automated Vibe Nudge', 'Completed', {
+                userId: loc.user_id.toString(),
+                merchantId: merchant.id.toString(),
+                vibe: analysis.current_vibe
+              });
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('[MaintenanceService] Vibe nudging failed:', err.message);
     }
   }
 

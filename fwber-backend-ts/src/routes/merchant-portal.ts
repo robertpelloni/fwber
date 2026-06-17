@@ -161,6 +161,20 @@ router.get('/dashboard', async (req: any, res) => {
   }
 });
 
+// GET /api/merchant-portal/vibe-history
+router.get('/vibe-history', async (req: any, res) => {
+  try {
+    const lat = Number(req.query.lat) || 42.33;
+    const lng = Number(req.query.lng) || -83.05;
+    const days = Number(req.query.days) || 7;
+
+    const history = await PromotionService.getVibeHistory(lat, lng, days);
+    res.json(serialize(history));
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to fetch vibe history' });
+  }
+});
+
 // GET /api/merchant-portal/promotions
 router.get('/promotions', async (req: any, res) => {
   try {

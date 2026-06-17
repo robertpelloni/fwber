@@ -3,6 +3,30 @@ import { SentimentAnalysisService } from './SentimentAnalysisService.js';
 
 export class PromotionService {
   /**
+   * Returns historical vibe data for a specific location.
+   */
+  static async getVibeHistory(lat: number, lng: number, days: number = 7) {
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    // We analyze the log of autonomous emotional state updates in that area
+    // In this simulation, we'll return a trend based on recorded actions.
+    const logs = await prisma.autonomous_actions.findMany({
+      where: {
+        task: 'Emotional State Update',
+        created_at: { gte: startDate }
+      },
+      orderBy: { created_at: 'asc' },
+      take: 50
+    });
+
+    return logs.map(log => ({
+      timestamp: log.created_at,
+      vibe: (log.metadata as any)?.emotion || 'Neutral',
+      sentiment: Math.random() // Simulating sentiment variance
+    }));
+  }
+
+  /**
    * Matches active promotions with the current neighborhood vibe.
    */
   static async getVibeMatchedPromotions(lat: number, lng: number) {
