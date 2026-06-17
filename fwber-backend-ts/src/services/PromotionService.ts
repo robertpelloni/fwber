@@ -30,7 +30,8 @@ export class PromotionService {
    * Matches active promotions with the current neighborhood vibe.
    */
   static async getVibeMatchedPromotions(lat: number, lng: number) {
-    const vibe = await SentimentAnalysisService.analyzeNeighborhoodSentiment(lat, lng);
+    const analysis = await SentimentAnalysisService.analyzeNeighborhoodSentiment(lat, lng);
+    const { vibe, keywords } = analysis;
 
     // In a real scenario, we'd query a 'promotions' table with a 'target_vibe' field.
     // Since our schema uses 'promotion_events' as a log, we'll simulate affinity logic.
@@ -43,15 +44,30 @@ export class PromotionService {
 
     return {
       current_vibe: vibe,
+      current_keywords: keywords,
       matched_promotions: recentPromos.map(p => ({
         ...p,
-        vibe_affinity: this.calculateAffinity(vibe, (p.metadata as any)?.vibe)
+        vibe_affinity: this.calculateAffinity(vibe, keywords || [], (p.metadata as any)?.vibe, (p.metadata as any)?.keywords)
       }))
     };
   }
 
-  private static calculateAffinity(currentVibe: string, targetVibe?: string) {
-    if (!targetVibe) return 0.5;
-    return currentVibe.toLowerCase() === targetVibe.toLowerCase() ? 1.0 : 0.2;
+  private static calculateAffinity(currentVibe: string, currentKeywords: string[], targetVibe?: string, targetKeywords?: string[]) {
+    let score = 0.5;
+
+    // Vibe match
+    if (targetVibe) {
+        score = currentVibe.toLowerCase() === targetVibe.toLowerCase() ? 0.8 : 0.2;
+    }
+
+    // Keyword overlap boost
+    if (targetKeywords && currentKeywords.length > 0) {
+        const overlap = targetKeywords.filter(k => currentKeywords.some(ck => ck.toLowerCase() === k.toLowerCase()));
+        if (overlap.length > 0) {
+            score += (overlap.length * 0.1);
+        }
+    }
+
+    return Math.min(score, 1.0);
   }
 }

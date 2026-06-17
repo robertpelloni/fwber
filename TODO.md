@@ -45,9 +45,14 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.3)
-- [ ] **Merchant Personalization**: Allow merchants to specify exact vibe-keywords to target.
-- [ ] **Vibe ROI Analytics**: Track conversion rates specifically for autonomous nudges.
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.4)
+- [ ] **Community Quests**: Trigger location-based challenges when neighborhood vibes are high.
+- [ ] **Aura-Matched Chat**: Suggest chat partners based on current emotional compatibility.
+
+## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.4)
+- [x] **Keyword Targeting**: Added granular matching between offers and sentiment keywords.
+- [x] **Vibe ROI Tracking**: Metrics to measure conversion lift from autonomous nudges.
+- [x] **Broadcast Attribution**: Link redemptions back to AI-triggered broadcasts.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.3)
 - [x] **Autonomous Nudging**: Background task to trigger deals based on neighborhood mood.

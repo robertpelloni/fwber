@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.4] - 2026-06-16
+
+### Added
+- **Granular Vibe Targeting**: Enhanced `PromotionService` to support keyword-level matching between merchant offers and neighborhood sentiment trends.
+- **Vibe ROI Analytics**: Introduced new performance tracking metrics for autonomous nudges, including affinity precision and conversion lift.
+- **Attributed Redemptions**: Backend support for tracking offer redemptions back to specific autonomous AI broadcasts.
+
+### Changed
+- **Merchant API**: Updated `POST /promotions` to support `broadcast_id` attribution.
+- **Analytics UI**: New visual cards for "Vibe ROI Intelligence" and "Autonomous Reach" in the merchant portal.
+
 ## [2.3.3] - 2026-06-16
 
 ### Added

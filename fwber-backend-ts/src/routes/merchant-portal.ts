@@ -206,14 +206,19 @@ router.get('/promotions', async (req: any, res) => {
 router.post('/promotions', async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { promotion_id, type, metadata } = req.body;
+    const { promotion_id, type, metadata, broadcast_id } = req.body;
+
+    const finalMetadata = {
+        ...(metadata || {}),
+        ...(broadcast_id && { attributed_broadcast_id: broadcast_id })
+    };
 
     const promo = await prisma.promotion_events.create({
       data: {
         promotion_id: promotion_id ? BigInt(promotion_id) : BigInt(0),
         user_id: userId,
         type: type || 'view',
-        metadata: metadata || null,
+        metadata: finalMetadata,
       },
     });
 

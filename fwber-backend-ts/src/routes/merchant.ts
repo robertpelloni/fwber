@@ -102,12 +102,13 @@ router.post('/pulse/broadcast', async (req: any, res) => {
     });
 
     // 4. Send Notifications
+    const broadcastId = `broadcast_${Date.now()}`;
     const notificationPromises = nearbyUsers.map(u =>
       ActivityNotificationService.notify(
         u.user_id,
         'Local Flash Deal',
         content,
-        { type: 'merchant_broadcast', discount_code, vibe: aiAnalysis.vibe }
+        { type: 'merchant_broadcast', discount_code, vibe: aiAnalysis.vibe, broadcast_id: broadcastId }
       )
     );
     await Promise.all(notificationPromises);
