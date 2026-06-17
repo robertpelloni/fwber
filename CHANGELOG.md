@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.3.0] - 2026-06-16
+
+### Added
+- **Sentiment Engine**: New `SentimentAnalysisService` that analyzes user and neighborhood emotional states based on recent posts and messages.
+- **Dynamic Emotional Avatars**: Integrated `current_emotion` into AI avatar generation prompts for reactive identity evolution.
+- **Aura UI**: Expanded frontend `EvolvingAvatar` with new visual aura styles for Excited, Thoughtful, Cynical, and Melancholic states.
+- **Pulse Forum Topics**: Seeded new neighborhood-focused topics (Local News, Mutual Aid, Instant Meetups) to evolve the pulse feed into a community board.
+
+### Changed
+- **Proactive Intelligence**: Automated sentiment evaluation now triggers on message and proximity artifact creation.
+
 ## [2.2.9] - 2026-06-10
 
 ### Added

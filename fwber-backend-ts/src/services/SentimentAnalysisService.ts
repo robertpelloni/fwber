@@ -1,0 +1,90 @@
+import prisma from '../lib/prisma.js';
+import { generateText } from '../lib/wingman-ai.js';
+import { AutonomousService } from './AutonomousService.js';
+
+export class SentimentAnalysisService {
+  /**
+   * Analyzes recent activity for a user to determine their current emotional state.
+   */
+  static async analyzeUserSentiment(userId: bigint) {
+    try {
+      // 1. Fetch recent proximity artifacts and messages
+      const [artifacts, messagesSent] = await Promise.all([
+        prisma.proximity_artifacts.findMany({
+          where: { user_id: userId },
+          orderBy: { created_at: 'desc' },
+          take: 5
+        }),
+        prisma.messages.findMany({
+          where: { sender_id: userId },
+          orderBy: { sent_at: 'desc' },
+          take: 10
+        })
+      ]);
+
+      if (artifacts.length === 0 && messagesSent.length === 0) {
+        return 'Neutral';
+      }
+
+      const content = [
+        ...artifacts.map(a => `Post: ${a.content}`),
+        ...messagesSent.map(m => `Message: ${m.content}`)
+      ].join('\n');
+
+      const systemPrompt = `
+        You are an emotional intelligence engine for a social app.
+        Based on the user's recent posts and messages, identify their current dominant emotion.
+        Choose from: Happy, Excited, Thoughtful, Cynical, Mysterious, Melancholic, or Neutral.
+        Respond with ONLY the emotion word.
+      `;
+
+      const emotion = await generateText(systemPrompt, content, 0.7);
+      const cleanEmotion = (emotion || 'Neutral').split('\n')[0]?.trim() || 'Neutral';
+
+      // 2. Update user profile
+      await prisma.user_profiles.updateMany({
+        where: { user_id: userId },
+        data: {
+          current_emotion: cleanEmotion,
+          emotion_updated_at: new Date()
+        }
+      });
+
+      await AutonomousService.logAction('Emotional State Update', 'Completed', { userId: userId.toString(), emotion: cleanEmotion });
+
+      return cleanEmotion;
+    } catch (err: any) {
+      console.error('[SentimentService] Analysis failed:', err.message);
+      return 'Neutral';
+    }
+  }
+
+  /**
+   * Analyzes neighborhood sentiment based on aggregated proximity artifacts.
+   */
+  static async analyzeNeighborhoodSentiment(lat: number, lng: number, radiusM: number = 5000) {
+    try {
+      const artifacts = await prisma.proximity_artifacts.findMany({
+        where: {
+          location_lat: { gte: lat - 0.05, lte: lat + 0.05 },
+          location_lng: { gte: lng - 0.05, lte: lng + 0.05 },
+          created_at: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24h
+        },
+        take: 20
+      });
+
+      if (artifacts.length === 0) return 'Neutral';
+
+      const content = artifacts.map(a => a.content).join('\n');
+      const systemPrompt = `
+        Analyze the collective mood of this neighborhood based on these local posts.
+        Respond with a single vibe word (e.g. Energetic, Chill, Gloomy, Tense, Vibrant).
+      `;
+
+      const vibe = await generateText(systemPrompt, content, 0.6);
+      return (vibe || 'Neutral').split('\n')[0]?.trim() || 'Neutral';
+    } catch (err: any) {
+      return 'Neutral';
+    }
+  }
+}

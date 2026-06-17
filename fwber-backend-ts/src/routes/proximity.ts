@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { FederationService } from '../services/FederationService.js';
+import { SentimentAnalysisService } from '../services/SentimentAnalysisService.js';
 
 const router = Router();
 const federationService = new FederationService();
@@ -16,8 +17,22 @@ function safeProfile(u: any) {
 router.get('/local-pulse', authenticate, async (req: any, res) => {
   try {
     const radius = Number(req.query.radius) || 5000;
+    const topicSlug = req.query.topic_slug as string;
+
+    const where: any = {
+      moderation_status: 'clean',
+      expires_at: { gt: new Date() }
+    };
+
+    if (topicSlug) {
+      where.meta = {
+        path: ['topic_slug'],
+        equals: topicSlug
+      };
+    }
+
     const artifacts = await prisma.proximity_artifacts.findMany({
-      where: { moderation_status: 'clean', expires_at: { gt: new Date() } },
+      where,
       orderBy: { created_at: 'desc' as const }, take: 30,
       include: { users: { select: { id: true, name: true, user_profiles: { select: { display_name: true, avatar_url: true } } } } }
     });
@@ -48,10 +63,32 @@ router.get('/feed', authenticate, async (_req: any, res) => {
 router.post('/artifacts', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const { type, content, lat, lng, radius_m } = req.body;
+    const { type, content, lat, lng, radius_m, topic_slug, amount } = req.body;
     if (!type || !content) return res.status(400).json({ error: 'type and content required' });
     const expiresAt = new Date(); expiresAt.setHours(expiresAt.getHours() + 4);
-    const a = await prisma.proximity_artifacts.create({ data: { user_id: userId, type, content, location_lat: lat || 42.33, location_lng: lng || -83.05, visibility_radius_m: radius_m || 1000, moderation_status: 'clean', expires_at: expiresAt } });
+
+    const meta: any = {};
+    if (topic_slug) meta.topic_slug = topic_slug;
+    if (amount) meta.amount = amount;
+
+    const a = await prisma.proximity_artifacts.create({
+      data: {
+        user_id: userId,
+        type,
+        content,
+        location_lat: lat || 42.33,
+        location_lng: lng || -83.05,
+        visibility_radius_m: radius_m || 1000,
+        moderation_status: 'clean',
+        expires_at: expiresAt,
+        meta
+      }
+    });
+
+    // Sentiment Analysis
+    SentimentAnalysisService.analyzeUserSentiment(userId).catch(err => {
+      console.warn('[proximity] Sentiment analysis error:', err.message);
+    });
 
     // Federation: Broadcast if enabled
     const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });

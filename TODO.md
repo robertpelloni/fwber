@@ -45,7 +45,26 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Upcoming: Phase 9 - Social Velocity & Federation
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.0)
+- [ ] **Sentiment Engine**: Service to analyze user emotion from posts/messages.
+- [ ] **Emotional Avatars**: Inject `current_emotion` into AI avatar generation prompts.
+- [ ] **Aura UI**: Display current user emotion/aura in profiles and chat.
+- [ ] **Pulse Topics**: Categorize proximity artifacts (News, Help, Meetups).
+- [ ] **Vibe Broadcasting**: Merchant promotions based on neighborhood sentiment.
+
+## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.0)
+- [x] **Sentiment Engine**: Service to analyze user emotion from posts/messages.
+- [x] **Emotional Avatars**: Inject `current_emotion` into AI avatar generation prompts.
+- [x] **Aura UI**: Expanded `EvolvingAvatar` with Excited, Thoughtful, Cynical styles.
+- [x] **Pulse Topics**: Categorized topics (News, Help, Meetups) for neighborhood aid.
+- [x] **Admin Federation UI**: Peer management and domain blocking tools.
+
+## 🟢 Recently Completed: Phase 9 - Social Velocity & Federation (v2.2.9)
+- [x] **ActivityPub Interop**: Bi-directional social actions and retractions.
+- [x] **Hardened Security**: DNS-level SSRF protection and frontend XSS sanitization.
+- [x] **AI Wingman Orchestration**: Proactive conversation analysis and social nudging.
+
+## 🔴 Upcoming: Phase 9 - Finalization
 - [ ] **ActivityPub Federation**: Complete end-to-end interop testing with local Mastodon/Pleroma nodes.
 - [ ] **Email Infrastructure**: Configure Resend DNS records (MX, SPF, DKIM, DMARC) for email delivery.
 - [ ] **AI Provider Keys**: Configure OpenRouter/OpenAI API keys for Wingman AI features.
