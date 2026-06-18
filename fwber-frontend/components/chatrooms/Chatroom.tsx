@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction, useJoinChatroom } from '@/lib/hooks/use-chatrooms';
 import { useAuth } from '@/lib/auth-context';
+import { cn } from '@/lib/utils';
 import {
   ConnectionStatusBadge,
   PresenceIndicator,
@@ -34,6 +35,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
   const chatroom = chatroomData?.chatroom;
   const messages = useMemo(() => messagesData?.data || [], [messagesData?.data]);
   const isSending = sendStandardMessageMutation.isPending;
+  const atmosphere = chatroom?.group_aura || "standard";
 
   // Get member IDs for presence tracking
   const memberIds = useMemo(() => {
@@ -145,16 +147,34 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
     );
   }
 
+
+  const atmosphereStyles: Record<string, string> = {
+		standard: "bg-gray-50 dark:bg-gray-900",
+		calm: "bg-slate-100 dark:bg-slate-900",
+		electric: "bg-indigo-50 dark:bg-indigo-950 shadow-[inset_0_0_50px_rgba(79,70,229,0.1)]",
+		warm: "bg-orange-50 dark:bg-orange-950 shadow-[inset_0_0_50px_rgba(245,158,11,0.05)]",
+		contemplative: "bg-zinc-100 dark:bg-zinc-900 grayscale-[10%]",
+		noir: "bg-neutral-100 dark:bg-neutral-900 contrast-125",
+		moody: "bg-purple-50 dark:bg-purple-950",
+		shadowy: "bg-stone-50 dark:bg-stone-950"
+	};
+
   return (
-    <div className="min-h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg">
+    <div className={cn("min-h-[600px] rounded-lg transition-all duration-1000", atmosphereStyles[atmosphere])}>
       <div className="flex flex-col h-[600px]">
         {/* Chatroom Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-t-lg shadow-sm border-b border-gray-200 dark:border-gray-700 p-4">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur rounded-t-lg shadow-sm border-b border-gray-200/50 dark:border-gray-700/50 p-4">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-1">
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">{chatroom.display_name || chatroom.name}</h1>
                 <ConnectionStatusBadge />
+                {atmosphere !== 'standard' && (
+                  <span className="text-xs font-medium px-2 py-1 bg-black/5 dark:bg-white/10 rounded-full capitalize">
+                    {atmosphere} Aura
+                  </span>
+                )}
+
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 <button
@@ -177,7 +197,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
         </div>
 
         {/* Chat Interface */}
-        <div className="bg-white dark:bg-gray-800 flex-1 flex flex-col relative rounded-b-lg">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur flex-1 flex flex-col relative rounded-b-lg">
 
           {/* Preview Mode Overlay */}
           {(chatroomData?.preview_mode) && (

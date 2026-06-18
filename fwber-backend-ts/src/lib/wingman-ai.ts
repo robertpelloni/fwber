@@ -344,7 +344,9 @@ Physical Attributes:
 - Ethnicity: ${profile.ethnicity || 'mixed'}
 - Style: ${profile.clothing_style || 'casual stylish'}
 - Vibe: ${profile.fitness_level || 'healthy'}
+- Current Emotion: ${profile.current_emotion || 'neutral'}
 
+The avatar should reflect their current emotion in their expression and the lighting/atmosphere of the image.
 Create a professional, attractive avatar prompt.`;
 
   return generateText(system, userPrompt, 0.7);

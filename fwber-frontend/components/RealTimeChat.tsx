@@ -185,6 +185,7 @@ export default function RealTimeChat({
 	const [message, setMessage] = useState("");
 	const [isRecordingVoice, setIsRecordingVoice] = useState(false);
 	const [isConnected, setIsConnected] = useState(false);
+	const [atmosphere, setAtmosphere] = useState("standard");
 	const [loadingHistory, setLoadingHistory] = useState(true);
 	const [isGiftModalOpen, setIsGiftModalOpen] = useState(false);
 	const [isDatePlannerOpen, setIsDatePlannerOpen] = useState(false);
@@ -232,11 +233,12 @@ export default function RealTimeChat({
 	useEffect(() => {
 		if (recipientId && user?.id) {
 			setLoadingHistory(true);
-			loadConversationHistory().finally(() => {
+			api.get(`/messages/${recipientId}`).then(res => {
+				if (res.atmosphere) setAtmosphere(res.atmosphere);
 				setLoadingHistory(false);
-			});
+			}).catch(() => setLoadingHistory(false));
 		}
-	}, [recipientId, user?.id, loadConversationHistory]);
+	}, [recipientId, user?.id]);
 
 	const recipientUser = (onlineUsers as OnlineUser[]).find(
 		(u) => u.user_id === recipientId,
@@ -408,8 +410,23 @@ export default function RealTimeChat({
 		}
 	};
 
+	const atmosphereStyles: Record<string, string> = {
+		standard: "bg-gray-800",
+		calm: "bg-slate-800/90 backdrop-blur-sm",
+		electric: "bg-indigo-900/40 shadow-[inset_0_0_50px_rgba(79,70,229,0.2)]",
+		warm: "bg-orange-900/20 shadow-[inset_0_0_50px_rgba(245,158,11,0.1)]",
+		contemplative: "bg-zinc-900/80 grayscale-[20%]",
+		noir: "bg-black/90 grayscale contrast-125",
+		moody: "bg-purple-950/30 backdrop-blur-md",
+		shadowy: "bg-stone-950/90 transition-opacity duration-1000"
+	};
+
 	return (
-		<div className={`flex flex-col h-full bg-gray-800 rounded-lg ${className}`}>
+		<div className={cn(
+			"flex flex-col h-full rounded-lg transition-all duration-1000",
+			atmosphereStyles[atmosphere] || atmosphereStyles.standard,
+			className
+		)}>
 			<div className="flex items-center justify-between p-4 border-b border-gray-700">
 				<div
 					className="flex items-center space-x-3 cursor-pointer"

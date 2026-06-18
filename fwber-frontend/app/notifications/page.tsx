@@ -6,7 +6,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import AppHeader from '@/components/AppHeader'
 import { api } from '@/lib/api/client'
 import { getNotificationRoute, normalizeNotificationType } from '@/lib/notifications'
-import { Bell, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar, CheckCheck } from 'lucide-react'
+import { Bell, MessageSquare, Heart, UserPlus, Eye, AlertCircle, Gift, Calendar, CheckCheck, Sparkles } from 'lucide-react'
 
 interface Notification {
   id: string
@@ -59,6 +59,8 @@ export default function NotificationsPage() {
         return <Gift className="h-4 w-4 text-orange-500" />
       case 'event':
         return <Calendar className="h-4 w-4 text-cyan-500" />
+      case 'wingman_nudge':
+        return <Sparkles className="h-4 w-4 text-purple-500" />
       default:
         return <AlertCircle className="h-4 w-4 text-yellow-500" />
     }

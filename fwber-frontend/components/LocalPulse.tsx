@@ -64,10 +64,22 @@ const ArtifactCard = ({
   onFlag: (id: number) => void;
   onClaim: (id: number) => void;
   onVote: (id: number, value: number) => void;
-  onComment: (id: number, content: string) => void;
+  onComment: (id: number, content: string, parentId?: string) => void;
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState<any[]>([]);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const { token } = useAuth();
+
+  useEffect(() => {
+    if (showComments) {
+      apiClient.get(`/proximity/artifacts/${artifact.id}/comments`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => setComments(res.data.data || []));
+    }
+  }, [showComments, artifact.id, token]);
 
   const getTimeRemaining = (expiresAt: string) => {
     const now = new Date();
@@ -101,7 +113,15 @@ const ArtifactCard = ({
     if (!commentText.trim()) return;
     onComment(artifact.id, commentText);
     setCommentText('');
-    setShowComments(false);
+    // For simplicity, we trigger a refetch via the parent, but we could also append locally
+  };
+
+  const handleReplySubmit = (e: React.FormEvent, parentId: number) => {
+    e.preventDefault();
+    if (!replyText.trim()) return;
+    onComment(artifact.id, replyText, parentId.toString());
+    setReplyText('');
+    setReplyingTo(null);
   };
 
   return (
@@ -243,6 +263,51 @@ const ArtifactCard = ({
         {/* Comment Entry Area */}
         {showComments && hasVoting && (
           <div className="mt-4 pt-3 border-t border-black/10">
+            <div className="space-y-4 mb-4 max-h-60 overflow-y-auto">
+              {comments.filter(c => !c.parent_id).map(comment => (
+                <div key={comment.id} className="space-y-2">
+                  <div className="bg-white/50 dark:bg-gray-800/50 p-2 rounded">
+                    <p className="text-sm">{comment.content}</p>
+                    <button
+                      onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                      className="text-[10px] text-blue-600 font-bold uppercase mt-1"
+                    >
+                      Reply
+                    </button>
+                  </div>
+
+                  {/* Replies */}
+                  <div className="ml-4 space-y-2 border-l-2 border-black/5 pl-2">
+                    {comments.filter(c => c.parent_id === comment.id).map(reply => (
+                      <div key={reply.id} className="bg-white/30 dark:bg-gray-800/30 p-2 rounded">
+                        <p className="text-xs">{reply.content}</p>
+                      </div>
+                    ))}
+
+                    {replyingTo === comment.id && (
+                      <form onSubmit={(e) => handleReplySubmit(e, comment.id)} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder="Write a reply..."
+                          className="flex-1 px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:outline-none"
+                          autoFocus
+                        />
+                        <button
+                          type="submit"
+                          disabled={!replyText.trim()}
+                          className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium"
+                        >
+                          Reply
+                        </button>
+                      </form>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <form onSubmit={handleCommentSubmit} className="flex gap-2">
               <input
                 type="text"
@@ -282,15 +347,23 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
-        <div>
-          <div className="flex items-center space-x-2 mb-1">
-            <span className="text-lg font-semibold">{candidate.age}</span>
-            <span className="text-gray-500">•</span>
-            <span className="text-sm text-gray-600 capitalize">{candidate.gender}</span>
-          </div>
-          <div className="flex items-center space-x-1 text-sm text-gray-500">
-            <MapPin className="h-3 w-3" />
-            <span>{candidate.distance_miles.toFixed(1)} miles away</span>
+        <div className="flex items-center gap-3">
+          <EvolvingAvatar
+            src={candidate.avatar || "/placeholder-avatar.png"}
+            alt={candidate.name || "Candidate"}
+            size="md"
+            emotion={(candidate.emotion as any) || "neutral"}
+          />
+          <div>
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="text-lg font-semibold">{candidate.age}</span>
+              <span className="text-gray-500">•</span>
+              <span className="text-sm text-gray-600 capitalize">{candidate.gender}</span>
+            </div>
+            <div className="flex items-center space-x-1 text-sm text-gray-500">
+              <MapPin className="h-3 w-3" />
+              <span>{candidate.distance_miles.toFixed(1)} miles away</span>
+            </div>
           </div>
         </div>
         <div className="flex gap-2">
@@ -468,10 +541,10 @@ export default function LocalPulse({ initialTopicSlug, compact = false }: LocalP
     }
   };
 
-  const handleCommentArtifact = async (id: number, content: string) => {
+  const handleCommentArtifact = async (id: number, content: string, parentId?: string) => {
     if (!token || !content.trim()) return;
     try {
-      await commentArtifact.mutateAsync({ id, content, token });
+      await commentArtifact.mutateAsync({ id, content, parent_id: parentId, token });
     } catch (err) {
       console.error('Failed to comment:', err);
     }

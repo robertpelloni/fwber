@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { SentimentAnalysisService } from '../services/SentimentAnalysisService.js';
 
 const router = Router();
 router.use(authenticate);
@@ -239,6 +240,9 @@ router.get('/:id', async (req: any, res) => {
     });
     if (!chatroom) { res.status(404).json({ message: 'Not found' }); return; }
 
+    const activeMemberIds = chatroom.chatroom_members.map((m: any) => m.user_id);
+    const groupAura = await SentimentAnalysisService.calculateGroupAura(activeMemberIds);
+
     res.json({
       id: Number(chatroom.id), name: chatroom.name, description: chatroom.description,
       type: chatroom.type,
@@ -248,6 +252,7 @@ router.get('/:id', async (req: any, res) => {
       members: chatroom.chatroom_members.map((m: any) => ({
         user_id: Number(m.user_id), role: m.role, name: m.users?.name || 'Unknown',
       })),
+      group_aura: groupAura,
       messages: [],
       last_activity_at: chatroom.last_activity_at?.toISOString(),
       created_at: chatroom.created_at?.toISOString(),
