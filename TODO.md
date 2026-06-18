@@ -45,9 +45,13 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.5)
-- [ ] **Aura-Matched Chat**: Suggest chat partners based on current emotional compatibility.
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.6)
 - [ ] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
+- [ ] **Atmospheric Messaging**: Dynamically change chat background/theme based on the combined Aura of both participants.
+
+## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.6)
+- [x] **Aura-Matched Chat**: Suggested partners based on current emotional headspace.
+- [x] **Vibe Compatibility**: Heuristic to compute emotional affinity between users.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.5)
 - [x] **Community Quests**: Autonomous challenge generation based on neighborhood mood.

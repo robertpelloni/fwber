@@ -118,4 +118,35 @@ export class MatchingHeuristicService {
       default: return 1;
     }
   }
+
+  /**
+   * Calculates emotional affinity based on current aura/emotion alignment.
+   */
+  async calculateAuraCompatibility(userId1: bigint, userId2: bigint): Promise<{ score: number, mood: string }> {
+    const [p1, p2] = await Promise.all([
+        prisma.user_profiles.findFirst({ where: { user_id: userId1 } }),
+        prisma.user_profiles.findFirst({ where: { user_id: userId2 } })
+    ]);
+
+    const e1 = (p1?.current_emotion || 'Neutral').toLowerCase();
+    const e2 = (p2?.current_emotion || 'Neutral').toLowerCase();
+
+    if (e1 === e2 && e1 !== 'neutral') {
+        return { score: 1.0, mood: `Both feeling ${p1?.current_emotion}` };
+    }
+
+    // Complementary moods
+    const complements: Record<string, string[]> = {
+        thoughtful: ['mysterious', 'melancholic'],
+        excited: ['happy', 'vibrant'],
+        cynical: ['mysterious', 'thoughtful'],
+        happy: ['excited', 'thoughtful']
+    };
+
+    if (complements[e1]?.includes(e2) || complements[e2]?.includes(e1)) {
+        return { score: 0.8, mood: 'Complementary Headspace' };
+    }
+
+    return { score: 0.3, mood: 'Different Vibes' };
+  }
 }

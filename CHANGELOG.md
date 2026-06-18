@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.6] - 2026-06-16
+
+### Added
+- **Aura-Matched Chat**: Introduced a new matching dimension based on real-time emotional alignment. Users are now suggested chat partners who share complementary or identical "Auras" (e.g., both feeling Thoughtful).
+- **Aura Compatibility Logic**: New heuristic in `MatchingHeuristicService` to compute emotional affinity scores.
+- **Messaging Dashboard Integration**: Added a "Vibe-Compatible Partners" discovery bar to the messages page.
+
+### Changed
+- **Matching API**: New `aura-matches` endpoint to fetch partners with high emotional resonance.
+
 ## [2.3.5] - 2026-06-16
 
 ### Added
