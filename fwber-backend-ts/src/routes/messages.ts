@@ -5,8 +5,10 @@ import prisma from '../lib/prisma.js';
 import { checkAndUnlockAchievements } from '../lib/achievements.js';
 import { filePathToUrl } from '../lib/photos.js';
 import { WingmanService } from '../services/WingmanService.js';
+import { MatchingHeuristicService } from '../services/MatchingHeuristicService.js';
 
 const router = Router();
+const matchingService = new MatchingHeuristicService();
 const upload = multer({ dest: 'uploads/messages/' });
 router.use(authenticate);
 
@@ -241,14 +243,21 @@ router.get('/:id', async (req: any, res) => {
     };
     if (before) where.sent_at = { lt: new Date(before) };
 
-    const messages = await prisma.messages.findMany({ where, orderBy: { sent_at: 'desc' }, take: limit });
+    const [messages, atmosphere] = await Promise.all([
+      prisma.messages.findMany({ where, orderBy: { sent_at: 'desc' }, take: limit }),
+      matchingService.calculateConversationVibe(userId, partnerId)
+    ]);
 
     await prisma.messages.updateMany({
       where: { sender_id: partnerId, receiver_id: userId, is_read: false },
       data: { is_read: true, read_at: new Date() },
     }).catch(() => {});
 
-    res.json({ messages: messages.reverse().map(serializeMessage), conversation: { id: req.params.id } });
+    res.json({
+      messages: messages.reverse().map(serializeMessage),
+      atmosphere,
+      conversation: { id: req.params.id }
+    });
   } catch (error: any) {
     console.error('[Messages] Get error:', error.message);
     res.json({ messages: [], conversation: { id: req.params.id } });

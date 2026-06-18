@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.7] - 2026-06-16
+
+### Added
+- **Atmospheric Messaging**: Implemented dynamic chat environments that change themes based on the combined "Aura" of both participants.
+- **Conversation Vibe Engine**: New logic in `MatchingHeuristicService` to determine the collective atmosphere of a chat session (e.g., Calm, Electric, Noir).
+- **Dynamic UI Themes**: `RealTimeChat` now supports visual transitions (gradients, blur, grayscale) mapped to the calculated conversation atmosphere.
+
+### Changed
+- **Messaging API**: Updated `GET /api/messages/:id` to include atmospheric metadata.
+
 ## [2.3.6] - 2026-06-16
 
 ### Added
