@@ -57,8 +57,6 @@ setup_wsl_*.ps1
 .kiro/
 .qoder/
 .augment/
-.borg/
-.borg-session.json
 
 # Configuration backups
 config-backups/
@@ -122,11 +120,9 @@ frontend_build.tar.gz
 temp_build/
 metamcp.db
 metamcp.db*
-+.jules/
 # Environment files with secrets
 .env
 .env.*
 !.env.example
 
 # AI Agent session logs and metadata
-.jules/
