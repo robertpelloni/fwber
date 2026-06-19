@@ -1,11 +1,5 @@
 # Changelog
 
-## [2.3.8] - 2026-06-18
-### Added
-- **Group Aura Heuristic**: Added `calculateGroupAura` to `SentimentAnalysisService` to aggregate the emotional state of all members within a group.
-- **Dynamic Chatroom Environments**: Injected `group_aura` into Chatroom and Proximity Chatroom API endpoints.
-- **Atmospheric Chatroom UI**: Updated `Chatroom.tsx` to display the active "Aura" and apply matching dynamic, transitionary background styles (e.g., Electric, Noir, Calm) based on collective participant sentiment.
-
 ## [2.3.7] - 2026-06-16
 
 ### Added

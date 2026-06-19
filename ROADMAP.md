@@ -1,13 +1,13 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.3.8 "Social Velocity & Federation"
+> **Current Version:** 2.2.9 "Social Velocity & Federation"
 > **Last Updated:** 2026-06-10
 
 ---
 
 ## 🗺️ High-Level Trajectory
 
-### Phase 10: Dynamic Identity & Proximity Forum (IN PROGRESS - v2.3.8)
+### Phase 10: Dynamic Identity & Proximity Forum (IN PROGRESS - v2.3.7)
 The next evolution focuses on making user identity alive and evolving the local pulse into a functional community layer.
 
 **Key Goals:**

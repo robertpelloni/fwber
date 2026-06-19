@@ -4,54 +4,6 @@ import { AutonomousService } from './AutonomousService.js';
 
 export class SentimentAnalysisService {
   /**
-   * Aggregates the emotions of multiple users to determine a group-wide mood/aura.
-   */
-  static async calculateGroupAura(userIds: bigint[]): Promise<string> {
-    if (!userIds || userIds.length === 0) return 'standard';
-
-    try {
-      const profiles = await prisma.user_profiles.findMany({
-        where: { user_id: { in: userIds } },
-        select: { current_emotion: true }
-      });
-
-      if (profiles.length === 0) return 'standard';
-
-      const emotions = profiles.map(p => (p.current_emotion || 'neutral').toLowerCase());
-
-      const counts: Record<string, number> = {};
-      for (const e of emotions) {
-        counts[e] = (counts[e] || 0) + 1;
-      }
-
-      const total = emotions.length;
-
-      // If a majority is a certain emotion
-      for (const [e, count] of Object.entries(counts)) {
-        if (e !== 'neutral' && count / total >= 0.5) {
-           if (e === 'excited') return 'electric';
-           if (e === 'happy') return 'warm';
-           if (e === 'thoughtful') return 'contemplative';
-           if (e === 'cynical') return 'noir';
-           if (e === 'melancholic') return 'moody';
-           if (e === 'mysterious') return 'shadowy';
-           return e;
-        }
-      }
-
-      // If mixed or mostly neutral
-      if ((counts['excited'] || 0) > 0 && (counts['happy'] || 0) > 0) return 'electric';
-      if ((counts['cynical'] || 0) > 0 || (counts['melancholic'] || 0) > 0) return 'noir';
-      if ((counts['thoughtful'] || 0) > 0 && (counts['mysterious'] || 0) > 0) return 'contemplative';
-
-      return 'standard';
-    } catch (err: any) {
-      console.error('[SentimentService] Group Aura calculation failed:', err.message);
-      return 'standard';
-    }
-  }
-
-  /**
    * Analyzes recent activity for a user to determine their current emotional state.
    */
   static async analyzeUserSentiment(userId: bigint) {

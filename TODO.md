@@ -1,6 +1,6 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.3.8
+> **Version:** 2.2.5
 > **Last Updated:** 2026-06-10
 
 ---
@@ -45,9 +45,9 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.8)
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
 - [ ] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
-- [x] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.
+- [ ] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
 - [x] **Atmospheric Messaging**: Dynamic chat themes based on participant vibes.

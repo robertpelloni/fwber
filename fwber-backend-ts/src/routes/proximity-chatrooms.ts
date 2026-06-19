@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
-import { SentimentAnalysisService } from '../services/SentimentAnalysisService.js';
 
 const router = Router();
 router.use(authenticate);
@@ -225,9 +224,6 @@ router.get('/:id', async (req: any, res) => {
 
     if (!room) return res.status(404).json({ message: 'Room not found' });
 
-    const activeMemberIds = room.proximity_chatroom_members.map((m: any) => m.user_id);
-    const groupAura = await SentimentAnalysisService.calculateGroupAura(activeMemberIds);
-
     res.json(serialize({
       id: room.id, name: room.name, description: room.description,
       lat: Number(room.lat), lng: Number(room.lng), radius_m: Number(room.radius_m),
@@ -235,7 +231,6 @@ router.get('/:id', async (req: any, res) => {
       members: room.proximity_chatroom_members.map((m: any) => ({
         id: Number(m.users?.id), name: m.users?.name, role: m.role,
       })),
-      group_aura: groupAura,
     }));
   } catch (error: any) {
     console.error('[ProximityChatrooms] Get error:', error.message);
