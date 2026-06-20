@@ -45,6 +45,9 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
+## 🟢 Recently Completed: Phase 11 - Core Backend Design (v2.3.9)
+- [x] **Backend Design Document**: Outlined the core Node.js/ESM backend architecture, endpoints, and models in `docs/BACKEND_DESIGN.md`.
+
 ## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
 - [ ] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
 - [ ] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.

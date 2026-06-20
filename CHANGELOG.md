@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.9] - 2026-06-20
+### Added
+- **Backend Architecture**: Documented the core Node.js/ESM backend architecture, API endpoints, and Prisma models for Local Pulse and ZK-Identity verification in `docs/BACKEND_DESIGN.md`.
+
 ## [2.3.7] - 2026-06-16
 
 ### Added
