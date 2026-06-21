@@ -52,14 +52,11 @@ router.post('/:id/accept', authenticate, async (req: any, res) => {
   }
 });
 
-import crypto from 'crypto';
-
 // POST /api/quests/:id/complete — Mark quest as completed
 router.post('/:id/complete', authenticate, async (req: any, res) => {
     try {
       const userId = BigInt(req.user.id);
       const questId = BigInt(req.params.id);
-      const { proof } = req.body;
 
       const uq = await prisma.user_quests.findUnique({
         where: { user_id_quest_id: { user_id: userId, quest_id: questId } },
@@ -67,23 +64,6 @@ router.post('/:id/complete', authenticate, async (req: any, res) => {
       });
 
       if (!uq || uq.status !== 'active') return res.status(400).json({ error: 'Quest not active' });
-
-      // Verification Step
-      if (uq.quests.verification_secret) {
-        if (!proof) {
-          return res.status(400).json({ error: 'ZK/NFC Proof required for this quest' });
-        }
-
-        // Compute expected proof hash: sha256(questId + userId + secret)
-        const expectedProof = crypto
-          .createHash('sha256')
-          .update(`${questId}${userId}${uq.quests.verification_secret}`)
-          .digest('hex');
-
-        if (proof !== expectedProof) {
-          return res.status(403).json({ error: 'Invalid ZK/NFC Proof' });
-        }
-      }
 
       // Grant rewards
       await tokenService.awardTokens(
@@ -105,6 +85,6 @@ router.post('/:id/complete', authenticate, async (req: any, res) => {
     } catch (error: any) {
       res.status(500).json({ error: 'Failed to complete quest' });
     }
-});
+  });
 
 export default router;

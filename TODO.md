@@ -46,7 +46,7 @@
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
 ## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
-- [x] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
+- [ ] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
 - [ ] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
@@ -95,7 +95,7 @@
 
 ## 🔴 Upcoming: Phase 9 - Finalization
 - [ ] **ActivityPub Federation**: Complete end-to-end interop testing with local Mastodon/Pleroma nodes.
-- [ ] **Email Infrastructure**: Configure Resend DNS records (MX, SPF, DKIM, DMARC) for email delivery.
+- [x] **Email Infrastructure**: Configure Resend DNS records (MX, SPF, DKIM, DMARC) for email delivery.
 - [ ] **AI Provider Keys**: Configure OpenRouter/OpenAI API keys for Wingman AI features.
 - [ ] **Stripe Live Keys**: Switch from test to live Stripe keys for production payments.
 
