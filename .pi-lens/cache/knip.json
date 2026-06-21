@@ -818,6 +818,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-backend-ts/src/middleware/auth.ts",
+      "file": "fwber-backend-ts/src/middleware/auth.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-backend-ts/src/routes/achievements.ts",
       "file": "fwber-backend-ts/src/routes/achievements.ts"
     },
@@ -1268,256 +1273,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-backend-ts/src/middleware/auth.ts",
-      "file": "fwber-backend-ts/src/middleware/auth.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/account-settings.cy.js",
-      "file": "fwber-frontend/cypress/e2e/account-settings.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/admin-analytics.cy.js",
-      "file": "fwber-frontend/cypress/e2e/admin-analytics.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/blocking.cy.js",
-      "file": "fwber-frontend/cypress/e2e/blocking.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/boosts.cy.js",
-      "file": "fwber-frontend/cypress/e2e/boosts.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/bulletin-board.cy.js",
-      "file": "fwber-frontend/cypress/e2e/bulletin-board.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/critical-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/critical-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/event-group-invites.cy.js",
-      "file": "fwber-frontend/cypress/e2e/event-group-invites.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/events.cy.js",
-      "file": "fwber-frontend/cypress/e2e/events.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/face-blur.cy.js",
-      "file": "fwber-frontend/cypress/e2e/face-blur.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/face-reveal.cy.js",
-      "file": "fwber-frontend/cypress/e2e/face-reveal.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/feedback.cy.js",
-      "file": "fwber-frontend/cypress/e2e/feedback.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/friends-full.cy.js",
-      "file": "fwber-frontend/cypress/e2e/friends-full.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/friends-nav.cy.js",
-      "file": "fwber-frontend/cypress/e2e/friends-nav.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/gifts.cy.js",
-      "file": "fwber-frontend/cypress/e2e/gifts.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/groups.cy.js",
-      "file": "fwber-frontend/cypress/e2e/groups.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/match-insights.cy.js",
-      "file": "fwber-frontend/cypress/e2e/match-insights.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/matching-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/matching-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/media-messaging.cy.js",
-      "file": "fwber-frontend/cypress/e2e/media-messaging.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/merchant-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/merchant-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/messaging-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/messaging-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js",
-      "file": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/moderation.cy.js",
-      "file": "fwber-frontend/cypress/e2e/moderation.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/nearby-users.cy.js",
-      "file": "fwber-frontend/cypress/e2e/nearby-users.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js",
-      "file": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/notifications.cy.js",
-      "file": "fwber-frontend/cypress/e2e/notifications.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js",
-      "file": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/onboarding.cy.js",
-      "file": "fwber-frontend/cypress/e2e/onboarding.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/optional-attributes.cy.js",
-      "file": "fwber-frontend/cypress/e2e/optional-attributes.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/physical-profile.cy.js",
-      "file": "fwber-frontend/cypress/e2e/physical-profile.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/premium-features.cy.js",
-      "file": "fwber-frontend/cypress/e2e/premium-features.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/presence-stability.cy.js",
-      "file": "fwber-frontend/cypress/e2e/presence-stability.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-feed.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-feed.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/pwa.cy.js",
-      "file": "fwber-frontend/cypress/e2e/pwa.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/realtime-chat.cy.js",
-      "file": "fwber-frontend/cypress/e2e/realtime-chat.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/recommendations.cy.js",
-      "file": "fwber-frontend/cypress/e2e/recommendations.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/report-user.cy.js",
-      "file": "fwber-frontend/cypress/e2e/report-user.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/safety-drills.cy.js",
-      "file": "fwber-frontend/cypress/e2e/safety-drills.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js",
-      "file": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/token-gated-events.cy.js",
-      "file": "fwber-frontend/cypress/e2e/token-gated-events.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js",
-      "file": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/venue-checkin.cy.js",
-      "file": "fwber-frontend/cypress/e2e/venue-checkin.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/video-chat.cy.js",
-      "file": "fwber-frontend/cypress/e2e/video-chat.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/voice-messaging.cy.js",
-      "file": "fwber-frontend/cypress/e2e/voice-messaging.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js",
-      "file": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/support/e2e.js",
-      "file": "fwber-frontend/cypress/support/e2e.js"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/achievements/page.tsx",
       "file": "fwber-frontend/app/achievements/page.tsx"
     },
@@ -1533,13 +1288,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api-test/page.tsx",
-      "file": "fwber-frontend/app/api-test/page.tsx"
+      "name": "fwber-frontend/app/boosts/page.tsx",
+      "file": "fwber-frontend/app/boosts/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/boosts/page.tsx",
-      "file": "fwber-frontend/app/boosts/page.tsx"
+      "name": "fwber-frontend/app/api-test/page.tsx",
+      "file": "fwber-frontend/app/api-test/page.tsx"
     },
     {
       "type": "file",
@@ -1583,6 +1338,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/contact/page.tsx",
+      "file": "fwber-frontend/app/contact/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/content-generation/page.tsx",
       "file": "fwber-frontend/app/content-generation/page.tsx"
     },
@@ -1595,11 +1355,6 @@
       "type": "file",
       "name": "fwber-frontend/app/daily-checkin/page.tsx",
       "file": "fwber-frontend/app/daily-checkin/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/contact/page.tsx",
-      "file": "fwber-frontend/app/contact/page.tsx"
     },
     {
       "type": "file",
@@ -1643,13 +1398,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/events/page.tsx",
-      "file": "fwber-frontend/app/events/page.tsx"
+      "name": "fwber-frontend/app/federation/page.tsx",
+      "file": "fwber-frontend/app/federation/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/federation/page.tsx",
-      "file": "fwber-frontend/app/federation/page.tsx"
+      "name": "fwber-frontend/app/events/page.tsx",
+      "file": "fwber-frontend/app/events/page.tsx"
     },
     {
       "type": "file",
@@ -1670,11 +1425,6 @@
       "type": "file",
       "name": "fwber-frontend/app/friends/page.tsx",
       "file": "fwber-frontend/app/friends/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/gifts/page.tsx",
-      "file": "fwber-frontend/app/gifts/page.tsx"
     },
     {
       "type": "file",
@@ -1703,8 +1453,18 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/gifts/page.tsx",
+      "file": "fwber-frontend/app/gifts/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/identity/page.tsx",
       "file": "fwber-frontend/app/identity/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/journal/page.tsx",
+      "file": "fwber-frontend/app/journal/page.tsx"
     },
     {
       "type": "file",
@@ -1715,11 +1475,6 @@
       "type": "file",
       "name": "fwber-frontend/app/journals/page.tsx",
       "file": "fwber-frontend/app/journals/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/journal/page.tsx",
-      "file": "fwber-frontend/app/journal/page.tsx"
     },
     {
       "type": "file",
@@ -1738,6 +1493,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/login/page.tsx",
+      "file": "fwber-frontend/app/login/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/marketplace/page.tsx",
       "file": "fwber-frontend/app/marketplace/page.tsx"
     },
@@ -1750,11 +1510,6 @@
       "type": "file",
       "name": "fwber-frontend/app/matches/page.tsx",
       "file": "fwber-frontend/app/matches/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/login/page.tsx",
-      "file": "fwber-frontend/app/login/page.tsx"
     },
     {
       "type": "file",
@@ -1833,11 +1588,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/premium/page.tsx",
-      "file": "fwber-frontend/app/premium/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/privacy/page.tsx",
       "file": "fwber-frontend/app/privacy/page.tsx"
     },
@@ -1858,6 +1608,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/premium/page.tsx",
+      "file": "fwber-frontend/app/premium/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/proximity/page.tsx",
       "file": "fwber-frontend/app/proximity/page.tsx"
     },
@@ -1868,13 +1623,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/rate-my-pussy/page.tsx",
-      "file": "fwber-frontend/app/rate-my-pussy/page.tsx"
+      "name": "fwber-frontend/app/pulse/page.tsx",
+      "file": "fwber-frontend/app/pulse/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/pulse/page.tsx",
-      "file": "fwber-frontend/app/pulse/page.tsx"
+      "name": "fwber-frontend/app/rate-my-pussy/page.tsx",
+      "file": "fwber-frontend/app/rate-my-pussy/page.tsx"
     },
     {
       "type": "file",
@@ -1888,6 +1643,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/register-simple/page.tsx",
+      "file": "fwber-frontend/app/register-simple/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/register/page.tsx",
       "file": "fwber-frontend/app/register/page.tsx"
     },
@@ -1898,13 +1658,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/register-simple/page.tsx",
-      "file": "fwber-frontend/app/register-simple/page.tsx"
+      "name": "fwber-frontend/app/reputation/page.tsx",
+      "file": "fwber-frontend/app/reputation/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/reputation/page.tsx",
-      "file": "fwber-frontend/app/reputation/page.tsx"
+      "name": "fwber-frontend/app/reset-password/page.tsx",
+      "file": "fwber-frontend/app/reset-password/page.tsx"
     },
     {
       "type": "file",
@@ -1920,11 +1680,6 @@
       "type": "file",
       "name": "fwber-frontend/app/roast/page.tsx",
       "file": "fwber-frontend/app/roast/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/reset-password/page.tsx",
-      "file": "fwber-frontend/app/reset-password/page.tsx"
     },
     {
       "type": "file",
@@ -1968,23 +1723,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/spaces/page.tsx",
-      "file": "fwber-frontend/app/spaces/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/studio/page.tsx",
       "file": "fwber-frontend/app/studio/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/subscription/page.tsx",
-      "file": "fwber-frontend/app/subscription/page.tsx"
+      "name": "fwber-frontend/app/spaces/page.tsx",
+      "file": "fwber-frontend/app/spaces/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/support/page.tsx",
-      "file": "fwber-frontend/app/support/page.tsx"
+      "name": "fwber-frontend/app/subscription/page.tsx",
+      "file": "fwber-frontend/app/subscription/page.tsx"
     },
     {
       "type": "file",
@@ -1995,6 +1745,11 @@
       "type": "file",
       "name": "fwber-frontend/app/test-auth/page.tsx",
       "file": "fwber-frontend/app/test-auth/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/support/page.tsx",
+      "file": "fwber-frontend/app/support/page.tsx"
     },
     {
       "type": "file",
@@ -2023,13 +1778,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/video/page.tsx",
-      "file": "fwber-frontend/app/video/page.tsx"
+      "name": "fwber-frontend/app/verify-email/page.tsx",
+      "file": "fwber-frontend/app/verify-email/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/verify-email/page.tsx",
-      "file": "fwber-frontend/app/verify-email/page.tsx"
+      "name": "fwber-frontend/app/video/page.tsx",
+      "file": "fwber-frontend/app/video/page.tsx"
     },
     {
       "type": "file",
@@ -2198,6 +1953,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/components/federation/FederatedFeed.tsx",
+      "file": "fwber-frontend/components/federation/FederatedFeed.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/components/friends/FriendList.tsx",
       "file": "fwber-frontend/components/friends/FriendList.tsx"
     },
@@ -2213,18 +1973,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/gifts/GiftShopModal.tsx",
-      "file": "fwber-frontend/components/gifts/GiftShopModal.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/gamification/DailyStreakModal.tsx",
       "file": "fwber-frontend/components/gamification/DailyStreakModal.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/federation/FederatedFeed.tsx",
-      "file": "fwber-frontend/components/federation/FederatedFeed.tsx"
+      "name": "fwber-frontend/components/gifts/GiftShopModal.tsx",
+      "file": "fwber-frontend/components/gifts/GiftShopModal.tsx"
     },
     {
       "type": "file",
@@ -2633,6 +2388,271 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/cypress/e2e/account-settings.cy.js",
+      "file": "fwber-frontend/cypress/e2e/account-settings.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/admin-analytics.cy.js",
+      "file": "fwber-frontend/cypress/e2e/admin-analytics.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/blocking.cy.js",
+      "file": "fwber-frontend/cypress/e2e/blocking.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/boosts.cy.js",
+      "file": "fwber-frontend/cypress/e2e/boosts.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/bulletin-board.cy.js",
+      "file": "fwber-frontend/cypress/e2e/bulletin-board.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/critical-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/critical-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/event-group-invites.cy.js",
+      "file": "fwber-frontend/cypress/e2e/event-group-invites.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/events.cy.js",
+      "file": "fwber-frontend/cypress/e2e/events.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/face-blur.cy.js",
+      "file": "fwber-frontend/cypress/e2e/face-blur.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/face-reveal.cy.js",
+      "file": "fwber-frontend/cypress/e2e/face-reveal.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/feedback.cy.js",
+      "file": "fwber-frontend/cypress/e2e/feedback.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/friends-full.cy.js",
+      "file": "fwber-frontend/cypress/e2e/friends-full.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/friends-nav.cy.js",
+      "file": "fwber-frontend/cypress/e2e/friends-nav.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/gifts.cy.js",
+      "file": "fwber-frontend/cypress/e2e/gifts.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/groups.cy.js",
+      "file": "fwber-frontend/cypress/e2e/groups.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/match-insights.cy.js",
+      "file": "fwber-frontend/cypress/e2e/match-insights.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/matching-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/matching-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/media-messaging.cy.js",
+      "file": "fwber-frontend/cypress/e2e/media-messaging.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/merchant-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/merchant-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/messaging-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/messaging-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js",
+      "file": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/moderation.cy.js",
+      "file": "fwber-frontend/cypress/e2e/moderation.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/nearby-users.cy.js",
+      "file": "fwber-frontend/cypress/e2e/nearby-users.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js",
+      "file": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/notifications.cy.js",
+      "file": "fwber-frontend/cypress/e2e/notifications.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js",
+      "file": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/onboarding.cy.js",
+      "file": "fwber-frontend/cypress/e2e/onboarding.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/optional-attributes.cy.js",
+      "file": "fwber-frontend/cypress/e2e/optional-attributes.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/physical-profile.cy.js",
+      "file": "fwber-frontend/cypress/e2e/physical-profile.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/premium-features.cy.js",
+      "file": "fwber-frontend/cypress/e2e/premium-features.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/presence-stability.cy.js",
+      "file": "fwber-frontend/cypress/e2e/presence-stability.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-feed.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-feed.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/pwa.cy.js",
+      "file": "fwber-frontend/cypress/e2e/pwa.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/realtime-chat.cy.js",
+      "file": "fwber-frontend/cypress/e2e/realtime-chat.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/recommendations.cy.js",
+      "file": "fwber-frontend/cypress/e2e/recommendations.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/report-user.cy.js",
+      "file": "fwber-frontend/cypress/e2e/report-user.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/safety-drills.cy.js",
+      "file": "fwber-frontend/cypress/e2e/safety-drills.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js",
+      "file": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/token-gated-events.cy.js",
+      "file": "fwber-frontend/cypress/e2e/token-gated-events.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js",
+      "file": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/venue-checkin.cy.js",
+      "file": "fwber-frontend/cypress/e2e/venue-checkin.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/video-chat.cy.js",
+      "file": "fwber-frontend/cypress/e2e/video-chat.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/voice-messaging.cy.js",
+      "file": "fwber-frontend/cypress/e2e/voice-messaging.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js",
+      "file": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/support/e2e.js",
+      "file": "fwber-frontend/cypress/support/e2e.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/contexts/PresenceContext.tsx",
+      "file": "fwber-frontend/lib/contexts/PresenceContext.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/contexts/WebSocketContext.tsx",
+      "file": "fwber-frontend/lib/contexts/WebSocketContext.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/e2e/crypto.ts",
+      "file": "fwber-frontend/lib/e2e/crypto.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/e2e/storage.ts",
+      "file": "fwber-frontend/lib/e2e/storage.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/lib/api/activitypub.ts",
       "file": "fwber-frontend/lib/api/activitypub.ts"
     },
@@ -2835,26 +2855,6 @@
       "type": "file",
       "name": "fwber-frontend/lib/api/wingman.ts",
       "file": "fwber-frontend/lib/api/wingman.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/contexts/PresenceContext.tsx",
-      "file": "fwber-frontend/lib/contexts/PresenceContext.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/contexts/WebSocketContext.tsx",
-      "file": "fwber-frontend/lib/contexts/WebSocketContext.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/e2e/crypto.ts",
-      "file": "fwber-frontend/lib/e2e/crypto.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/e2e/storage.ts",
-      "file": "fwber-frontend/lib/e2e/storage.ts"
     },
     {
       "type": "file",
@@ -3138,16 +3138,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/lib/wasm/benchmark.ts",
-      "file": "fwber-frontend/lib/wasm/benchmark.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/websocket/client.ts",
-      "file": "fwber-frontend/lib/websocket/client.ts"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/lib/vault/crypto.ts",
       "file": "fwber-frontend/lib/vault/crypto.ts"
     },
@@ -3160,6 +3150,16 @@
       "type": "file",
       "name": "fwber-frontend/lib/vault/storage.ts",
       "file": "fwber-frontend/lib/vault/storage.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/wasm/benchmark.ts",
+      "file": "fwber-frontend/lib/wasm/benchmark.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/websocket/client.ts",
+      "file": "fwber-frontend/lib/websocket/client.ts"
     },
     {
       "type": "file",
@@ -3233,11 +3233,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/referrals/route.ts",
-      "file": "fwber-frontend/app/api/referrals/route.ts"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/api/reports/route.ts",
       "file": "fwber-frontend/app/api/reports/route.ts"
     },
@@ -3248,18 +3243,23 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/api/referrals/route.ts",
+      "file": "fwber-frontend/app/api/referrals/route.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/api/topics/route.ts",
       "file": "fwber-frontend/app/api/topics/route.ts"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/bounty/[slug]/page.tsx",
-      "file": "fwber-frontend/app/bounty/[slug]/page.tsx"
+      "name": "fwber-frontend/app/auth/signin/page.tsx",
+      "file": "fwber-frontend/app/auth/signin/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/auth/signin/page.tsx",
-      "file": "fwber-frontend/app/auth/signin/page.tsx"
+      "name": "fwber-frontend/app/bounty/[slug]/page.tsx",
+      "file": "fwber-frontend/app/bounty/[slug]/page.tsx"
     },
     {
       "type": "file",
@@ -3288,18 +3288,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/gifts/history/page.tsx",
-      "file": "fwber-frontend/app/gifts/history/page.tsx"
+      "name": "fwber-frontend/app/groups/create/page.tsx",
+      "file": "fwber-frontend/app/groups/create/page.tsx"
     },
     {
       "type": "file",
       "name": "fwber-frontend/app/groups/matching/page.tsx",
       "file": "fwber-frontend/app/groups/matching/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/gifts/send/page.tsx",
-      "file": "fwber-frontend/app/gifts/send/page.tsx"
     },
     {
       "type": "file",
@@ -3313,8 +3308,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/groups/create/page.tsx",
-      "file": "fwber-frontend/app/groups/create/page.tsx"
+      "name": "fwber-frontend/app/gifts/history/page.tsx",
+      "file": "fwber-frontend/app/gifts/history/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/gifts/send/page.tsx",
+      "file": "fwber-frontend/app/gifts/send/page.tsx"
     },
     {
       "type": "file",
@@ -3368,13 +3368,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/vibe/page.tsx",
-      "file": "fwber-frontend/app/merchant/vibe/page.tsx"
+      "name": "fwber-frontend/app/merchant/register/page.tsx",
+      "file": "fwber-frontend/app/merchant/register/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/register/page.tsx",
-      "file": "fwber-frontend/app/merchant/register/page.tsx"
+      "name": "fwber-frontend/app/merchant/vibe/page.tsx",
+      "file": "fwber-frontend/app/merchant/vibe/page.tsx"
     },
     {
       "type": "file",
@@ -3385,6 +3385,16 @@
       "type": "file",
       "name": "fwber-frontend/app/photos/reveals/page.tsx",
       "file": "fwber-frontend/app/photos/reveals/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/profile/edit/page.tsx",
+      "file": "fwber-frontend/app/profile/edit/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/profile/[id]/page.tsx",
+      "file": "fwber-frontend/app/profile/[id]/page.tsx"
     },
     {
       "type": "file",
@@ -3403,33 +3413,8 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/profile/edit/page.tsx",
-      "file": "fwber-frontend/app/profile/edit/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/profile/[id]/page.tsx",
-      "file": "fwber-frontend/app/profile/[id]/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/proximity-chatrooms/[id]/page.tsx",
       "file": "fwber-frontend/app/proximity-chatrooms/[id]/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/share/[id]/opengraph-image.tsx",
-      "file": "fwber-frontend/app/share/[id]/opengraph-image.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/share/[id]/page.tsx",
-      "file": "fwber-frontend/app/share/[id]/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/share/[id]/share-content.tsx",
-      "file": "fwber-frontend/app/share/[id]/share-content.tsx"
     },
     {
       "type": "file",
@@ -3440,11 +3425,6 @@
       "type": "file",
       "name": "fwber-frontend/app/settings/blocked/page.tsx",
       "file": "fwber-frontend/app/settings/blocked/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/settings/hardware/page.tsx",
-      "file": "fwber-frontend/app/settings/hardware/page.tsx"
     },
     {
       "type": "file",
@@ -3463,18 +3443,23 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/settings/hardware/page.tsx",
+      "file": "fwber-frontend/app/settings/hardware/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/settings/physical-profile/page.tsx",
       "file": "fwber-frontend/app/settings/physical-profile/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/security/page.tsx",
-      "file": "fwber-frontend/app/settings/security/page.tsx"
+      "name": "fwber-frontend/app/settings/privacy/page.tsx",
+      "file": "fwber-frontend/app/settings/privacy/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/privacy/page.tsx",
-      "file": "fwber-frontend/app/settings/privacy/page.tsx"
+      "name": "fwber-frontend/app/settings/security/page.tsx",
+      "file": "fwber-frontend/app/settings/security/page.tsx"
     },
     {
       "type": "file",
@@ -3503,13 +3488,23 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/venue/login/page.tsx",
-      "file": "fwber-frontend/app/venue/login/page.tsx"
+      "name": "fwber-frontend/app/share/[id]/opengraph-image.tsx",
+      "file": "fwber-frontend/app/share/[id]/opengraph-image.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/venue/register/page.tsx",
-      "file": "fwber-frontend/app/venue/register/page.tsx"
+      "name": "fwber-frontend/app/share/[id]/page.tsx",
+      "file": "fwber-frontend/app/share/[id]/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/share/[id]/share-content.tsx",
+      "file": "fwber-frontend/app/share/[id]/share-content.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/topics/[slug]/page.tsx",
+      "file": "fwber-frontend/app/topics/[slug]/page.tsx"
     },
     {
       "type": "file",
@@ -3518,8 +3513,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/topics/[slug]/page.tsx",
-      "file": "fwber-frontend/app/topics/[slug]/page.tsx"
+      "name": "fwber-frontend/app/venue/login/page.tsx",
+      "file": "fwber-frontend/app/venue/login/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/venue/register/page.tsx",
+      "file": "fwber-frontend/app/venue/register/page.tsx"
     },
     {
       "type": "file",
@@ -3548,13 +3548,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/fortune/page.tsx",
-      "file": "fwber-frontend/app/wingman/fortune/page.tsx"
+      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
+      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
-      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
+      "name": "fwber-frontend/app/wingman/fortune/page.tsx",
+      "file": "fwber-frontend/app/wingman/fortune/page.tsx"
     },
     {
       "type": "file",
@@ -3588,13 +3588,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/(protected)/settings/matching/page.tsx",
-      "file": "fwber-frontend/app/(protected)/settings/matching/page.tsx"
+      "name": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx",
+      "file": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx",
-      "file": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx"
+      "name": "fwber-frontend/app/(protected)/settings/matching/page.tsx",
+      "file": "fwber-frontend/app/(protected)/settings/matching/page.tsx"
     },
     {
       "type": "file",
@@ -4541,6 +4541,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-backend-ts/src/middleware/auth.ts",
+      "file": "fwber-backend-ts/src/middleware/auth.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-backend-ts/src/routes/achievements.ts",
       "file": "fwber-backend-ts/src/routes/achievements.ts"
     },
@@ -4991,256 +4996,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-backend-ts/src/middleware/auth.ts",
-      "file": "fwber-backend-ts/src/middleware/auth.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/account-settings.cy.js",
-      "file": "fwber-frontend/cypress/e2e/account-settings.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/admin-analytics.cy.js",
-      "file": "fwber-frontend/cypress/e2e/admin-analytics.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/blocking.cy.js",
-      "file": "fwber-frontend/cypress/e2e/blocking.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/boosts.cy.js",
-      "file": "fwber-frontend/cypress/e2e/boosts.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/bulletin-board.cy.js",
-      "file": "fwber-frontend/cypress/e2e/bulletin-board.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/critical-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/critical-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/event-group-invites.cy.js",
-      "file": "fwber-frontend/cypress/e2e/event-group-invites.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/events.cy.js",
-      "file": "fwber-frontend/cypress/e2e/events.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/face-blur.cy.js",
-      "file": "fwber-frontend/cypress/e2e/face-blur.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/face-reveal.cy.js",
-      "file": "fwber-frontend/cypress/e2e/face-reveal.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/feedback.cy.js",
-      "file": "fwber-frontend/cypress/e2e/feedback.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/friends-full.cy.js",
-      "file": "fwber-frontend/cypress/e2e/friends-full.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/friends-nav.cy.js",
-      "file": "fwber-frontend/cypress/e2e/friends-nav.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/gifts.cy.js",
-      "file": "fwber-frontend/cypress/e2e/gifts.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/groups.cy.js",
-      "file": "fwber-frontend/cypress/e2e/groups.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/match-insights.cy.js",
-      "file": "fwber-frontend/cypress/e2e/match-insights.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/matching-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/matching-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/media-messaging.cy.js",
-      "file": "fwber-frontend/cypress/e2e/media-messaging.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/merchant-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/merchant-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/messaging-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/messaging-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js",
-      "file": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/moderation.cy.js",
-      "file": "fwber-frontend/cypress/e2e/moderation.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/nearby-users.cy.js",
-      "file": "fwber-frontend/cypress/e2e/nearby-users.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js",
-      "file": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/notifications.cy.js",
-      "file": "fwber-frontend/cypress/e2e/notifications.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js",
-      "file": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js",
-      "file": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/onboarding.cy.js",
-      "file": "fwber-frontend/cypress/e2e/onboarding.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/optional-attributes.cy.js",
-      "file": "fwber-frontend/cypress/e2e/optional-attributes.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/physical-profile.cy.js",
-      "file": "fwber-frontend/cypress/e2e/physical-profile.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/premium-features.cy.js",
-      "file": "fwber-frontend/cypress/e2e/premium-features.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/presence-stability.cy.js",
-      "file": "fwber-frontend/cypress/e2e/presence-stability.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/proximity-feed.cy.js",
-      "file": "fwber-frontend/cypress/e2e/proximity-feed.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/pwa.cy.js",
-      "file": "fwber-frontend/cypress/e2e/pwa.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/realtime-chat.cy.js",
-      "file": "fwber-frontend/cypress/e2e/realtime-chat.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/recommendations.cy.js",
-      "file": "fwber-frontend/cypress/e2e/recommendations.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/report-user.cy.js",
-      "file": "fwber-frontend/cypress/e2e/report-user.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/safety-drills.cy.js",
-      "file": "fwber-frontend/cypress/e2e/safety-drills.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js",
-      "file": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/token-gated-events.cy.js",
-      "file": "fwber-frontend/cypress/e2e/token-gated-events.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js",
-      "file": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/venue-checkin.cy.js",
-      "file": "fwber-frontend/cypress/e2e/venue-checkin.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/video-chat.cy.js",
-      "file": "fwber-frontend/cypress/e2e/video-chat.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/voice-messaging.cy.js",
-      "file": "fwber-frontend/cypress/e2e/voice-messaging.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js",
-      "file": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/cypress/support/e2e.js",
-      "file": "fwber-frontend/cypress/support/e2e.js"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/achievements/page.tsx",
       "file": "fwber-frontend/app/achievements/page.tsx"
     },
@@ -5256,13 +5011,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api-test/page.tsx",
-      "file": "fwber-frontend/app/api-test/page.tsx"
+      "name": "fwber-frontend/app/boosts/page.tsx",
+      "file": "fwber-frontend/app/boosts/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/boosts/page.tsx",
-      "file": "fwber-frontend/app/boosts/page.tsx"
+      "name": "fwber-frontend/app/api-test/page.tsx",
+      "file": "fwber-frontend/app/api-test/page.tsx"
     },
     {
       "type": "file",
@@ -5306,6 +5061,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/contact/page.tsx",
+      "file": "fwber-frontend/app/contact/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/content-generation/page.tsx",
       "file": "fwber-frontend/app/content-generation/page.tsx"
     },
@@ -5318,11 +5078,6 @@
       "type": "file",
       "name": "fwber-frontend/app/daily-checkin/page.tsx",
       "file": "fwber-frontend/app/daily-checkin/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/contact/page.tsx",
-      "file": "fwber-frontend/app/contact/page.tsx"
     },
     {
       "type": "file",
@@ -5366,13 +5121,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/events/page.tsx",
-      "file": "fwber-frontend/app/events/page.tsx"
+      "name": "fwber-frontend/app/federation/page.tsx",
+      "file": "fwber-frontend/app/federation/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/federation/page.tsx",
-      "file": "fwber-frontend/app/federation/page.tsx"
+      "name": "fwber-frontend/app/events/page.tsx",
+      "file": "fwber-frontend/app/events/page.tsx"
     },
     {
       "type": "file",
@@ -5393,11 +5148,6 @@
       "type": "file",
       "name": "fwber-frontend/app/friends/page.tsx",
       "file": "fwber-frontend/app/friends/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/gifts/page.tsx",
-      "file": "fwber-frontend/app/gifts/page.tsx"
     },
     {
       "type": "file",
@@ -5426,8 +5176,18 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/gifts/page.tsx",
+      "file": "fwber-frontend/app/gifts/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/identity/page.tsx",
       "file": "fwber-frontend/app/identity/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/journal/page.tsx",
+      "file": "fwber-frontend/app/journal/page.tsx"
     },
     {
       "type": "file",
@@ -5438,11 +5198,6 @@
       "type": "file",
       "name": "fwber-frontend/app/journals/page.tsx",
       "file": "fwber-frontend/app/journals/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/journal/page.tsx",
-      "file": "fwber-frontend/app/journal/page.tsx"
     },
     {
       "type": "file",
@@ -5461,6 +5216,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/login/page.tsx",
+      "file": "fwber-frontend/app/login/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/marketplace/page.tsx",
       "file": "fwber-frontend/app/marketplace/page.tsx"
     },
@@ -5473,11 +5233,6 @@
       "type": "file",
       "name": "fwber-frontend/app/matches/page.tsx",
       "file": "fwber-frontend/app/matches/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/login/page.tsx",
-      "file": "fwber-frontend/app/login/page.tsx"
     },
     {
       "type": "file",
@@ -5556,11 +5311,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/premium/page.tsx",
-      "file": "fwber-frontend/app/premium/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/privacy/page.tsx",
       "file": "fwber-frontend/app/privacy/page.tsx"
     },
@@ -5581,6 +5331,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/premium/page.tsx",
+      "file": "fwber-frontend/app/premium/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/proximity/page.tsx",
       "file": "fwber-frontend/app/proximity/page.tsx"
     },
@@ -5591,13 +5346,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/rate-my-pussy/page.tsx",
-      "file": "fwber-frontend/app/rate-my-pussy/page.tsx"
+      "name": "fwber-frontend/app/pulse/page.tsx",
+      "file": "fwber-frontend/app/pulse/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/pulse/page.tsx",
-      "file": "fwber-frontend/app/pulse/page.tsx"
+      "name": "fwber-frontend/app/rate-my-pussy/page.tsx",
+      "file": "fwber-frontend/app/rate-my-pussy/page.tsx"
     },
     {
       "type": "file",
@@ -5611,6 +5366,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/register-simple/page.tsx",
+      "file": "fwber-frontend/app/register-simple/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/register/page.tsx",
       "file": "fwber-frontend/app/register/page.tsx"
     },
@@ -5621,13 +5381,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/register-simple/page.tsx",
-      "file": "fwber-frontend/app/register-simple/page.tsx"
+      "name": "fwber-frontend/app/reputation/page.tsx",
+      "file": "fwber-frontend/app/reputation/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/reputation/page.tsx",
-      "file": "fwber-frontend/app/reputation/page.tsx"
+      "name": "fwber-frontend/app/reset-password/page.tsx",
+      "file": "fwber-frontend/app/reset-password/page.tsx"
     },
     {
       "type": "file",
@@ -5643,11 +5403,6 @@
       "type": "file",
       "name": "fwber-frontend/app/roast/page.tsx",
       "file": "fwber-frontend/app/roast/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/reset-password/page.tsx",
-      "file": "fwber-frontend/app/reset-password/page.tsx"
     },
     {
       "type": "file",
@@ -5691,23 +5446,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/spaces/page.tsx",
-      "file": "fwber-frontend/app/spaces/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/studio/page.tsx",
       "file": "fwber-frontend/app/studio/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/subscription/page.tsx",
-      "file": "fwber-frontend/app/subscription/page.tsx"
+      "name": "fwber-frontend/app/spaces/page.tsx",
+      "file": "fwber-frontend/app/spaces/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/support/page.tsx",
-      "file": "fwber-frontend/app/support/page.tsx"
+      "name": "fwber-frontend/app/subscription/page.tsx",
+      "file": "fwber-frontend/app/subscription/page.tsx"
     },
     {
       "type": "file",
@@ -5718,6 +5468,11 @@
       "type": "file",
       "name": "fwber-frontend/app/test-auth/page.tsx",
       "file": "fwber-frontend/app/test-auth/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/support/page.tsx",
+      "file": "fwber-frontend/app/support/page.tsx"
     },
     {
       "type": "file",
@@ -5746,13 +5501,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/video/page.tsx",
-      "file": "fwber-frontend/app/video/page.tsx"
+      "name": "fwber-frontend/app/verify-email/page.tsx",
+      "file": "fwber-frontend/app/verify-email/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/verify-email/page.tsx",
-      "file": "fwber-frontend/app/verify-email/page.tsx"
+      "name": "fwber-frontend/app/video/page.tsx",
+      "file": "fwber-frontend/app/video/page.tsx"
     },
     {
       "type": "file",
@@ -5921,6 +5676,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/components/federation/FederatedFeed.tsx",
+      "file": "fwber-frontend/components/federation/FederatedFeed.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/components/friends/FriendList.tsx",
       "file": "fwber-frontend/components/friends/FriendList.tsx"
     },
@@ -5936,18 +5696,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/gifts/GiftShopModal.tsx",
-      "file": "fwber-frontend/components/gifts/GiftShopModal.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/gamification/DailyStreakModal.tsx",
       "file": "fwber-frontend/components/gamification/DailyStreakModal.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/federation/FederatedFeed.tsx",
-      "file": "fwber-frontend/components/federation/FederatedFeed.tsx"
+      "name": "fwber-frontend/components/gifts/GiftShopModal.tsx",
+      "file": "fwber-frontend/components/gifts/GiftShopModal.tsx"
     },
     {
       "type": "file",
@@ -6356,6 +6111,271 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/cypress/e2e/account-settings.cy.js",
+      "file": "fwber-frontend/cypress/e2e/account-settings.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/admin-analytics.cy.js",
+      "file": "fwber-frontend/cypress/e2e/admin-analytics.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/blocking.cy.js",
+      "file": "fwber-frontend/cypress/e2e/blocking.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/boosts.cy.js",
+      "file": "fwber-frontend/cypress/e2e/boosts.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/bulletin-board.cy.js",
+      "file": "fwber-frontend/cypress/e2e/bulletin-board.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/critical-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/critical-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/event-group-invites.cy.js",
+      "file": "fwber-frontend/cypress/e2e/event-group-invites.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/events.cy.js",
+      "file": "fwber-frontend/cypress/e2e/events.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/face-blur.cy.js",
+      "file": "fwber-frontend/cypress/e2e/face-blur.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/face-reveal.cy.js",
+      "file": "fwber-frontend/cypress/e2e/face-reveal.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/feedback.cy.js",
+      "file": "fwber-frontend/cypress/e2e/feedback.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/friends-full.cy.js",
+      "file": "fwber-frontend/cypress/e2e/friends-full.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/friends-nav.cy.js",
+      "file": "fwber-frontend/cypress/e2e/friends-nav.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/gifts.cy.js",
+      "file": "fwber-frontend/cypress/e2e/gifts.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/groups.cy.js",
+      "file": "fwber-frontend/cypress/e2e/groups.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/match-insights.cy.js",
+      "file": "fwber-frontend/cypress/e2e/match-insights.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/matching-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/matching-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/media-messaging.cy.js",
+      "file": "fwber-frontend/cypress/e2e/media-messaging.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/merchant-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/merchant-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/messaging-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/messaging-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js",
+      "file": "fwber-frontend/cypress/e2e/ml-content-generation.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/moderation.cy.js",
+      "file": "fwber-frontend/cypress/e2e/moderation.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/nearby-users.cy.js",
+      "file": "fwber-frontend/cypress/e2e/nearby-users.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js",
+      "file": "fwber-frontend/cypress/e2e/nfc-tap-to-pay.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/notifications.cy.js",
+      "file": "fwber-frontend/cypress/e2e/notifications.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js",
+      "file": "fwber-frontend/cypress/e2e/onboarding-flow.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js",
+      "file": "fwber-frontend/cypress/e2e/onboarding-skip.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/onboarding.cy.js",
+      "file": "fwber-frontend/cypress/e2e/onboarding.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/optional-attributes.cy.js",
+      "file": "fwber-frontend/cypress/e2e/optional-attributes.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/physical-profile.cy.js",
+      "file": "fwber-frontend/cypress/e2e/physical-profile.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/premium-features.cy.js",
+      "file": "fwber-frontend/cypress/e2e/premium-features.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/presence-stability.cy.js",
+      "file": "fwber-frontend/cypress/e2e/presence-stability.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-create.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-chatroom-messaging.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-chatrooms.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/proximity-feed.cy.js",
+      "file": "fwber-frontend/cypress/e2e/proximity-feed.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/pwa.cy.js",
+      "file": "fwber-frontend/cypress/e2e/pwa.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/realtime-chat.cy.js",
+      "file": "fwber-frontend/cypress/e2e/realtime-chat.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/recommendations.cy.js",
+      "file": "fwber-frontend/cypress/e2e/recommendations.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/report-user.cy.js",
+      "file": "fwber-frontend/cypress/e2e/report-user.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/safety-drills.cy.js",
+      "file": "fwber-frontend/cypress/e2e/safety-drills.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js",
+      "file": "fwber-frontend/cypress/e2e/token-gated-chatrooms.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/token-gated-events.cy.js",
+      "file": "fwber-frontend/cypress/e2e/token-gated-events.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js",
+      "file": "fwber-frontend/cypress/e2e/two-factor-auth.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/venue-checkin.cy.js",
+      "file": "fwber-frontend/cypress/e2e/venue-checkin.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/video-chat.cy.js",
+      "file": "fwber-frontend/cypress/e2e/video-chat.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/voice-messaging.cy.js",
+      "file": "fwber-frontend/cypress/e2e/voice-messaging.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js",
+      "file": "fwber-frontend/cypress/e2e/zk-identity-and-ar.cy.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/cypress/support/e2e.js",
+      "file": "fwber-frontend/cypress/support/e2e.js"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/contexts/PresenceContext.tsx",
+      "file": "fwber-frontend/lib/contexts/PresenceContext.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/contexts/WebSocketContext.tsx",
+      "file": "fwber-frontend/lib/contexts/WebSocketContext.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/e2e/crypto.ts",
+      "file": "fwber-frontend/lib/e2e/crypto.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/e2e/storage.ts",
+      "file": "fwber-frontend/lib/e2e/storage.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/lib/api/activitypub.ts",
       "file": "fwber-frontend/lib/api/activitypub.ts"
     },
@@ -6558,26 +6578,6 @@
       "type": "file",
       "name": "fwber-frontend/lib/api/wingman.ts",
       "file": "fwber-frontend/lib/api/wingman.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/contexts/PresenceContext.tsx",
-      "file": "fwber-frontend/lib/contexts/PresenceContext.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/contexts/WebSocketContext.tsx",
-      "file": "fwber-frontend/lib/contexts/WebSocketContext.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/e2e/crypto.ts",
-      "file": "fwber-frontend/lib/e2e/crypto.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/e2e/storage.ts",
-      "file": "fwber-frontend/lib/e2e/storage.ts"
     },
     {
       "type": "file",
@@ -6861,16 +6861,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/lib/wasm/benchmark.ts",
-      "file": "fwber-frontend/lib/wasm/benchmark.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/lib/websocket/client.ts",
-      "file": "fwber-frontend/lib/websocket/client.ts"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/lib/vault/crypto.ts",
       "file": "fwber-frontend/lib/vault/crypto.ts"
     },
@@ -6883,6 +6873,16 @@
       "type": "file",
       "name": "fwber-frontend/lib/vault/storage.ts",
       "file": "fwber-frontend/lib/vault/storage.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/wasm/benchmark.ts",
+      "file": "fwber-frontend/lib/wasm/benchmark.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/lib/websocket/client.ts",
+      "file": "fwber-frontend/lib/websocket/client.ts"
     },
     {
       "type": "file",
@@ -6956,11 +6956,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/referrals/route.ts",
-      "file": "fwber-frontend/app/api/referrals/route.ts"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/api/reports/route.ts",
       "file": "fwber-frontend/app/api/reports/route.ts"
     },
@@ -6971,18 +6966,23 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/api/referrals/route.ts",
+      "file": "fwber-frontend/app/api/referrals/route.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/api/topics/route.ts",
       "file": "fwber-frontend/app/api/topics/route.ts"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/bounty/[slug]/page.tsx",
-      "file": "fwber-frontend/app/bounty/[slug]/page.tsx"
+      "name": "fwber-frontend/app/auth/signin/page.tsx",
+      "file": "fwber-frontend/app/auth/signin/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/auth/signin/page.tsx",
-      "file": "fwber-frontend/app/auth/signin/page.tsx"
+      "name": "fwber-frontend/app/bounty/[slug]/page.tsx",
+      "file": "fwber-frontend/app/bounty/[slug]/page.tsx"
     },
     {
       "type": "file",
@@ -7011,18 +7011,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/gifts/history/page.tsx",
-      "file": "fwber-frontend/app/gifts/history/page.tsx"
+      "name": "fwber-frontend/app/groups/create/page.tsx",
+      "file": "fwber-frontend/app/groups/create/page.tsx"
     },
     {
       "type": "file",
       "name": "fwber-frontend/app/groups/matching/page.tsx",
       "file": "fwber-frontend/app/groups/matching/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/gifts/send/page.tsx",
-      "file": "fwber-frontend/app/gifts/send/page.tsx"
     },
     {
       "type": "file",
@@ -7036,8 +7031,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/groups/create/page.tsx",
-      "file": "fwber-frontend/app/groups/create/page.tsx"
+      "name": "fwber-frontend/app/gifts/history/page.tsx",
+      "file": "fwber-frontend/app/gifts/history/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/gifts/send/page.tsx",
+      "file": "fwber-frontend/app/gifts/send/page.tsx"
     },
     {
       "type": "file",
@@ -7091,13 +7091,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/vibe/page.tsx",
-      "file": "fwber-frontend/app/merchant/vibe/page.tsx"
+      "name": "fwber-frontend/app/merchant/register/page.tsx",
+      "file": "fwber-frontend/app/merchant/register/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/register/page.tsx",
-      "file": "fwber-frontend/app/merchant/register/page.tsx"
+      "name": "fwber-frontend/app/merchant/vibe/page.tsx",
+      "file": "fwber-frontend/app/merchant/vibe/page.tsx"
     },
     {
       "type": "file",
@@ -7108,6 +7108,16 @@
       "type": "file",
       "name": "fwber-frontend/app/photos/reveals/page.tsx",
       "file": "fwber-frontend/app/photos/reveals/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/profile/edit/page.tsx",
+      "file": "fwber-frontend/app/profile/edit/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/profile/[id]/page.tsx",
+      "file": "fwber-frontend/app/profile/[id]/page.tsx"
     },
     {
       "type": "file",
@@ -7126,33 +7136,8 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/profile/edit/page.tsx",
-      "file": "fwber-frontend/app/profile/edit/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/profile/[id]/page.tsx",
-      "file": "fwber-frontend/app/profile/[id]/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/proximity-chatrooms/[id]/page.tsx",
       "file": "fwber-frontend/app/proximity-chatrooms/[id]/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/share/[id]/opengraph-image.tsx",
-      "file": "fwber-frontend/app/share/[id]/opengraph-image.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/share/[id]/page.tsx",
-      "file": "fwber-frontend/app/share/[id]/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/share/[id]/share-content.tsx",
-      "file": "fwber-frontend/app/share/[id]/share-content.tsx"
     },
     {
       "type": "file",
@@ -7163,11 +7148,6 @@
       "type": "file",
       "name": "fwber-frontend/app/settings/blocked/page.tsx",
       "file": "fwber-frontend/app/settings/blocked/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/settings/hardware/page.tsx",
-      "file": "fwber-frontend/app/settings/hardware/page.tsx"
     },
     {
       "type": "file",
@@ -7186,18 +7166,23 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/settings/hardware/page.tsx",
+      "file": "fwber-frontend/app/settings/hardware/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/settings/physical-profile/page.tsx",
       "file": "fwber-frontend/app/settings/physical-profile/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/security/page.tsx",
-      "file": "fwber-frontend/app/settings/security/page.tsx"
+      "name": "fwber-frontend/app/settings/privacy/page.tsx",
+      "file": "fwber-frontend/app/settings/privacy/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/privacy/page.tsx",
-      "file": "fwber-frontend/app/settings/privacy/page.tsx"
+      "name": "fwber-frontend/app/settings/security/page.tsx",
+      "file": "fwber-frontend/app/settings/security/page.tsx"
     },
     {
       "type": "file",
@@ -7226,13 +7211,23 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/venue/login/page.tsx",
-      "file": "fwber-frontend/app/venue/login/page.tsx"
+      "name": "fwber-frontend/app/share/[id]/opengraph-image.tsx",
+      "file": "fwber-frontend/app/share/[id]/opengraph-image.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/venue/register/page.tsx",
-      "file": "fwber-frontend/app/venue/register/page.tsx"
+      "name": "fwber-frontend/app/share/[id]/page.tsx",
+      "file": "fwber-frontend/app/share/[id]/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/share/[id]/share-content.tsx",
+      "file": "fwber-frontend/app/share/[id]/share-content.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/topics/[slug]/page.tsx",
+      "file": "fwber-frontend/app/topics/[slug]/page.tsx"
     },
     {
       "type": "file",
@@ -7241,8 +7236,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/topics/[slug]/page.tsx",
-      "file": "fwber-frontend/app/topics/[slug]/page.tsx"
+      "name": "fwber-frontend/app/venue/login/page.tsx",
+      "file": "fwber-frontend/app/venue/login/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/venue/register/page.tsx",
+      "file": "fwber-frontend/app/venue/register/page.tsx"
     },
     {
       "type": "file",
@@ -7271,13 +7271,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/fortune/page.tsx",
-      "file": "fwber-frontend/app/wingman/fortune/page.tsx"
+      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
+      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
-      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
+      "name": "fwber-frontend/app/wingman/fortune/page.tsx",
+      "file": "fwber-frontend/app/wingman/fortune/page.tsx"
     },
     {
       "type": "file",
@@ -7311,13 +7311,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/(protected)/settings/matching/page.tsx",
-      "file": "fwber-frontend/app/(protected)/settings/matching/page.tsx"
+      "name": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx",
+      "file": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx",
-      "file": "fwber-frontend/app/(protected)/compatibility-audit/[id]/page.tsx"
+      "name": "fwber-frontend/app/(protected)/settings/matching/page.tsx",
+      "file": "fwber-frontend/app/(protected)/settings/matching/page.tsx"
     },
     {
       "type": "file",
