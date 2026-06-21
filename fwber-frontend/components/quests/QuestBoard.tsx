@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, Zap, MapPin, CheckCircle2, Coins, ArrowRight } from 'lucide-react';
+import { Trophy, Zap, MapPin, CheckCircle2, Coins, ArrowRight, ScanLine } from 'lucide-react';
 import { api } from '@/lib/api/client';
+import { generateSHA256 } from '@/lib/utils/hash';
 import { useAuth } from '@/lib/auth-context';
 
 interface Quest {
@@ -51,15 +52,25 @@ export default function QuestBoard() {
         }
     };
 
-    const handleComplete = async (id: number) => {
+    const handleComplete = async (quest: Quest) => {
         try {
-            const res = await api.post<{ success: boolean; reward: number }>(`/quests/${id}/complete`, {}, {
+            let proof = undefined;
+
+            // Generate proof if the quest requires it (simulating an NFC scan or ZK proof)
+            if (quest.verification_secret) {
+                // In a real scenario, this secret would be read from an NFC tag, not exposed via API
+                // For demo purposes, we read it from the quest object
+                const userId = token ? JSON.parse(atob(token.split('.')[1])).id : 0;
+                proof = await generateSHA256(`${quest.id}${userId}${quest.verification_secret}`);
+            }
+
+            const res = await api.post<{ success: boolean; reward: number }>(`/quests/${quest.id}/complete`, { proof }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert(`Quest Complete! You earned ${res.reward} FWB tokens.`);
             fetchQuests();
-        } catch (err) {
-            alert('Condition not met yet. Keep going!');
+        } catch (err: any) {
+            alert(err.response?.data?.error || 'Condition not met yet. Keep going!');
         }
     };
 
@@ -113,8 +124,8 @@ export default function QuestBoard() {
                                             <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
                                                 <div className="bg-amber-500 h-full w-1/3 animate-pulse" />
                                             </div>
-                                            <Button onClick={() => handleComplete(quest.id)} className="w-full bg-amber-500 text-white hover:bg-amber-600 h-9 text-xs font-bold uppercase tracking-widest rounded-xl">
-                                                Complete Task
+                                            <Button onClick={() => handleComplete(quest)} className="w-full bg-amber-500 text-white hover:bg-amber-600 h-9 text-xs font-bold uppercase tracking-widest rounded-xl">
+                                                {quest.verification_secret ? <><ScanLine className="w-4 h-4 mr-2" /> Scan NFC to Verify</> : "Complete Task"}
                                             </Button>
                                         </div>
                                     ) : (

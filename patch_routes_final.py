@@ -1,58 +1,9 @@
-import { Router } from 'express';
-import { authenticate } from '../middleware/auth.js';
-import prisma from '../lib/prisma.js';
-import { serialize } from '../lib/prisma.js';
-import { TokenDistributionService } from '../services/TokenDistributionService.js';
+import re
 
-const router = Router();
-const tokenService = new TokenDistributionService();
+with open('fwber-backend-ts/src/routes/quests.ts', 'r') as f:
+    content = f.read()
 
-// GET /api/quests/active — Get active neighborhood quests for the user
-router.get('/active', authenticate, async (req: any, res) => {
-  try {
-    const userId = BigInt(req.user.id);
-    const quests = await prisma.quests.findMany({
-      where: {
-        is_active: true,
-        expires_at: { gt: new Date() }
-      },
-      include: {
-        user_quests: {
-          where: { user_id: userId }
-        }
-      }
-    });
-
-    res.json(serialize(quests));
-  } catch (error: any) {
-    res.status(500).json({ error: 'Failed to fetch quests' });
-  }
-});
-
-// POST /api/quests/:id/accept — Join a quest
-router.post('/:id/accept', authenticate, async (req: any, res) => {
-  try {
-    const userId = BigInt(req.user.id);
-    const questId = BigInt(req.params.id);
-
-    const userQuest = await prisma.user_quests.upsert({
-      where: { user_id_quest_id: { user_id: userId, quest_id: questId } },
-      update: {},
-      create: {
-        user_id: userId,
-        quest_id: questId,
-        status: 'active',
-        progress: { current: 0, target: 3 }
-      }
-    });
-
-    res.json({ success: true, userQuest: serialize(userQuest) });
-  } catch (error: any) {
-    res.status(500).json({ error: 'Failed to accept quest' });
-  }
-});
-
-import crypto from 'crypto';
+replacement = """import crypto from 'crypto';
 
 // POST /api/quests/:id/complete — Mark quest as completed
 router.post('/:id/complete', authenticate, async (req: any, res) => {
@@ -105,6 +56,13 @@ router.post('/:id/complete', authenticate, async (req: any, res) => {
     } catch (error: any) {
       res.status(500).json({ error: 'Failed to complete quest' });
     }
-});
+});"""
 
-export default router;
+content = re.sub(r'// POST /api/quests/:id/complete.*\}\);', replacement, content, flags=re.DOTALL)
+
+# Add crypto import at top if needed, though we put it right before the route
+if "import crypto from 'crypto';" not in content:
+  content = content.replace("import { Router } from 'express';", "import { Router } from 'express';\nimport crypto from 'crypto';")
+
+with open('fwber-backend-ts/src/routes/quests.ts', 'w') as f:
+    f.write(content)
