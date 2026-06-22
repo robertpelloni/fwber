@@ -10,10 +10,12 @@ import { useAuth } from '@/lib/auth-context'
 import { Logo } from '@/components/Logo'
 
 function shouldHideGlobalSubpageNav(pathname: string): boolean {
-  return pathname === '/'
-    || pathname === '/dashboard'
-    || pathname.startsWith('/dashboard/')
-    || pathname.startsWith('/api/')
+  return (
+    pathname === '/' ||
+    pathname === '/dashboard' ||
+    pathname.startsWith('/dashboard/') ||
+    pathname.startsWith('/api/')
+  )
 }
 
 export default function GlobalSubpageNav() {
@@ -69,20 +71,24 @@ export default function GlobalSubpageNav() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed left-4 top-4 z-[60] flex items-center gap-2 rounded-full glass-strong px-2 py-2 shadow-premium-lg border border-white/20 dark:border-white/10"
+      className="glass-strong shadow-premium-lg fixed left-4 top-4 z-[60] flex items-center gap-2 rounded-full border border-white/20 px-2 py-2 dark:border-white/10"
     >
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         type="button"
         onClick={handleBack}
-        className="rounded-full p-2 text-gray-700 dark:text-gray-300 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
+        className="rounded-full p-2 text-gray-700 transition-colors hover:bg-white/20 dark:text-gray-300 dark:hover:bg-white/10"
         aria-label="Go back"
         title="Go back"
       >
         <ArrowLeft className="h-5 w-5" />
       </motion.button>
-      <Link href={homeHref} className="flex items-center transition-opacity hover:opacity-90" aria-label="Go home">
+      <Link
+        href={homeHref}
+        className="flex items-center transition-opacity hover:opacity-90"
+        aria-label="Go home"
+      >
         <Logo className="text-2xl" />
       </Link>
     </motion.div>
