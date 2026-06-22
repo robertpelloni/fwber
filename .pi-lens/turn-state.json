@@ -1,17 +1,6 @@
 {
-  "files": {
-    "fwber-frontend/vercel-ignore-build.sh": {
-      "modifiedRanges": [
-        {
-          "start": 1,
-          "end": 34
-        }
-      ],
-      "importsChanged": false,
-      "lastEdit": "2026-06-18T18:37:47.896Z"
-    }
-  },
+  "files": {},
   "turnCycles": 0,
   "maxCycles": 3,
-  "lastUpdated": "2026-06-18T18:37:47.897Z"
+  "lastUpdated": "2026-06-22T11:53:49.824Z"
 }
