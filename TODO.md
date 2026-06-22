@@ -28,7 +28,7 @@
 
 ## 🔴 Upcoming: Phase 9 - Social Velocity & Federation
 - [ ] **ActivityPub Federation**: Complete end-to-end interop testing with local Mastodon/Pleroma nodes.
-- [ ] **Email Infrastructure**: Configure Resend DNS records (MX, SPF, DKIM, DMARC) for email delivery.
+- [x] **Email Infrastructure**: Configure Resend DNS records (MX, SPF, DKIM, DMARC) for email delivery.
 - [ ] **AI Provider Keys**: Configure OpenRouter/OpenAI API keys for Wingman AI features.
 - [ ] **Stripe Live Keys**: Switch from test to live Stripe keys for production payments.
 

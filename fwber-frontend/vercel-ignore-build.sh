@@ -2,7 +2,7 @@
 
 # fwber Vercel Ignored Build Step Script
 # Touching this file is a safe way to trigger a frontend-only Vercel deploy when needed.
-# Last forced deploy trigger: v1.0.29 auth probe rollout recovery.
+# Last forced deploy trigger: v2.1.9 Hetzner backend deploy verification fix.
 # Usage: Set "Ignored Build Step" in Vercel to: bash vercel-ignore-build.sh
 
 # Determine the path to check
@@ -10,24 +10,24 @@
 # If we are running from fwber-frontend (Vercel Root Directory), check .
 TARGET_PATH="."
 if [ -d "fwber-frontend" ]; then
-    TARGET_PATH="fwber-frontend"
+	TARGET_PATH="fwber-frontend"
 fi
 
 echo "Checking for changes in: $TARGET_PATH"
 
 # Check if we have enough history
 if ! git rev-parse --verify HEAD^ >/dev/null 2>&1; then
-    echo "Warning: No previous commit found (shallow clone?). Proceeding with build."
-    exit 1 # Build
+	echo "Warning: No previous commit found (shallow clone?). Proceeding with build."
+	exit 1 # Build
 fi
 
 # Check for changes
 # git diff --quiet returns 0 if NO changes (Skip Build)
 # git diff --quiet returns 1 if CHANGES (Proceed Build)
 if git diff --quiet HEAD^ HEAD -- "$TARGET_PATH"; then
-    echo "No changes detected in $TARGET_PATH. Skipping build."
-    exit 0
+	echo "No changes detected in $TARGET_PATH. Skipping build."
+	exit 0
 else
-    echo "Changes detected in $TARGET_PATH. Proceeding with build."
-    exit 1
+	echo "Changes detected in $TARGET_PATH. Proceeding with build."
+	exit 1
 fi

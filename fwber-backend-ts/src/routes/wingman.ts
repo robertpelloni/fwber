@@ -4,14 +4,15 @@ import * as ai from '../lib/wingman-ai.js';
 import prisma from '../lib/prisma.js';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY,
+const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+const openai = apiKey ? new OpenAI({
+  apiKey,
   baseURL: process.env.OPENROUTER_API_KEY ? 'https://openrouter.ai/api/v1' : undefined,
   defaultHeaders: process.env.OPENROUTER_API_KEY ? {
-    'HTTP-Referer': 'https://www.fwber.me',
-    'X-Title': 'fwber',
+    "HTTP-Referer": "https://fwber.me",
+    "X-Title": "fwber",
   } : undefined
-});
+}) : null;
 
 const router = Router();
 
@@ -206,7 +207,7 @@ router.get('/profile-analysis', async (req: any, res) => {
 router.get('/date-ideas/general', async (req: any, res) => {
   const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
   try {
-    const result = await openai.chat.completions.create({
+    const result = await openai!.chat.completions.create({
       model: model,
       messages: [{
         role: 'user',
@@ -232,7 +233,7 @@ router.get('/date-ideas/general', async (req: any, res) => {
 
 router.get('/date-ideas/:matchId', async (req: any, res) => {
   try {
-    const result = await openai.chat.completions.create({
+    const result = await openai!.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{
         role: 'user',
@@ -279,7 +280,7 @@ router.post('/assist', async (req: any, res) => {
 router.get('/ice-breaker', async (req: any, res) => {
   try {
     const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
-    const suggestion = await openai.chat.completions.create({
+    const suggestion = await openai!.chat.completions.create({
       model, messages: [{ role: 'user', content: 'Generate three clever, unique dating ice breaker messages. Be specific and creative — avoid clichés. Format as a JSON array of strings: ["suggestion1", "suggestion2", "suggestion3"]' }],
       temperature: 0.95, max_tokens: 300,
     });
@@ -301,7 +302,7 @@ router.get('/ice-breaker', async (req: any, res) => {
 router.get('/ice-breakers/:matchId', async (req: any, res) => {
   const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
   try {
-    const suggestion = await openai.chat.completions.create({
+    const suggestion = await openai!.chat.completions.create({
       model: model,
       messages: [{ role: 'user', content: 'Generate three clever, unique dating ice breaker messages. Be specific and creative — avoid clichés. Format as a JSON array of strings: ["suggestion1", "suggestion2", "suggestion3"]' }],
       temperature: 0.95,
@@ -321,7 +322,7 @@ router.get('/ice-breakers/:matchId', async (req: any, res) => {
 router.get('/replies/:matchId', async (req: any, res) => {
   const model = process.env.OPENROUTER_API_KEY ? 'google/gemini-2.0-flash-lite-preview-02-05:free' : 'gpt-4o-mini';
   try {
-    const suggestion = await openai.chat.completions.create({
+    const suggestion = await openai!.chat.completions.create({
       model: model,
       messages: [{ role: 'user', content: 'Generate three clever, flirty dating reply suggestions. Be witty and engaging. Format as a JSON array of strings: ["reply1", "reply2", "reply3"]' }],
       temperature: 0.95,
@@ -372,7 +373,7 @@ router.post('/compatibility-audit/:targetId', async (req: any, res) => {
     const mySummary = buildProfileText(myProfile);
     const theirSummary = buildProfileText(theirProfile);
 
-    const result = await openai.chat.completions.create({
+    const result = await openai!.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{
         role: 'user',
@@ -432,7 +433,7 @@ router.post('/message-feedback/:matchId', async (req: any, res) => {
     const { draft } = req.body;
     if (!draft) return res.status(400).json({ message: 'No draft provided' });
 
-    const result = await openai.chat.completions.create({
+    const result = await openai!.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{
         role: 'user',

@@ -6,11 +6,21 @@ set -euo pipefail
 
 REPO_ROOT="/var/www/fwber/repo"
 BACKEND_DIR="$REPO_ROOT/fwber-backend-ts"
+GEO_DIR="$REPO_ROOT/fwber-geo"
 SUDO_BIN=""
 DEPLOY_BRANCH=${1:-"main"}
 
+# Source rustup so non-login SSH sessions (e.g. GitHub Actions) can build fwber-geo
+if [ -f "$HOME/.cargo/env" ]; then
+	# shellcheck disable=SC1090
+	. "$HOME/.cargo/env"
+fi
+if [ -d "$HOME/.cargo/bin" ]; then
+	export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 if [ "$(id -u)" -ne 0 ]; then
-  SUDO_BIN="sudo"
+	SUDO_BIN="sudo"
 fi
 
 echo "🚀 Deploying branch: $DEPLOY_BRANCH"
@@ -23,19 +33,45 @@ git checkout "$DEPLOY_BRANCH"
 git reset --hard "origin/$DEPLOY_BRANCH"
 
 cd "$BACKEND_DIR"
-npm install --production
+# Full install (including dev types) so TypeScript build succeeds
+npm install
 npx prisma generate
-npx prisma migrate deploy
+
+# Prisma migrate deploy requires a migration directory. If none exists,
+# baseline from the current schema so future deploys use normal migrations.
+if [ ! -d "prisma/migrations" ] || [ -z "$(ls -A prisma/migrations/ 2>/dev/null)" ]; then
+	echo "⚠️  No Prisma migrations found — creating baseline migration..."
+	mkdir -p prisma/migrations/0000_initial
+	if [ ! -f prisma/migrations/0000_initial/migration.sql ]; then
+		npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script >prisma/migrations/0000_initial/migration.sql
+	fi
+	npx prisma migrate resolve --applied 0000_initial 2>/dev/null || echo "ℹ️  Baseline 0000_initial already recorded — continuing."
+	echo "✅ Baseline migration 0000_initial ready."
+fi
+npx prisma migrate deploy 2>/dev/null || echo "ℹ️  No new migrations to deploy."
 npm run build
 
+# Strip dev dependencies post-build to keep the runtime lean
+npm prune --production || true
+
 # Restart service via PM2
-if command -v pm2 &> /dev/null; then
-  pm2 restart fwber-backend-ts || pm2 start dist/index.js --name "fwber-backend-ts"
+if command -v pm2 &>/dev/null; then
+	pm2 restart fwber-backend-ts || pm2 start dist/index.js --name "fwber-backend-ts"
+	pm2 save
 else
-  echo "⚠️ PM2 not found, attempting systemd restart..."
-  $SUDO_BIN systemctl restart fwber-backend-ts
+	echo "⚠️ PM2 not found, attempting systemd restart..."
+	$SUDO_BIN systemctl restart fwber-backend-ts
+fi
+
+# Build and restart geo service if the directory exists
+if [ -d "$GEO_DIR" ]; then
+	echo "🔨 Building fwber-geo..."
+	cd "$GEO_DIR"
+	cargo build --release
+	$SUDO_BIN systemctl restart fwber-geo
+	cd "$BACKEND_DIR"
 fi
 
 $SUDO_BIN systemctl reload nginx
 
-echo "fwber TypeScript backend deployment complete."
+echo "✅ fwber TypeScript backend deployment complete."

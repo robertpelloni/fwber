@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.10] - 2026-06-22
+### Added
+- Created `docs/EMAIL_INFRASTRUCTURE.md` to guide production deployments for email deliverability.
+### Fixed
+- Updated `email.ts` to dynamically load `resend` to prevent ESM crashes when using SMTP fallbacks.
+- Fixed a fatal startup crash in `wingman.ts` when `OPENAI_API_KEY` is not provided.
+
 ## [2.1.9] - 2026-06-08
 
 ### Added

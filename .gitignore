@@ -57,8 +57,6 @@ setup_wsl_*.ps1
 .kiro/
 .qoder/
 .augment/
-.borg/
-.borg-session.json
 
 # Configuration backups
 config-backups/
@@ -122,11 +120,17 @@ frontend_build.tar.gz
 temp_build/
 metamcp.db
 metamcp.db*
-+.jules/
 # Environment files with secrets
 .env
 .env.*
 !.env.example
 
 # AI Agent session logs and metadata
-.jules/
+
+# IMPORTANT: Do NOT add any of the following to .gitignore
+# - Databases (*.db, *.sqlite, etc.)
+# - Session/conversation files (*-session.json, sessions/)
+# - .tormentnexus/ (AI sessions, memory, handoffs, db)
+# - .jules/ (Jules AI conversations and state)
+# These contain critical development history and must be tracked.
+# Only ignore system logs (*.log), build artifacts, and caches.
