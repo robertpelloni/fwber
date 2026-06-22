@@ -1,6 +1,6 @@
 {
-  "signature": "fwber-frontend/components/GlobalSubpageNav.tsx::Unresolved from this turn — fwber-frontend/components/GlobalSubpageNav.tsx:\n🔴 STOP — 6 issue(s) must be fixed:\n  L67: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L73: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L83: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L87: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L67: react/jsx-no-undef: 'motion' is not defined.\n  L73: react/jsx-no-undef: 'motion' is not defined.",
+  "signature": "fwber-frontend/components/AnimatedParticles.tsx::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 3 across 1 file(s).\nTop rules: high-complexity×2, high-fan-out×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "projectSeqStart": 80,
-  "projectSeqEnd": 81
+  "projectSeqStart": 96,
+  "projectSeqEnd": 97
 }

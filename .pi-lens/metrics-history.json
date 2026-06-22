@@ -1033,12 +1033,12 @@
     },
     "fwber-backend-ts\\src\\index.ts": {
       "latest": {
-        "commit": "f287734a0",
-        "timestamp": "2026-06-18T18:27:28.130Z",
-        "mi": 26.1,
+        "commit": "unknown",
+        "timestamp": "2026-06-22T22:37:46.458Z",
+        "mi": 26,
         "cognitive": 26,
         "nesting": 4,
-        "lines": 258,
+        "lines": 260,
         "maxCyclomatic": 4,
         "entropy": 5.16
       },
@@ -1050,6 +1050,16 @@
           "cognitive": 26,
           "nesting": 4,
           "lines": 258,
+          "maxCyclomatic": 4,
+          "entropy": 5.16
+        },
+        {
+          "commit": "unknown",
+          "timestamp": "2026-06-22T22:37:46.458Z",
+          "mi": 26,
+          "cognitive": 26,
+          "nesting": 4,
+          "lines": 260,
           "maxCyclomatic": 4,
           "entropy": 5.16
         }
@@ -1330,7 +1340,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-backend-ts\\src\\routes\\quests.ts": {
+      "latest": {
+        "commit": "unknown",
+        "timestamp": "2026-06-22T22:37:46.375Z",
+        "mi": 40.5,
+        "cognitive": 13,
+        "nesting": 3,
+        "lines": 73,
+        "maxCyclomatic": 4,
+        "entropy": 5.68
+      },
+      "history": [
+        {
+          "commit": "unknown",
+          "timestamp": "2026-06-22T22:37:46.375Z",
+          "mi": 40.5,
+          "cognitive": 13,
+          "nesting": 3,
+          "lines": 73,
+          "maxCyclomatic": 4,
+          "entropy": 5.68
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-18T18:35:35.033Z"
+  "capturedAt": "2026-06-22T22:37:51.469Z"
 }

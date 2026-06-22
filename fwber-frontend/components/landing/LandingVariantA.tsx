@@ -2,31 +2,76 @@
 
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import { motion, useInView } from 'framer-motion'
 import { Logo } from '@/components/Logo'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { trackCTAClick } from '@/lib/ab-testing'
 import {
-  Shield,
-  Heart,
-  MapPin,
-  MessageCircle,
-  Lock,
-  Ghost,
-  Layers,
-  CheckCircle2,
-  Sparkles,
-  Star,
-  Eye,
-  Fingerprint,
-  UserCheck,
-  Home,
-  UserPlus,
-  Compass,
+  Shield, Heart, MapPin, MessageCircle, Lock, Ghost, Layers,
+  CheckCircle2, Sparkles, Star, Eye, Fingerprint, UserCheck,
+  Home, UserPlus, Compass, ArrowRight, Zap,
 } from 'lucide-react'
 import { Suspense } from 'react'
 import ReferralBanner from '@/components/ReferralBanner'
+import { PremiumBadge, GradientIcon, ShimmerBorder } from '@/components/PremiumEffects'
+
+function FadeInUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+function StaggerGrid({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-60px' }}
+      variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+}
+
+function FloatUp({ children }: { children: React.ReactNode }) {
+  return <motion.div variants={staggerItem}>{children}</motion.div>
+}
+
+function FloatingOrbs() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
+      <div className="orb orb-pink" style={{ width: '600px', height: '600px', top: '-10%', left: '-5%', animation: 'blob 12s ease-in-out infinite' }} />
+      <div className="orb orb-purple" style={{ width: '500px', height: '500px', top: '20%', right: '-8%', animation: 'blob 15s ease-in-out infinite reverse' }} />
+      <div className="orb orb-cyan" style={{ width: '400px', height: '400px', bottom: '-5%', left: '30%', animation: 'blob 18s ease-in-out infinite 2s' }} />
+      <div className="orb orb-pink" style={{ width: '300px', height: '300px', top: '50%', left: '10%', animation: 'blob 20s ease-in-out infinite 5s', opacity: 0.2 }} />
+      <div className="orb orb-purple" style={{ width: '350px', height: '350px', bottom: '15%', right: '15%', animation: 'blob 14s ease-in-out infinite 3s', opacity: 0.25 }} />
+      {/* 3D geometric shapes */}
+      <div className="absolute top-[18%] left-[6%] w-20 h-20 border-2 border-purple-400/25 rounded-xl rotate-45 animate-float-slow dark:border-purple-500/15" />
+      <div className="absolute top-[55%] right-[10%] w-24 h-24 border-2 border-pink-400/20 rounded-full animate-float dark:border-pink-500/10" style={{ animationDelay: '2s' }} />
+      <div className="absolute bottom-[20%] left-[18%] w-14 h-14 border-2 border-cyan-400/20 rounded-lg rotate-12 animate-float-slow dark:border-cyan-500/10" style={{ animationDelay: '4s' }} />
+      <div className="absolute top-[35%] left-[48%] w-10 h-10 border-2 border-purple-400/15 rotate-[30deg] animate-float dark:border-purple-500/8" style={{ animationDelay: '1s' }} />
+      {/* Shooting star streaks */}
+      <div className="absolute top-[12%] right-[25%] w-24 h-px bg-gradient-to-r from-transparent via-purple-400/40 to-transparent -rotate-45 animate-pulse-glow" style={{ animationDuration: '4s' }} />
+      <div className="absolute top-[22%] right-[35%] w-16 h-px bg-gradient-to-r from-transparent via-pink-400/30 to-transparent -rotate-45 animate-pulse-glow" style={{ animationDuration: '5s', animationDelay: '2s' }} />
+    </div>
+  )
+}
 
 export default function LandingVariantA() {
   const { isAuthenticated, isLoading } = useAuth()
@@ -34,314 +79,267 @@ export default function LandingVariantA() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      const timer = setTimeout(() => {
-        router.push('/dashboard')
-      }, 100)
+      const timer = setTimeout(() => router.push('/dashboard'), 100)
       return () => clearTimeout(timer)
     }
   }, [isAuthenticated, isLoading, router])
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-purple-200 border-t-purple-600"></div>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-gray-950 dark:via-gray-900 dark:to-violet-950/30">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+          className="h-14 w-14 rounded-full border-[3px] border-purple-200 border-t-purple-600 shadow-[0_0_20px_rgba(168,85,247,0.2)] dark:border-purple-800 dark:border-t-purple-400"
+        />
       </div>
     )
   }
 
   if (isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-950">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-purple-200 border-t-purple-600"></div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Taking you to your dashboard…</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-gray-950 dark:via-gray-900 dark:to-violet-950/30">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+            className="mx-auto mb-4 h-14 w-14 rounded-full border-[3px] border-purple-200 border-t-purple-600 shadow-[0_0_20px_rgba(168,85,247,0.2)] dark:border-purple-800 dark:border-t-purple-400"
+          />
+          <p className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">Taking you to your dashboard…</p>
+        </motion.div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Suspense fallback={null}>
-        <ReferralBanner />
-      </Suspense>
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-gray-950 dark:via-gray-900 dark:to-violet-950/30 overflow-hidden">
+      <Suspense fallback={null}><ReferralBanner /></Suspense>
 
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-xl dark:border-gray-800 dark:bg-gray-950/80">
+      {/* ── Navigation ── */}
+      <motion.nav
+        initial={{ y: -80 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="sticky top-0 z-50 glass-strong border-b border-white/20 dark:border-white/5"
+      >
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 justify-between">
-            <div className="flex items-center">
-              <Link href="/" className="flex flex-shrink-0 items-center gap-1.5">
-                <Logo className="text-3xl" />
-              </Link>
-            </div>
+          <div className="flex h-16 justify-between items-center">
+            <Link href="/" className="flex-shrink-0">
+              <motion.div whileHover={{ scale: 1.02 }}><Logo className="text-3xl" /></motion.div>
+            </Link>
             <div className="hidden items-center space-x-6 md:flex">
-              <Link
-                href="#how-it-works"
-                className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-              >
-                How it works
-              </Link>
-              <Link
-                href="#safety"
-                className="text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-              >
-                Safety
-              </Link>
+              {['How it works', 'Features', 'Safety'].map((label) => (
+                <Link key={label} href={`#${label.toLowerCase().replace(/\s/g, '-')}`}
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-purple-500 after:transition-all hover:after:w-full"
+                >{label}</Link>
+              ))}
               <ThemeToggle />
-              <Link
-                href="/login"
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-full bg-gray-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-              >
-                Get started
+              <Link href="/login" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all">Log in</Link>
+              <Link href="/register"
+                className="btn-shiny rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-[length:200%_auto] animate-gradient-x px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/30 active:scale-95 transition-all duration-300">
+                Get started <ArrowRight className="inline h-3.5 w-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <div className="flex items-center gap-3 md:hidden">
               <ThemeToggle />
-              <Link
-                href="/register"
-                className="rounded-full bg-gray-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-gray-900"
-              >
-                Join
-              </Link>
+              <Link href="/register"
+                className="btn-shiny rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg">Join</Link>
             </div>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-50/60 via-white to-white dark:from-purple-950/20 dark:via-gray-950 dark:to-gray-950"></div>
-        <div className="absolute left-1/4 top-20 h-96 w-96 rounded-full bg-pink-200/30 blur-3xl dark:bg-pink-500/5"></div>
-        <div className="absolute right-1/4 top-40 h-80 w-80 rounded-full bg-purple-200/30 blur-3xl dark:bg-purple-500/5"></div>
+        <FloatingOrbs />
+        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #a855f7 1px, transparent 0)', backgroundSize: '40px 40px' }} />
 
-        <div className="relative mx-auto max-w-4xl px-4 pb-24 pt-20 text-center sm:pb-32 sm:pt-28">
-          <div className="mb-6 flex justify-center">
-            <Logo className="text-5xl sm:text-7xl" showDotMe={true} />
-          </div>
+        <div className="relative mx-auto max-w-5xl px-4 pb-24 pt-20 text-center sm:pb-32 sm:pt-28">
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}>
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, delay: 0.1 }} className="mb-6 flex justify-center">
+              <Logo className="text-6xl sm:text-8xl" showDotMe={true} />
+            </motion.div>
 
-          <h1 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
-            Meet people for who{' '}
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              they really are
-            </span>
-          </h1>
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-6 text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+              <span className="text-gray-900 dark:text-white">Meet people for who </span>
+              <br />
+              <span className="text-gradient-pink">they really are</span>
+            </motion.h1>
 
-          <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-400">
-            Photos stay hidden until you choose to reveal them. Values, personality, and real
-            connection come first. Your privacy is the foundation, not a feature toggle.
-          </p>
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+              className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-gray-600 sm:text-xl dark:text-gray-400">
+              Photos stay hidden until you choose to reveal them. Values, personality, and real
+              connection come first. Your privacy is the foundation, not a feature toggle.
+            </motion.p>
 
-          <div className="mb-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/register"
-              onClick={() => trackCTAClick('hero_cta_a')}
-              className="w-full rounded-full bg-gray-900 px-8 py-3.5 text-base font-medium text-white shadow-sm transition-all hover:bg-gray-800 sm:w-auto dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-            >
-              Create your account — it&apos;s free
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="w-full rounded-full border border-gray-200 px-8 py-3.5 text-base font-medium text-gray-700 transition-all hover:bg-gray-50 sm:w-auto dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
-            >
-              See how it works
-            </Link>
-          </div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
+              className="mb-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/register" onClick={() => trackCTAClick('hero_cta_a')}
+                className="group relative btn-shiny rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-[length:200%_auto] animate-gradient-x px-8 py-4 text-base font-bold text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/35 active:scale-[0.97] transition-all duration-300 w-full sm:w-auto">
+                Create your account — it&apos;s free
+                <ArrowRight className="inline h-4 w-4 ml-2 group-hover:translate-x-1.5 transition-transform" />
+              </Link>
+              <Link href="#how-it-works"
+                className="group glass border border-white/30 dark:border-white/10 rounded-full px-8 py-4 text-base font-medium text-gray-700 dark:text-gray-300 hover:shadow-premium-lg active:scale-[0.97] transition-all duration-300 w-full sm:w-auto flex items-center gap-2">
+                See how it works <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </motion.div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-500">
-            <span className="flex items-center gap-1.5">
-              <Lock className="h-4 w-4" /> End-to-end encrypted
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Ghost className="h-4 w-4" /> Browse anonymously
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Eye className="h-4 w-4" /> Photos are opt-in
-            </span>
-            <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4" /> Open source
-            </span>
-          </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.5 }}
+              className="flex flex-wrap items-center justify-center gap-3 text-sm">
+              {[
+                { icon: Lock, text: 'End-to-end encrypted' },
+                { icon: Ghost, text: 'Browse anonymously' },
+                { icon: Eye, text: 'Photos are opt-in' },
+                { icon: CheckCircle2, text: 'Open source' },
+              ].map((item, i) => (
+                <motion.span key={item.text}
+                  initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 + i * 0.1 }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-light border border-white/20 dark:border-white/5 shadow-sm">
+                  <item.icon className="h-3.5 w-3.5 text-purple-500 dark:text-purple-400" />
+                  {item.text}
+                </motion.span>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 dark:from-gray-950 to-transparent pointer-events-none" />
+      </section>
+
+      {/* ── How it works ── */}
+      <section id="how-it-works" className="relative py-28 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 via-white to-white dark:from-gray-900/50 dark:via-gray-950 dark:to-gray-950" />
+        <FloatingOrbs />
+        <div className="relative mx-auto max-w-5xl px-4">
+          <FadeInUp>
+            <div className="mb-16 text-center">
+              <motion.span initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+                className="inline-flex items-center rounded-full border border-pink-500/30 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-cyan-500/20 backdrop-blur-sm px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-pink-500 dark:text-pink-400 mb-4">
+                How it works
+              </motion.span>
+              <h2 className="text-4xl font-black text-gray-900 sm:text-5xl dark:text-white">
+                Connection before <span className="text-gradient-pink">attraction</span>
+              </h2>
+            </div>
+          </FadeInUp>
+          <StaggerGrid className="grid gap-8 md:grid-cols-3">
+            {[
+              { icon: Sparkles, title: '1. Answer questions', desc: 'Share what matters to you — your values, lifestyle, and what you\'re looking for. Our matching engine uses 100+ personality questions.', gradient: 'from-pink-500 to-purple-500' },
+              { icon: Compass, title: '2. Discover nearby', desc: 'Browse people near you through AI-generated avatars — not photos. See compatibility scores, shared values, and local events.', gradient: 'from-purple-500 to-cyan-500' },
+              { icon: Heart, title: '3. Reveal on your terms', desc: 'When you\'ve built trust through conversation, choose to reveal photos. You control the pace. No pressure.', gradient: 'from-cyan-500 to-pink-500' },
+            ].map((item) => (
+              <FloatUp key={item.title}>
+                <motion.div whileHover={{ y: -10, scale: 1.02 }}
+                  className="glass rounded-2xl p-8 text-center shadow-premium hover:shadow-premium-lg transition-all duration-300 border border-white/20 dark:border-white/5 h-full group">
+                  <div className={`mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <item.icon className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">{item.title}</h3>
+                  <p className="leading-relaxed text-gray-600 dark:text-gray-400">{item.desc}</p>
+                </motion.div>
+              </FloatUp>
+            ))}
+          </StaggerGrid>
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="bg-gray-50 py-24 dark:bg-gray-900">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="mb-16 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400">
-              How it works
-            </p>
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl dark:text-white">
-              Connection before attraction
+      {/* ── Features ── */}
+      <section id="features" className="relative py-28 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-white via-purple-50/30 to-white dark:from-gray-950 dark:via-purple-950/10 dark:to-gray-950" />
+        <FloatingOrbs />
+        <div className="relative mx-auto max-w-5xl px-4">
+          <FadeInUp>
+            <div className="mb-16 text-center">
+              <span className="badge-shiny inline-block mb-4">Built different</span>
+              <h2 className="text-4xl font-black text-gray-900 sm:text-5xl dark:text-white">
+                Designed around <span className="text-gradient-pink">trust</span>
+              </h2>
+            </div>
+          </FadeInUp>
+          <StaggerGrid className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Ghost, title: 'AI Avatars', desc: 'Your real photos stay hidden behind an AI persona. Personality first, photos on your terms.', color: 'from-purple-400 to-purple-600' },
+              { icon: Fingerprint, title: 'Zero-Knowledge Proof', desc: 'Prove you\'re real without revealing your identity. Privacy-preserving verification.', color: 'from-blue-400 to-blue-600' },
+              { icon: MapPin, title: 'Fuzzy Location', desc: 'Your neighborhood, not your address. Proximity without surveillance.', color: 'from-emerald-400 to-green-600' },
+              { icon: Lock, title: 'E2E Encryption', desc: 'Messages encrypted on your device. We can\'t read them. No one can.', color: 'from-pink-400 to-rose-600' },
+              { icon: Layers, title: 'Progressive Reveal', desc: 'Control when your match sees photos, name, details. Trust builds step by step.', color: 'from-orange-400 to-amber-600' },
+              { icon: UserCheck, title: 'Value Matching', desc: '100+ questions across 7 categories. Matched on what matters, not just looks.', color: 'from-indigo-400 to-indigo-600' },
+              { icon: Shield, title: 'AI Guardrails', desc: 'Block unsolicited explicit content automatically. Safety first, always.', color: 'from-red-400 to-rose-600' },
+              { icon: Star, title: 'Open Source', desc: 'Every line auditable. We don\'t sell your data. Trust through transparency.', color: 'from-amber-400 to-yellow-600' },
+            ].map((item) => (
+              <FloatUp key={item.title}>
+                <motion.div whileHover={{ y: -6, scale: 1.02 }}
+                  className="glass rounded-2xl p-5 shadow-premium hover:shadow-premium-lg transition-all duration-300 border border-white/20 dark:border-white/5 h-full group">
+                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${item.color} shadow-lg group-hover:scale-110 transition-transform`}>
+                    <item.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <h3 className="mb-1.5 font-bold text-gray-900 dark:text-white text-sm">{item.title}</h3>
+                  <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400">{item.desc}</p>
+                </motion.div>
+              </FloatUp>
+            ))}
+          </StaggerGrid>
+        </div>
+      </section>
+
+      {/* ── Safety ── */}
+      <section id="safety" className="relative py-28 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950" />
+        <FloatingOrbs />
+        <div className="relative mx-auto max-w-4xl px-4 text-center">
+          <FadeInUp>
+            <motion.div whileHover={{ scale: 1.08, rotate: 5 }}
+              className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 shadow-lg shadow-green-500/30">
+              <Shield className="h-8 w-8 text-white" />
+            </motion.div>
+            <h2 className="mb-4 text-4xl font-black text-gray-900 sm:text-5xl dark:text-white">
+              Your safety comes <span className="text-gradient-gold">first</span>
             </h2>
-          </div>
-          <div className="grid gap-12 md:grid-cols-3">
-            <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-purple-100 dark:bg-purple-900/30">
-                <Sparkles className="h-7 w-7 text-purple-600 dark:text-purple-400" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                1. Answer questions
-              </h3>
-              <p className="leading-relaxed text-gray-600 dark:text-gray-400">
-                Share what matters to you — your values, lifestyle, and what you&apos;re looking
-                for. Our matching engine uses 100+ personality questions to find real compatibility.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-pink-100 dark:bg-pink-900/30">
-                <Compass className="h-7 w-7 text-pink-600 dark:text-pink-400" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                2. Discover nearby
-              </h3>
-              <p className="leading-relaxed text-gray-600 dark:text-gray-400">
-                Browse people near you through AI-generated avatars — not photos. See compatibility
-                scores, shared values, and local events. Your exact location is never shared.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30">
-                <Heart className="h-7 w-7 text-green-600 dark:text-green-400" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-                3. Reveal on your terms
-              </h3>
-              <p className="leading-relaxed text-gray-600 dark:text-gray-400">
-                When you&apos;ve built trust through conversation, choose to reveal photos. You
-                control the pace. No pressure, no rush — real connection grows naturally.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="py-24">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="mb-16 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-purple-600 dark:text-purple-400">
-              Built different
+            <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400">
+              We built fwber because we believe dating apps should protect you, not exploit you.
             </p>
-            <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl dark:text-white">
-              Designed around trust
-            </h2>
-          </div>
-          <div className="grid gap-8 sm:grid-cols-2">
-            <FeatureCard
-              icon={<Ghost className="h-6 w-6" />}
-              title="AI Avatars by default"
-              description="Your real photos are hidden behind an AI-generated persona. No snap judgments — you're seen for your personality first."
-              color="purple"
-            />
-            <FeatureCard
-              icon={<Fingerprint className="h-6 w-6" />}
-              title="Zero-knowledge verification"
-              description="Prove you're real without revealing your identity. Anti-catfish technology that protects your privacy."
-              color="blue"
-            />
-            <FeatureCard
-              icon={<MapPin className="h-6 w-6" />}
-              title="Fuzzy location"
-              description="We know your neighborhood, not your address. Meet people nearby without ever sharing exact coordinates."
-              color="green"
-            />
-            <FeatureCard
-              icon={<Lock className="h-6 w-6" />}
-              title="End-to-end encryption"
-              description="Every message is encrypted on your device. We can't read them. No one can. Your conversations are yours."
-              color="pink"
-            />
-            <FeatureCard
-              icon={<Layers className="h-6 w-6" />}
-              title="Progressive reveal"
-              description="You control when your match sees your photos, your name, your details. Trust builds step by step."
-              color="orange"
-            />
-            <FeatureCard
-              icon={<UserCheck className="h-6 w-6" />}
-              title="Value-based matching"
-              description="100+ personality questions across 7 categories. We match on what matters — not just photos and swipes."
-              color="indigo"
-            />
-            <FeatureCard
-              icon={<Shield className="h-6 w-6" />}
-              title="AI safety guardrails"
-              description="Unsolicited explicit content is blocked automatically. Reports are handled quickly. Your safety is non-negotiable."
-              color="red"
-            />
-            <FeatureCard
-              icon={<Star className="h-6 w-6" />}
-              title="Open source"
-              description="Every line of code is auditable. We don't sell your data because you can verify we don't. Trust through transparency."
-              color="amber"
-            />
-          </div>
+          </FadeInUp>
+          <StaggerGrid className="mb-12 grid gap-4 text-left sm:grid-cols-2">
+            {[
+              { icon: Eye, title: 'Ghost Mode', desc: 'Browse invisibly. No one knows you looked at their profile unless you want them to.' },
+              { icon: MapPin, title: 'Location Fuzzing', desc: 'Your location is approximate. We show your area, never your exact spot.' },
+              { icon: Lock, title: 'Private Vault', desc: 'Encrypted storage for private content that never touches the cloud unencrypted.' },
+              { icon: MessageCircle, title: 'Safe Walk', desc: 'Share your live route with trusted contacts when walking to meet someone.' },
+            ].map((item) => (
+              <FloatUp key={item.title}>
+                <motion.div whileHover={{ x: 4 }}
+                  className="flex gap-3 glass rounded-xl p-4 border border-white/20 dark:border-white/5 shadow-sm">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-green-500 shadow-md">
+                    <item.icon className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="mb-0.5 text-sm font-bold text-gray-900 dark:text-white">{item.title}</h4>
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{item.desc}</p>
+                  </div>
+                </motion.div>
+              </FloatUp>
+            ))}
+          </StaggerGrid>
+          <FadeInUp delay={0.2}>
+            <motion.div whileHover={{ y: -4 }}
+              className="glass rounded-2xl p-8 sm:p-10 shadow-premium-lg border border-white/20 dark:border-white/5">
+              <h3 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
+                Ready to try a different kind of dating app?
+              </h3>
+              <p className="mb-6 text-gray-600 dark:text-gray-400">Free to join. No credit card required.</p>
+              <Link href="/register" onClick={() => trackCTAClick('bottom_cta_a')}
+                className="btn-shiny inline-block rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-[length:200%_auto] animate-gradient-x px-8 py-4 font-bold text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/30 active:scale-[0.97] transition-all duration-300">
+                Create your account <ArrowRight className="inline h-4 w-4 ml-2" />
+              </Link>
+            </motion.div>
+          </FadeInUp>
         </div>
       </section>
 
-      {/* Safety */}
-      <section id="safety" className="bg-gray-50 py-24 dark:bg-gray-900">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30">
-            <Shield className="h-8 w-8 text-green-600 dark:text-green-400" />
-          </div>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl dark:text-white">
-            Your safety comes first
-          </h2>
-          <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-gray-600 dark:text-gray-400">
-            We built fwber because we believe dating apps should protect you, not exploit you. Every
-            design decision starts with the question: &quot;Does this keep people safe?&quot;
-          </p>
-          <div className="mb-12 grid gap-6 text-left sm:grid-cols-2">
-            <SafetyItem
-              icon={<Eye className="h-5 w-5" />}
-              title="Ghost Mode"
-              description="Browse invisibly. No one knows you looked at their profile unless you want them to."
-            />
-            <SafetyItem
-              icon={<MapPin className="h-5 w-5" />}
-              title="Location fuzzing"
-              description="Your location is approximate. We show your area, never your exact spot."
-            />
-            <SafetyItem
-              icon={<Lock className="h-5 w-5" />}
-              title="Private vault"
-              description="Encrypted storage for private content that never touches the cloud unencrypted."
-            />
-            <SafetyItem
-              icon={<MessageCircle className="h-5 w-5" />}
-              title="Safe Walk"
-              description="Share your live route with trusted contacts when walking to meet someone."
-            />
-          </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-8 sm:p-10 dark:border-gray-700 dark:bg-gray-800">
-            <h3 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
-              Ready to try a different kind of dating app?
-            </h3>
-            <p className="mb-6 text-gray-600 dark:text-gray-400">
-              Free to join. No credit card required. Your data stays yours.
-            </p>
-            <Link
-              href="/register"
-              onClick={() => trackCTAClick('bottom_cta_a')}
-              className="inline-block rounded-full bg-gray-900 px-8 py-3.5 font-medium text-white transition-colors hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
-            >
-              Create your account
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-12 dark:border-gray-800">
+      {/* ── Footer ── */}
+      <footer className="relative border-t border-white/10 dark:border-white/5 py-12 glass-strong">
         <div className="mx-auto max-w-6xl px-4">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-4">
@@ -349,128 +347,33 @@ export default function LandingVariantA() {
               <span className="text-sm text-gray-500">© 2026 fwber</span>
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500">
-              <Link
-                href="/privacy"
-                className="transition-colors hover:text-gray-900 dark:hover:text-white"
-              >
-                Privacy
-              </Link>
-              <Link
-                href="/terms"
-                className="transition-colors hover:text-gray-900 dark:hover:text-white"
-              >
-                Terms
-              </Link>
-              <Link
-                href="/contact"
-                className="transition-colors hover:text-gray-900 dark:hover:text-white"
-              >
-                Contact
-              </Link>
-              <a
-                href="https://github.com/robertpelloni/fwber"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-gray-900 dark:hover:text-white"
-              >
-                GitHub
-              </a>
+              {[{ href: '/privacy', label: 'Privacy' }, { href: '/terms', label: 'Terms' }, { href: '/contact', label: 'Contact' }, { href: 'https://github.com/robertpelloni/fwber', label: 'GitHub' }].map((link) => (
+                <Link key={link.label} href={link.href} {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="transition-all hover:text-purple-500 dark:hover:text-purple-400">{link.label}</Link>
+              ))}
             </div>
           </div>
         </div>
       </footer>
 
       {/* Mobile bottom nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white md:hidden dark:border-gray-800 dark:bg-gray-950">
+      <motion.div initial={{ y: 60 }} animate={{ y: 0 }} transition={{ delay: 0.5 }}
+        className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 dark:border-white/5 md:hidden">
         <div className="flex h-14 items-center justify-around">
-          <Link
-            href="/"
-            className="flex h-full w-full flex-col items-center justify-center text-gray-900 dark:text-white"
-          >
-            <Home className="h-5 w-5" />
-            <span className="mt-0.5 text-[10px] font-medium">Home</span>
-          </Link>
-          <Link
-            href="#how-it-works"
-            className="flex h-full w-full flex-col items-center justify-center text-gray-400"
-          >
-            <Star className="h-5 w-5" />
-            <span className="mt-0.5 text-[10px]">How it works</span>
-          </Link>
-          <Link
-            href="#safety"
-            className="flex h-full w-full flex-col items-center justify-center text-gray-400"
-          >
-            <Shield className="h-5 w-5" />
-            <span className="mt-0.5 text-[10px]">Safety</span>
-          </Link>
-          <Link
-            href="/register"
-            className="flex h-full w-full flex-col items-center justify-center font-semibold text-purple-600 dark:text-purple-400"
-          >
-            <UserPlus className="h-5 w-5" />
-            <span className="mt-0.5 text-[10px]">Join</span>
-          </Link>
+          {[
+            { href: '/', icon: Home, label: 'Home', active: true },
+            { href: '#how-it-works', icon: Star, label: 'How' },
+            { href: '#features', icon: Zap, label: 'Features' },
+            { href: '/register', icon: UserPlus, label: 'Join', highlight: true },
+          ].map((item) => (
+            <Link key={item.label} href={item.href}
+              className={`flex h-full w-full flex-col items-center justify-center transition-all duration-200 ${item.active || item.highlight ? 'text-purple-600 dark:text-purple-400' : 'text-gray-400 dark:text-gray-500'} ${item.highlight ? 'font-bold' : ''}`}>
+              <item.icon className={`h-5 w-5 ${item.active || item.highlight ? 'drop-shadow-[0_0_6px_rgba(168,85,247,0.5)]' : ''}`} />
+              <span className="mt-0.5 text-[10px] font-medium">{item.label}</span>
+            </Link>
+          ))}
         </div>
-      </div>
-    </div>
-  )
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-  color,
-}: {
-  icon: React.ReactNode
-  title: string
-  description: string
-  color: string
-}) {
-  const colors: Record<string, string> = {
-    purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-    blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-    green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-    pink: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
-    orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
-    indigo: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
-    red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-    amber: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-  }
-  return (
-    <div className="group rounded-2xl border border-gray-100 bg-white p-6 transition-all hover:border-gray-200 hover:shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:hover:border-gray-700">
-      <div
-        className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl ${
-          colors[color] || colors.purple
-        }`}
-      >
-        {icon}
-      </div>
-      <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">{title}</h3>
-      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{description}</p>
-    </div>
-  )
-}
-
-function SafetyItem({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode
-  title: string
-  description: string
-}) {
-  return (
-    <div className="flex gap-3 rounded-xl border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-        {icon}
-      </div>
-      <div>
-        <h4 className="mb-0.5 text-sm font-medium text-gray-900 dark:text-white">{title}</h4>
-        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{description}</p>
-      </div>
+      </motion.div>
     </div>
   )
 }
