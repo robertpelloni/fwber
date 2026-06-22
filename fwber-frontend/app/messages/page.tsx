@@ -35,6 +35,7 @@ export default function MessagesPage() {
 	const { videoSignals }: { videoSignals: any[] } = useWebSocket();
 	const { confirmAction, ConfirmDialog } = useConfirmDialog();
 	const [conversations, setConversations] = useState<Conversation[]>([]);
+	const [auraMatches, setAuraMatches] = useState<any[]>([]);
 	const [selectedConversation, setSelectedConversation] =
 		useState<Conversation | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -55,10 +56,14 @@ export default function MessagesPage() {
 		try {
 			setIsLoading(true);
 			setError(null);
-			const conversationsData = await getConversations(token);
+			const [conversationsData, auraMatchesData] = await Promise.all([
+				getConversations(token),
+				api.get('/matching/aura-matches')
+			]);
 			setConversations(
 				Array.isArray(conversationsData) ? conversationsData : [],
 			);
+			setAuraMatches(Array.isArray(auraMatchesData) ? auraMatchesData : []);
 		} catch (err) {
 			setError(
 				err instanceof Error ? err.message : "Failed to load conversations",
@@ -203,6 +208,51 @@ export default function MessagesPage() {
 				<AppHeader />
 
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+					{/* Aura Matches Bar */}
+					{auraMatches.length > 0 && (
+						<div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-700">
+							<div className="flex items-center gap-2 mb-3 px-2">
+								<Sparkles className="w-4 h-4 text-purple-500 fill-current" />
+								<h3 className="text-xs font-black uppercase tracking-widest text-zinc-500">
+									Vibe-Compatible Partners
+								</h3>
+							</div>
+							<div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide">
+								{auraMatches.map((match) => (
+									<div
+										key={match.user_id}
+										className="flex-shrink-0 flex flex-col items-center gap-2 cursor-pointer group"
+										onClick={() => {
+											const conv = conversations.find(c => String(c.other_user.id) === String(match.user_id));
+											if (conv) setSelectedConversation(conv);
+										}}
+									>
+										<div className="relative">
+											<EvolvingAvatar
+												src={match.avatar || "/placeholder-avatar.png"}
+												alt={match.name}
+												size="md"
+												emotion={match.emotion.toLowerCase()}
+												className="group-hover:scale-105 transition-transform"
+											/>
+											<div className="absolute -top-1 -right-1 bg-purple-600 text-[8px] font-black text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter shadow-lg shadow-purple-500/20">
+												Match
+											</div>
+										</div>
+										<div className="text-center">
+											<p className="text-[10px] font-bold text-gray-900 dark:text-white truncate max-w-[64px]">
+												{match.name}
+											</p>
+											<p className="text-[8px] font-medium text-purple-500 uppercase tracking-tighter">
+												{match.aura_mood}
+											</p>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+
 					<div className="mb-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
 						<div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 							<div>
@@ -280,12 +330,12 @@ export default function MessagesPage() {
 										>
 											<div className="flex items-center space-x-3">
 												<div className="relative">
-													<div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-														{(conversation.other_user?.profile
-															?.display_name?.[0] || 
-														  conversation.other_user?.email?.[0] ||
-														  "?").toUpperCase()}
-													</div>
+													<EvolvingAvatar
+														src={conversation.other_user?.profile?.photos?.[0]?.url || "/placeholder-avatar.png"}
+														alt={conversation.other_user?.profile?.display_name || "User"}
+														size="md"
+														emotion={(conversation.other_user?.profile?.current_emotion as any) || "neutral"}
+													/>
 													<div className="absolute -bottom-0.5 -right-0.5">
 														<PresenceIndicator
 															userId={String(conversation.other_user?.id)}

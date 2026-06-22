@@ -59,4 +59,30 @@ export class ActivityNotificationService {
     const body = `${actorName}@${actorDomain} boosted your post: "${objectTitle}"`;
     await this.notify(targetUserId, title, body, { type: 'boost', actor: `${actorName}@${actorDomain}` });
   }
+
+  /**
+   * Specifically handle ActivityPub "Mention" notifications.
+   */
+  static async notifyMention(targetUserId: bigint, actorName: string, actorDomain: string, content: string) {
+    const title = 'You were mentioned';
+    const body = `${actorName}@${actorDomain} mentioned you in a post.`;
+    await this.notify(targetUserId, title, body, {
+        type: 'mention',
+        actor: `${actorName}@${actorDomain}`,
+        preview: content.substring(0, 100)
+    });
+  }
+
+  /**
+   * Specifically handle ActivityPub "Reply" notifications.
+   */
+  static async notifyReply(targetUserId: bigint, actorName: string, actorDomain: string, content: string) {
+    const title = 'New Reply';
+    const body = `${actorName}@${actorDomain} replied to your post.`;
+    await this.notify(targetUserId, title, body, {
+        type: 'reply',
+        actor: `${actorName}@${actorDomain}`,
+        preview: content.substring(0, 100)
+    });
+  }
 }

@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { PlusCircle, Tag, Radio } from 'lucide-react'
 import NeighborhoodVibe from '@/components/merchant/NeighborhoodVibe'
+import VibeIntelligence from '@/components/merchant/VibeIntelligence'
 import { Badge } from '@/components/ui/badge'
 import { MerchantPOS } from '@/components/merchant/MerchantPOS'
 
@@ -113,8 +114,9 @@ export default function MerchantDashboard() {
 
         {/* Real-time Intel */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
                 {token && <NeighborhoodVibe token={token} />}
+                {token && <VibeIntelligence token={token} />}
             </div>
             <div>
                 <MerchantPOS />

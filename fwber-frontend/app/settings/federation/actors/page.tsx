@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 import {
   ArrowLeft,
   ExternalLink,
@@ -13,6 +14,7 @@ import {
   MessageSquare,
   Radio,
   UserPlus,
+  UserMinus,
 } from 'lucide-react'
 
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -143,6 +145,38 @@ function FederationActorExplorerContent() {
     }
   }
 
+  const handleUnfollow = async () => {
+    if (!actor || !isFollowing) {
+      return
+    }
+
+    try {
+      setIsFollowPending(true)
+      await api.post('/federation/unfollow', { actor_id: actor.id })
+      setFollowing((current) => current.filter(f => f.actor_uri !== actor.id))
+      setActor((current) =>
+        current
+          ? {
+              ...current,
+              followingStatus: undefined,
+            }
+          : current
+      )
+      toast({
+        title: 'Unfollowed',
+        description: 'You have unfollowed this federated actor.',
+      })
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Unfollow failed',
+        description: 'Could not send unfollow request to the remote server.',
+      })
+    } finally {
+      setIsFollowPending(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <AppHeader />
@@ -239,14 +273,26 @@ function FederationActorExplorerContent() {
                         </a>
                       </Button>
                     ) : null}
-                    <Button
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() => void handleFollow()}
-                      disabled={isFollowPending || isFollowing || !isFederated}
-                    >
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      {isFollowing ? 'Already Following' : isFollowPending ? 'Sending…' : 'Follow Actor'}
-                    </Button>
+                    {isFollowing ? (
+                        <Button
+                            variant="outline"
+                            className="text-rose-500 border-rose-200 hover:bg-rose-50"
+                            onClick={() => void handleUnfollow()}
+                            disabled={isFollowPending || !isFederated}
+                        >
+                            <UserMinus className="w-4 h-4 mr-2" />
+                            {isFollowPending ? 'Sending…' : 'Unfollow Actor'}
+                        </Button>
+                    ) : (
+                        <Button
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => void handleFollow()}
+                            disabled={isFollowPending || !isFederated}
+                        >
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            {isFollowPending ? 'Sending…' : 'Follow Actor'}
+                        </Button>
+                    )}
                   </div>
                   {!isFederated ? (
                     <p className="text-xs text-amber-600">
@@ -339,7 +385,7 @@ function FederationActorExplorerContent() {
                         </div>
                         <div
                           className="mt-4 prose max-w-none text-sm text-gray-700 dark:prose-invert dark:text-gray-300"
-                          dangerouslySetInnerHTML={{ __html: post.content }}
+                          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
                         />
                         <div className="mt-4 flex flex-wrap gap-3">
                           {post.url ? (

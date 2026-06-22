@@ -42,6 +42,44 @@ router.get('/questions', async (req: any, res) => {
   }
 });
 
+router.get('/aura-matches', async (req: any, res) => {
+  try {
+    const userId = BigInt(req.user.id);
+
+    // Find recent matches/conversations
+    const matches = await prisma.matches.findMany({
+      where: {
+        OR: [{ user1_id: userId }, { user2_id: userId }],
+        status: 'accepted'
+      },
+      include: {
+        users_matches_user1_idTousers: { include: { user_profiles: true } },
+        users_matches_user2_idTousers: { include: { user_profiles: true } }
+      },
+      take: 10,
+      orderBy: { last_message_at: 'desc' }
+    });
+
+    const auraMatches = await Promise.all(matches.map(async (m: any) => {
+        const otherUser = m.user1_id === userId ? m.users_matches_user2_idTousers : m.users_matches_user1_idTousers;
+        const compatibility = await matchingService.calculateAuraCompatibility(userId, otherUser.id);
+
+        return {
+            user_id: otherUser.id.toString(),
+            name: otherUser.user_profiles?.[0]?.display_name || otherUser.name,
+            avatar: otherUser.user_profiles?.[0]?.avatar_url,
+            emotion: otherUser.user_profiles?.[0]?.current_emotion || 'Neutral',
+            aura_score: compatibility.score,
+            aura_mood: compatibility.mood
+        };
+    }));
+
+    res.json(auraMatches.filter(m => m.aura_score > 0.5).sort((a, b) => b.aura_score - a.aura_score));
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/matching/answer - Submit an answer
 router.post('/answer', async (req: any, res) => {
   try {

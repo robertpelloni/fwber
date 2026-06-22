@@ -12,6 +12,7 @@ export type NormalizedNotificationType =
   | 'system'
   | 'gift'
   | 'event'
+  | 'wingman_nudge'
 
 export function normalizeNotificationType(type?: string): NormalizedNotificationType {
   switch (type) {
@@ -28,6 +29,7 @@ export function normalizeNotificationType(type?: string): NormalizedNotification
     case 'view':
     case 'gift':
     case 'event':
+    case 'wingman_nudge':
       return type
     default:
       return 'system'
@@ -69,6 +71,10 @@ export function getNotificationRoute(notification: NotificationRoutePayload): st
       return typeof data.event_id === 'number' || typeof data.event_id === 'string'
         ? `/events/${data.event_id}`
         : '/events'
+    case 'wingman_nudge':
+      return typeof data.targetId === 'string' || typeof data.targetId === 'number'
+        ? `/messages/${data.targetId}`
+        : '/messages'
     default:
       return '#'
   }
@@ -86,6 +92,8 @@ export function getNotificationActionLabel(notification: NotificationRoutePayloa
       return 'Open Friends'
     case 'view':
       return 'View Profile'
+    case 'wingman_nudge':
+      return 'Chat Now'
     default:
       return 'Open'
   }

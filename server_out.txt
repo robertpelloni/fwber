@@ -1,0 +1,7 @@
+◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+[Email] No SMTP configured, relying on Resend or console fallback
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+[server]: Server is running at http://localhost:4000
