@@ -457,7 +457,7 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
       {showNav && (
         <aside className="fixed top-[4.625rem] bottom-0 left-0 z-30 hidden w-72 border-r border-gray-200 dark:border-gray-700 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-900/95 lg:flex lg:flex-col">
           <div className="flex-1 overflow-y-auto px-4 py-6">
-            <div className="mb-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-gray-50 to-white p-4 dark:border-gray-800 dark:from-gray-900 dark:to-gray-950">
+            <div className="mb-6 rounded-2xl glass border border-white/20 dark:border-white/5 p-4 shadow-premium">
               <div className="mb-3 flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-orange-500 text-base font-bold text-white">
                   {userInitial}
@@ -494,10 +494,10 @@ export default function AppHeader({ title = 'FWBer', showNav = true }: AppHeader
               </div>
             </div>
 
-            <div className="mt-6 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950/60">
+            <div className="mt-6 rounded-2xl glass border border-white/20 dark:border-white/5 p-4 shadow-sm">
               <a
                 href="/help"
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900 dark:text-white dark:text-gray-300 dark:hover:text-white"
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"
               >
                 <CircleHelp className="h-4 w-4" />
                 <span>Need help?</span>

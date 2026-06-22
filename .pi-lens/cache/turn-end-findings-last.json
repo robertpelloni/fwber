@@ -1,6 +1,6 @@
 {
-  "signature": "ops/hetzner/scripts/deploy-backend-ts.sh::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 2 across 1 file(s).\nTop rules: shellcheck:SC1091×1, shellcheck:SC2034×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
-  "sessionId": "019edbed-7ec8-7b80-9183-b9fb27b0b279",
-  "projectSeqStart": 57,
-  "projectSeqEnd": 58
+  "signature": "fwber-frontend/components/GlobalSubpageNav.tsx::Unresolved from this turn — fwber-frontend/components/GlobalSubpageNav.tsx:\n🔴 STOP — 6 issue(s) must be fixed:\n  L67: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L73: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L83: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L87: Cannot find name 'motion'. Did you mean 'Option'?\n    💡 Fix: LSP quick fixes: Change spelling to 'Option'; Add import from \"framer-motion\"\n  L67: react/jsx-no-undef: 'motion' is not defined.\n  L73: react/jsx-no-undef: 'motion' is not defined.",
+  "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
+  "projectSeqStart": 80,
+  "projectSeqEnd": 81
 }
