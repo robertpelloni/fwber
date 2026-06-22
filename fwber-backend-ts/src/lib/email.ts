@@ -4,14 +4,16 @@ dotenv.config();
 
 // Resend support (modern API-based email)
 let resend: any = null;
-try {
-  const { Resend } = require('resend');
-  if (process.env.RESEND_API_KEY) {
-    resend = new Resend(process.env.RESEND_API_KEY);
-    console.log('[Email] Resend API initialized');
-  }
-} catch {
-  // Resend package not available, fall back to SMTP
+if (process.env.RESEND_API_KEY) {
+  (async () => {
+    try {
+      const { Resend } = await import('resend');
+      resend = new Resend(process.env.RESEND_API_KEY);
+      console.log('[Email] Resend API initialized');
+    } catch (err: any) {
+      console.error('[Email] Failed to load or initialize Resend module:', err.message);
+    }
+  })();
 }
 
 // SMTP transporter (legacy fallback)

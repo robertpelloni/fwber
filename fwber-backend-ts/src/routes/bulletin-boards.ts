@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
+import { FederationService } from '../services/FederationService.js';
 
 const router = Router();
+const federationService = new FederationService();
 router.use(authenticate);
 
 function serialize(obj: any): any {
@@ -206,6 +208,19 @@ router.post('/', async (req: any, res) => {
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     });
+
+    // Federation: Broadcast board post if enabled
+    const profile = await prisma.user_profiles.findFirst({ where: { user_id: userId } });
+    if (profile?.is_federated) {
+        const apiDomain = process.env.API_DOMAIN || 'api.fwber.me';
+        federationService.broadcastUpdate(userId, {
+            id: `https://${apiDomain}/api/proximity/artifacts/${artifact.id}`,
+            type: 'Note',
+            content: content,
+            published: artifact.created_at?.toISOString(),
+            tag: topic_slug ? [{ type: 'Hashtag', href: `https://${apiDomain}/api/bulletin-boards/${topic_slug}`, name: `#${topic_slug}` }] : []
+        }).catch(err => console.error('[BulletinBoards] Federation broadcast failed:', err.message));
+    }
 
     res.json({ success: true, id: Number(artifact.id) });
   } catch (error: any) {

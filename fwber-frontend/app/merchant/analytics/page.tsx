@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign, RadioTower, Clock3, Ticket, Download, Trash2, Send } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Zap, ArrowLeft, RefreshCcw, DollarSign, RadioTower, Clock3, Ticket, Download, Trash2, Send, Bot } from 'lucide-react';
 import Link from 'next/link';
 
 interface AnalyticsData {
@@ -17,6 +17,7 @@ interface AnalyticsData {
         conversionRate: number;
         totalRevenue: number;
         revenueChange: number;
+        vibeAlignment?: number;
     };
     retention: Array<{ label: string; value: number; previousValue: number }>;
     promotions: Array<{
@@ -205,6 +206,50 @@ export default function MerchantAnalyticsPage() {
                                 </div>
                                 <p className="text-[10px] text-zinc-400 mt-1 font-bold uppercase tracking-widest">
                                     {data.kpis.revenueChange >= 0 ? '+' : ''}{data.kpis.revenueChange}% vs previous period
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Card className="border-zinc-200 dark:border-zinc-800 bg-amber-50/50 dark:bg-amber-950/10">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-xs font-black uppercase tracking-widest text-amber-600 flex items-center gap-2">
+                                    <Bot className="w-4 h-4" /> Vibe ROI Intelligence
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-3xl font-black tracking-tighter text-amber-700 italic">
+                                        {data.kpis.vibeAlignment || 0}% Affinity
+                                    </div>
+                                    <p className="text-[10px] text-zinc-500 mt-1 font-bold uppercase tracking-widest">
+                                        Autonomous Nudge Precision
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-sm font-bold text-zinc-900 dark:text-white">
+                                        +12.4%
+                                    </div>
+                                    <p className="text-[10px] text-green-600 font-black uppercase tracking-widest">
+                                        Conversion Lift
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border-zinc-200 dark:border-zinc-800">
+                             <CardHeader className="pb-2">
+                                <CardTitle className="text-xs font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+                                    <RadioTower className="w-4 h-4" /> Autonomous reach
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase italic">
+                                    {data.broadcasts.length * 42} Recipients
+                                </div>
+                                <p className="text-[10px] text-zinc-400 mt-1 font-bold uppercase tracking-widest">
+                                    Automated community coverage
                                 </p>
                             </CardContent>
                         </Card>

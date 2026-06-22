@@ -1,7 +1,7 @@
 # VISION.md — The Ultimate fwber Architecture & Philosophy
 
-> **Last Updated:** 2026-06-05
-> **Version:** 2.1.5 (OkCupid Matching Engine)
+> **Last Updated:** 2026-06-10
+> **Version:** 2.2.0 (Social Velocity & Federation)
 > **Goal:** To serve as the definitive North Star for all human and AI agents working on the fwber project.
 
 ---

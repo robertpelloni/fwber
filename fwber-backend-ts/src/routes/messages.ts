@@ -4,8 +4,11 @@ import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { checkAndUnlockAchievements } from '../lib/achievements.js';
 import { filePathToUrl } from '../lib/photos.js';
+import { WingmanService } from '../services/WingmanService.js';
+import { MatchingHeuristicService } from '../services/MatchingHeuristicService.js';
 
 const router = Router();
+const matchingService = new MatchingHeuristicService();
 const upload = multer({ dest: 'uploads/messages/' });
 router.use(authenticate);
 
@@ -96,10 +99,10 @@ router.get('/conversations', async (req: any, res) => {
       },
       include: {
         users_matches_user1_idTousers: {
-          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true }, take: 1 } },
         },
         users_matches_user2_idTousers: {
-          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true }, take: 1 } },
+          select: { id: true, name: true, email: true, user_profiles: { select: { display_name: true, avatar_url: true, current_emotion: true }, take: 1 } },
         },
       },
       take: 50,
@@ -152,7 +155,7 @@ router.get('/conversations', async (req: any, res) => {
           profile: {
             display_name: profile?.display_name || otherUser?.name || 'Unknown',
             age: null,
-            current_emotion: null,
+            current_emotion: (profile?.current_emotion || 'neutral').toLowerCase(),
             photos: profile?.avatar_url ? [{ "id": 0, "url": profile.avatar_url, "is_private": false, "is_primary": true }] : [],
           },
         },
@@ -240,14 +243,21 @@ router.get('/:id', async (req: any, res) => {
     };
     if (before) where.sent_at = { lt: new Date(before) };
 
-    const messages = await prisma.messages.findMany({ where, orderBy: { sent_at: 'desc' }, take: limit });
+    const [messages, atmosphere] = await Promise.all([
+      prisma.messages.findMany({ where, orderBy: { sent_at: 'desc' }, take: limit }),
+      matchingService.calculateConversationVibe(userId, partnerId)
+    ]);
 
     await prisma.messages.updateMany({
       where: { sender_id: partnerId, receiver_id: userId, is_read: false },
       data: { is_read: true, read_at: new Date() },
     }).catch(() => {});
 
-    res.json({ messages: messages.reverse().map(serializeMessage), conversation: { id: req.params.id } });
+    res.json({
+      messages: messages.reverse().map(serializeMessage),
+      atmosphere,
+      conversation: { id: req.params.id }
+    });
   } catch (error: any) {
     console.error('[Messages] Get error:', error.message);
     res.json({ messages: [], conversation: { id: req.params.id } });
@@ -328,6 +338,11 @@ router.post('/', upload.single('media'), async (req: any, res) => {
   }
 
     checkAndUnlockAchievements(userId).catch(() => {});
+
+    // Proactive AI Wingman Nudge
+    WingmanService.analyzeAndNudge(userId, BigInt(receiver_id)).catch((err) => {
+      console.warn('[Messages] Wingman nudge error:', err.message);
+    });
 
     res.json({ success: true, message: serializeMessage(message) });
   } catch (error: any) {

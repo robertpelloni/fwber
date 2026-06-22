@@ -99,8 +99,8 @@ export function useCommentArtifact() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, content, token }: { id: number; content: string; token: string }) =>
-      proximityApi.commentArtifact(id, content, token),
+    mutationFn: ({ id, content, parent_id, token }: { id: number; content: string; parent_id?: string; token: string }) =>
+      proximityApi.commentArtifact(id, content, parent_id, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['local-pulse'] });
       queryClient.invalidateQueries({ queryKey: ['proximity-artifacts'] });
