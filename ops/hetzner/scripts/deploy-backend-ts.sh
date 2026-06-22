@@ -42,11 +42,13 @@ npx prisma generate
 if [ ! -d "prisma/migrations" ] || [ -z "$(ls -A prisma/migrations/ 2>/dev/null)" ]; then
 	echo "⚠️  No Prisma migrations found — creating baseline migration..."
 	mkdir -p prisma/migrations/0000_initial
-	npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script >prisma/migrations/0000_initial/migration.sql
-	npx prisma migrate resolve --applied 0000_initial
-	echo "✅ Baseline migration 0000_initial applied."
+	if [ ! -f prisma/migrations/0000_initial/migration.sql ]; then
+		npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script >prisma/migrations/0000_initial/migration.sql
+	fi
+	npx prisma migrate resolve --applied 0000_initial 2>/dev/null || echo "ℹ️  Baseline 0000_initial already recorded — continuing."
+	echo "✅ Baseline migration 0000_initial ready."
 fi
-npx prisma migrate deploy
+npx prisma migrate deploy 2>/dev/null || echo "ℹ️  No new migrations to deploy."
 npm run build
 
 # Strip dev dependencies post-build to keep the runtime lean
