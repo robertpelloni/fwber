@@ -1,43 +1,56 @@
-# fwber Email Infrastructure Guide
+# Production Email Infrastructure: Resend Configuration
 
-## Overview
-fwber relies on robust email delivery for account verification and password recovery. The backend utilizes a tiered fallback system:
-1. **Resend API** (Primary, High Deliverability)
-2. **SMTP Transport** (Secondary / Custom Hosted Fallback)
-3. **Console Logging** (Development / Failsafe mode)
+This document outlines the required configuration for moving `fwber.me` to production-grade email delivery via Resend.
 
-## 1. Domain Configuration (DNS)
-To achieve 100% deliverability and avoid Spam folders, you **must** configure DNS records on your domain registrar (e.g., Cloudflare, Hetzner, GoDaddy) pointing `fwber.me` to your chosen provider (like Resend).
+## 1. DNS Configuration (Vercel/Cloudflare)
 
-### Required Records for Resend (Example)
-Navigate to your DNS provider and add the following records (values will be provided by your Resend dashboard under "Domains"):
+To ensure high deliverability (preventing Spam folders), the following records must be added to the `fwber.me` DNS zone.
 
-| Type  | Name / Host   | Value / Target                                  | Priority |
-|-------|---------------|-------------------------------------------------|----------|
-| TXT   | `resend._domainkey` | `k=rsa; p=YOUR_PUBLIC_KEY...` (DKIM)            | -        |
-| TXT   | `@`           | `v=spf1 include:sendgrid.net ~all` (SPF)        | -        |
-| MX    | `feedback`    | `feedback-smtp.us-east-1.amazonses.com`         | 10       |
-| TXT   | `_dmarc`      | `v=DMARC1; p=none; rua=mailto:admin@fwber.me;`  | -        |
+### SPF (Sender Policy Framework)
+**Type:** TXT
+**Host:** `@`
+**Value:** `v=spf1 include:resend.com ~all`
 
-*Note: Once added, it may take 24-48 hours for DNS to propagate. Verify within the Resend console.*
+### DKIM (DomainKeys Identified Mail)
+*Note: Resend provides 3 CNAME records for DKIM during domain verification.*
+1. **Host:** `resend._domainkey` | **Value:** `resend.dkim.resend.com`
+2. **Host:** `resend2._domainkey` | **Value:** `resend2.dkim.resend.com`
+3. **Host:** `resend3._domainkey` | **Value:** `resend3.dkim.resend.com`
 
-## 2. Environment Variables
-On your production server (Hetzner), update your `.env` file located in `fwber-backend-ts/.env`:
+### DMARC (Domain-based Message Authentication, Reporting, and Conformance)
+**Type:** TXT
+**Host:** `_dmarc`
+**Value:** `v=DMARC1; p=quarantine; rua=mailto:admin@fwber.me`
+
+---
+
+## 2. Server Configuration (`fwber-backend-ts`)
+
+Once DNS is verified, update the production `.env` file on the Hetzner server:
 
 ```env
-# Primary Email Provider
-RESEND_API_KEY="re_YOUR_LIVE_KEY_HERE"
-MAIL_FROM="noreply@fwber.me"
+# Email Primary (Resend)
+RESEND_API_KEY=re_123456789...
+MAIL_FROM=notifications@fwber.me
 
-# Fallback SMTP Settings (Optional if using Resend)
-MAIL_HOST="smtp.example.com"
-MAIL_PORT="587"
-MAIL_USER="your-smtp-user"
-MAIL_PASS="your-smtp-password"
+# Fallback SMTP (DreamHost)
+MAIL_HOST=smtp.dreamhost.com
+MAIL_PORT=587
+MAIL_USER=notifications@fwber.me
+MAIL_PASS=********
 ```
 
-## 3. Deployment
-Once your `.env` is updated and DNS is verified:
-1. Restart the backend process: `pm2 restart fwber-backend`
-2. Test delivery by triggering a password reset or registering a new account.
-3. Check `pm2 logs fwber-backend` to confirm the log outputs `[Email] Sent via Resend to...`
+---
+
+## 3. Implementation Details
+
+The system uses a tiered delivery strategy (`src/lib/email.ts`):
+1. **Resend API**: Primary method. Fast, handles tracking, and provides high reputation.
+2. **SMTP**: Automatic fallback if Resend fails or is unconfigured.
+3. **Console**: Final fallback for development/emergency, logging URLs to stdout.
+
+## 4. Verification Checklist
+- [ ] Domain `fwber.me` marked as **Verified** in Resend Dashboard.
+- [ ] DNS propagation check (use `dig -t txt fwber.me`).
+- [ ] Test verification email sent to a real Gmail/Outlook address.
+- [ ] Check DMARC reports for any alignment issues.

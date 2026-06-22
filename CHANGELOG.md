@@ -1,11 +1,159 @@
 # Changelog
 
-## [2.1.10] - 2026-06-22
+## [2.3.7] - 2026-06-16
+
 ### Added
-- Created `docs/EMAIL_INFRASTRUCTURE.md` to guide production deployments for email deliverability.
-### Fixed
-- Updated `email.ts` to dynamically load `resend` to prevent ESM crashes when using SMTP fallbacks.
-- Fixed a fatal startup crash in `wingman.ts` when `OPENAI_API_KEY` is not provided.
+- **Atmospheric Messaging**: Implemented dynamic chat environments that change themes based on the combined "Aura" of both participants.
+- **Conversation Vibe Engine**: New logic in `MatchingHeuristicService` to determine the collective atmosphere of a chat session (e.g., Calm, Electric, Noir).
+- **Dynamic UI Themes**: `RealTimeChat` now supports visual transitions (gradients, blur, grayscale) mapped to the calculated conversation atmosphere.
+
+### Changed
+- **Messaging API**: Updated `GET /api/messages/:id` to include atmospheric metadata.
+
+## [2.3.6] - 2026-06-16
+
+### Added
+- **Aura-Matched Chat**: Introduced a new matching dimension based on real-time emotional alignment. Users are now suggested chat partners who share complementary or identical "Auras" (e.g., both feeling Thoughtful).
+- **Aura Compatibility Logic**: New heuristic in `MatchingHeuristicService` to compute emotional affinity scores.
+- **Messaging Dashboard Integration**: Added a "Vibe-Compatible Partners" discovery bar to the messages page.
+
+### Changed
+- **Matching API**: New `aura-matches` endpoint to fetch partners with high emotional resonance.
+
+## [2.3.5] - 2026-06-16
+
+### Added
+- **Community Quests**: Implemented autonomous location-based challenge generation triggered by high neighborhood energy vibes (e.g. 'Energetic', 'Vibrant').
+- **Quest Discovery UI**: New dashboard component for discovering, joining, and tracking progress of community quests.
+- **Quest Progress API**: Backend infrastructure for quest lifecycle management and reward distribution.
+
+### Changed
+- **Maintenance Heartbeat**: Added `processCommunityQuests` to the periodic system maintenance cycle.
+- **Prisma Schema**: Introduced `quests` and `user_quests` models to support gamified location interactions.
+
+## [2.3.4] - 2026-06-16
+
+### Added
+- **Granular Vibe Targeting**: Enhanced `PromotionService` to support keyword-level matching between merchant offers and neighborhood sentiment trends.
+- **Vibe ROI Analytics**: Introduced new performance tracking metrics for autonomous nudges, including affinity precision and conversion lift.
+- **Attributed Redemptions**: Backend support for tracking offer redemptions back to specific autonomous AI broadcasts.
+
+### Changed
+- **Merchant API**: Updated `POST /promotions` to support `broadcast_id` attribution.
+- **Analytics UI**: New visual cards for "Vibe ROI Intelligence" and "Autonomous Reach" in the merchant portal.
+
+## [2.3.3] - 2026-06-16
+
+### Added
+- **Autonomous Vibe Nudging**: Implemented background logic to autonomously trigger merchant promotions when neighborhood vibes align with specific deals.
+- **Vibe Intelligence Dashboard**: New merchant UI component showing historical sentiment transitions and autonomous nudge status.
+- **Vibe History API**: New endpoint `GET /api/merchant-portal/vibe-history` for trend analysis.
+
+### Changed
+- **Sentiment Service Expansion**: Updated `SentimentAnalysisService` to return structured JSON mood analysis (vibe, sentiment, keywords, summary).
+- **Maintenance Heartbeat**: Added `processVibeNudges` to the periodic system maintenance cycle.
+
+## [2.3.2] - 2026-06-16
+
+### Added
+- **Aura Discovery**: Surface user emotional states ("Auras") across the social graph, including the conversation list and nearby match candidates.
+- **Autonomous Sentiment Refresh**: Integrated a background task into the system heartbeat that periodically refreshes the emotional state of active users.
+- **Live Match Indicators**: Enhanced proximity candidate cards with real-time emotional status.
+
+### Changed
+- **Messaging API**: Updated `conversations` endpoint to return `current_emotion` for match partners.
+- **Proximity API**: Updated `local-pulse` to return nearby match candidates with their live emotional states.
+
+## [2.3.1] - 2026-06-16
+
+### Added
+- **Threaded Forum Conversations**: Implemented `parent_id` support for proximity artifact comments, enabling nested replies in the Local Pulse feed.
+- **AI-Enhanced Merchant Vibe**: Integrated AI sentiment analysis into the merchant pulse API for real-time neighborhood mood detection.
+- **Vibe-Matched Promotions**: New `PromotionService` to align merchant offers with the local neighborhood vibe (e.g., chill vibes triggering coffee discounts).
+- **Merchant Analytics Expansion**: Added "Vibe Alignment" KPI to the merchant dashboard to track performance against neighborhood sentiment.
+
+### Changed
+- **Prisma Schema**: Updated `proximity_artifact_comments` model with optional `parent_id` for recursive threading.
+
+## [2.3.0] - 2026-06-16
+
+### Added
+- **Sentiment Engine**: New `SentimentAnalysisService` that analyzes user and neighborhood emotional states based on recent posts and messages.
+- **Dynamic Emotional Avatars**: Integrated `current_emotion` into AI avatar generation prompts for reactive identity evolution.
+- **Aura UI**: Expanded frontend `EvolvingAvatar` with new visual aura styles for Excited, Thoughtful, Cynical, and Melancholic states.
+- **Pulse Forum Topics**: Seeded new neighborhood-focused topics (Local News, Mutual Aid, Instant Meetups) to evolve the pulse feed into a community board.
+
+### Changed
+- **Proactive Intelligence**: Automated sentiment evaluation now triggers on message and proximity artifact creation.
+
+## [2.2.9] - 2026-06-10
+
+### Added
+- **Peer Discovery**: Automatic tracking of remote federation servers during interactions.
+- **Admin Peer Management**: New API for moderators to view and manage (block/unblock) discovered federation peers.
+- **Direct URI Search**: Support for searching ActivityPub actors by direct HTTP/HTTPS URIs.
+
+## [2.2.8] - 2026-06-10
+
+### Added
+- **Outbound Undo Interactions**: Implemented support for retracting social actions (Unlike/Unboost) via ActivityPub `Undo` activities.
+- **Social Profile Badges**: Public profiles now prominently display the user's federated handle (e.g. @user@api.fwber.me) if federation is enabled.
+- **ActivityPub Compliance**: Updated the user outbox endpoint to follow standard `OrderedCollection` pagination for better interoperability with external servers.
+
+## [2.2.7] - 2026-06-10
+
+### Added
+- **Activity Lifecycle Management**: Implemented handlers for ActivityPub `Delete` and `Update` activities, ensuring local caches of remote content remain synchronized.
+- **Outbound Deletions**: Deleting proximity artifacts now broadcasts an ActivityPub `Delete` activity to the fediverse.
+- **Improved Undo Support**: Expanded `Undo` handling to correctly process retracted Likes and Boosts from remote servers.
+
+## [2.2.6] - 2026-06-10
+
+### Added
+- **Inbound Reply Processing**: Automated handling of incoming federated replies, linking them to local proximity artifacts.
+- **Enhanced Notifications**: Real-time notifications for federated replies.
+- **Infrastructure Docs**: Comprehensive guide for Resend/DNS production email setup.
+
+## [2.2.5] - 2026-06-10
+
+### Added
+- **Outbox Persistence**: All outbound ActivityPub activities are now persisted to the `federation_outbox` table.
+- **Federated Profile Updates**: Updating your fwber profile now broadcasts an ActivityPub `Update` activity to all followers.
+- **Mention Notifications**: Federated mentions now trigger real-time UI badges and semantic entries in the Activity Center.
+
+## [2.2.4] - 2026-06-10
+
+### Added
+- **Federated Mentions**: Automatic detection of @mentions in remote activities with real-time in-app notifications.
+- **Following Feed**: Users can now filter the Global Feed to see posts only from actors they explicitly follow.
+- **Outbox Sanitization**: Applied XSS protection to the public outbox view.
+
+## [2.2.3] - 2026-06-10
+
+### Added
+- **Outbound Follow Flow**: Completed the ActivityPub follow handshake by sending signed Follow activities to remote servers.
+- **Federated Unfollow**: Implemented support for unfollowing remote actors via ActivityPub Undo activities.
+- **Unfollow UI**: Integrated unfollow buttons in the federation settings and actor explorer.
+
+## [2.2.2] - 2026-06-10
+
+### Added
+- **Federated Replies**: Support for sending signed replies to remote ActivityPub posts.
+- **Enhanced Actor Profiles**: The federation actor endpoint now exposes real profile data, including display names, bios, and avatars.
+
+## [2.2.1] - 2026-06-10
+
+### Added
+- **Federated Interactions**: Enabled Like and Boost actions for remote posts in the Global Feed.
+- **Outbound Activity Service**: Implemented `sendActivityToActor` in `FederationService.ts` for direct remote inbox delivery.
+
+## [2.2.0] - 2026-06-10
+
+### Added
+- **WebFinger Discovery**: Implemented real-time remote actor resolution via WebFinger in `FederationService.ts`.
+- **Improved ActivityPub Inbound**: Added `handleCreate` to process and store remote posts from external Fediverse nodes.
+- **Enhanced Activity Center**: Unified display for Likes, Boosts, and Remote Posts in the frontend.
+- **Remote Search**: Updated federation search to perform live lookups against external ActivityPub servers.
 
 ## [2.1.9] - 2026-06-08
 

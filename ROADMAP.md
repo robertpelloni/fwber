@@ -1,11 +1,29 @@
 # ROADMAP.md — fwber Project Trajectory
 
-> **Current Version:** 2.1.9 "Intelligent Match Refinement"
-> **Last Updated:** 2026-06-08
+> **Current Version:** 2.2.9 "Social Velocity & Federation"
+> **Last Updated:** 2026-06-10
 
 ---
 
 ## 🗺️ High-Level Trajectory
+
+### Phase 10: Dynamic Identity & Proximity Forum (IN PROGRESS - v2.3.7)
+The next evolution focuses on making user identity alive and evolving the local pulse into a functional community layer.
+
+**Key Goals:**
+- **Dynamic Emotional Identity**: AI Avatars that reflect the user's recent sentiment and activity ("Emotional Auras").
+- **Atmospheric Social Graph**: Dynamic chat environments and partner discovery based on real-time emotional alignment (Aura-Matched Chat & Messaging).
+- **AI-Driven Local Economy**: Autonomous vibe-matched promotions and community quests triggered by neighborhood sentiment.
+
+### Phase 9: Social Velocity & Federation (COMPLETE - v2.2.9)
+Transitions the platform from a pasive observer into a fully interactive and secure Fediverse node.
+
+**Key Achievements:**
+- **Interactive Social Graph**: Bi-directional ActivityPub support for Likes, Boosts, Replies, and Follows.
+- **WebFinger Discovery**: Real-time handle-to-URI resolution for remote actors.
+- **Security Hardening**: Implemented DNS-level SSRF protection and isomorphic XSS sanitization.
+- **Social Synchronization**: Automated inbound reply loops and @mention notifications.
+- **Administrative Control**: Discovered peer management and server-level blocklists.
 
 ### Phase 8: Intelligent Match Refinement (COMPLETED - v2.1.9)
 The next major evolution focuses on high-fidelity personality analysis and deeper signal integration.

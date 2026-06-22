@@ -1,7 +1,14 @@
 # MEMORY.md — fwber Internal Architectural Observations
 
-## Current Version: 2.1.9 "Intelligent Match Refinement"
-**Last Updated:** 2026-06-08
+## Current Version: 2.2.1 "Federated Interactions"
+**Last Updated:** 2026-06-10
+
+### Architectural Shift: Production Federation (v2.2.1)
+The ActivityPub layer is now production-ready for external discovery and real-time interaction.
+- **WebFinger**: Handles resolution of `@user@domain` handles to internal actor URIs.
+- **Security Hardening**: DNS-level SSRF protection (`ssrf.ts`) for all outbound federation requests and XSS sanitization (`sanitize.ts`) for remote content.
+- **Federated Interactions**: Support for outbound `Like` and `Announce` (Boost) activities, correctly targeting remote object URIs.
+- **Activity Stream Ingestion**: `FederationService` now processes inbound `Create` activities for future global feed integration.
 
 ### Architectural Shift: Narrative Compatibility (v2.1.9)
 The matching engine now produces "Narrative Reports" via `NarrativeService.ts`. This moves the platform away from raw percentages toward a more immersive "Cyber-Noir" discovery experience.
