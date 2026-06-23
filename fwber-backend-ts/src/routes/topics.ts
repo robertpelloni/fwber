@@ -5,7 +5,7 @@ import prisma from '../lib/prisma.js';
 const router = Router();
 
 // Helper to serialize a topic with all frontend-expected fields
-async function serializeTopic(t: any, userId: bigint | null): Promise<any> {
+async function serializeTopic(t: any, userId: bigint): Promise<any> {
   let isFollowed = false;
   if (userId) {
     try {
@@ -48,7 +48,7 @@ async function serializeTopic(t: any, userId: bigint | null): Promise<any> {
 // Public: featured topic listing works without auth
 router.get('/', async (req: any, res) => {
   try {
-    let userId: bigint | null = null;
+    let userId: bigint = BigInt(0);
     try {
       if (req.headers.authorization) {
         const token = req.headers.authorization.split(' ')[1];
@@ -102,7 +102,7 @@ router.get('/', async (req: any, res) => {
 // GET /api/topics/featured — popular topics (public)
 router.get('/featured', async (req: any, res) => {
   try {
-    let userId: bigint | null = null;
+    let userId: bigint = BigInt(0);
     try {
       if (req.headers.authorization) {
         const token = req.headers.authorization.split(' ')[1];

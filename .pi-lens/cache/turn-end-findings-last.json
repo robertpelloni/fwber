@@ -1,6 +1,6 @@
 {
-  "signature": "fwber-frontend/app/login/page.tsx::Unresolved from this turn — fwber-frontend/app/login/page.tsx:\n🔴 STOP — 2 issue(s) must be fixed:\n  L373: Cannot find name 'div'.\n  L26: 'disconnect' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.",
+  "signature": "fwber-backend-ts/src/routes/topics.ts::Unresolved from this turn — fwber-backend-ts/src/routes/topics.ts:\n🔴 STOP — 3 issue(s) must be fixed:\n  L79: Type 'bigint | null' is not assignable to type 'number | bigint | BigIntFilter<\"topic_user_follows\"> | undefined'.\n    Type 'null' is not assignable to type 'number | bigint | BigIntFilter<\"topic_user_follows\"> | undefined'.\n  L92: Argument of type 'bigint | null' is not assignable to parameter of type 'bigint'.\n    Type 'null' is not assignable to type 'bigint'.\n  L121: Argument of type 'bigint | null' is not assignable to parameter of type 'bigint'.\n    Type 'null' is not assignable to type 'bigint'.\n\nℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 4 across 1 file(s).\nTop rules: missing-error-propagation×4\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "projectSeqStart": 107,
-  "projectSeqEnd": 108
+  "projectSeqStart": 108,
+  "projectSeqEnd": 109
 }
