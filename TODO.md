@@ -1,7 +1,7 @@
 # TODO — fwber Immediate Action Items
 
-> **Version:** 2.2.5
-> **Last Updated:** 2026-06-10
+> **Version:** 2.3.8
+> **Last Updated:** 2026-06-23
 
 ---
 
@@ -45,9 +45,24 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
+## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.8)
 - [ ] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
 - [ ] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.
+- [ ] **Photo Migration**: 157 photos in DB but files missing from uploads directory — need backup restore.
+- [ ] **Stripe Live Keys**: Transition from test to live mode for production payments.
+- [ ] **Email DNS**: Configure Resend MX/SPF/DKIM/DMARC records for production email.
+
+## 🟢 Recently Completed: Phase 11 - 10,000x Shiny UI (v2.3.8)
+- [x] **Glassmorphism Design System**: Complete globals.css rewrite with glass, glow, shimmer utilities.
+- [x] **Animated Particles**: Canvas particle system with mouse tracking on all pages.
+- [x] **PremiumEffects Components**: AmbientGlow, ShimmerBorder, GlowingDot, PremiumBadge, GradientIcon.
+- [x] **3D Landing Hero**: Floating geometric shapes, shooting stars, framer-motion staggered reveals.
+- [x] **Dashboard Overhaul**: Glass metric cards, gradient icons, shimmer loading states.
+- [x] **UI Components Upgrade**: Card, Button, Badge, Dialog, Input, Skeleton — all glass/premium versions.
+- [x] **Logo Reconstruction**: 5-layer 3D logo with outer glow, depth stroke, animated gradient, reflection.
+- [x] **Custom Scrollbar**: Thin purple-tinted scrollbar across all pages.
+- [x] **Port Migration**: Backend 4002→4003; removed crash-looping systemd service.
+- [x] **Quest System**: Created quests table, seeded 5 demo quests, fixed 500 error.
 
 ## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.7)
 - [x] **Atmospheric Messaging**: Dynamic chat themes based on participant vibes.

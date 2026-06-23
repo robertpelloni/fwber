@@ -1,6 +1,6 @@
 {
-  "signature": "fwber-frontend/components/AnimatedParticles.tsx::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 3 across 1 file(s).\nTop rules: high-complexity×2, high-fan-out×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "signature": "docs/SUBMODULE_DASHBOARD.md::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 17 across 1 file(s).\nTop rules: MD013×9, MD060×8\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "projectSeqStart": 96,
-  "projectSeqEnd": 97
+  "projectSeqStart": 113,
+  "projectSeqEnd": 114
 }
