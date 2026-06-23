@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.11] - 2026-06-22
+### Added
+- Completed ActivityPub end-to-end interop testing. Added `tests/FederationInterop.test.ts` to simulate local Mastodon nodes and verify cryptographic inbound/outbound handshakes.
+- Created `docs/FEDERATION_INTEROP.md` documentation guide for federation architecture.
+### Fixed
+- Added robust SSRF detection utility `isSafeUrl` to ActivityPub outbound fetchers to block internal network access from remote actors.
+
 ## [2.1.10] - 2026-06-22
 ### Added
 - Created `docs/EMAIL_INFRASTRUCTURE.md` to guide production deployments for email deliverability.
