@@ -1,20 +1,20 @@
 {
   "version": 1,
   "cwd": "C:\\Users\\hyper\\workspace\\fwber",
-  "generatedAt": "2026-06-22T22:40:32.490Z",
+  "generatedAt": "2026-06-23T13:00:37.394Z",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "turnIndex": 99,
-  "projectSeqStart": 97,
-  "projectSeqEnd": 98,
+  "turnIndex": 141,
+  "projectSeqStart": 104,
+  "projectSeqEnd": 105,
   "diagnostics": [
     {
-      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\components\\PremiumEffects.tsx",
+      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\index.ts",
       "severity": "warning",
       "semantic": "warning",
       "tool": "knip",
       "runner": "knip",
       "rule": "knip:file",
-      "message": "Unused file fwber-frontend/components/PremiumEffects.tsx",
+      "message": "Unused file fwber-backend-ts/src/index.ts",
       "source": "project-scan"
     }
   ],
