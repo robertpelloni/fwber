@@ -1,6 +1,6 @@
 {
-  "signature": "docs/SUBMODULE_DASHBOARD.md::ℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 17 across 1 file(s).\nTop rules: MD013×9, MD060×8\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "signature": "fwber-frontend/app/login/page.tsx::Unresolved from this turn — fwber-frontend/app/login/page.tsx:\n🔴 STOP — 2 issue(s) must be fixed:\n  L373: Cannot find name 'div'.\n  L26: 'disconnect' is declared but its value is never read.\n    💡 Fix: Remove the unused declaration or rename with '_' prefix if intentionally unused.",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "projectSeqStart": 113,
-  "projectSeqEnd": 114
+  "projectSeqStart": 107,
+  "projectSeqEnd": 108
 }

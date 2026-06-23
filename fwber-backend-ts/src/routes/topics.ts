@@ -45,9 +45,18 @@ async function serializeTopic(t: any, userId: bigint | null): Promise<any> {
 }
 
 // GET /api/topics — list all topics with filters
-router.get('/', authenticate, async (req: any, res) => {
+// Public: featured topic listing works without auth
+router.get('/', async (req: any, res) => {
   try {
-    const userId = BigInt(req.user.id);
+    let userId: bigint | null = null;
+    try {
+      if (req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1];
+        const { default: jwt } = await import('jsonwebtoken');
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        userId = BigInt(decoded.id);
+      }
+    } catch { /* not authenticated */ }
     const search = String(req.query.search || '').trim();
     const category = String(req.query.category || '').trim();
     const featured = req.query.featured === 'true';
@@ -90,10 +99,18 @@ router.get('/', authenticate, async (req: any, res) => {
   }
 });
 
-// GET /api/topics/featured — popular topics
-router.get('/featured', authenticate, async (req: any, res) => {
+// GET /api/topics/featured — popular topics (public)
+router.get('/featured', async (req: any, res) => {
   try {
-    const userId = BigInt(req.user.id);
+    let userId: bigint | null = null;
+    try {
+      if (req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1];
+        const { default: jwt } = await import('jsonwebtoken');
+        const decoded: any = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+        userId = BigInt(decoded.id);
+      }
+    } catch { /* not authenticated */ }
     const topics = await prisma.topics.findMany({
       where: { follower_count: { gte: 5 } },
       orderBy: { follower_count: 'desc' as const },

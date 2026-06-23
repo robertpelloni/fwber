@@ -23,7 +23,7 @@ export default function LoginPage() {
   const [isFedModalOpen, setIsFedModalOpen] = useState(false)
   const { login, loginWithWallet, verifyTwoFactor, error, clearError, isAuthenticated, requiresTwoFactor } = useAuth()
   const router = useRouter()
-  const { publicKey, signMessage, disconnect } = useWallet()
+  const { publicKey, signMessage } = useWallet()
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -134,11 +134,13 @@ export default function LoginPage() {
 
   if (requiresTwoFactor) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-gray-950 dark:via-gray-900 dark:to-violet-950/30 py-12 px-4 sm:px-6 lg:px-8 relative">
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
         <div className="max-w-md w-full space-y-8">
+          <div className="orb orb-purple absolute top-0 right-0 w-96 h-96" />
+          <div className="orb orb-pink absolute bottom-0 left-0 w-80 h-80" />
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
               Two-Factor Authentication
@@ -228,14 +230,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 dark:from-gray-950 dark:via-gray-900 dark:to-violet-950/30 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="orb orb-purple absolute -top-20 -right-20 w-[500px] h-[500px] animate-blob" />
+      <div className="orb orb-pink absolute -bottom-20 -left-20 w-[400px] h-[400px] animate-blob" style={{ animationDelay: '3s' }} />
+      <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign in to <span className="text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 animate-gradient-chaos">FWBer</span>
+      <div className="max-w-md w-full space-y-8 relative z-10">
+        <div className="glass rounded-2xl p-8 shadow-premium-lg border border-white/20 dark:border-white/5">
+          <h2 className="text-center text-3xl font-black text-gray-900 dark:text-white mb-2">
+            Sign in to <span className="text-gradient-pink">FWBer</span>
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
@@ -249,10 +253,10 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+          <div className="space-y-3">
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email address
               </label>
               <input
@@ -261,14 +265,14 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                className="block w-full rounded-xl border border-white/30 dark:border-white/10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-purple-300/50"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Password
               </label>
               <input
@@ -277,14 +281,14 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-800 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                className="block w-full rounded-xl border border-white/30 dark:border-white/10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm px-4 py-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-purple-300/50"
+                placeholder="• • • • • • • •"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="flex justify-end">
-              <Link href="/forgot-password" className="text-sm text-orange-600 hover:text-orange-500 dark:text-orange-400">
+              <Link href="/forgot-password" className="text-sm text-purple-600 hover:text-purple-500 dark:text-purple-400 font-medium transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -300,9 +304,17 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full btn-shiny rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-[length:200%_auto] animate-gradient-x py-3 px-4 text-sm font-bold text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : 'Sign in'}
             </button>
           </div>
 
@@ -318,37 +330,39 @@ export default function LoginPage() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+              <div className="w-full border-t border-white/20 dark:border-white/10"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500">
+              <span className="px-3 glass-light rounded-full text-gray-500 dark:text-gray-400 text-xs font-medium">
                 Or continue with
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="space-y-3">
             <button
               type="button"
               onClick={() => setIsFedModalOpen(true)}
-              className="group relative w-full flex justify-center py-2 px-4 border border-zinc-200 dark:border-zinc-800 text-sm font-bold rounded-md text-zinc-900 dark:text-white bg-white dark:bg-gray-800 dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all shadow-sm"
+              className="group relative w-full flex justify-center items-center py-3 px-4 rounded-xl border border-white/30 dark:border-white/10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-900/80 hover:shadow-md transition-all duration-200"
             >
               <Globe className="w-4 h-4 mr-2 text-purple-500" />
               Sign in with ActivityPub
             </button>
 
-            {!publicKey ? (
-              <WalletMultiButton />
-            ) : (
-              <button
-                type="button"
-                onClick={handleWalletLogin}
-                disabled={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
-              >
-                {isLoading ? 'Verifying Wallet...' : 'Login with Wallet'}
-              </button>
-            )}
+            <div className="flex justify-center">
+              {!publicKey ? (
+                <WalletMultiButton />
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleWalletLogin}
+                  disabled={isLoading}
+                  className="group relative w-full flex justify-center py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-sm font-bold text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/25 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
+                >
+                  {isLoading ? 'Verifying Wallet...' : 'Login with Wallet'}
+                </button>
+              )}
+            </div>
           </div>
 
         </form>
