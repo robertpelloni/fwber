@@ -15,6 +15,7 @@ import { SolanaProvider } from '@/components/SolanaProvider'
 import NotificationListener from '@/components/realtime/NotificationListener'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import AnalyticsProvider from '@/components/AnalyticsProvider'
+import { AnimatedParticles } from '@/components/AnimatedParticles'
 import SafeWalkTracker from '@/components/safety/SafeWalkTracker'
 import AssetRecovery from '@/components/AssetRecovery'
 import { AuthenticatedRealtimeProvider } from '@/components/AuthenticatedRealtimeProvider'
@@ -121,6 +122,7 @@ export default function RootLayout({
                   <AnalyticsProvider />
                 </Suspense>
                 <ToastProvider>
+                  <AnimatedParticles />
                   <AuthenticatedRealtimeProvider>
                   <NativeForegroundNotificationBridge />
                   <NotificationListener />

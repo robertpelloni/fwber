@@ -1,3 +1,5 @@
+🛠️ ALPHA SOFTWARE UNDER CONSTRUCTION — Use at your own risk. Backwards compatibility not guaranteed.
+
 # fwber
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)

@@ -55,7 +55,7 @@ const config: Config = {
       },
       animation: {
         'gradient-x': 'gradient-x 3s ease infinite',
-        'blob': 'blob 7s infinite',
+        blob: 'blob 7s infinite',
         'gradient-chaos': 'gradient-chaos 1s ease infinite',
       },
       keyframes: {
@@ -108,9 +108,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/aspect-ratio'),
-  ],
+  plugins: [require('@tailwindcss/aspect-ratio')],
 }
 
 export default config

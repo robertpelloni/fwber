@@ -1,92 +1,74 @@
-# Session Handoff - v2.3.0 (Dynamic Identity & Proximity Forum)
+# HANDOFF.md — Session Summary
 
-## Overview
-Initiated Phase 10, transforming user identity into a reactive, emotion-driven experience and evolving the Local Pulse into a structured community forum. This release bridges the gap between static profiles and a living social graph.
+> **Date:** 2026-06-23
+> **Agent:** Gemini/Claude Cross-Review Session
+> **Version:** 2.3.8
 
-## Key Changes
-- **Sentiment Engine**: Launched `SentimentAnalysisService` which autonomously evaluates user and neighborhood moods based on recent posts/messages.
-- **Dynamic Emotional Identity**:
-    - AI Avatar prompts now factor in `current_emotion`, enabling visual identity evolution.
-    - Enhanced `EvolvingAvatar` with new visual "Auras" for Excited, Thoughtful, Cynical, and Melancholic states.
-- **Proximity Forum Evolution**:
-    - Seeded new neighborhood topics: `news` (Local News), `help` (Mutual Aid), and `meetup` (Instant Meetups).
-    - Updated `LocalPulse` to support topic-based filtering and categorization.
-- **Autonomous Integration**: Sentiment analysis is now hooked into core social loops (Artifact/Message creation) to ensure identity remains current.
+---
 
-## Documentation Sync
-- **VERSION**: Updated to 2.3.0
-- **CHANGELOG.md**: Documented Phase 10 additions.
-- **PROJECT_STATUS.md**: Marked Phase 10 as "In Progress."
-- **ROADMAP.md**: Defined the Phase 10 trajectory.
-- **TODO.md**: Initialized Phase 10 task list.
+## Completed Work
 
-## Deployment Notes
-- **Seeding**: Run `node dist/lib/seeds/pulse-topics.js` to initialize the new forum categories.
-- **Secrets**: `OPENAI_API_KEY` is required for the Sentiment Engine.
+### 1. 10,000x Shiny UI Overhaul
+- **Design System**: Complete globals.css rewrite — glassmorphism, glow effects, premium shadows, custom scrollbar, orb backgrounds, shimmer overlays.
+- **tailwind.config.ts**: 16 new keyframe animations (float, spin-gradient, shimmer-text, glow-pulse, scale-in, slide-up, border-dance, etc.).
+- **Logo**: 5-layer 3D reconstruction (outer glow → black outline with purple glow → animated gradient → shimmer highlight → reflection).
+- **Landing Variant A**: framer-motion staggered reveals, floating 3D geometric shapes, shooting stars, glass cards with gradient icons.
+- **Dashboard**: All metric cards, feature tiles, quick actions, and navigation upgraded to glassmorphism with motion animations.
+- **New Components**:
+  - `AnimatedParticles.tsx` — Canvas particle system with mouse tracking, glow radii, connection lines (on every page via layout.tsx)
+  - `PremiumEffects.tsx` — AmbientGlow, ShimmerBorder (animated conic gradient), GlowingDot, PremiumBadge, GradientIcon
+- **shadcn/ui Upgrades**: Card (rounded-2xl, shadow-premium), Button (btn-shiny, glass/premium variants), Badge (shiny/premium/glass/success variants), Dialog (glass overlay), Input (backdrop-blur), Skeleton (shimmer gradient).
+- **ThemeToggle**: Glass design with glow indicator dot.
+- **AppHeader/GlobalSubpageNav**: glass-strong styling, framer-motion transitions.
 
-## Next Steps
-- **Forum Polish**: Implement threaded conversations (replies) for proximity artifacts.
-- **Vibe-Matched Promotion**: Automated merchant broadcasts based on neighborhood vibe.
-- **Aura Discovery**: Display user auras in the message list and candidate cards.
+### 2. Bug Fixes
+- **`/api/quests/active` 500**: Missing `quests` database table — pushed Prisma schema, created table, seeded 5 demo quests.
+- **`fwber-api.service` crash-loop**: Systemd service was competing with PM2 for port 4002. Restarted 15,966 times. **Stopped, disabled, config file deleted.**
+- **Port 4002 EADDRINUSE**: Moved backend to port 4003. Updated nginx, .env, start.bat, source code default.
 
-# Session Handoff - v2.2.9 (Social Velocity & Federation)
+### 3. Port Migration (4002→4003)
+All updated:
+- `src/index.ts` default PORT
+- `/etc/nginx/sites-enabled/api.fwber.me` proxy_pass
+- `/etc/nginx/sites-enabled/ws.fwber.me` proxy_pass
+- Server `.env` PORT variable
+- `.env.example`
+- `start.bat`
+- `.memory/main.md` port registry
 
-## Overview
-Completed the core implementation and hardening of Phase 9: Social Velocity & Federation. This release establishes fwber as a full, interactive, and secure participant in the decentralized Fediverse.
+### 4. Repository Synchronization
+- Fetched all remotes (upstream + origin)
+- Inspected all feature branches — all fully merged into main
+- Merged `rev/` branches are redundant, all content absorbed
+- No submodules in this repo
 
-# Session Handoff - v2.1.9 (Intelligent Match Refinement)
+### 5. Documentation Updated
+- `CHANGELOG.md` — v2.3.8 entry
+- `ROADMAP.md` — Phase 11: 10,000x Shiny UI completed
+- `TODO.md` — Active/Completed sections updated
+- `VERSION` — bumped to 2.3.8
+- `HANDOFF.md` — this file
 
-## Overview
-Successfully implemented Phase 8: Intelligent Match Refinement. This release transforms the matching engine from a pure numerical score into a narrative personality analysis, while also integrating real-world proximity signals.
+### 6. Deployment
+- Pushed to GitHub (`d5addb6c1` → commit, then `aff62f190` cherry-picked → `d5addb6c1` on main)
+- Hetzner backend: `git pull`, rebuilt, PM2 restarted on port 4003
+- Nginx reloaded
+- Vercel auto-deploy triggered from GitHub push
 
-## Key Changes
-- **Narrative Compatibility Reports**: Launched AI-powered analysis that explains the "why" behind compatibility scores. Created `NarrativeService.ts` and integrated it with the `/api/matching/narrative/:matchId` endpoint.
-- **Proximity-Enhanced Matching**: Updated `MatchingHeuristicService.ts` to include real-time proximity in the compatibility score (80% values / 20% proximity).
-- **Expanded Matching Questions**: Scaled the value-matching dataset to 108 high-signal questions by adding new Cyber-Noir and Tech Ethics categories.
-- **Frontend Integration**: Created `useMatchNarrative` hook and updated `MatchInsights.tsx` and the public profile page to display the atmospheric narrative reports.
-- **Federation Fix**: Resolved the 500 error on `/api/federation/actors/:id` by adding validation for non-numeric IDs (e.g., "detail").
+---
 
-## Documentation Sync
-- **VERSION**: Updated to 2.1.9
-- **CHANGELOG.md**: Documented all v2.1.9 additions and fixes.
-- **ROADMAP.md**: Marked Phase 8 as COMPLETED.
-- **TODO.md**: Updated with recently completed items and moved on to Phase 9.
+## Known Issues
+1. **Photo 404** (`1778007604927-zsf4wy.png`): 157 photos referenced in DB but files missing from uploads directory. Profile uses DiceBear fallback which works.
+2. **Geo Rust build**: `cargo build --release` fails on Hetzner (needs Cargo `edition2024` feature, not yet in Cargo 1.75.0). Previous binary runs fine.
+3. **Stripe Live Keys**: Still on test mode.
+4. **Email DNS**: Resend records not yet configured.
 
-## Deployment Notes
-- **Environment**: Ensure `OPENAI_API_KEY` is set in the backend `.env` for narrative reports. Fallback is active if missing.
-- **Seeding**: Run `node dist/lib/seeds/matching-questions.js` to populate the new questions (108 total).
+---
 
-## Next Steps
-- **Phase 9: Social Velocity & Federation**: Focus on interop testing with external Fediverse nodes (Mastodon/Pleroma).
-- **Email DNS**: Configure Resend records for production delivery.
-- **Stripe Live**: Transition to live keys for payments.
-
-## Session 2026-06-10 — v2.1.9 Forward Merge & TS Fixes
-
-### Completed
-1. **Upstream Sync** — Fetched all remotes. 0 new upstream commits. No merge needed.
-2. **Branch Reconciliation** — Forward-merged `v2.1.9-intelligent-match-refinement` branch into main (2 commits, clean merge):
-   - NarrativeService.ts — AI-powered compatibility narrative reports
-   - use-match-narrative.ts — Frontend hook for narrative data
-   - New matching route `/narrative/:matchId`
-   - Enhanced MatchingHeuristicService with proximity integration
-   - Updated MatchInsights and profile pages
-   - Federation route hardening (actors/:id validation)
-   - 108 total matching questions (expanded from 95)
-3. **TS Fixes** — Fixed 3 TypeScript errors in NarrativeService.ts:
-   - Prisma relation types: added `(ua as any).matching_questions?.text` guards
-   - OpenAI response: added optional chaining on `response.choices?.[0]?.message?.content`
-4. **Branch Reconciliation** — Federation branch: 0 unique commits (fully merged). OkCupid branch: 3 stale finalization commits (ignored — already incorporated into main).
-5. **Version bumped to 2.1.9** — VERSION, VERSION.md, CHANGELOG, TODO, ROADMAP, HANDOFF all synced by v2.1.9 branch merge.
-
-### Current State
-- Backend: 0 TS errors
-- Frontend: 0 TS errors
-- No unmerged feature branches with unique progress
-- Working tree clean
-
-### Known Issues
-- `/api/federation/actors/detail` may still return 500 (needs testing after deploy)
-- Email delivery requires Resend DNS configuration
-- AI Wingman features fall back to static content (no API keys)
-- Stripe in test mode only
+## Next Steps for Next Agent
+1. **Photo Migration**: Restore `/uploads/` files from backup or implement DiceBear-only fallback for all user avatars.
+2. **Stripe Go-Live**: Switch from test keys to live Stripe keys.
+3. **Email DNS**: Configure Resend MX/SPF/DKIM/DMARC records.
+4. **Rust Update**: Upgrade Cargo on Hetzner to latest stable to enable geo rebuild.
+5. **Landing Variant B**: Apply the same glassmorphism/framer-motion treatment to the B variant.
+6. **More page polish**: Apply the PremiumEffects components across more subpages (settings, profile, messages, etc.).
