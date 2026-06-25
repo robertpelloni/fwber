@@ -22,7 +22,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [FWBer] Starting backend (port 4000)...
+echo [FWBer] Starting backend (port 4003)...
 start "FWBer Backend" cmd /k "npm run dev"
 
 echo [FWBer] Installing frontend dependencies...
@@ -40,7 +40,7 @@ start "FWBer Frontend" cmd /k "npm run dev"
 cd ..
 echo.
 echo [FWBer] Both services starting:
-echo   Backend:  http://localhost:4000
+echo   Backend:  http://localhost:4003
 echo   Frontend: http://localhost:3000
 echo.
 echo Press any key to close this launcher (services will keep running)...

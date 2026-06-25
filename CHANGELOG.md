@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.3.8] - 2026-06-23
+
+### Added
+- **10,000x Shiny UI Overhaul**: glassmorphism design system, framer-motion animations, floating 3D geometric shapes, shooting stars — across landing page and dashboard.
+- **AnimatedParticles**: Canvas-based particle system with mouse tracking, glow, and connection lines on all pages.
+- **PremiumEffects**: Ambient glow containers, animated shimmer borders, glowing dots, gradient icon wrappers, premium badge variants.
+- **Quest System**: New `quests` table seeded with 5 demo quests; `/api/quests/active` endpoint now returns live data.
+
+### Changed
+- **Backend API port**: Moved from `4002` to `4003` to resolve port conflict with systemd crash-loop.
+- **Removed competing `fwber-api.service`**: Systemd service crash-looping 15,966× stopped, disabled, config file deleted.
+- **start.bat**: Updated backend port reference from 4000 to 4003.
+- **Default port in code**: `src/index.ts` default PORT changed from 4000 to 4003.
+
+### Fixed
+- **`GET /api/quests/active` 500 error**: Missing database table — pushed Prisma schema and created table.
+- **Avatar 404**: Photo `1778007604927-zsf4wy.png` still missing from uploads dir (pre-existing data issue, 157 photos in DB without files on disk).
+
 ## [2.3.7] - 2026-06-16
 
 ### Added
