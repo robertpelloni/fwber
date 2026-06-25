@@ -39,7 +39,7 @@ fwber is a privacy-first, proximity-based social platform. It replaces swipe-bas
 
 | Port | Service | System |
 |------|---------|--------|
-| 4002 | fwber-backend-ts | `/etc/services` + Windows `services` |
+| 4003 | fwber-backend-ts | `/etc/services` + Windows `services` |
 | 8081 | fwber-geo | `/etc/services` + Windows `services` |
 | 8080 | freellm-dashboard (not fwber) | taken — fwber-reverb was removed |
 | 4000 | freellm | taken — unrelated |
