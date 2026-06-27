@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { getAvatarUrl, getInitials } from "@/lib/utils/avatar";
+import { getAvatarUrl } from "@/lib/utils/avatar";
 
 interface UserAvatarProps {
   src?: string | null;
@@ -16,7 +15,7 @@ interface UserAvatarProps {
 
 /**
  * Consistent avatar display across the app.
- * Falls back to DiceBear on load error, then to initials.
+ * Falls back to a DiceBear-generated avatar when no photo is uploaded.
  */
 export default function UserAvatar({
   src,
@@ -27,47 +26,12 @@ export default function UserAvatar({
   fill = false,
   priority = false,
 }: UserAvatarProps) {
-  const [imgError, setImgError] = useState(false);
-  const seed = name || userId || "user";
-
-  // If src is provided and not errored, try loading it
-  if (src && !imgError) {
-    const avatarSrc = getAvatarUrl(src, seed);
-
-    if (fill) {
-      return (
-        <Image
-          src={avatarSrc}
-          alt={name || "User"}
-          fill
-          className={`object-cover ${className}`}
-          priority={priority}
-          onError={() => setImgError(true)}
-        />
-      );
-    }
-
-    return (
-      <Image
-        src={avatarSrc}
-        alt={name || "User"}
-        width={size}
-        height={size}
-        className={`rounded-full object-cover ${className}`}
-        style={{ width: size, height: size }}
-        priority={priority}
-        onError={() => setImgError(true)}
-      />
-    );
-  }
-
-  // Fallback: DiceBear generated avatar
-  const dicebearUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(String(seed))}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+  const avatarSrc = getAvatarUrl(src, name || userId || "user");
 
   if (fill) {
     return (
       <Image
-        src={dicebearUrl}
+        src={avatarSrc}
         alt={name || "User"}
         fill
         className={`object-cover ${className}`}
@@ -78,12 +42,11 @@ export default function UserAvatar({
 
   return (
     <Image
-      src={dicebearUrl}
+      src={avatarSrc}
       alt={name || "User"}
       width={size}
       height={size}
       className={`rounded-full object-cover ${className}`}
-      style={{ width: size, height: size }}
       priority={priority}
     />
   );
