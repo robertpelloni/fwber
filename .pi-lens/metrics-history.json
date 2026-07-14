@@ -1390,7 +1390,57 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\app\\sitemap.ts": {
+      "latest": {
+        "commit": "3f3d882ac",
+        "timestamp": "2026-07-14T02:11:27.023Z",
+        "mi": 58.6,
+        "cognitive": 0,
+        "nesting": 1,
+        "lines": 78,
+        "maxCyclomatic": 1,
+        "entropy": 4.25
+      },
+      "history": [
+        {
+          "commit": "3f3d882ac",
+          "timestamp": "2026-07-14T02:11:27.023Z",
+          "mi": 58.6,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 78,
+          "maxCyclomatic": 1,
+          "entropy": 4.25
+        }
+      ],
+      "trend": "stable"
+    },
+    "fwber-frontend\\app\\robots.ts": {
+      "latest": {
+        "commit": "3f3d882ac",
+        "timestamp": "2026-07-14T02:11:27.167Z",
+        "mi": 73.9,
+        "cognitive": 1,
+        "nesting": 1,
+        "lines": 24,
+        "maxCyclomatic": 1,
+        "entropy": 3.84
+      },
+      "history": [
+        {
+          "commit": "3f3d882ac",
+          "timestamp": "2026-07-14T02:11:27.167Z",
+          "mi": 73.9,
+          "cognitive": 1,
+          "nesting": 1,
+          "lines": 24,
+          "maxCyclomatic": 1,
+          "entropy": 3.84
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-07-14T01:41:42.074Z"
+  "capturedAt": "2026-07-14T02:11:32.198Z"
 }
