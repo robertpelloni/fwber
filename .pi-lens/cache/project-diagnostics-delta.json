@@ -1,20 +1,20 @@
 {
   "version": 2,
   "cwd": "C:\\Users\\hyper\\workspace\\fwber",
-  "generatedAt": "2026-07-14T01:42:25.651Z",
+  "generatedAt": "2026-07-14T03:43:54.118Z",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "turnIndex": 7,
-  "projectSeqStart": 114,
-  "projectSeqEnd": 115,
+  "turnIndex": 44,
+  "projectSeqStart": 123,
+  "projectSeqEnd": 123,
   "diagnostics": [
     {
-      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\next.config.js",
+      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\app\\sitemap.ts",
       "severity": "warning",
       "semantic": "warning",
       "tool": "knip",
       "runner": "knip",
       "rule": "knip:file",
-      "message": "Unused file fwber-frontend/next.config.js",
+      "message": "Unused file fwber-frontend/app/sitemap.ts",
       "source": "project-scan"
     }
   ],
