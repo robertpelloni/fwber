@@ -1365,7 +1365,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "fwber-frontend\\next.config.js": {
+      "latest": {
+        "commit": "0eb14e0d7",
+        "timestamp": "2026-07-14T01:41:37.066Z",
+        "mi": 56,
+        "cognitive": 21,
+        "nesting": 4,
+        "lines": 169,
+        "maxCyclomatic": 2,
+        "entropy": 6.01
+      },
+      "history": [
+        {
+          "commit": "0eb14e0d7",
+          "timestamp": "2026-07-14T01:41:37.066Z",
+          "mi": 56,
+          "cognitive": 21,
+          "nesting": 4,
+          "lines": 169,
+          "maxCyclomatic": 2,
+          "entropy": 6.01
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-06-22T22:37:51.469Z"
+  "capturedAt": "2026-07-14T01:41:42.074Z"
 }

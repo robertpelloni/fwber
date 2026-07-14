@@ -48,6 +48,9 @@ const nextConfig = {
   // outputFileTracingRoot only works in monorepo; Vercel builds fwber-frontend/ as root
   ...(fs.existsSync(path.join(__dirname, '../VERSION')) ? { outputFileTracingRoot: path.join(__dirname, '../') } : {}),
 
+  // Standalone output for self-contained Hetzner deployment
+  output: 'standalone',
+
   // Performance optimizations
   compress: true,
   poweredByHeader: false,
@@ -88,6 +91,8 @@ const nextConfig = {
       { protocol: 'http', hostname: 'localhost', port: '8002', pathname: '/files/**' },
       { protocol: 'http', hostname: 'localhost', port: '8002', pathname: '/storage/**' },
       { protocol: 'http', hostname: 'localhost', port: '8002', pathname: '/images/**' },
+      { protocol: 'http', hostname: '127.0.0.1', port: '4003', pathname: '/**' },
+      { protocol: 'http', hostname: 'localhost', port: '4003', pathname: '/**' },
       { protocol: 'http', hostname: 'localhost', port: '8000', pathname: '/**' },
     ],
     formats: ['image/webp', 'image/avif'],

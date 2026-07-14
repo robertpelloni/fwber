@@ -1,20 +1,20 @@
 {
-  "version": 1,
+  "version": 2,
   "cwd": "C:\\Users\\hyper\\workspace\\fwber",
-  "generatedAt": "2026-06-23T13:00:37.394Z",
+  "generatedAt": "2026-07-14T01:42:25.651Z",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "turnIndex": 141,
-  "projectSeqStart": 104,
-  "projectSeqEnd": 105,
+  "turnIndex": 7,
+  "projectSeqStart": 114,
+  "projectSeqEnd": 115,
   "diagnostics": [
     {
-      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-backend-ts\\src\\index.ts",
+      "filePath": "C:\\Users\\hyper\\workspace\\fwber\\fwber-frontend\\next.config.js",
       "severity": "warning",
       "semantic": "warning",
       "tool": "knip",
       "runner": "knip",
       "rule": "knip:file",
-      "message": "Unused file fwber-backend-ts/src/index.ts",
+      "message": "Unused file fwber-frontend/next.config.js",
       "source": "project-scan"
     }
   ],

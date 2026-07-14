@@ -1,0 +1,78 @@
+name: Deploy Frontend (Hetzner)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'fwber-frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy Frontend to Hetzner
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+          cache-dependency-path: fwber-frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./fwber-frontend
+        run: npm install --no-fund --no-audit
+
+      - name: Build Next.js (standalone)
+        working-directory: ./fwber-frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.fwber.me
+          NEXT_PUBLIC_WS_URL: wss://ws.fwber.me
+          NEXT_PUBLIC_REVERB_HOST: ws.fwber.me
+          NEXT_PUBLIC_REVERB_PORT: "443"
+          NEXT_PUBLIC_REVERB_SCHEME: https
+          NEXT_PUBLIC_APP_URL: https://fwber.me
+
+      - name: Copy build to Hetzner
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: "fwber-frontend/.next/standalone,fwber-frontend/.next/static,fwber-frontend/public"
+          target: "/var/www/fwber/repo/"
+          strip_components: 0
+
+      - name: Deploy on Hetzner
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USERNAME }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/fwber/repo
+
+            # Move standalone build into place
+            if [ -d "fwber-frontend/.next/standalone" ]; then
+              # Merge static assets into standalone
+              cp -r fwber-frontend/.next/static fwber-frontend/.next/standalone/.next/ 2>/dev/null || true
+              # Copy public assets
+              cp -r fwber-frontend/public fwber-frontend/.next/standalone/ 2>/dev/null || true
+
+              # Symlink uploads directory for user photos
+              ln -sf /var/www/fwber/repo/fwber-backend-ts/uploads fwber-frontend/.next/standalone/public/uploads 2>/dev/null || true
+            fi
+
+            # Restart frontend via PM2
+            cd fwber-frontend/.next/standalone
+            pm2 restart fwber-frontend || pm2 start server.js --name "fwber-frontend" --cwd /var/www/fwber/repo/fwber-frontend/.next/standalone -- -p 3000
+            pm2 save
+
+            echo "✅ Frontend deployed and restarted"
