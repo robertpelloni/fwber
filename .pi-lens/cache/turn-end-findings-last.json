@@ -1,6 +1,6 @@
 {
-  "signature": ".github/workflows/deploy-frontend.yml::Unresolved from this turn — .github/workflows/deploy-frontend.yml:\n🔴 STOP — 7 issue(s) must be fixed:\n  L5: [brackets] too many spaces inside brackets\n  L5: [brackets] too many spaces inside brackets\n  L48: [line-length] line too long (101 > 80 characters)\n  L65: [line-length] line too long (106 > 80 characters)\n  L67: [line-length] line too long (94 > 80 characters)\n  L70: [line-length] line too long (132 > 80 characters)\n  L75: [line-length] line too long (154 > 80 characters)\n\nℹ️ Advisory — no action required this turn:\nCode-quality warnings introduced/touched this turn: 8 across 1 file(s).\nTop rules: zizmor:unpinned-uses×4, document-start×1, truthy×1\nDetails written to .pi-lens/cache/code-quality-warnings.json\nNo action required unless you are already refactoring these areas.",
+  "signature": ".github/workflows/deploy-frontend.yml::Unresolved from this turn — .github/workflows/deploy-frontend.yml:\n🔴 STOP — 1 issue(s) must be fixed:\n  L66: [line-length] line too long (88 > 80 characters)",
   "sessionId": "019eefaf-b346-7ef3-82cf-bd21fc7724d6",
-  "projectSeqStart": 115,
-  "projectSeqEnd": 116
+  "projectSeqStart": 117,
+  "projectSeqEnd": 118
 }

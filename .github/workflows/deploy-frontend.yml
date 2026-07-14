@@ -60,19 +60,19 @@ jobs:
             cd /var/www/fwber/repo
 
             # Move standalone build into place
-            if [ -d "fwber-frontend/.next/standalone" ]; then
+            STANDALONE=fwber-frontend/.next/standalone/fwber-frontend
+            if [ -f "$STANDALONE/server.js" ]; then
               # Merge static assets into standalone
-              cp -r fwber-frontend/.next/static fwber-frontend/.next/standalone/.next/ 2>/dev/null || true
+              cp -r fwber-frontend/.next/static "$STANDALONE/.next/" 2>/dev/null || true
               # Copy public assets
-              cp -r fwber-frontend/public fwber-frontend/.next/standalone/ 2>/dev/null || true
-
+              cp -r fwber-frontend/public "$STANDALONE/" 2>/dev/null || true
               # Symlink uploads directory for user photos
-              ln -sf /var/www/fwber/repo/fwber-backend-ts/uploads fwber-frontend/.next/standalone/public/uploads 2>/dev/null || true
+              ln -sf /var/www/fwber/repo/fwber-backend-ts/uploads "$STANDALONE/public/uploads" 2>/dev/null || true
             fi
 
             # Restart frontend via PM2
-            cd fwber-frontend/.next/standalone
-            pm2 restart fwber-frontend || pm2 start server.js --name "fwber-frontend" --cwd /var/www/fwber/repo/fwber-frontend/.next/standalone -- -p 3000
+            pm2 restart fwber-frontend || \
+              PORT=3000 pm2 start "$STANDALONE/server.js" --name fwber-frontend
             pm2 save
 
-            echo "✅ Frontend deployed and restarted"
+            echo '✅ Frontend deployed and restarted'

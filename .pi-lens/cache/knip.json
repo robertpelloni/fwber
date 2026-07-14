@@ -753,11 +753,6 @@
     },
     {
       "type": "file",
-      "name": "tools/scripts/consensus_gate.js",
-      "file": "tools/scripts/consensus_gate.js"
-    },
-    {
-      "type": "file",
       "name": "tools/orchestration/consolidated-mcp-server.js",
       "file": "tools/orchestration/consolidated-mcp-server.js"
     },
@@ -770,6 +765,11 @@
       "type": "file",
       "name": "tools/orchestration/unified-ai-orchestrator-secure.js",
       "file": "tools/orchestration/unified-ai-orchestrator-secure.js"
+    },
+    {
+      "type": "file",
+      "name": "tools/scripts/consensus_gate.js",
+      "file": "tools/scripts/consensus_gate.js"
     },
     {
       "type": "file",
@@ -800,46 +800,6 @@
       "type": "file",
       "name": "fwber-backend-ts/src/controllers/AuthController.ts",
       "file": "fwber-backend-ts/src/controllers/AuthController.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/achievements.ts",
-      "file": "fwber-backend-ts/src/lib/achievements.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/email.ts",
-      "file": "fwber-backend-ts/src/lib/email.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/photos.ts",
-      "file": "fwber-backend-ts/src/lib/photos.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/prisma.ts",
-      "file": "fwber-backend-ts/src/lib/prisma.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/redis.ts",
-      "file": "fwber-backend-ts/src/lib/redis.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/ssrf.ts",
-      "file": "fwber-backend-ts/src/lib/ssrf.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/verification-store.ts",
-      "file": "fwber-backend-ts/src/lib/verification-store.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/wingman-ai.ts",
-      "file": "fwber-backend-ts/src/lib/wingman-ai.ts"
     },
     {
       "type": "file",
@@ -1318,6 +1278,46 @@
     },
     {
       "type": "file",
+      "name": "fwber-backend-ts/src/lib/achievements.ts",
+      "file": "fwber-backend-ts/src/lib/achievements.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/email.ts",
+      "file": "fwber-backend-ts/src/lib/email.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/photos.ts",
+      "file": "fwber-backend-ts/src/lib/photos.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/prisma.ts",
+      "file": "fwber-backend-ts/src/lib/prisma.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/redis.ts",
+      "file": "fwber-backend-ts/src/lib/redis.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/ssrf.ts",
+      "file": "fwber-backend-ts/src/lib/ssrf.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/verification-store.ts",
+      "file": "fwber-backend-ts/src/lib/verification-store.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/wingman-ai.ts",
+      "file": "fwber-backend-ts/src/lib/wingman-ai.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/achievements/page.tsx",
       "file": "fwber-frontend/app/achievements/page.tsx"
     },
@@ -1358,6 +1358,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/commerce/page.tsx",
+      "file": "fwber-frontend/app/commerce/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/chatrooms/layout.tsx",
       "file": "fwber-frontend/app/chatrooms/layout.tsx"
     },
@@ -1368,23 +1373,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/commerce/page.tsx",
-      "file": "fwber-frontend/app/commerce/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/conference-pulse/page.tsx",
       "file": "fwber-frontend/app/conference-pulse/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/connections/page.tsx",
-      "file": "fwber-frontend/app/connections/page.tsx"
+      "name": "fwber-frontend/app/contact/page.tsx",
+      "file": "fwber-frontend/app/contact/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/contact/page.tsx",
-      "file": "fwber-frontend/app/contact/page.tsx"
+      "name": "fwber-frontend/app/connections/page.tsx",
+      "file": "fwber-frontend/app/connections/page.tsx"
     },
     {
       "type": "file",
@@ -1403,6 +1403,16 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/date-planner/page.tsx",
+      "file": "fwber-frontend/app/date-planner/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/deals/page.tsx",
+      "file": "fwber-frontend/app/deals/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/dashboard/layout.tsx",
       "file": "fwber-frontend/app/dashboard/layout.tsx"
     },
@@ -1418,11 +1428,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/date-planner/page.tsx",
-      "file": "fwber-frontend/app/date-planner/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/dev-auth/page.tsx",
       "file": "fwber-frontend/app/dev-auth/page.tsx"
     },
@@ -1430,11 +1435,6 @@
       "type": "file",
       "name": "fwber-frontend/app/discover/page.tsx",
       "file": "fwber-frontend/app/discover/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/deals/page.tsx",
-      "file": "fwber-frontend/app/deals/page.tsx"
     },
     {
       "type": "file",
@@ -1453,13 +1453,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/forgot-password/page.tsx",
-      "file": "fwber-frontend/app/forgot-password/page.tsx"
+      "name": "fwber-frontend/app/feedback/page.tsx",
+      "file": "fwber-frontend/app/feedback/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/feedback/page.tsx",
-      "file": "fwber-frontend/app/feedback/page.tsx"
+      "name": "fwber-frontend/app/forgot-password/page.tsx",
+      "file": "fwber-frontend/app/forgot-password/page.tsx"
     },
     {
       "type": "file",
@@ -1483,8 +1483,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/ice-breakers/page.tsx",
-      "file": "fwber-frontend/app/ice-breakers/page.tsx"
+      "name": "fwber-frontend/app/help/layout.tsx",
+      "file": "fwber-frontend/app/help/layout.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/help/page.tsx",
+      "file": "fwber-frontend/app/help/page.tsx"
     },
     {
       "type": "file",
@@ -1498,6 +1503,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/ice-breakers/page.tsx",
+      "file": "fwber-frontend/app/ice-breakers/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/integrations/page.tsx",
       "file": "fwber-frontend/app/integrations/page.tsx"
     },
@@ -1505,16 +1515,6 @@
       "type": "file",
       "name": "fwber-frontend/app/journal/page.tsx",
       "file": "fwber-frontend/app/journal/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/help/layout.tsx",
-      "file": "fwber-frontend/app/help/layout.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/help/page.tsx",
-      "file": "fwber-frontend/app/help/page.tsx"
     },
     {
       "type": "file",
@@ -1528,23 +1528,23 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/location-settings/page.tsx",
-      "file": "fwber-frontend/app/location-settings/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/local-pulse/page.tsx",
       "file": "fwber-frontend/app/local-pulse/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/login/page.tsx",
-      "file": "fwber-frontend/app/login/page.tsx"
+      "name": "fwber-frontend/app/location-settings/page.tsx",
+      "file": "fwber-frontend/app/location-settings/page.tsx"
     },
     {
       "type": "file",
       "name": "fwber-frontend/app/marketplace/page.tsx",
       "file": "fwber-frontend/app/marketplace/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/login/page.tsx",
+      "file": "fwber-frontend/app/login/page.tsx"
     },
     {
       "type": "file",
@@ -1598,13 +1598,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/notifications/page.tsx",
-      "file": "fwber-frontend/app/notifications/page.tsx"
+      "name": "fwber-frontend/app/onboarding/page.tsx",
+      "file": "fwber-frontend/app/onboarding/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/onboarding/page.tsx",
-      "file": "fwber-frontend/app/onboarding/page.tsx"
+      "name": "fwber-frontend/app/notifications/page.tsx",
+      "file": "fwber-frontend/app/notifications/page.tsx"
     },
     {
       "type": "file",
@@ -1728,6 +1728,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/roast-date/page.tsx",
+      "file": "fwber-frontend/app/roast-date/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/safety/page.tsx",
       "file": "fwber-frontend/app/safety/page.tsx"
     },
@@ -1743,23 +1748,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/roast-date/page.tsx",
-      "file": "fwber-frontend/app/roast-date/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/search/page.tsx",
       "file": "fwber-frontend/app/search/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/page.tsx",
-      "file": "fwber-frontend/app/settings/page.tsx"
+      "name": "fwber-frontend/app/sentry-test/page.tsx",
+      "file": "fwber-frontend/app/sentry-test/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/sentry-test/page.tsx",
-      "file": "fwber-frontend/app/sentry-test/page.tsx"
+      "name": "fwber-frontend/app/settings/page.tsx",
+      "file": "fwber-frontend/app/settings/page.tsx"
     },
     {
       "type": "file",
@@ -1793,23 +1793,23 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/test-auth/page.tsx",
-      "file": "fwber-frontend/app/test-auth/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/tier-demo/page.tsx",
       "file": "fwber-frontend/app/tier-demo/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/topics/page.tsx",
-      "file": "fwber-frontend/app/topics/page.tsx"
+      "name": "fwber-frontend/app/unlocks/page.tsx",
+      "file": "fwber-frontend/app/unlocks/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/unlocks/page.tsx",
-      "file": "fwber-frontend/app/unlocks/page.tsx"
+      "name": "fwber-frontend/app/test-auth/page.tsx",
+      "file": "fwber-frontend/app/test-auth/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/topics/page.tsx",
+      "file": "fwber-frontend/app/topics/page.tsx"
     },
     {
       "type": "file",
@@ -1953,11 +1953,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/chatrooms/Chatroom.tsx",
-      "file": "fwber-frontend/components/chatrooms/Chatroom.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/chat/ConversationCoach.tsx",
       "file": "fwber-frontend/components/chat/ConversationCoach.tsx"
     },
@@ -1965,6 +1960,11 @@
       "type": "file",
       "name": "fwber-frontend/components/chat/TierUnlockGuide.tsx",
       "file": "fwber-frontend/components/chat/TierUnlockGuide.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/chatrooms/Chatroom.tsx",
+      "file": "fwber-frontend/components/chatrooms/Chatroom.tsx"
     },
     {
       "type": "file",
@@ -2003,11 +2003,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/gamification/DailyStreakModal.tsx",
-      "file": "fwber-frontend/components/gamification/DailyStreakModal.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/friends/FriendList.tsx",
       "file": "fwber-frontend/components/friends/FriendList.tsx"
     },
@@ -2020,6 +2015,11 @@
       "type": "file",
       "name": "fwber-frontend/components/friends/UserSearch.tsx",
       "file": "fwber-frontend/components/friends/UserSearch.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/gamification/DailyStreakModal.tsx",
+      "file": "fwber-frontend/components/gamification/DailyStreakModal.tsx"
     },
     {
       "type": "file",
@@ -2233,6 +2233,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/components/quests/QuestBoard.tsx",
+      "file": "fwber-frontend/components/quests/QuestBoard.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/components/realtime/DatePlanner.tsx",
       "file": "fwber-frontend/components/realtime/DatePlanner.tsx"
     },
@@ -2258,11 +2263,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/quests/QuestBoard.tsx",
-      "file": "fwber-frontend/components/quests/QuestBoard.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/safety/SafeWalkTracker.tsx",
       "file": "fwber-frontend/components/safety/SafeWalkTracker.tsx"
     },
@@ -2270,16 +2270,6 @@
       "type": "file",
       "name": "fwber-frontend/components/tipping/TipButton.tsx",
       "file": "fwber-frontend/components/tipping/TipButton.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/components/VideoCall/CallHistory.tsx",
-      "file": "fwber-frontend/components/VideoCall/CallHistory.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/components/VideoCall/VideoCallModal.tsx",
-      "file": "fwber-frontend/components/VideoCall/VideoCallModal.tsx"
     },
     {
       "type": "file",
@@ -2400,6 +2390,16 @@
       "type": "file",
       "name": "fwber-frontend/components/ui/use-toast.ts",
       "file": "fwber-frontend/components/ui/use-toast.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/VideoCall/CallHistory.tsx",
+      "file": "fwber-frontend/components/VideoCall/CallHistory.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/VideoCall/VideoCallModal.tsx",
+      "file": "fwber-frontend/components/VideoCall/VideoCallModal.tsx"
     },
     {
       "type": "file",
@@ -3198,11 +3198,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/lib/wasm/benchmark.ts",
-      "file": "fwber-frontend/lib/wasm/benchmark.ts"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/lib/vault/crypto.ts",
       "file": "fwber-frontend/lib/vault/crypto.ts"
     },
@@ -3218,8 +3213,18 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/lib/wasm/benchmark.ts",
+      "file": "fwber-frontend/lib/wasm/benchmark.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/lib/websocket/client.ts",
       "file": "fwber-frontend/lib/websocket/client.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts",
+      "file": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts"
     },
     {
       "type": "file",
@@ -3230,11 +3235,6 @@
       "type": "file",
       "name": "fwber-backend-ts/src/lib/seeds/matching-questions.ts",
       "file": "fwber-backend-ts/src/lib/seeds/matching-questions.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts",
-      "file": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts"
     },
     {
       "type": "file",
@@ -3278,13 +3278,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/bounties/route.ts",
-      "file": "fwber-frontend/app/api/bounties/route.ts"
+      "name": "fwber-frontend/app/api/bulletin-boards/route.ts",
+      "file": "fwber-frontend/app/api/bulletin-boards/route.ts"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/bulletin-boards/route.ts",
-      "file": "fwber-frontend/app/api/bulletin-boards/route.ts"
+      "name": "fwber-frontend/app/api/bounties/route.ts",
+      "file": "fwber-frontend/app/api/bounties/route.ts"
     },
     {
       "type": "file",
@@ -3298,13 +3298,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/referrals/route.ts",
-      "file": "fwber-frontend/app/api/referrals/route.ts"
+      "name": "fwber-frontend/app/api/reports/route.ts",
+      "file": "fwber-frontend/app/api/reports/route.ts"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/reports/route.ts",
-      "file": "fwber-frontend/app/api/reports/route.ts"
+      "name": "fwber-frontend/app/api/referrals/route.ts",
+      "file": "fwber-frontend/app/api/referrals/route.ts"
     },
     {
       "type": "file",
@@ -3378,13 +3378,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/integrations/contacts/page.tsx",
-      "file": "fwber-frontend/app/integrations/contacts/page.tsx"
+      "name": "fwber-frontend/app/help/[slug]/page.tsx",
+      "file": "fwber-frontend/app/help/[slug]/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/help/[slug]/page.tsx",
-      "file": "fwber-frontend/app/help/[slug]/page.tsx"
+      "name": "fwber-frontend/app/integrations/contacts/page.tsx",
+      "file": "fwber-frontend/app/integrations/contacts/page.tsx"
     },
     {
       "type": "file",
@@ -3408,23 +3408,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/dashboard/page.tsx",
-      "file": "fwber-frontend/app/merchant/dashboard/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/merchant/inventory/page.tsx",
       "file": "fwber-frontend/app/merchant/inventory/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/loyalty/page.tsx",
-      "file": "fwber-frontend/app/merchant/loyalty/page.tsx"
+      "name": "fwber-frontend/app/merchant/dashboard/page.tsx",
+      "file": "fwber-frontend/app/merchant/dashboard/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/promotions/page.tsx",
-      "file": "fwber-frontend/app/merchant/promotions/page.tsx"
+      "name": "fwber-frontend/app/merchant/loyalty/page.tsx",
+      "file": "fwber-frontend/app/merchant/loyalty/page.tsx"
     },
     {
       "type": "file",
@@ -3435,6 +3430,11 @@
       "type": "file",
       "name": "fwber-frontend/app/merchant/register/page.tsx",
       "file": "fwber-frontend/app/merchant/register/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/merchant/promotions/page.tsx",
+      "file": "fwber-frontend/app/merchant/promotions/page.tsx"
     },
     {
       "type": "file",
@@ -3498,13 +3498,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/identity/page.tsx",
-      "file": "fwber-frontend/app/settings/identity/page.tsx"
+      "name": "fwber-frontend/app/settings/hardware/page.tsx",
+      "file": "fwber-frontend/app/settings/hardware/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/hardware/page.tsx",
-      "file": "fwber-frontend/app/settings/hardware/page.tsx"
+      "name": "fwber-frontend/app/settings/identity/page.tsx",
+      "file": "fwber-frontend/app/settings/identity/page.tsx"
     },
     {
       "type": "file",
@@ -3538,13 +3538,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/two-factor/page.tsx",
-      "file": "fwber-frontend/app/settings/two-factor/page.tsx"
+      "name": "fwber-frontend/app/settings/vault/page.tsx",
+      "file": "fwber-frontend/app/settings/vault/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/vault/page.tsx",
-      "file": "fwber-frontend/app/settings/vault/page.tsx"
+      "name": "fwber-frontend/app/settings/two-factor/page.tsx",
+      "file": "fwber-frontend/app/settings/two-factor/page.tsx"
     },
     {
       "type": "file",
@@ -3613,11 +3613,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
-      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/wingman/fortune/page.tsx",
       "file": "fwber-frontend/app/wingman/fortune/page.tsx"
     },
@@ -3633,13 +3628,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/roast/page.tsx",
-      "file": "fwber-frontend/app/wingman/roast/page.tsx"
+      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
+      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
     },
     {
       "type": "file",
       "name": "fwber-frontend/app/wingman/vibe/page.tsx",
       "file": "fwber-frontend/app/wingman/vibe/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/wingman/roast/page.tsx",
+      "file": "fwber-frontend/app/wingman/roast/page.tsx"
     },
     {
       "type": "file",
@@ -4541,11 +4541,6 @@
     },
     {
       "type": "file",
-      "name": "tools/scripts/consensus_gate.js",
-      "file": "tools/scripts/consensus_gate.js"
-    },
-    {
-      "type": "file",
       "name": "tools/orchestration/consolidated-mcp-server.js",
       "file": "tools/orchestration/consolidated-mcp-server.js"
     },
@@ -4558,6 +4553,11 @@
       "type": "file",
       "name": "tools/orchestration/unified-ai-orchestrator-secure.js",
       "file": "tools/orchestration/unified-ai-orchestrator-secure.js"
+    },
+    {
+      "type": "file",
+      "name": "tools/scripts/consensus_gate.js",
+      "file": "tools/scripts/consensus_gate.js"
     },
     {
       "type": "file",
@@ -4588,46 +4588,6 @@
       "type": "file",
       "name": "fwber-backend-ts/src/controllers/AuthController.ts",
       "file": "fwber-backend-ts/src/controllers/AuthController.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/achievements.ts",
-      "file": "fwber-backend-ts/src/lib/achievements.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/email.ts",
-      "file": "fwber-backend-ts/src/lib/email.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/photos.ts",
-      "file": "fwber-backend-ts/src/lib/photos.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/prisma.ts",
-      "file": "fwber-backend-ts/src/lib/prisma.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/redis.ts",
-      "file": "fwber-backend-ts/src/lib/redis.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/ssrf.ts",
-      "file": "fwber-backend-ts/src/lib/ssrf.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/verification-store.ts",
-      "file": "fwber-backend-ts/src/lib/verification-store.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/lib/wingman-ai.ts",
-      "file": "fwber-backend-ts/src/lib/wingman-ai.ts"
     },
     {
       "type": "file",
@@ -5106,6 +5066,46 @@
     },
     {
       "type": "file",
+      "name": "fwber-backend-ts/src/lib/achievements.ts",
+      "file": "fwber-backend-ts/src/lib/achievements.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/email.ts",
+      "file": "fwber-backend-ts/src/lib/email.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/photos.ts",
+      "file": "fwber-backend-ts/src/lib/photos.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/prisma.ts",
+      "file": "fwber-backend-ts/src/lib/prisma.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/redis.ts",
+      "file": "fwber-backend-ts/src/lib/redis.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/ssrf.ts",
+      "file": "fwber-backend-ts/src/lib/ssrf.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/verification-store.ts",
+      "file": "fwber-backend-ts/src/lib/verification-store.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/lib/wingman-ai.ts",
+      "file": "fwber-backend-ts/src/lib/wingman-ai.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/achievements/page.tsx",
       "file": "fwber-frontend/app/achievements/page.tsx"
     },
@@ -5146,6 +5146,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/commerce/page.tsx",
+      "file": "fwber-frontend/app/commerce/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/chatrooms/layout.tsx",
       "file": "fwber-frontend/app/chatrooms/layout.tsx"
     },
@@ -5156,23 +5161,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/commerce/page.tsx",
-      "file": "fwber-frontend/app/commerce/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/conference-pulse/page.tsx",
       "file": "fwber-frontend/app/conference-pulse/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/connections/page.tsx",
-      "file": "fwber-frontend/app/connections/page.tsx"
+      "name": "fwber-frontend/app/contact/page.tsx",
+      "file": "fwber-frontend/app/contact/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/contact/page.tsx",
-      "file": "fwber-frontend/app/contact/page.tsx"
+      "name": "fwber-frontend/app/connections/page.tsx",
+      "file": "fwber-frontend/app/connections/page.tsx"
     },
     {
       "type": "file",
@@ -5191,6 +5191,16 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/date-planner/page.tsx",
+      "file": "fwber-frontend/app/date-planner/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/deals/page.tsx",
+      "file": "fwber-frontend/app/deals/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/dashboard/layout.tsx",
       "file": "fwber-frontend/app/dashboard/layout.tsx"
     },
@@ -5206,11 +5216,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/date-planner/page.tsx",
-      "file": "fwber-frontend/app/date-planner/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/dev-auth/page.tsx",
       "file": "fwber-frontend/app/dev-auth/page.tsx"
     },
@@ -5218,11 +5223,6 @@
       "type": "file",
       "name": "fwber-frontend/app/discover/page.tsx",
       "file": "fwber-frontend/app/discover/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/deals/page.tsx",
-      "file": "fwber-frontend/app/deals/page.tsx"
     },
     {
       "type": "file",
@@ -5241,13 +5241,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/forgot-password/page.tsx",
-      "file": "fwber-frontend/app/forgot-password/page.tsx"
+      "name": "fwber-frontend/app/feedback/page.tsx",
+      "file": "fwber-frontend/app/feedback/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/feedback/page.tsx",
-      "file": "fwber-frontend/app/feedback/page.tsx"
+      "name": "fwber-frontend/app/forgot-password/page.tsx",
+      "file": "fwber-frontend/app/forgot-password/page.tsx"
     },
     {
       "type": "file",
@@ -5271,8 +5271,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/ice-breakers/page.tsx",
-      "file": "fwber-frontend/app/ice-breakers/page.tsx"
+      "name": "fwber-frontend/app/help/layout.tsx",
+      "file": "fwber-frontend/app/help/layout.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/help/page.tsx",
+      "file": "fwber-frontend/app/help/page.tsx"
     },
     {
       "type": "file",
@@ -5286,6 +5291,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/ice-breakers/page.tsx",
+      "file": "fwber-frontend/app/ice-breakers/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/integrations/page.tsx",
       "file": "fwber-frontend/app/integrations/page.tsx"
     },
@@ -5293,16 +5303,6 @@
       "type": "file",
       "name": "fwber-frontend/app/journal/page.tsx",
       "file": "fwber-frontend/app/journal/page.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/help/layout.tsx",
-      "file": "fwber-frontend/app/help/layout.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/app/help/page.tsx",
-      "file": "fwber-frontend/app/help/page.tsx"
     },
     {
       "type": "file",
@@ -5316,23 +5316,23 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/location-settings/page.tsx",
-      "file": "fwber-frontend/app/location-settings/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/local-pulse/page.tsx",
       "file": "fwber-frontend/app/local-pulse/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/login/page.tsx",
-      "file": "fwber-frontend/app/login/page.tsx"
+      "name": "fwber-frontend/app/location-settings/page.tsx",
+      "file": "fwber-frontend/app/location-settings/page.tsx"
     },
     {
       "type": "file",
       "name": "fwber-frontend/app/marketplace/page.tsx",
       "file": "fwber-frontend/app/marketplace/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/login/page.tsx",
+      "file": "fwber-frontend/app/login/page.tsx"
     },
     {
       "type": "file",
@@ -5386,13 +5386,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/notifications/page.tsx",
-      "file": "fwber-frontend/app/notifications/page.tsx"
+      "name": "fwber-frontend/app/onboarding/page.tsx",
+      "file": "fwber-frontend/app/onboarding/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/onboarding/page.tsx",
-      "file": "fwber-frontend/app/onboarding/page.tsx"
+      "name": "fwber-frontend/app/notifications/page.tsx",
+      "file": "fwber-frontend/app/notifications/page.tsx"
     },
     {
       "type": "file",
@@ -5516,6 +5516,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/app/roast-date/page.tsx",
+      "file": "fwber-frontend/app/roast-date/page.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/app/safety/page.tsx",
       "file": "fwber-frontend/app/safety/page.tsx"
     },
@@ -5531,23 +5536,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/roast-date/page.tsx",
-      "file": "fwber-frontend/app/roast-date/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/search/page.tsx",
       "file": "fwber-frontend/app/search/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/page.tsx",
-      "file": "fwber-frontend/app/settings/page.tsx"
+      "name": "fwber-frontend/app/sentry-test/page.tsx",
+      "file": "fwber-frontend/app/sentry-test/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/sentry-test/page.tsx",
-      "file": "fwber-frontend/app/sentry-test/page.tsx"
+      "name": "fwber-frontend/app/settings/page.tsx",
+      "file": "fwber-frontend/app/settings/page.tsx"
     },
     {
       "type": "file",
@@ -5581,23 +5581,23 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/test-auth/page.tsx",
-      "file": "fwber-frontend/app/test-auth/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/tier-demo/page.tsx",
       "file": "fwber-frontend/app/tier-demo/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/topics/page.tsx",
-      "file": "fwber-frontend/app/topics/page.tsx"
+      "name": "fwber-frontend/app/unlocks/page.tsx",
+      "file": "fwber-frontend/app/unlocks/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/unlocks/page.tsx",
-      "file": "fwber-frontend/app/unlocks/page.tsx"
+      "name": "fwber-frontend/app/test-auth/page.tsx",
+      "file": "fwber-frontend/app/test-auth/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/topics/page.tsx",
+      "file": "fwber-frontend/app/topics/page.tsx"
     },
     {
       "type": "file",
@@ -5741,11 +5741,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/chatrooms/Chatroom.tsx",
-      "file": "fwber-frontend/components/chatrooms/Chatroom.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/chat/ConversationCoach.tsx",
       "file": "fwber-frontend/components/chat/ConversationCoach.tsx"
     },
@@ -5753,6 +5748,11 @@
       "type": "file",
       "name": "fwber-frontend/components/chat/TierUnlockGuide.tsx",
       "file": "fwber-frontend/components/chat/TierUnlockGuide.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/chatrooms/Chatroom.tsx",
+      "file": "fwber-frontend/components/chatrooms/Chatroom.tsx"
     },
     {
       "type": "file",
@@ -5791,11 +5791,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/gamification/DailyStreakModal.tsx",
-      "file": "fwber-frontend/components/gamification/DailyStreakModal.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/friends/FriendList.tsx",
       "file": "fwber-frontend/components/friends/FriendList.tsx"
     },
@@ -5808,6 +5803,11 @@
       "type": "file",
       "name": "fwber-frontend/components/friends/UserSearch.tsx",
       "file": "fwber-frontend/components/friends/UserSearch.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/gamification/DailyStreakModal.tsx",
+      "file": "fwber-frontend/components/gamification/DailyStreakModal.tsx"
     },
     {
       "type": "file",
@@ -6021,6 +6021,11 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/components/quests/QuestBoard.tsx",
+      "file": "fwber-frontend/components/quests/QuestBoard.tsx"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/components/realtime/DatePlanner.tsx",
       "file": "fwber-frontend/components/realtime/DatePlanner.tsx"
     },
@@ -6046,11 +6051,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/components/quests/QuestBoard.tsx",
-      "file": "fwber-frontend/components/quests/QuestBoard.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/components/safety/SafeWalkTracker.tsx",
       "file": "fwber-frontend/components/safety/SafeWalkTracker.tsx"
     },
@@ -6058,16 +6058,6 @@
       "type": "file",
       "name": "fwber-frontend/components/tipping/TipButton.tsx",
       "file": "fwber-frontend/components/tipping/TipButton.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/components/VideoCall/CallHistory.tsx",
-      "file": "fwber-frontend/components/VideoCall/CallHistory.tsx"
-    },
-    {
-      "type": "file",
-      "name": "fwber-frontend/components/VideoCall/VideoCallModal.tsx",
-      "file": "fwber-frontend/components/VideoCall/VideoCallModal.tsx"
     },
     {
       "type": "file",
@@ -6188,6 +6178,16 @@
       "type": "file",
       "name": "fwber-frontend/components/ui/use-toast.ts",
       "file": "fwber-frontend/components/ui/use-toast.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/VideoCall/CallHistory.tsx",
+      "file": "fwber-frontend/components/VideoCall/CallHistory.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/components/VideoCall/VideoCallModal.tsx",
+      "file": "fwber-frontend/components/VideoCall/VideoCallModal.tsx"
     },
     {
       "type": "file",
@@ -6986,11 +6986,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/lib/wasm/benchmark.ts",
-      "file": "fwber-frontend/lib/wasm/benchmark.ts"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/lib/vault/crypto.ts",
       "file": "fwber-frontend/lib/vault/crypto.ts"
     },
@@ -7006,8 +7001,18 @@
     },
     {
       "type": "file",
+      "name": "fwber-frontend/lib/wasm/benchmark.ts",
+      "file": "fwber-frontend/lib/wasm/benchmark.ts"
+    },
+    {
+      "type": "file",
       "name": "fwber-frontend/lib/websocket/client.ts",
       "file": "fwber-frontend/lib/websocket/client.ts"
+    },
+    {
+      "type": "file",
+      "name": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts",
+      "file": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts"
     },
     {
       "type": "file",
@@ -7018,11 +7023,6 @@
       "type": "file",
       "name": "fwber-backend-ts/src/lib/seeds/matching-questions.ts",
       "file": "fwber-backend-ts/src/lib/seeds/matching-questions.ts"
-    },
-    {
-      "type": "file",
-      "name": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts",
-      "file": "fwber-backend-ts/src/services/Security/ZkIdentityVerificationService.ts"
     },
     {
       "type": "file",
@@ -7066,13 +7066,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/bounties/route.ts",
-      "file": "fwber-frontend/app/api/bounties/route.ts"
+      "name": "fwber-frontend/app/api/bulletin-boards/route.ts",
+      "file": "fwber-frontend/app/api/bulletin-boards/route.ts"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/bulletin-boards/route.ts",
-      "file": "fwber-frontend/app/api/bulletin-boards/route.ts"
+      "name": "fwber-frontend/app/api/bounties/route.ts",
+      "file": "fwber-frontend/app/api/bounties/route.ts"
     },
     {
       "type": "file",
@@ -7086,13 +7086,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/referrals/route.ts",
-      "file": "fwber-frontend/app/api/referrals/route.ts"
+      "name": "fwber-frontend/app/api/reports/route.ts",
+      "file": "fwber-frontend/app/api/reports/route.ts"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/api/reports/route.ts",
-      "file": "fwber-frontend/app/api/reports/route.ts"
+      "name": "fwber-frontend/app/api/referrals/route.ts",
+      "file": "fwber-frontend/app/api/referrals/route.ts"
     },
     {
       "type": "file",
@@ -7166,13 +7166,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/integrations/contacts/page.tsx",
-      "file": "fwber-frontend/app/integrations/contacts/page.tsx"
+      "name": "fwber-frontend/app/help/[slug]/page.tsx",
+      "file": "fwber-frontend/app/help/[slug]/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/help/[slug]/page.tsx",
-      "file": "fwber-frontend/app/help/[slug]/page.tsx"
+      "name": "fwber-frontend/app/integrations/contacts/page.tsx",
+      "file": "fwber-frontend/app/integrations/contacts/page.tsx"
     },
     {
       "type": "file",
@@ -7196,23 +7196,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/dashboard/page.tsx",
-      "file": "fwber-frontend/app/merchant/dashboard/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/merchant/inventory/page.tsx",
       "file": "fwber-frontend/app/merchant/inventory/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/loyalty/page.tsx",
-      "file": "fwber-frontend/app/merchant/loyalty/page.tsx"
+      "name": "fwber-frontend/app/merchant/dashboard/page.tsx",
+      "file": "fwber-frontend/app/merchant/dashboard/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/merchant/promotions/page.tsx",
-      "file": "fwber-frontend/app/merchant/promotions/page.tsx"
+      "name": "fwber-frontend/app/merchant/loyalty/page.tsx",
+      "file": "fwber-frontend/app/merchant/loyalty/page.tsx"
     },
     {
       "type": "file",
@@ -7223,6 +7218,11 @@
       "type": "file",
       "name": "fwber-frontend/app/merchant/register/page.tsx",
       "file": "fwber-frontend/app/merchant/register/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/merchant/promotions/page.tsx",
+      "file": "fwber-frontend/app/merchant/promotions/page.tsx"
     },
     {
       "type": "file",
@@ -7286,13 +7286,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/identity/page.tsx",
-      "file": "fwber-frontend/app/settings/identity/page.tsx"
+      "name": "fwber-frontend/app/settings/hardware/page.tsx",
+      "file": "fwber-frontend/app/settings/hardware/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/hardware/page.tsx",
-      "file": "fwber-frontend/app/settings/hardware/page.tsx"
+      "name": "fwber-frontend/app/settings/identity/page.tsx",
+      "file": "fwber-frontend/app/settings/identity/page.tsx"
     },
     {
       "type": "file",
@@ -7326,13 +7326,13 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/two-factor/page.tsx",
-      "file": "fwber-frontend/app/settings/two-factor/page.tsx"
+      "name": "fwber-frontend/app/settings/vault/page.tsx",
+      "file": "fwber-frontend/app/settings/vault/page.tsx"
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/settings/vault/page.tsx",
-      "file": "fwber-frontend/app/settings/vault/page.tsx"
+      "name": "fwber-frontend/app/settings/two-factor/page.tsx",
+      "file": "fwber-frontend/app/settings/two-factor/page.tsx"
     },
     {
       "type": "file",
@@ -7401,11 +7401,6 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
-      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
-    },
-    {
-      "type": "file",
       "name": "fwber-frontend/app/wingman/fortune/page.tsx",
       "file": "fwber-frontend/app/wingman/fortune/page.tsx"
     },
@@ -7421,13 +7416,18 @@
     },
     {
       "type": "file",
-      "name": "fwber-frontend/app/wingman/roast/page.tsx",
-      "file": "fwber-frontend/app/wingman/roast/page.tsx"
+      "name": "fwber-frontend/app/wingman/draft-analysis/page.tsx",
+      "file": "fwber-frontend/app/wingman/draft-analysis/page.tsx"
     },
     {
       "type": "file",
       "name": "fwber-frontend/app/wingman/vibe/page.tsx",
       "file": "fwber-frontend/app/wingman/vibe/page.tsx"
+    },
+    {
+      "type": "file",
+      "name": "fwber-frontend/app/wingman/roast/page.tsx",
+      "file": "fwber-frontend/app/wingman/roast/page.tsx"
     },
     {
       "type": "file",
