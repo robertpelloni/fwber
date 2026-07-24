@@ -102,7 +102,9 @@ describe('ActivityPub End-to-End Interop', () => {
 
     const activity = {
       "type": "Note",
-      "content": "Hello world from interop test"
+      "content": "Hello world from interop test",
+      "fwber:currentEmotion": "happy",
+      "fwber:auraScore": 0.8
     };
 
     // The service handles fetching the remote actor inbox internally inside broadcastUpdate
@@ -113,5 +115,7 @@ describe('ActivityPub End-to-End Interop', () => {
     expect(receivedActivities.length).toBe(1);
     expect(receivedActivities[0].type).toBe('Create');
     expect(receivedActivities[0].object.content).toBe('Hello world from interop test');
+    expect(receivedActivities[0].object["fwber:currentEmotion"]).toBe('happy');
+    expect(receivedActivities[0].object["fwber:auraScore"]).toBe(0.8);
   });
 });

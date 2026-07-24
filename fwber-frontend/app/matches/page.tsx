@@ -30,6 +30,7 @@ export default function MatchesPage() {
 	const [matches, setMatches] = useState<Match[]>([]);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
+	const [auraMatchMode, setAuraMatchMode] = useState(false);
 	const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [matchedUser, setMatchedUser] = useState<{id: number; name: string; photoUrl: string} | null>(null);
@@ -52,10 +53,13 @@ export default function MatchesPage() {
 		async (filters = {}) => {
 			try {
 				setLoading(true);
-				const response = await api.get<{ matches?: Match[] }>("/matches", {
+				const endpoint = auraMatchMode ? "/matching/aura-matches" : "/matches";
+				const response = await api.get<{ matches?: Match[] } | Match[]>(endpoint, {
 					params: filters,
 				});
-				setMatches(Array.isArray(response.matches) ? response.matches : []);
+				// Normalize response depending on endpoint
+				const matchData = Array.isArray(response) ? response : response.matches;
+				setMatches(Array.isArray(matchData) ? matchData : []);
 				setCurrentIndex(0);
 				setIsPlaying(false);
 			} catch (err) {
@@ -65,7 +69,7 @@ export default function MatchesPage() {
 				setLoading(false);
 			}
 		},
-		[error],
+		[error, auraMatchMode],
 	);
 
 	useEffect(() => {
@@ -161,6 +165,16 @@ export default function MatchesPage() {
 						<div className="flex items-center justify-between gap-3">
 							<CreateBountyModal />
 							<BoostButton />
+						</div>
+						<div className="flex items-center justify-end">
+							<Button
+								variant={auraMatchMode ? "default" : "outline"}
+								className={auraMatchMode ? "bg-purple-600 hover:bg-purple-700 text-white animate-pulse" : ""}
+								onClick={() => setAuraMatchMode(!auraMatchMode)}
+							>
+								<Star className="w-4 h-4 mr-2" />
+								{auraMatchMode ? "Aura Matches Active" : "Find Aura Matches"}
+							</Button>
 						</div>
 						<MatchFilter onFilterChange={handleFilterChange} />
 					</div>

@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma.js';
+import { SentimentAnalysisService } from './SentimentAnalysisService.js';
 import axios from 'axios';
 import crypto from 'crypto';
 import { validateFederationUrl, getHardenedFederationAgent } from '../lib/ssrf.js';
@@ -159,6 +160,13 @@ export class FederationService {
     // This service method is for logic-level processing (e.g. notifications on mentions).
     if (object.type === 'Note') {
         const content = object.content || '';
+
+        // Dynamic Emotional Identity: analyze remote post to influence neighborhood sentiment locally
+        try {
+            await SentimentAnalysisService.analyzeUserSentiment(targetUserId);
+        } catch (e) {
+            console.error('[Federation] Could not analyze sentiment for incoming activity', e);
+        }
         const user = await prisma.users.findUnique({ where: { id: targetUserId } });
         const mentionTag = `@${user?.name}`;
 

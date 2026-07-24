@@ -1,6 +1,33 @@
 # Changelog
 
+## [2.3.10] - 2026-06-30
+### Added
+- **Quest System Integration**: LocalPulse now fetches and displays active quests from `/api/quests/active`, enabling users to accept them directly from the feed.
+- **Dynamic Emotional Identity**: Candidate cards in LocalPulse now use `EvolvingAvatar` to reflect the user's current emotional state visually (glows, borders, blends).
+
+## [2.3.9] - 2026-06-30
+### Added
+- **Group Aura** feature: `SentimentAnalysisService` now calculates an aggregated mood based on chatroom participant emotions.
+- Chatroom API (`GET /api/chatrooms/:id`, `GET /api/proximity-chatrooms/:id`) now returns the `group_aura` attribute.
+- Chatroom Frontend UI applies dynamic CSS styling (`auraTheme`) mapping directly to the specific room's Group Aura.
+- Descriptive tooltip indicator explaining the Group Aura context added to the UI headers using Radix components.
+
+## [2.3.9] - 2026-06-30
+### Added
+- **ActivityPub Dynamic Emotion Identity Integration**: Remote incoming notes now automatically trigger the `SentimentAnalysisService` to influence the local neighborhood sentiment and the recipient's aura tracking.
+- **AI-Driven Local Economy**: `GET /api/quests/active` now reads the user's `current_emotion` to compute dynamic `ai_vibe_match` flags, seeding the foundation for aura-targeted neighborhood quests.
+
+## [2.3.9] - 2026-07-03
+### Added
+- Phase 10 Completed: Integrated `VibePromotionService` to autonomously generate community quests based on neighborhood sentiment.
+- AI-Driven Local Economy: Connected real-time `SentimentAnalysisService` with `fwber-backend-ts` quest API to deliver dynamic vibe-matched quests.
+
 ## [2.3.8] - 2026-06-23
+### Added
+- **Quest System Integration**: LocalPulse now fetches and displays active quests from `/api/quests/active`, enabling users to accept them directly from the feed.
+- **Dynamic Emotional Identity**: Candidate cards in LocalPulse now use `EvolvingAvatar` to reflect the user's current emotional state visually (glows, borders, blends).
+
+
 
 ### Added
 - **10,000x Shiny UI Overhaul**: glassmorphism design system, framer-motion animations, floating 3D geometric shapes, shooting stars — across landing page and dashboard.

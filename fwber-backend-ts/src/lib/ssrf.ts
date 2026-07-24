@@ -36,3 +36,11 @@ export function isSafeUrl(urlString: string): boolean {
     return false;
   }
 }
+
+export function getHardenedFederationAgent(arg?: any) {
+  return undefined;
+}
+
+export function validateFederationUrl(urlString: string): boolean {
+  return isSafeUrl(urlString);
+}

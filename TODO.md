@@ -45,9 +45,16 @@
 - [x] **Matching Questions Seeded**: 10 OkCupid-style questions live in production.
 - [x] **start.bat Updated**: Monorepo-aware dev launcher (backend :4000, frontend :3000).
 
-## 🔴 Active: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.8)
-- [ ] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
-- [ ] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.
+## 🟢 Recently Completed: Phase 10 - Aura Chat Finalization (v2.3.17)
+- [x] **Aura Match Mode**: Toggle discovery based on emotional identity in the matches list.
+- [x] **Avatar Real-time Sync**: Wire `EmotionalIdentityService` rendering flow to `EvolvingAvatar` on match cards.
+- [x] **Aura-Matched Chat Endpoint**: Expose `/api/chat/aura` to initiate socket-driven atmospheric matches.
+- [x] **End-to-End Tests**: Implement `AuraE2E.test.ts` to simulate emotional matching swaps and response handling.
+- [x] **Vercel Config**: Add Cache-Control headers to invalidate stale front-end assets on push.
+
+## 🟢 Recently Completed: Phase 10 - Dynamic Identity & Proximity Forum (v2.3.9)
+- [x] **Quest Verification**: Use ZK-proofs or NFC tags to verify quest completion tasks.
+- [x] **Group Aura**: Aggregate emotions of group chat participants to determine group-wide mood and theme.
 - [ ] **Photo Migration**: 157 photos in DB but files missing from uploads directory — need backup restore.
 - [ ] **Stripe Live Keys**: Transition from test to live mode for production payments.
 - [ ] **Email DNS**: Configure Resend MX/SPF/DKIM/DMARC records for production email.

@@ -113,3 +113,87 @@ export const AvatarFallback = React.forwardRef<HTMLDivElement, React.HTMLAttribu
   },
 );
 AvatarFallback.displayName = 'AvatarFallback';
+
+export type EmotionState = 'neutral' | 'happy' | 'flirty' | 'mysterious' | 'intense' | 'thoughtful' | 'cynical' | 'melancholic';
+
+interface EvolvingAvatarProps {
+    src: string;
+    alt: string;
+    size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+    emotion?: EmotionState;
+    className?: string;
+    disableAnimation?: boolean;
+}
+
+const sizeConfig = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
+    '2xl': 'w-32 h-32',
+};
+
+const emotionStyles: Record<EmotionState, { wrapper: string, overlay: string }> = {
+    neutral: {
+        wrapper: 'border-transparent',
+        overlay: 'opacity-0'
+    },
+    happy: {
+        wrapper: 'border-yellow-400 ring-2 ring-yellow-400/50',
+        overlay: 'bg-yellow-400/10 opacity-100 mix-blend-overlay'
+    },
+    flirty: {
+        wrapper: 'border-pink-500 animate-pulse-slow shadow-[0_0_15px_rgba(236,72,153,0.6)]',
+        overlay: 'bg-gradient-to-t from-pink-500/20 to-transparent opacity-100 mix-blend-overlay'
+    },
+    mysterious: {
+        wrapper: 'border-indigo-500 grayscale-[30%] shadow-[0_0_20px_rgba(99,102,241,0.4)]',
+        overlay: 'bg-indigo-900/30 opacity-100 mix-blend-multiply backdrop-blur-[1px]'
+    },
+    intense: {
+        wrapper: 'border-red-600 animate-pulse ring-4 ring-red-600/30',
+        overlay: 'bg-red-600/20 opacity-100 mix-blend-color-burn'
+    },
+    thoughtful: {
+        wrapper: 'border-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.6)]',
+        overlay: 'bg-blue-400/20 opacity-100 mix-blend-overlay'
+    },
+    cynical: {
+        wrapper: 'border-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.6)]',
+        overlay: 'bg-purple-900/40 opacity-100 mix-blend-multiply'
+    },
+    melancholic: {
+        wrapper: 'border-slate-500 grayscale shadow-[0_0_15px_rgba(100,116,139,0.4)]',
+        overlay: 'bg-slate-700/30 opacity-100 mix-blend-multiply'
+    }
+};
+
+export const EvolvingAvatar: React.FC<EvolvingAvatarProps> = ({
+    src,
+    alt,
+    size = 'md',
+    emotion = 'neutral',
+    className,
+    disableAnimation = false
+}) => {
+    const currentStyle = emotionStyles[emotion] || emotionStyles.neutral;
+    const dimensions = sizeConfig[size];
+
+    return (
+        <div className={cn("relative rounded-full inline-block transition-all duration-700 ease-in-out border-2", currentStyle.wrapper, className)}>
+            <div className={cn("overflow-hidden rounded-full relative", dimensions)}>
+                <img
+                    src={src}
+                    alt={alt}
+                    className="object-cover w-full h-full"
+                />
+                {/* The Emotion Overlay Wrapper */}
+                <div className={cn(
+                    "absolute inset-0 rounded-full transition-opacity duration-1000",
+                    currentStyle.overlay,
+                    disableAnimation && "animate-none transition-none"
+                )} />
+            </div>
+        </div>
+    );
+};
