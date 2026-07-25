@@ -1,0 +1,74 @@
+
+> fwber-frontend@2.1.4 lint
+> eslint app components lib
+
+
+/app/fwber-frontend/app/burner-links/page.tsx
+  74:64  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/app/integrations/contacts/page.tsx
+  17:8   warning  React Hook useEffect has a missing dependency: 'fetchContacts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  88:64  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                   react/no-unescaped-entities
+
+/app/fwber-frontend/app/matching/nfc/page.tsx
+  35:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  35:42  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  43:69  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  43:81  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/app/merchant/loyalty/page.tsx
+  93:76  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  93:90  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/app/onboarding/page.tsx
+  262:6  warning  React Hook useCallback has missing dependencies: 'persistStepUpdate' and 'sanitizeLocationUpdate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/fwber-frontend/app/profile/[id]/page.tsx
+  85:6  warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/fwber-frontend/app/search/page.tsx
+  168:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/app/fwber-frontend/app/vouch/[code]/vouch-client.tsx
+  93:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/app/fwber-frontend/components/PhotoEditor.tsx
+  420:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  525:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/app/fwber-frontend/components/ProtectedRoute.tsx
+  38:6  warning  React Hook useEffect has a missing dependency: 'isBanned'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/fwber-frontend/components/ai/WingmanDashboardModal.tsx
+  28:15  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  28:45  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  39:99  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/components/council/VoteVerifier.tsx
+  99:47  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  99:72  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/components/matches/MatchInsights.tsx
+  125:15  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  125:94  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/components/matches/NFCProfileExchange.tsx
+  33:8  warning  React Hook useEffect has missing dependencies: 'processNfcData' and 'setLastScan'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/fwber-frontend/components/merchant/MerchantPOS.tsx
+  73:52  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/app/fwber-frontend/components/quests/QuestBoard.tsx
+  41:8  warning  React Hook useEffect has a missing dependency: 'fetchQuests'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/app/fwber-frontend/components/realtime/ProximityPresenceView.tsx
+  31:9  warning  The 'safeNearbyUsers' conditional could make the dependencies of useMemo Hook (at line 32) change on every render. To fix this, wrap the initialization of 'safeNearbyUsers' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/app/fwber-frontend/components/ui/avatar.tsx
+   80:5   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  185:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/app/fwber-frontend/lib/api/photos.ts
+  377:6  warning  React Hook useEffect has a missing dependency: 'fetchPhotos'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 30 problems (16 errors, 14 warnings)

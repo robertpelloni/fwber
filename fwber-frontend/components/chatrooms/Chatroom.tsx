@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useChatroom, useChatroomMessages, useSendMessage, useAddReaction, useRemoveReaction, useJoinChatroom } from '@/lib/hooks/use-chatrooms';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useAuth } from '@/lib/auth-context';
+import { useSocketLogic } from '@/lib/hooks/use-socket-logic';
 import {
   ConnectionStatusBadge,
   PresenceIndicator,
@@ -30,6 +32,17 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
   const addStandardReactionMutation = useAddReaction();
   const removeStandardReactionMutation = useRemoveReaction();
   const joinChatroomMutation = useJoinChatroom();
+
+  // Real-time atmospheric integration
+  const { connected, joinChatroom, leaveChatroom, sendRoomMessage } = useSocketLogic();
+
+  useEffect(() => {
+    if (connected && chatroomId) {
+      joinChatroom(chatroomId.toString());
+      return () => leaveChatroom(chatroomId.toString());
+    }
+  }, [connected, chatroomId, joinChatroom, leaveChatroom]);
+
 
   const chatroom = chatroomData?.chatroom;
   const messages = useMemo(() => messagesData?.data || [], [messagesData?.data]);
@@ -123,6 +136,25 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
     }
   };
 
+
+  // Determine dynamic chatroom theme based on group_aura
+  const auraTheme = useMemo(() => {
+    const aura = chatroom?.group_aura || 'standard';
+    switch (aura) {
+      case 'warm': return 'bg-orange-50/30 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800';
+      case 'electric': return 'bg-yellow-50/30 dark:bg-yellow-900/10 border-yellow-200 dark:border-yellow-800';
+      case 'contemplative': return 'bg-blue-50/30 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800';
+      case 'noir': return 'bg-purple-50/30 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800';
+      case 'moody': return 'bg-indigo-50/30 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800';
+      default: return 'bg-gray-50 dark:bg-gray-900 border-transparent';
+    }
+  }, [chatroom?.group_aura]);
+
+  const auraLabel = useMemo(() => {
+    const aura = chatroom?.group_aura || 'standard';
+    return aura.charAt(0).toUpperCase() + aura.slice(1) + ' Vibe';
+  }, [chatroom?.group_aura]);
+
   if (chatroomLoading) {
     return (
       <div className="min-h-[400px] bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -146,7 +178,7 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
   }
 
   return (
-    <div className="min-h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg">
+    <div className={`min-h-[600px] rounded-lg border transition-colors duration-500 ${auraTheme}`}>
       <div className="flex flex-col h-[600px]">
         {/* Chatroom Header */}
         <div className="bg-white dark:bg-gray-800 rounded-t-lg shadow-sm border-b border-gray-200 dark:border-gray-700 p-4">
@@ -157,6 +189,18 @@ export default function Chatroom({ chatroomId }: ChatroomProps) {
                 <ConnectionStatusBadge />
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
+                {chatroom?.group_aura && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <span className="px-2 py-1 text-xs rounded-full bg-black/5 dark:bg-white/10 font-medium tracking-wide cursor-help">
+                          ✨ {auraLabel}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent><p>The Group Aura is calculated based on the current emotional headspace of the active participants in this room.</p></TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 <button
                   onClick={() => setShowOnlineUsers(!showOnlineUsers)}
                   className="flex items-center gap-1 hover:text-blue-600 transition-colors"

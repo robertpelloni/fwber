@@ -10,5 +10,18 @@
     "NEXT_PUBLIC_REVERB_SCHEME": "https",
     "NEXT_PUBLIC_APP_URL": "https://fwber.me"
   },
-  "regions": ["iad1"]
+  "regions": [
+    "iad1"
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
 }

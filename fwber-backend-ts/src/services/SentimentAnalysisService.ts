@@ -4,6 +4,40 @@ import { AutonomousService } from './AutonomousService.js';
 
 export class SentimentAnalysisService {
   /**
+   * Calculates the aggregated 'Group Aura' for a list of users, useful for chatrooms and groups.
+   */
+  static async calculateGroupAura(userIds: bigint[]) {
+    try {
+      if (userIds.length === 0) return 'standard';
+
+      const profiles = await prisma.user_profiles.findMany({
+        where: { user_id: { in: userIds } },
+        select: { current_emotion: true }
+      });
+
+      const emotionCounts: Record<string, number> = {};
+      profiles.forEach(p => {
+        const e = (p.current_emotion || 'Neutral').toLowerCase();
+        emotionCounts[e] = (emotionCounts[e] || 0) + 1;
+      });
+
+      // Simple heuristic based on majority or significant presence
+      const total = profiles.length;
+
+      if ((emotionCounts['happy'] || 0) + (emotionCounts['excited'] || 0) > total * 0.4) return 'warm';
+      if ((emotionCounts['excited'] || 0) > total * 0.3) return 'electric';
+      if ((emotionCounts['thoughtful'] || 0) > total * 0.4) return 'contemplative';
+      if ((emotionCounts['cynical'] || 0) + (emotionCounts['mysterious'] || 0) > total * 0.3) return 'noir';
+      if ((emotionCounts['melancholic'] || 0) > total * 0.3) return 'moody';
+
+      return 'standard';
+    } catch (err: any) {
+      console.error('[SentimentService] calculateGroupAura failed:', err.message);
+      return 'standard';
+    }
+  }
+
+  /**
    * Analyzes recent activity for a user to determine their current emotional state.
    */
   static async analyzeUserSentiment(userId: bigint) {

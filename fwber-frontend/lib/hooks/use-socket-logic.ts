@@ -183,6 +183,24 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
     }
   }, []);
 
+  const joinChatroom = useCallback((roomId: string) => {
+    if (_socket) {
+      _socket.emit('join_room', roomId);
+    }
+  }, []);
+
+  const leaveChatroom = useCallback((roomId: string) => {
+    if (_socket) {
+      _socket.emit('leave_room', roomId);
+    }
+  }, []);
+
+  const sendRoomMessage = useCallback((roomId: string, content: string) => {
+    if (_socket) {
+      _socket.emit('send_room_message', { roomId, content });
+    }
+  }, []);
+
   const leaveEventRoom = useCallback((eventId: number) => {
     if (_socket) {
       _socket.emit('leave_event', { eventId });
@@ -215,6 +233,9 @@ export function useSocketLogic(options: { autoConnect?: boolean } = {}) {
     sendTypingIndicator,
     joinEventRoom,
     leaveEventRoom,
+    joinChatroom,
+    leaveChatroom,
+    sendRoomMessage,
     broadcastLocation,
     eventAttendeesLocations,
     connect,

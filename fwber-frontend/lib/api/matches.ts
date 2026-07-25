@@ -40,6 +40,8 @@ export interface Match {
   gender?: string | null;
   is_verified?: boolean;
   is_confessional?: boolean;
+  aura_score?: number;
+  aura_mood?: string;
   voice_intro_url?: string | null;
   photos?: Array<{
     id: number;

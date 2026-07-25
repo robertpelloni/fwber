@@ -1,4 +1,6 @@
 "use client";
+import { Sparkles } from 'lucide-react';
+import { EvolvingAvatar } from '@/components/ui/avatar';
 
 export const dynamic = "force-dynamic";
 

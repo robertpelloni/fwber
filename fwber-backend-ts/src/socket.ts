@@ -62,6 +62,27 @@ export function setupSocketIO(httpServer: any) {
       socket.join(`user:${socket.user.id}`);
     }
 
+    socket.on('join_room', (roomId: string) => {
+        socket.join(`room:${roomId}`);
+        console.log(`[Socket.io] User ${socket.user?.id} joined room ${roomId}`);
+    });
+
+    socket.on('leave_room', (roomId: string) => {
+        socket.leave(`room:${roomId}`);
+        console.log(`[Socket.io] User ${socket.user?.id} left room ${roomId}`);
+    });
+
+    socket.on('send_room_message', async (data: { roomId: string, content: string }) => {
+        if (!socket.user) return;
+        io.to(`room:${data.roomId}`).emit('new_room_message', {
+            roomId: data.roomId,
+            senderId: socket.user.id,
+            content: data.content,
+            createdAt: new Date().toISOString()
+        });
+    });
+
+
     // Handle real-time messaging
     socket.on('send_message', async (data: { receiverId: number; content: string }) => {
       if (!socket.user) return;

@@ -6,11 +6,16 @@ import { useAuth } from '@/lib/auth-context';
 import { useLocalPulse, useCreateProximityArtifact, useFlagProximityArtifact, useVoteArtifact, useCommentArtifact } from '@/lib/hooks/use-proximity';
 import { useLocalPulseRealtime } from '@/lib/hooks/use-local-pulse-realtime';
 import { useTopics } from '@/lib/hooks/use-topics';
+import { useActiveQuests, useAcceptQuest, useCompleteQuest } from '@/lib/hooks/use-quests';
+import { EvolvingAvatar } from '@/components/ui/avatar';
+
 import { apiClient } from '@/lib/api/client';
 import {
   MapPin,
   MessageCircle,
   Users,
+  Target,
+  CheckCircle2,
   Heart,
   Clock,
   AlertCircle,
@@ -349,10 +354,15 @@ const CandidateCard = ({ candidate }: { candidate: MatchCandidate }) => {
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <EvolvingAvatar
-            src={candidate.avatar || "/placeholder-avatar.png"}
+            src={candidate.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${candidate.user_id}`}
             alt={candidate.name || "Candidate"}
             size="md"
-            emotion={(candidate.emotion as any) || "neutral"}
+            emotion={
+              (candidate.emotion?.toLowerCase() === 'excited' || candidate.emotion?.toLowerCase() === 'happy') ? 'happy' :
+              (candidate.emotion?.toLowerCase() === 'thoughtful' || candidate.emotion?.toLowerCase() === 'mysterious') ? 'mysterious' :
+              (candidate.emotion?.toLowerCase() === 'cynical' || candidate.emotion?.toLowerCase() === 'intense') ? 'intense' :
+              'neutral'
+            }
           />
           <div>
             <div className="flex items-center space-x-2 mb-1">
@@ -419,6 +429,10 @@ interface LocalPulseProps {
 
 export default function LocalPulse({ initialTopicSlug, compact = false }: LocalPulseProps) {
   const { token } = useAuth();
+  const { data: activeQuests = [] } = useActiveQuests();
+  const acceptQuestMutation = useAcceptQuest();
+  const completeQuestMutation = useCompleteQuest();
+
   const [location, setLocation] = useState<LocationState>({
     latitude: null,
     longitude: null,
@@ -780,6 +794,55 @@ export default function LocalPulse({ initialTopicSlug, compact = false }: LocalP
       {/* Local Pulse Content */}
       {localPulse && (
         <div className={`grid grid-cols-1 gap-6 ${compact ? '' : 'lg:grid-cols-3'}`}>
+
+          {/* Active Quests Feed Integration */}
+          {activeQuests.length > 0 && (
+            <div className="mb-6 space-y-3">
+              <div className="flex items-center space-x-2 mb-2">
+                <Target className="h-5 w-5 text-indigo-600" />
+                <h3 className="font-semibold text-gray-900 dark:text-white">Active Neighborhood Quests</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {activeQuests.map((quest: any) => {
+                  const isAccepted = quest.user_quests && quest.user_quests.length > 0;
+                  return (
+                    <div key={quest.id} className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg p-4 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-2 opacity-10">
+                        <Target className="w-16 h-16" />
+                      </div>
+                      <h4 className="font-bold text-indigo-900 dark:text-indigo-100 mb-1">{quest.title}</h4>
+                      <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-3">{quest.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                          <Coins className="w-3 h-3 mr-1" />
+                          {quest.token_reward} FWB
+                        </span>
+                        {isAccepted ? (
+                          <button
+                            onClick={() => completeQuestMutation.mutate({ questId: quest.id })}
+                            disabled={completeQuestMutation.isPending}
+                            className="flex items-center text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 cursor-pointer bg-green-50 px-3 py-1.5 rounded transition-colors"
+                          >
+                            <CheckCircle2 className="w-4 h-4 mr-1" />
+                            Complete Quest
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => acceptQuestMutation.mutate(quest.id)}
+                            disabled={acceptQuestMutation.isPending}
+                            className="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors"
+                          >
+                            Accept Quest
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Proximity Artifacts (2 columns on large screens) */}
           <div className={`${compact ? '' : 'lg:col-span-2'} space-y-4`}>
             <div className="flex items-center justify-between mb-4">

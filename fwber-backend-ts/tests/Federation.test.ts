@@ -32,7 +32,16 @@ jest.unstable_mockModule('../src/lib/prisma.js', () => ({
   sanitizeUser: (obj: any) => obj,
 }));
 
+
+import { Router } from 'express';
+jest.unstable_mockModule('../src/routes/wingman.js', () => {
+    const mockRouter = Router();
+    return {
+        default: mockRouter
+    }
+});
 const { default: app } = await import('../src/index.js');
+
 
 describe('Federation Endpoints', () => {
   const testUser = {

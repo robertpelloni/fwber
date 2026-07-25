@@ -3,6 +3,8 @@ import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { serialize } from '../lib/prisma.js';
 import { TokenDistributionService } from '../services/TokenDistributionService.js';
+import crypto from 'crypto';
+import { VibePromotionService } from '../services/VibePromotionService.js';
 
 const router = Router();
 const tokenService = new TokenDistributionService();
@@ -11,7 +13,24 @@ const tokenService = new TokenDistributionService();
 router.get('/active', authenticate, async (req: any, res) => {
   try {
     const userId = BigInt(req.user.id);
-    const quests = await prisma.quests.findMany({
+    const profile = await prisma.user_profiles.findFirst({
+        where: { user_id: userId }
+    });
+    const currentEmotion = (profile?.current_emotion || 'neutral').toLowerCase();
+
+    // Optionally generate a contextual quest based on recent vibe if requested (e.g. via an admin trigger or autonomous system)
+    // Here we'll expose a query param `?generate=true` to act as an admin trigger for the demo
+    if (req.query.generate === 'true') {
+      const loc = await prisma.user_locations.findFirst({
+        where: { user_id: userId, is_active: true },
+        orderBy: { last_updated: 'desc' }
+      });
+      if (loc) {
+        await VibePromotionService.generateContextualQuest(Number(loc.latitude), Number(loc.longitude));
+      }
+    }
+
+    const allQuests = await prisma.quests.findMany({
       where: {
         is_active: true,
         expires_at: { gt: new Date() }
@@ -23,7 +42,12 @@ router.get('/active', authenticate, async (req: any, res) => {
       }
     });
 
-    res.json(serialize(quests));
+    const filteredQuests = allQuests.map((q: any) => ({
+      ...q,
+      ai_vibe_match: currentEmotion === 'excited' || currentEmotion === 'happy' ? true : false
+    }));
+
+    res.json(serialize(filteredQuests));
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to fetch quests' });
   }
@@ -64,6 +88,16 @@ router.post('/:id/complete', authenticate, async (req: any, res) => {
       });
 
       if (!uq || uq.status !== 'active') return res.status(400).json({ error: 'Quest not active' });
+
+      // Verification Logic (e.g. ZK/NFC crypto proofs)
+      const { proof } = req.body;
+      // For now, if a proof is passed, we check it against a simulated secret.
+      if (proof) {
+         const hash = crypto.createHash('sha256').update(`quest_${questId}_secret`).digest('hex');
+         if (proof !== hash) {
+             return res.status(403).json({ error: 'Invalid quest completion proof.' });
+         }
+      }
 
       // Grant rewards
       await tokenService.awardTokens(

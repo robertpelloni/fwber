@@ -3,9 +3,11 @@ import { authenticate } from '../middleware/auth.js';
 import prisma from '../lib/prisma.js';
 import { FederationService } from '../services/FederationService.js';
 import { SentimentAnalysisService } from '../services/SentimentAnalysisService.js';
+import { MatchingHeuristicService } from '../services/MatchingHeuristicService.js';
 
 const router = Router();
 const federationService = new FederationService();
+const matchingService = new MatchingHeuristicService();
 
 function safeProfile(u: any) {
   if (!u) return { name: 'Anonymous', avatar: null, emotion: 'neutral' };
@@ -62,10 +64,16 @@ router.get('/local-pulse', authenticate, async (req: any, res) => {
       })
     ]);
 
-    const candidates = nearbyLocations.map(loc => {
+    const candidates = await Promise.all(nearbyLocations.map(async (loc) => {
       const u = loc.users;
       const p = u.user_profiles?.[0];
       const age = p?.date_of_birth ? new Date().getFullYear() - new Date(p.date_of_birth).getFullYear() : null;
+
+      const auraCompat = await matchingService.calculateAuraCompatibility(userId, u.id);
+      const isAuraMatch = auraCompat.score >= 0.8;
+
+      const indicators = ['active_locally'];
+      if (isAuraMatch) indicators.push('aura_match');
 
       return {
         user_id: Number(u.id),
@@ -75,10 +83,15 @@ router.get('/local-pulse', authenticate, async (req: any, res) => {
         age,
         gender: p?.gender,
         distance_miles: 0.5, // Simplified
-        compatibility_indicators: ['active_locally'],
+        compatibility_indicators: indicators,
+        aura_score: auraCompat.score,
         last_seen: loc.updated_at?.toISOString()
       };
-    });
+    }));
+
+    // Sort by aura match and proximity
+    candidates.sort((a, b) => b.aura_score - a.aura_score);
+
 
     res.json({
       artifacts: artifacts.map((a: any) => {

@@ -9,7 +9,7 @@ jest.unstable_mockModule('../src/lib/prisma.js', () => ({
   default: {
     proximity_artifacts: { findMany: mockFindMany },
     messages: { findMany: mockFindMany },
-    user_profiles: { updateMany: mockUpdateMany }
+    user_profiles: { updateMany: mockUpdateMany, findMany: mockFindMany }
   },
   serialize: (val: any) => val,
   sanitizeUser: (user: any) => user
@@ -41,5 +41,16 @@ describe('SentimentAnalysisService', () => {
     expect(mockUpdateMany).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ current_emotion: 'Happy' })
     }));
+  });
+
+  it('should calculate group aura correctly', async () => {
+    mockFindMany.mockResolvedValueOnce([
+        { current_emotion: 'Happy' },
+        { current_emotion: 'Excited' },
+        { current_emotion: 'Neutral' },
+    ]);
+
+    const aura = await SentimentAnalysisService.calculateGroupAura([1n, 2n, 3n]);
+    expect(aura).toBe('warm');
   });
 });

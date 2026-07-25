@@ -45,6 +45,8 @@ router.get('/actors/:id', async (req, res) => {
           mediaType: 'image/jpeg',
           url: profile.avatar_url
       } : null,
+      'fwber:currentEmotion': profile?.current_emotion || 'Neutral',
+      'fwber:auraScore': profile?.current_emotion ? 1.0 : 0.0,
       inbox: `https://${apiDomain}/api/federation/users/${user.id}/inbox`,
       outbox: `https://${apiDomain}/api/federation/users/${user.id}/outbox`,
       publicKey: {
